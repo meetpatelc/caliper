@@ -1,0 +1,142 @@
+@import "tailwindcss";
+@import "./diagrams.css";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --color-bg: #12100e;
+  --color-surface: #1c1915;
+  --color-elevated: #25211c;
+  --color-fg: #ece7dc;
+  --color-muted: #a39888;
+  --color-accent: #e08a4a;
+  --color-accent-fg: #1a1008;
+  --color-mark: #e0b14a;
+  --color-border: #2f2a24;
+  --color-danger: #e07058;
+  --color-ok: #7dba7a;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+}
+
+html {
+  --desk-amber: var(--color-mark);
+  --desk-cyan-wash: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  --desk-ink: var(--color-fg);
+  color-scheme: dark;
+}
+
+html.light {
+  --color-bg: #f3eee4;
+  --color-surface: #fffdf8;
+  --color-elevated: #f7f1e6;
+  --color-fg: #1c1915;
+  --color-muted: #6b6358;
+  --color-accent: #b4532a;
+  --color-accent-fg: #fff8f2;
+  --color-mark: #9a6b10;
+  --color-border: #ddd4c6;
+  --color-danger: #b42318;
+  --color-ok: #3f7d43;
+  color-scheme: light;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg text-fg font-sans;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.page-wrap {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 1.75rem 3.5rem;
+}
+
+.display-title {
+  font-size: clamp(2rem, 4.4vw, 3.35rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.mechanical-diagram {
+  margin-inline: auto;
+}
+
+.diagram-surface {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  background:
+    linear-gradient(var(--color-border) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--color-surface);
+  padding: 1.25rem;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-sheet {
+    display: block !important;
+    color: #111 !important;
+  }
+  .print-sheet * {
+    color: #111 !important;
+  }
+}
+
+.print-sheet {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

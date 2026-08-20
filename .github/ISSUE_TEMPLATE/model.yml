@@ -1,0 +1,32 @@
+name: Model request
+description: Propose a new calculator or a method correction
+title: "[model] "
+labels: ["enhancement"]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Proposed model name
+    validations:
+      required: true
+  - type: textarea
+    id: relation
+    attributes:
+      label: Governing relation
+      placeholder: The equation, in symbols, with units.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      placeholder: Standard, textbook, or primary URL (edition / section if possible).
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Boundary / exclusions
+      placeholder: When this model must not be used.
+    validations:
+      required: true

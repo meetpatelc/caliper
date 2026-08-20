@@ -1,0 +1,287 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Check, Download, Minus, Plus, Save } from "lucide-react";
+import { toast } from "sonner";
+import {
+  calculateFmea,
+  calculateTradeStudy,
+  reviewAreas,
+  reviewRules,
+  selectionWorkflows,
+  type ReviewArea,
+} from "@/lib/reviewRules";
+import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemplates";
+import { useDeskStore } from "@/lib/workspace-store";
+
+type ReviewSearch = { id?: string };
+
+export const Route = createFileRoute("/review")({
+  validateSearch: (search: Record<string, unknown>): ReviewSearch => ({
+    id: typeof search.id === "string" ? search.id : undefined,
+  }),
+  component: ReviewPage,
+});
+
+type Criterion = { label: string; weight: string; optionA: string; optionB: string };
+
+const starter: Criterion[] = [
+  { label: "Functional performance", weight: "4", optionA: "7", optionB: "7" },
+  { label: "Safety / risk controls", weight: "5", optionA: "8", optionB: "6" },
+  { label: "Manufacturing / lifecycle", weight: "3", optionA: "6", optionB: "8" },
+];
+
+function ReviewPage() {
+  const { id: restoreId } = Route.useSearch();
+  const saveReview = useDeskStore((state) => state.saveReview);
+  const reviews = useDeskStore((state) => state.reviews);
+  const [area, setArea] = useState<ReviewArea>("engineering");
+  const [complete, setComplete] = useState<string[]>([]);
+  const [notes, setNotes] = useState("");
+  const [optionAName, setOptionAName] = useState("Option A");
+  const [optionBName, setOptionBName] = useState("Option B");
+  const [criteria, setCriteria] = useState<Criterion[]>(starter);
+  const [severity, setSeverity] = useState("6");
+  const [occurrence, setOccurrence] = useState("4");
+  const [detection, setDetection] = useState("5");
+  const [workflowId, setWorkflowId] = useState(selectionWorkflows[0].id);
+  const [workflowChecks, setWorkflowChecks] = useState<string[]>([]);
+  const [title, setTitle] = useState("Evidence review");
+  const [templateKind, setTemplateKind] = useState<DocumentTemplateKind>("report");
+
+  useEffect(() => {
+    if (!restoreId) return;
+    const record = useDeskStore.getState().reviews.find((item) => item.id === restoreId);
+    if (!record) {
+      toast.error("That review snapshot is no longer in this browser.");
+      return;
+    }
+    try {
+      const payload = JSON.parse(record.payloadJson) as {
+        complete?: string[];
+        workflowId?: (typeof selectionWorkflows)[number]["id"];
+        workflowChecks?: string[];
+        notes?: string;
+        criteria?: Criterion[];
+        optionAName?: string;
+        optionBName?: string;
+        severity?: string;
+        occurrence?: string;
+        detection?: string;
+      };
+      setTitle(record.title);
+      setArea((record.area as ReviewArea) || "engineering");
+      setComplete(payload.complete ?? []);
+      setWorkflowId(payload.workflowId ?? selectionWorkflows[0].id);
+      setWorkflowChecks(payload.workflowChecks ?? []);
+      setNotes(payload.notes ?? "");
+      setCriteria(payload.criteria?.length ? payload.criteria : starter);
+      setOptionAName(payload.optionAName ?? "Option A");
+      setOptionBName(payload.optionBName ?? "Option B");
+      setSeverity(payload.severity ?? "6");
+      setOccurrence(payload.occurrence ?? "4");
+      setDetection(payload.detection ?? "5");
+      toast.success("Review snapshot restored.");
+    } catch {
+      toast.error("Review snapshot could not be read.");
+    }
+  }, [restoreId]);
+
+  const activeRules = reviewRules.filter((rule) => rule.area === area);
+  const activeWorkflow = selectionWorkflows.find((item) => item.id === workflowId) ?? selectionWorkflows[0];
+  const trade = useMemo(() => {
+    try {
+      return { result: calculateTradeStudy(criteria.map((item) => ({ weight: Number(item.weight), optionA: Number(item.optionA), optionB: Number(item.optionB) }))), error: "" };
+    } catch (error) {
+      return { result: null, error: error instanceof Error ? error.message : "Study cannot be calculated." };
+    }
+  }, [criteria]);
+  const fmea = useMemo(() => {
+    try {
+      return { result: calculateFmea({ severity: Number(severity), occurrence: Number(occurrence), detection: Number(detection) }), error: "" };
+    } catch (error) {
+      return { result: null, error: error instanceof Error ? error.message : "FMEA cannot be calculated." };
+    }
+  }, [severity, occurrence, detection]);
+
+  const template = useMemo(
+    () =>
+      buildReviewTemplate({
+        kind: templateKind,
+        title,
+        area,
+        areaLabel: reviewAreas.find((item) => item.id === area)?.label ?? "Engineering review",
+        rules: reviewRules,
+        completedRuleIds: complete,
+        workflow: activeWorkflow,
+        workflowChecks,
+        notes,
+        optionAName,
+        optionBName,
+        criteria,
+        trade: trade.result,
+        fmea: fmea.result,
+        severity,
+        occurrence,
+        detection,
+      }),
+    [templateKind, title, area, complete, activeWorkflow, workflowChecks, notes, optionAName, optionBName, criteria, trade.result, fmea.result, severity, occurrence, detection],
+  );
+
+  const persist = () => {
+    saveReview({
+      title: title.trim() || "Evidence review",
+      area,
+      payloadJson: JSON.stringify({ complete, workflowId, workflowChecks, notes, criteria, optionAName, optionBName, severity, occurrence, detection }),
+    });
+    toast.success("Review snapshot saved locally.");
+  };
+
+  const download = () => {
+    const href = URL.createObjectURL(new Blob([template], { type: "text/markdown" }));
+    const anchor = document.createElement("a");
+    anchor.href = href;
+    anchor.download = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "review"}-${templateKind}.md`;
+    anchor.click();
+    URL.revokeObjectURL(href);
+  };
+
+  return (
+    <div className="page-wrap">
+      <p className="eyebrow">Evidence, not a verdict</p>
+      <h1 className="display-title mt-3">Engineering review</h1>
+      <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+        Checklists, a scored trade study, and FMEA arithmetic you control. Nothing here infers a recommendation or signs a design.
+      </p>
+
+      <div className="mt-8 grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
+        <aside className="grid h-fit gap-1 rounded-lg border border-border p-2">
+          {reviewAreas.map((item) => (
+            <button key={item.id} type="button" onClick={() => setArea(item.id)} className={`rounded-md px-3 py-2 text-left text-sm ${area === item.id ? "bg-elevated" : "text-muted hover:text-fg"}`}>
+              {item.label}
+            </button>
+          ))}
+        </aside>
+        <div className="grid gap-4">
+          {activeRules.map((rule) => {
+            const on = complete.includes(rule.id);
+            return (
+              <button key={rule.id} type="button" onClick={() => setComplete((current) => (on ? current.filter((id) => id !== rule.id) : [...current, rule.id]))} className="flex gap-3 rounded-lg border border-border p-4 text-left hover:bg-elevated">
+                <span className={`mt-0.5 grid size-5 place-items-center rounded-sm border ${on ? "border-ok bg-ok text-bg" : "border-border"}`}>
+                  {on && <Check size={12} />}
+                </span>
+                <span>
+                  <strong className="block">{rule.title}</strong>
+                  <small className="text-muted">{rule.prompt}</small>
+                  <em className="mt-1 block text-xs not-italic text-muted">Evidence: {rule.evidence}</em>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <section className="mt-12 grid gap-8 lg:grid-cols-2">
+        <div className="rounded-xl border border-border p-5">
+          <p className="eyebrow">Trade study</p>
+          <h2 className="mt-1 text-xl font-semibold">Weighted comparison</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <label className="grid gap-1 text-xs text-muted">
+              Option A
+              <input value={optionAName} onChange={(event) => setOptionAName(event.target.value)} className="h-10 rounded-md border border-border bg-bg px-3 text-sm text-fg" />
+            </label>
+            <label className="grid gap-1 text-xs text-muted">
+              Option B
+              <input value={optionBName} onChange={(event) => setOptionBName(event.target.value)} className="h-10 rounded-md border border-border bg-bg px-3 text-sm text-fg" />
+            </label>
+          </div>
+          <div className="mt-4 grid gap-3">
+            {criteria.map((criterion, index) => (
+              <div key={index} className="grid gap-2 rounded-md border border-border p-3 sm:grid-cols-[1fr_70px_70px_70px_auto]">
+                <input value={criterion.label} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, label: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 text-sm" />
+                <input value={criterion.weight} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, weight: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 font-mono text-sm" aria-label="Weight" />
+                <input value={criterion.optionA} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionA: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 font-mono text-sm" aria-label="A score" />
+                <input value={criterion.optionB} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionB: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 font-mono text-sm" aria-label="B score" />
+                <button type="button" className="grid size-10 place-items-center" onClick={() => setCriteria((current) => (current.length === 1 ? current : current.filter((_, i) => i !== index)))} aria-label="Remove">
+                  <Minus size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button type="button" className="mt-3 inline-flex items-center gap-1 text-sm text-accent" onClick={() => setCriteria((current) => [...current, { label: "New criterion", weight: "1", optionA: "5", optionB: "5" }])}>
+            <Plus size={14} /> Add criterion
+          </button>
+          {trade.error ? <p className="mt-4 text-sm text-danger">{trade.error}</p> : trade.result && (
+            <p className="mt-4 font-mono text-sm">
+              {optionAName}: {trade.result.normalizedA.toFixed(2)} · {optionBName}: {trade.result.normalizedB.toFixed(2)}
+            </p>
+          )}
+        </div>
+        <div className="rounded-xl border border-border p-5">
+          <p className="eyebrow">FMEA arithmetic</p>
+          <h2 className="mt-1 text-xl font-semibold">Severity × occurrence × detection</h2>
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            {(
+              [
+                ["Severity", severity, setSeverity],
+                ["Occurrence", occurrence, setOccurrence],
+                ["Detection", detection, setDetection],
+              ] as const
+            ).map(([label, value, setter]) => (
+              <label key={label} className="grid gap-1 text-xs text-muted">
+                {label}
+                <input value={value} onChange={(event) => setter(event.target.value)} className="h-10 rounded-md border border-border bg-bg px-3 font-mono text-sm text-fg" />
+              </label>
+            ))}
+          </div>
+          {fmea.error ? <p className="mt-4 text-sm text-danger">{fmea.error}</p> : fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>}
+          <label className="mt-6 grid gap-2 text-xs text-muted">
+            Selection workflow
+            <select value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)} className="h-10 rounded-md border border-border bg-bg px-3 text-sm text-fg">
+              {selectionWorkflows.map((item) => (
+                <option key={item.id} value={item.id}>{item.title}</option>
+              ))}
+            </select>
+          </label>
+          <p className="mt-3 text-sm text-muted">{activeWorkflow.scope}</p>
+          <ul className="mt-3 grid gap-2">
+            {activeWorkflow.evidence.map((item, index) => {
+              const id = `${activeWorkflow.id}-${index}`;
+              const on = workflowChecks.includes(id);
+              return (
+                <li key={id}>
+                  <button type="button" onClick={() => setWorkflowChecks((current) => (on ? current.filter((entry) => entry !== id) : [...current, id]))} className="flex w-full items-start gap-2 text-left text-sm">
+                    <span className={`mt-0.5 size-4 rounded-sm border ${on ? "border-ok bg-ok" : "border-border"}`} />
+                    {item}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      <section className="mt-10 rounded-xl border border-border p-5">
+        <p className="eyebrow">Record</p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <input value={title} onChange={(event) => setTitle(event.target.value)} className="h-11 rounded-md border border-border bg-bg px-3 text-sm" placeholder="Snapshot title" />
+          <select value={templateKind} onChange={(event) => setTemplateKind(event.target.value as DocumentTemplateKind)} className="h-11 rounded-md border border-border bg-bg px-3 text-sm">
+            <option value="report">Report template</option>
+            <option value="checklist">Checklist template</option>
+            <option value="designBasis">Design-basis record</option>
+            <option value="changeSummary">Change-summary record</option>
+          </select>
+        </div>
+        <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className="mt-3 w-full rounded-md border border-border bg-bg px-3 py-2 text-sm" placeholder="Notes (optional)" />
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" onClick={persist} className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg">
+            <Save size={15} /> Save locally
+          </button>
+          <button type="button" onClick={download} className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm">
+            <Download size={15} /> Download markdown
+          </button>
+        </div>
+        {reviews.length > 0 && <p className="mt-4 text-sm text-muted">{reviews.length} snapshot{reviews.length === 1 ? "" : "s"} stored in this browser. Open one from Projects to continue.</p>}
+      </section>
+    </div>
+  );
+}

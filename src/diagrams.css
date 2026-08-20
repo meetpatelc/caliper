@@ -1,0 +1,809 @@
+.fluid-diagram,.continuity-diagram,.thermal-diagram,.circuit-diagram {
+  width: 280px;
+  height: 175px;
+}
+.fluid-vessel {
+  position: absolute;
+  top: 26px;
+  left: 70px;
+  width: 125px;
+  height: 120px;
+  border: 2px solid var(--color-accent);
+  border-top: 0;
+  background: linear-gradient(to top,var(--color-accent) 0 72%,transparent 72%);
+  @supports (color: color-mix(in lab, red, red)) {
+    background: linear-gradient(to top,color-mix(in srgb,var(--color-accent) 18%,transparent) 0 72%,transparent 72%);
+  }
+}
+.fluid-surface {
+  position: absolute;
+  top: 62px;
+  left: 72px;
+  width: 121px;
+  border-top: 2px solid var(--desk-amber);
+}
+.fluid-depth {
+  position: absolute;
+  top: 100px;
+  right: 49px;
+  color: var(--desk-amber);
+}
+.fluid-pressure {
+  position: absolute;
+  bottom: 5px;
+  left: 116px;
+  color: var(--color-accent);
+}
+.continuity-channel {
+  position: absolute;
+  top: 64px;
+  left: 20px;
+  width: 240px;
+  height: 52px;
+  border: 2px solid var(--color-accent);
+  clip-path: polygon(0 0,38% 0,62% 26%,100% 26%,100% 74%,62% 74%,38% 100%,0 100%);
+  background: var(--desk-cyan-wash);
+}
+.continuity-diagram span {
+  position: absolute;
+  color: var(--desk-amber);
+  font-size: 10px;
+}
+.continuity-a1 {
+  top: 49px;
+  left: 20px;
+}
+.continuity-a2 {
+  bottom: 38px;
+  right: 12px;
+}
+.continuity-diagram b {
+  position: absolute;
+  top: 84px;
+  left: 132px;
+  color: var(--color-accent);
+}
+.thermal-mass {
+  position: absolute;
+  bottom: 26px;
+  left: 95px;
+  width: 85px;
+  height: 70px;
+  border: 2px solid var(--color-accent);
+  background: repeating-linear-gradient(45deg,var(--desk-cyan-wash) 0 7px,transparent 7px 14px);
+}
+.thermal-diagram span,.thermal-diagram b {
+  position: absolute;
+}
+.thermal-heat {
+  top: 38px;
+  right: 28px;
+  color: var(--desk-amber);
+}
+.thermal-temp {
+  bottom: 7px;
+  left: 124px;
+  color: var(--color-accent);
+}
+.thermal-diagram b {
+  top: 107px;
+  left: 124px;
+  color: var(--desk-ink);
+}
+.circuit-loop {
+  position: absolute;
+  top: 42px;
+  left: 38px;
+  width: 205px;
+  height: 90px;
+  border: 2px solid var(--color-accent);
+  border-radius: 10px;
+}
+.circuit-source {
+  position: absolute;
+  top: 78px;
+  left: 34px;
+  width: 15px;
+  height: 25px;
+  border-left: 3px solid var(--desk-amber);
+  border-right: 1px solid var(--desk-amber);
+}
+.circuit-resistor {
+  position: absolute;
+  top: 79px;
+  right: 33px;
+  width: 45px;
+  border-top: 3px dashed var(--desk-amber);
+}
+.circuit-diagram span {
+  position: absolute;
+  font-size: 10px;
+}
+.circuit-current {
+  top: 25px;
+  left: 125px;
+  color: var(--color-accent);
+}
+.circuit-voltage {
+  bottom: 15px;
+  left: 44px;
+  color: var(--desk-amber);
+}
+.circuit-r {
+  bottom: 15px;
+  right: 48px;
+  color: var(--desk-amber);
+}
+:root {
+  color-scheme: dark;
+  --desk-canvas: var(--color-bg);
+  --desk-canvas-raised: #151a1b;
+  --desk-instrument: #171f20;
+  --desk-instrument-deep: #111718;
+  --desk-editorial: #171c1d;
+  --desk-line: rgba(238, 241, 237, .12);
+  --desk-line-strong: rgba(88, 231, 225, .35);
+  --desk-ink: #eef1ed;
+  --desk-ink-soft: #c0cbc5;
+  --desk-muted: #94a19c;
+  --desk-cyan: var(--color-accent);
+  --desk-cyan-ink: #85f6e8;
+  --desk-cyan-wash: rgba(88, 231, 225, .08);
+  --desk-amber: #ffbf73;
+  --desk-amber-ink: #ffd298;
+  --desk-amber-wash: rgba(255, 191, 115, .08);
+  --desk-shadow: 0 16px 38px rgba(0, 0, 0, .24);
+  --desk-grid: rgba(88, 231, 225, .055);
+  --desk-rail: #111719;
+  --desk-rail-ink: #edf3ef;
+}
+
+.fits-diagram,.stack-diagram,.position-diagram,.mmc-diagram,.motion-diagram,.inertia-diagram,.pneumatic-diagram,.clamp-diagram {
+  min-height: 160px;
+  position: relative;
+}
+.fits-zero {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  border-top: 1px dashed rgba(236,243,239,.45);
+}
+.fits-hole,.fits-shaft {
+  position: absolute;
+  left: 28%;
+  width: 44%;
+  border: 1px solid var(--color-accent);
+  background: rgba(88,231,225,.16);
+  font: 9px "DM Mono",monospace;
+  letter-spacing: .12em;
+  padding: 9px;
+  color: #a6fff4;
+}
+.fits-hole {
+  top: 28%;
+}
+.fits-shaft {
+  top: 56%;
+  border-color: #ffbf73;
+  background: rgba(255,191,115,.13);
+  color: #ffe0b3;
+}
+.fits-diagram b {
+  position: absolute;
+  right: 12%;
+  top: 45%;
+  font: 9px "DM Mono",monospace;
+  color: #aebbb6;
+}
+.stack-line {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 50%;
+  border-top: 2px solid var(--color-accent);
+}
+.stack-diagram span {
+  position: absolute;
+  top: 34%;
+  font: 11px "DM Mono",monospace;
+  color: #c8d7d1;
+}
+.stack-diagram span:nth-of-type(1) {
+  left: 20%;
+}
+.stack-diagram span:nth-of-type(2) {
+  left: 46%;
+}
+.stack-diagram span:nth-of-type(3) {
+  right: 20%;
+}
+.stack-diagram b {
+  position: absolute;
+  top: 60%;
+  left: 48%;
+  color: #ffcf92;
+  font: 12px "DM Mono",monospace;
+}
+.position-zone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 98px;
+  height: 98px;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+}
+.position-cross:before,.position-cross:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: rgba(236,243,239,.54);
+  transform: translate(-50%,-50%);
+}
+.position-cross:before {
+  width: 2px;
+  height: 128px;
+}
+.position-cross:after {
+  width: 128px;
+  height: 2px;
+}
+.position-actual {
+  position: absolute;
+  left: 60%;
+  top: 39%;
+  font-size: 22px;
+  color: #ffbf73;
+}
+.position-diagram span {
+  position: absolute;
+  left: 64%;
+  top: 56%;
+  font: 10px "DM Mono",monospace;
+  color: #c6d4cf;
+}
+.mmc-boundary {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+}
+.mmc-boundary.outer {
+  width: 120px;
+  height: 120px;
+  border-color: #ffbf73;
+}
+.mmc-boundary.inner {
+  width: 72px;
+  height: 72px;
+}
+.mmc-diagram b,.mmc-diagram span {
+  position: absolute;
+  font: 10px "DM Mono",monospace;
+}
+.mmc-diagram b {
+  left: 25%;
+  top: 26%;
+  color: #a9fff2;
+}
+.mmc-diagram span {
+  right: 25%;
+  bottom: 24%;
+  color: #ffd89e;
+}
+.motion-profile {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 30%;
+  height: 70px;
+  border-left: 2px solid #aefbf2;
+  border-bottom: 2px solid #aefbf2;
+  clip-path: polygon(0 100%,22% 10%,72% 10%,100% 100%,100% 100%,0 100%);
+  background: linear-gradient(135deg,transparent 48%,rgba(88,231,225,.22) 49% 51%,transparent 52%);
+}
+.motion-diagram span,.motion-diagram b {
+  position: absolute;
+  font: 10px "DM Mono",monospace;
+  color: #c6d4cf;
+}
+.motion-diagram span:nth-of-type(1) {
+  left: 25%;
+  bottom: 20%;
+}
+.motion-diagram span:nth-of-type(2) {
+  left: 49%;
+  bottom: 20%;
+}
+.motion-diagram span:nth-of-type(3) {
+  right: 25%;
+  bottom: 20%;
+}
+.motion-diagram b {
+  left: 49%;
+  top: 19%;
+  color: var(--color-accent);
+}
+.inertia-load,.inertia-gear,.inertia-motor {
+  position: absolute;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.inertia-load {
+  left: 18%;
+  width: 68px;
+  height: 68px;
+}
+.inertia-gear {
+  left: 45%;
+  width: 46px;
+  height: 46px;
+  border-color: #ffbf73;
+}
+.inertia-motor {
+  right: 18%;
+  width: 56px;
+  height: 56px;
+}
+.inertia-diagram span,.inertia-diagram b {
+  position: absolute;
+  font: 10px "DM Mono",monospace;
+}
+.inertia-diagram span:nth-of-type(1) {
+  left: 22%;
+  top: 28%;
+  color: #a9fff2;
+}
+.inertia-diagram span:nth-of-type(2) {
+  left: 48%;
+  bottom: 24%;
+  color: #ffd89e;
+}
+.inertia-diagram b {
+  right: 22%;
+  top: 28%;
+  color: #a9fff2;
+}
+.pneumatic-body {
+  position: absolute;
+  left: 16%;
+  top: 28%;
+  width: 68%;
+  height: 44%;
+  border: 2px solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.mechanical-diagram {
+  position: relative;
+  width: min(100%,440px);
+  height: 150px;
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.diagram-label {
+  position: absolute;
+  color: var(--color-mark);
+  font-size: 11px;
+}
+.axial-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+}
+.axial-member {
+  width: 235px;
+  height: 46px;
+  border: 2px solid var(--color-accent);
+  border-left-width: 9px;
+  border-right-width: 9px;
+  background: repeating-linear-gradient(90deg,rgba(88,231,225,.08) 0 16px,transparent 16px 32px);
+  box-shadow: inset 0 0 20px rgba(88,231,225,.08), 0 0 22px rgba(88,231,225,.08);
+}
+.axial-diagram .arrow {
+  color: var(--color-mark);
+}
+.axial-diagram .diagram-label {
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.beam-diagram {
+  height: 160px;
+}
+.beam-line {
+  position: absolute;
+  top: 72px;
+  left: 52px;
+  right: 52px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 17px rgba(88,231,225,.15);
+}
+.beam-diagram .wall {
+  position: absolute;
+  top: 39px;
+  bottom: 33px;
+  left: 48px;
+  width: 8px;
+  border-left: 3px solid var(--color-muted);
+  background: repeating-linear-gradient(45deg,rgba(214,224,219,.4) 0 2px,transparent 2px 6px);
+}
+.beam-diagram .support {
+  position: absolute;
+  top: 76px;
+  width: 0;
+  height: 0;
+  border-right: 12px solid transparent;
+  border-bottom: 20px solid var(--color-muted);
+  border-left: 12px solid transparent;
+}
+.beam-diagram .support.left {
+  left: 52px;
+}
+.beam-diagram .support.right {
+  right: 52px;
+}
+.load-arrow {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  color: var(--color-mark);
+  transform: translateX(-50%);
+}
+.beam-cantilever .load-arrow {
+  left: auto;
+  right: 37px;
+}
+.beam-diagram .diagram-label {
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.stability-diagram {
+  width: 200px;
+  height: 190px;
+}
+.column {
+  position: absolute;
+  top: 40px;
+  bottom: 36px;
+  left: 50%;
+  width: 10px;
+  border: 2px solid var(--color-accent);
+  background: rgba(88,231,225,.1);
+  transform: translateX(-50%);
+}
+.compression {
+  position: absolute;
+  left: 50%;
+  color: var(--color-mark);
+  transform: translateX(-50%);
+}
+.compression.top {
+  top: 8px;
+}
+.compression.bottom {
+  bottom: 4px;
+}
+.stability-diagram .diagram-label {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+.section-diagram {
+  width: 205px;
+  height: 205px;
+}
+.section-diagram > i {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+  border: 2px solid var(--color-accent);
+  background: rgba(88,231,225,.08);
+}
+.section-circle > i {
+  border-radius: 50%;
+}
+.section-annulus > i {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 42px var(--color-surface), inset 0 0 0 44px var(--color-accent);
+}
+.section-diagram:before {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  left: 9px;
+  height: 1px;
+  background: var(--color-mark);
+  content: "";
+}
+.section-diagram .axis {
+  position: absolute;
+  top: calc(50% + 4px);
+  left: 2px;
+  color: var(--color-mark);
+}
+.section-diagram .axis.right {
+  right: 2px;
+  left: auto;
+}
+.section-diagram .diagram-label {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.converter-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--color-muted);
+}
+.converter-diagram b {
+  border: 1px solid var(--color-accent);
+  border-radius: 7px;
+  color: var(--color-accent);
+  padding: 9px 12px;
+}
+.converter-diagram i {
+  color: var(--color-mark);
+  font-style: normal;
+}
+
+
+.triangle-diagram {
+  width: 230px;
+  height: 190px;
+}
+.triangle-shape {
+  position: absolute;
+  right: 20px;
+  bottom: 25px;
+  left: 22px;
+  height: 130px;
+  border-bottom: 2px solid var(--color-accent);
+  border-left: 2px solid var(--color-accent);
+  clip-path: polygon(0 0,100% 100%,0 100%);
+  background: linear-gradient(135deg,transparent 49.4%,var(--color-accent) 49.7%,var(--color-accent) 50.5%,transparent 50.8%),rgba(88,231,225,.08);
+}
+.triangle-leg {
+  position: absolute;
+  color: var(--color-mark);
+}
+.triangle-a {
+  bottom: 6px;
+  left: 50%;
+}
+.triangle-b {
+  top: 91px;
+  left: 6px;
+}
+.triangle-c {
+  top: 63px;
+  right: 42px;
+  color: var(--color-accent);
+  transform: rotate(34deg);
+}
+.triangle-angle {
+  position: absolute;
+  bottom: 29px;
+  left: 27px;
+  color: var(--color-muted);
+  font-size: 9px;
+}
+.coordinate-diagram {
+  width: 250px;
+  height: 190px;
+}
+.coordinate-diagram i {
+  position: absolute;
+  display: block;
+  height: 1px;
+  background: var(--color-accent);
+  transform-origin: left center;
+}
+.axis-x {
+  top: 104px;
+  left: 36px;
+  width: 165px;
+}
+.axis-y {
+  top: 104px;
+  left: 36px;
+  width: 115px;
+  transform: rotate(-50deg) !important;
+}
+.axis-z {
+  top: 104px;
+  left: 36px;
+  width: 104px;
+  transform: rotate(143deg) !important;
+}
+.coordinate-diagram b {
+  position: absolute;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-size: 9px;
+}
+.point-a {
+  top: 94px;
+  left: 27px;
+}
+.point-b {
+  top: 38px;
+  right: 30px;
+}
+.span-line {
+  position: absolute;
+  top: 54px;
+  right: 48px;
+  left: 48px;
+  border-top: 1px dashed var(--color-mark);
+  transform: rotate(-22deg);
+}
+.cylinder-diagram {
+  width: 270px;
+  height: 180px;
+}
+.cylinder-body {
+  position: absolute;
+  top: 48px;
+  right: 36px;
+  left: 36px;
+  height: 82px;
+  border-top: 2px solid var(--color-accent);
+  border-bottom: 2px solid var(--color-accent);
+  background: repeating-linear-gradient(90deg,rgba(88,231,225,.08) 0 13px,transparent 13px 26px);
+}
+.cylinder-cap {
+  position: absolute;
+  top: 48px;
+  width: 50px;
+  height: 82px;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  background: rgba(88,231,225,.06);
+}
+.cap-left {
+  left: 10px;
+}
+.cap-right {
+  right: 10px;
+}
+.cylinder-label {
+  position: absolute;
+  color: var(--color-mark);
+}
+.cylinder-label.length {
+  right: 48%;
+  bottom: 20px;
+}
+.cylinder-label.diameter {
+  top: 83px;
+  left: 0;
+}
+.density-diagram {
+  width: 210px;
+  height: 180px;
+}
+.density-cube {
+  position: absolute;
+  top: 45px;
+  left: 58px;
+  width: 94px;
+  height: 94px;
+  border: 2px solid var(--color-accent);
+  background: repeating-linear-gradient(45deg,rgba(88,231,225,.07) 0 9px,transparent 9px 18px);
+  box-shadow: 14px -14px 0 -12px var(--color-accent), 14px -14px 0 -10px var(--color-surface);
+}
+.density-mass {
+  position: absolute;
+  top: 78px;
+  left: 99px;
+  color: var(--color-accent);
+  font-size: 20px;
+}
+.density-volume {
+  position: absolute;
+  bottom: 17px;
+  left: 101px;
+  color: var(--color-mark);
+}
+.density-rho {
+  position: absolute;
+  top: 23px;
+  left: 100px;
+  color: var(--color-fg);
+}
+.newton-diagram {
+  width: 270px;
+  height: 165px;
+}
+.newton-block {
+  position: absolute;
+  top: 65px;
+  left: 78px;
+  width: 80px;
+  height: 62px;
+  border: 2px solid var(--color-accent);
+  border-radius: 6px;
+  background: rgba(88,231,225,.08);
+}
+.newton-force {
+  position: absolute;
+  top: 42px;
+  right: 20px;
+  color: var(--color-mark);
+}
+.newton-accel {
+  position: absolute;
+  right: 26px;
+  bottom: 21px;
+  color: var(--color-accent);
+}
+.newton-mass {
+  position: absolute;
+  top: 86px;
+  left: 112px;
+  color: var(--color-fg);
+}
+.kinetic-diagram {
+  width: 280px;
+  height: 165px;
+}
+.kinetic-track {
+  position: absolute;
+  right: 15px;
+  bottom: 33px;
+  left: 15px;
+  height: 3px;
+  background: var(--color-border);
+}
+.kinetic-body {
+  position: absolute;
+  bottom: 36px;
+  left: 75px;
+  width: 72px;
+  height: 38px;
+  border: 2px solid var(--color-accent);
+  border-radius: 7px 11px 7px 7px;
+  background: rgba(88,231,225,.09);
+}
+.kinetic-speed {
+  position: absolute;
+  top: 55px;
+  right: 37px;
+  color: var(--color-mark);
+}
+.kinetic-mass {
+  position: absolute;
+  bottom: 47px;
+  left: 104px;
+  color: var(--color-fg);
+}
+.kinetic-energy {
+  position: absolute;
+  top: 23px;
+  left: 73px;
+  color: var(--color-accent);
+  font-size: 14px;
+}

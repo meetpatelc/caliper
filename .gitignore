@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.node_modules.lock
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Build / framework output
+dist/
+.output/
+.vercel/
+.nitro/
+.tanstack/
+*.tsbuildinfo
+
+# Logs and OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Test / agent artifacts
+coverage/
+playwright-report/
+test-results/
+screenshots/
+artifacts/
+
+# Workspace-only (not part of the product)
+.grok/
+AGENTS.md
+AGENTS.project.md
+startup.sh
+
+# Optional local notes
+*.local

@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in Caliper is wrong or unclear
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For formula issues, include inputs, displayed units, the output you got, and the output you expected.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Calculator / formula
+        - Library / search
+        - Review / projects
+        - Auth
+        - UI / mobile
+        - Docs
+    validations:
+      required: true
+  - type: input
+    id: tool
+    attributes:
+      label: Model (if any)
+      placeholder: axial, npshAvailableBudget, …
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: 1. Open … 2. Enter … 3. Observe …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+    validations:
+      required: true
