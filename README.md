@@ -37,7 +37,8 @@ Calculators and local saves work without signing in. Copy `.env.example` to `.en
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Development server |
-| `npm run build` | Production build |
+| `npm run build` | Production frontend build |
+| `npm run db:migrate` | Apply SQL migrations when `DATABASE_URL` is set |
 | `npm run typecheck` | TypeScript (`tsc --noEmit`) |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |

@@ -11,7 +11,6 @@ function Plate({ label, children, viewBox = "0 0 440 168" }: { label: string; ch
 
 const ink = { stroke: "currentColor", strokeWidth: 1.75, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 const dim = { stroke: "currentColor", strokeWidth: 1, opacity: 0.55 };
-const load = { stroke: "currentColor", strokeWidth: 1.75, className: "text-accent" };
 
 function T({ x, y, children, anchor = "middle", accent = false }: { x: number | string; y: number | string; children: ReactNode; anchor?: "start" | "middle" | "end"; accent?: boolean }) {
   return (
@@ -323,7 +322,7 @@ export function RelationPlate({ toolId }: { toolId: ToolId }) {
   );
 }
 
-export function sketchFor(toolId: ToolId, variant?: string) {
+export function ToolSketch({ toolId, variant }: { toolId: ToolId; variant?: string }) {
   switch (toolId) {
     case "axial":
       return <AxialSketch />;

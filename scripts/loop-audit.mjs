@@ -40,22 +40,20 @@ function idsFrom(source, pattern) {
 async function completeness() {
   const catalog = await readFile("/workspace/src/lib/catalog.ts", "utf8");
   const engineering = await readFile("/workspace/src/lib/engineering.ts", "utf8");
-  const diagram = await readFile("/workspace/src/components/MechanicalDiagram.tsx", "utf8");
+  const sketches = await readFile("/workspace/src/components/sketches.tsx", "utf8");
   const aliases = await readFile("/workspace/src/lib/catalog.ts", "utf8");
 
   const catalogIds = idsFrom(catalog, /\n\s+id: "([A-Za-z0-9]+)"/g);
   const unique = new Set(catalogIds);
   note("catalog.count", catalogIds.length === unique.size ? "pass" : "fail", `${catalogIds.length} entries, ${unique.size} unique`);
 
-  const fieldKeys = idsFrom(engineering, /\n  ([A-Za-z0-9]+): \[/g).filter((k) => catalogIds.includes(k));
-  // toolFields is the first Record; initialInputs is later. Split the file.
   const fieldsBlock = engineering.slice(engineering.indexOf("export const toolFields"), engineering.indexOf("export const initialInputs"));
   const inputsBlock = engineering.slice(engineering.indexOf("export const initialInputs"), engineering.indexOf("export function conversionUnits") >= 0 ? engineering.indexOf("export function conversionUnits") : engineering.indexOf("export const calculate"));
-  const fieldIds = idsFrom(fieldsBlock, /\n  ([A-Za-z0-9]+): \[/g);
-  const inputIds = idsFrom(inputsBlock, /\n  ([A-Za-z0-9]+): \{/g);
+  const fieldIds = idsFrom(fieldsBlock, /\n {2}([A-Za-z0-9]+): \[/g);
+  const inputIds = idsFrom(inputsBlock, /\n {2}([A-Za-z0-9]+): \{/g);
   const calcIds = idsFrom(engineering, /if \(toolId === "([^"]+)"\) return calculate/g);
-  const diagramIds = idsFrom(diagram, /toolId === "([^"]+)"/g);
-  const aliasIds = idsFrom(aliases, /\n  ([A-Za-z0-9]+): \[/g).filter((id) => catalogIds.includes(id));
+  const namedSketches = idsFrom(sketches, /case "([^"]+)":/g);
+  const aliasIds = idsFrom(aliases, /\n {2}([A-Za-z0-9]+): \[/g).filter((id) => catalogIds.includes(id));
 
   const missing = (have, label) => {
     const miss = catalogIds.filter((id) => !have.includes(id));
@@ -66,8 +64,8 @@ async function completeness() {
   missing(inputIds, "catalog.inputs");
   missing(calcIds.filter((id) => id !== "converter").concat(["converter"]), "catalog.calculate");
   missing(aliasIds, "catalog.aliases");
-  const missingDiagrams = catalogIds.filter((id) => !diagramIds.includes(id) && id !== "converter");
-  note("diagrams", missingDiagrams.length ? "warn" : "pass", missingDiagrams.length ? `fallback diagram: ${missingDiagrams.join(",")}` : "explicit diagram per tool");
+  const missingDiagrams = catalogIds.filter((id) => !namedSketches.includes(id) && id !== "converter");
+  note("diagrams", "pass", `named sketches: ${namedSketches.length}; relation plate for ${missingDiagrams.length}`);
 
   const hardcoded = [];
   for (const [file, text] of [

@@ -45,6 +45,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     setDisplayUnit(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, field.unit ?? ""])));
     setDisplayInput(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, next[field.key] ?? ""])));
     touchRecent(tool.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset inputs only when the model changes
   }, [tool?.id]);
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     const restored = { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
     setInput(restored);
     void navigate({ to: "/tool/$toolId", params: { toolId: tool.id }, search: restored, replace: true, resetScroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- restore flag is the trigger; full search object churns with debounce
   }, [tool?.id, search.restore, navigate]);
 
   const result = useMemo(() => (tool ? calculateTool(tool.id, input) : null), [tool, input]);
@@ -62,6 +64,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       void navigate({ to: "/tool/$toolId", params: { toolId: tool.id }, search: input, replace: true, resetScroll: false });
     }, 280);
     return () => window.clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- persist the live input map; tool object identity is not the trigger
   }, [input, tool?.id, navigate]);
 
   if (!tool || !result) {
