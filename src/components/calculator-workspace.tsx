@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, CircleAlert, Copy, Download, Printer, RotateCcw, Save, Star, Upload } from "lucide-react";
+import { ArrowLeft, CircleAlert, Copy, RotateCcw, Save, Star } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
-import MethodBrief from "@/components/MethodBrief";
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
-import { getToolBrief } from "@/lib/toolBriefs";
 import { groupResultValues } from "@/lib/resultPresentation";
-import { buildCalculationPrintScope, buildCalculationSnapshot, extractSnapshotInput } from "@/lib/calculationSnapshot";
+import { convertShop, formatShop, parseShop, unitSwitchFor } from "@/lib/fieldUnits";
+import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,15 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     if (!tool) return {};
     return { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
   });
-  const importRef = useRef<HTMLInputElement>(null);
+  const [resultUnit, setResultUnit] = useState<Record<string, string>>({});
+  const [displayInput, setDisplayInput] = useState<Record<string, string>>(() => {
+    if (!tool) return {};
+    return { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
+  });
+  const [displayUnit, setDisplayUnit] = useState<Record<string, string>>(() => {
+    if (!tool) return {};
+    return Object.fromEntries(toolFields[tool.id].map((field) => [field.key, field.unit ?? ""]));
+  });
   const favorites = useDeskStore((state) => state.favorites);
   const toggleFavorite = useDeskStore((state) => state.toggleFavorite);
   const touchRecent = useDeskStore((state) => state.touchRecent);
@@ -32,7 +39,11 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
 
   useEffect(() => {
     if (!tool) return;
-    setInput({ ...initialInputs[tool.id], ...pickKnown(search, tool.id) });
+    const next = { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
+    setInput(next);
+    setResultUnit({});
+    setDisplayUnit(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, field.unit ?? ""])));
+    setDisplayInput(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, next[field.key] ?? ""])));
     touchRecent(tool.id);
   }, [tool?.id]);
 
@@ -66,9 +77,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   }
 
   const fields = toolFields[tool.id];
-  const brief = getToolBrief(tool.id);
   const pinned = favorites.includes(tool.id);
-  const Icon = tool.icon;
   const printScope = !result.errors.length
     ? buildCalculationPrintScope(
         tool,
@@ -85,6 +94,36 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       return;
     }
     setInput((current) => ({ ...current, [key]: value }));
+    setDisplayInput((current) => ({ ...current, [key]: value }));
+  };
+
+  const onNumberChange = (key: string, value: string, engineUnit?: string) => {
+    setDisplayInput((current) => ({ ...current, [key]: value }));
+    const spec = unitSwitchFor(engineUnit);
+    const shownUnit = displayUnit[key] || engineUnit;
+    const numeric = parseShop(value);
+    if (!spec || !shownUnit || !Number.isFinite(numeric)) {
+      setInput((current) => ({ ...current, [key]: value }));
+      return;
+    }
+    try {
+      const engine = convertShop(spec.family, numeric, shownUnit, spec.engine);
+      setInput((current) => ({ ...current, [key]: String(engine) }));
+    } catch {
+      setInput((current) => ({ ...current, [key]: value }));
+    }
+  };
+
+  const onUnitChange = (key: string, nextUnit: string, engineUnit?: string) => {
+    const spec = unitSwitchFor(engineUnit);
+    const engineValue = parseShop(input[key] ?? "");
+    setDisplayUnit((current) => ({ ...current, [key]: nextUnit }));
+    if (!spec || !Number.isFinite(engineValue)) return;
+    try {
+      setDisplayInput((current) => ({ ...current, [key]: formatShop(convertShop(spec.family, engineValue, spec.engine, nextUnit)) }));
+    } catch {
+      /* keep the typed value */
+    }
   };
 
   const copySummary = async () => {
@@ -95,36 +134,6 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       toast.success("Result copied with method context.");
     } catch {
       toast.error("Clipboard unavailable. Select the result text instead.");
-    }
-  };
-
-  const exportSnapshot = () => {
-    if (result.errors.length) return;
-    const snapshot = buildCalculationSnapshot(tool, input, result);
-    const href = URL.createObjectURL(new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" }));
-    const anchor = document.createElement("a");
-    anchor.href = href;
-    anchor.download = `${tool.id}-calculation-snapshot.json`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(href), 800);
-    toast.success("Snapshot exported.");
-  };
-
-  const importSnapshot = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
-    if (file.size > 1_000_000) {
-      toast.error("Snapshots are limited to 1 MB.");
-      return;
-    }
-    try {
-      setInput(extractSnapshotInput(JSON.parse(await file.text()), tool.id));
-      toast.success("Inputs restored from snapshot.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Snapshot could not be imported.");
     }
   };
 
@@ -139,22 +148,24 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     } else {
       setActiveProject(projectId);
     }
+    const primary = groupResultValues(result.values)[0]?.primary;
+    const headline = primary ? `${primary.display} ${primary.unit}` : tool.title;
     saveCalculation({
       projectId,
       toolId: tool.id,
-      title: `${tool.title} · ${new Date().toLocaleString()}`,
+      title: `${tool.title} · ${headline}`,
       input,
       method: result.method,
       resultJson: JSON.stringify({ values: result.values, warnings: result.warnings }),
     });
-    toast.success("Saved to Projects. No sign-in required.");
+    toast.success("Saved to this browser. Reopen it from the desk.");
   };
 
   const related = relatedTools(tool.id);
 
   return (
     <div className="page-wrap">
-      <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link to="/library" className="inline-flex items-center gap-2 text-sm text-muted hover:text-fg">
           <ArrowLeft size={15} />
           All models
@@ -169,38 +180,29 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
         </button>
       </div>
 
-      <section className="grid gap-6 xl:grid-cols-[1fr_280px] xl:items-end">
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-md bg-elevated text-accent">
-              <Icon size={18} />
-            </span>
-            <p className="eyebrow text-accent">{tool.kicker}</p>
-          </div>
-          <h1 className="display-title mt-4">{tool.title}</h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-muted">{tool.description}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-surface p-4">
-          <p className="eyebrow">Posture</p>
-          <p className="mt-2 font-mono text-xs leading-5 text-muted">
-            {tool.contract.domain} · v{tool.contract.formulaVersion} · {tool.contract.validation} · tier {tool.contract.safetyTier}
-          </p>
-        </div>
-      </section>
+      <p className="eyebrow">{tool.kicker}</p>
+      <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">{tool.title}</h1>
 
-      <section className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(220px,280px)]">
-        <aside id="inputs" className="bg-surface p-5">
+      <section className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border lg:grid-cols-[minmax(240px,320px)_minmax(0,1fr)]">
+        <aside id="inputs" className="bg-surface p-4 sm:p-5">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="eyebrow">Conditions</p>
-              <h2 className="mt-1 text-lg font-semibold">Inputs</h2>
-            </div>
-            <button type="button" className="inline-flex items-center gap-1 text-xs text-muted hover:text-fg" onClick={() => { setInput({ ...initialInputs[tool.id] }); toast.success("Example restored."); }}>
+            <h2 className="text-base font-semibold">Inputs</h2>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 text-xs text-muted hover:text-fg"
+              onClick={() => {
+                const next = { ...initialInputs[tool.id] };
+                setInput(next);
+                setDisplayUnit(Object.fromEntries(fields.map((field) => [field.key, field.unit ?? ""])));
+                setDisplayInput(Object.fromEntries(fields.map((field) => [field.key, next[field.key] ?? ""])));
+                toast.success("Example restored.");
+              }}
+            >
               <RotateCcw size={13} />
               Example
             </button>
           </div>
-          <div className="mt-5 grid gap-4">
+          <div className="mt-4 grid gap-4">
             {fields.map((field) => {
               if (isFieldHidden(tool.id, field.key, input)) return null;
               const converterUnit = tool.id === "converter" && (field.key === "from" || field.key === "to");
@@ -209,12 +211,18 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               const fieldError = result.errors.find((error) => error.toLowerCase().includes(field.label.toLowerCase()));
               return (
                 <label key={field.key} htmlFor={fieldId} className="grid gap-1.5">
-                  <span className="flex items-baseline justify-between gap-2 text-[13px]">
-                    <span>{field.label}</span>
-                    {field.symbol && <em className="font-mono text-[11px] not-italic text-muted">{field.symbol}</em>}
+                  <span className="flex items-baseline gap-2 text-sm">
+                    {field.label}
+                    {field.symbol ? <em className="font-mono text-xs not-italic text-accent">{field.symbol}</em> : null}
                   </span>
                   {field.kind === "select" || converterUnit ? (
-                    <select id={fieldId} value={input[field.key] ?? ""} onChange={(event) => update(field.key, event.target.value)} aria-invalid={Boolean(fieldError)} className={cn("h-11 rounded-md border border-border bg-bg px-3 text-sm", fieldError && "border-danger")}>
+                    <select
+                      id={fieldId}
+                      value={input[field.key] ?? ""}
+                      onChange={(event) => update(field.key, event.target.value)}
+                      aria-invalid={Boolean(fieldError)}
+                      className={cn("h-10 rounded-md border border-border bg-bg px-3 text-sm", fieldError && "border-danger")}
+                    >
                       {options?.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -223,108 +231,143 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     </select>
                   ) : field.kind === "text" ? (
                     field.key === "observations" ? (
-                      <textarea id={fieldId} rows={4} value={input[field.key] ?? ""} onChange={(event) => update(field.key, event.target.value)} className={cn("rounded-md border border-border bg-bg px-3 py-2 text-sm", fieldError && "border-danger")} />
+                      <textarea
+                        id={fieldId}
+                        rows={4}
+                        value={input[field.key] ?? ""}
+                        onChange={(event) => update(field.key, event.target.value)}
+                        className={cn("rounded-md border border-border bg-bg px-3 py-2 text-sm", fieldError && "border-danger")}
+                      />
                     ) : (
-                      <input id={fieldId} type="text" value={input[field.key] ?? ""} onChange={(event) => update(field.key, event.target.value)} className={cn("h-11 rounded-md border border-border bg-bg px-3 text-sm", fieldError && "border-danger")} />
+                      <input
+                        id={fieldId}
+                        type="text"
+                        value={input[field.key] ?? ""}
+                        onChange={(event) => update(field.key, event.target.value)}
+                        className={cn("h-10 rounded-md border border-border bg-bg px-3 text-sm", fieldError && "border-danger")}
+                      />
                     )
                   ) : (
-                    <span className="relative">
-                      <input id={fieldId} inputMode="decimal" value={input[field.key] ?? ""} onChange={(event) => update(field.key, event.target.value)} className={cn("h-11 w-full rounded-md border border-border bg-bg px-3 pr-16 font-mono text-sm tabular-nums", fieldError && "border-danger")} />
-                      {field.unit && <b className="pointer-events-none absolute inset-y-0 right-3 grid place-items-center font-mono text-[11px] font-normal text-muted">{field.unit}</b>}
+                    <span className="flex gap-2">
+                      <input
+                        id={fieldId}
+                        inputMode="decimal"
+                        value={displayInput[field.key] ?? input[field.key] ?? ""}
+                        onChange={(event) => onNumberChange(field.key, event.target.value, field.unit)}
+                        className={cn("h-10 min-w-0 flex-1 rounded-md border border-border bg-bg px-3 font-mono text-sm tabular-nums", fieldError && "border-danger")}
+                      />
+                      {unitSwitchFor(field.unit) && tool.id !== "converter" ? (
+                        <select
+                          aria-label={`${field.label} unit`}
+                          value={displayUnit[field.key] || field.unit}
+                          onChange={(event) => onUnitChange(field.key, event.target.value, field.unit)}
+                          className="h-10 w-[4.75rem] shrink-0 rounded-md border border-border bg-bg px-1 font-mono text-xs"
+                        >
+                          {unitSwitchFor(field.unit)!.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : field.unit ? (
+                        <span className="grid h-10 w-[4.75rem] shrink-0 place-items-center rounded-md border border-border bg-bg font-mono text-xs text-muted">
+                          {field.unit}
+                        </span>
+                      ) : null}
                     </span>
                   )}
-                  <small className={cn("text-[11px] leading-4 text-muted", fieldError && "text-danger")}>{fieldError ?? field.helper}</small>
+                  {fieldError ? <small className="text-xs leading-4 text-danger">{fieldError}</small> : null}
                 </label>
               );
             })}
           </div>
         </aside>
 
-        <div className="bg-bg">
+        <div id="results" className="bg-bg">
           <div className="diagram-surface">
             <MechanicalDiagram toolId={tool.id} variant={tool.id === "beam" ? input.case : tool.id === "section" ? input.shape : undefined} />
           </div>
-          <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
-            <p className="eyebrow">Active method</p>
-            <code className="font-mono text-[11px] leading-4 text-muted">{result.method}</code>
-          </div>
-          <section id="results" className="p-5" aria-live="polite">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="eyebrow">Response</p>
-                <h2 className="mt-1 text-lg font-semibold">{result.errors.length ? "Resolve the input state" : "Result, with context"}</h2>
-              </div>
-              {!result.errors.length && (
-                <div className="no-print flex flex-wrap gap-2">
-                  <input ref={importRef} className="sr-only" type="file" accept="application/json,.json" onChange={importSnapshot} />
-                  <button type="button" className="rounded-md border border-border px-2.5 py-1.5 text-xs hover:bg-elevated" onClick={() => importRef.current?.click()}><Upload size={13} className="mr-1 inline" />Import</button>
-                  <button type="button" className="rounded-md border border-border px-2.5 py-1.5 text-xs hover:bg-elevated" onClick={saveLocal}><Save size={13} className="mr-1 inline" />Save</button>
-                  <button type="button" className="rounded-md border border-border px-2.5 py-1.5 text-xs hover:bg-elevated" onClick={exportSnapshot}><Download size={13} className="mr-1 inline" />JSON</button>
-                  <button type="button" className="rounded-md border border-border px-2.5 py-1.5 text-xs hover:bg-elevated" onClick={() => window.print()}><Printer size={13} className="mr-1 inline" />Print</button>
-                  <button type="button" className="rounded-md border border-border px-2.5 py-1.5 text-xs hover:bg-elevated" onClick={copySummary}><Copy size={13} className="mr-1 inline" />Copy</button>
-                </div>
-              )}
-            </div>
+          <section className="p-4 sm:p-5" aria-live="polite">
+            <h2 className="text-base font-semibold">{result.errors.length ? "Resolve the input state" : "Results"}</h2>
             {result.errors.length ? (
-              <div className="mt-5 flex items-start gap-2 rounded-md border border-danger/40 bg-danger/10 p-4 text-sm text-danger">
+              <div className="mt-4 flex items-start gap-2 rounded-md border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
                 <CircleAlert size={16} />
                 <p>{result.errors[0]}</p>
               </div>
             ) : (
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {groupResultValues(result.values).map((group) => (
-                  <div key={group.label} className="rounded-lg border border-border bg-surface p-4">
-                    <p className="text-xs text-muted">{group.label}</p>
-                    <p className="mt-1 font-mono text-2xl font-medium tabular-nums tracking-tight">
-                      {group.primary.display}
-                      <span className="ml-2 text-sm text-muted">{group.primary.unit}</span>
-                    </p>
-                    {group.alternatives.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2 font-mono text-[11px] text-muted">
-                        {group.alternatives.map((item) => (
-                          <span key={item.key}>
-                            {item.display} {item.unit}
-                          </span>
-                        ))}
+              <>
+                <div className="mt-4 grid gap-4">
+                  {groupResultValues(result.values).map((group) => {
+                    const spec = unitSwitchFor(group.primary.unit);
+                    const unit = resultUnit[group.label] ?? group.primary.unit;
+                    const numeric = parseShop(group.primary.display);
+                    let shown = tidyDisplay(group.primary.display);
+                    if (spec && Number.isFinite(numeric) && unit !== group.primary.unit) {
+                      try {
+                        shown = formatShop(convertShop(spec.family, numeric, group.primary.unit, unit));
+                      } catch {
+                        shown = tidyDisplay(group.primary.display);
+                      }
+                    }
+                    const options = spec ? spec.options : [group.primary, ...group.alternatives].map((item) => item.unit);
+                    const canSwitch = options.length > 1;
+                    return (
+                      <div key={group.label} className="grid gap-1.5">
+                        <span className="text-sm">{group.label}</span>
+                        <span className="flex items-center gap-2">
+                          <p className="min-w-0 flex-1 font-mono text-3xl font-medium tabular-nums tracking-tight">{shown}</p>
+                          {canSwitch ? (
+                            <select
+                              aria-label={`${group.label} unit`}
+                              value={unit}
+                              onChange={(event) => setResultUnit((current) => ({ ...current, [group.label]: event.target.value }))}
+                              className="h-10 w-[4.75rem] shrink-0 rounded-md border border-border bg-bg px-1 font-mono text-xs"
+                            >
+                              {options.map((option) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <span className="grid h-10 w-[4.75rem] shrink-0 place-items-center rounded-md border border-border bg-bg font-mono text-xs text-muted">
+                              {group.primary.unit}
+                            </span>
+                          )}
+                        </span>
                       </div>
-                    )}
+                    );
+                  })}
+                </div>
+                <div className="mt-5 flex flex-wrap gap-2">
+                    <button type="button" className="h-10 rounded-md bg-accent px-3 text-sm font-medium text-accent-fg" onClick={saveLocal}>
+                      <Save size={13} className="mr-1 inline" />
+                      Save this check
+                    </button>
+                    <button type="button" className="h-10 rounded-md border border-border px-3 text-sm hover:bg-elevated" onClick={copySummary}>
+                      <Copy size={13} className="mr-1 inline" />
+                      Copy
+                    </button>
                   </div>
-                ))}
-              </div>
+              </>
             )}
-            {result.warnings[0] && !result.errors.length && <p className="mt-4 text-sm text-mark">{result.warnings[0]}</p>}
           </section>
         </div>
-
-        <aside className="bg-surface p-5">
-          <p className="eyebrow">Model boundary</p>
-          <ul className="mt-3 grid gap-2 text-sm leading-5 text-muted">
-            {tool.assumptions.map((assumption) => (
-              <li key={assumption} className="border-l-2 border-accent pl-3">{assumption}</li>
-            ))}
-          </ul>
-          <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="mt-5 inline-flex text-sm text-accent hover:underline">
-            {tool.sourceLabel}
-          </a>
-          {related.length > 0 && (
-            <div className="mt-6 border-t border-border pt-4">
-              <p className="eyebrow">Nearby models</p>
-              <ul className="mt-3 grid gap-2">
-                {related.map((item) => (
-                  <li key={item.id}>
-                    <Link to="/tool/$toolId" params={{ toolId: item.id }} className="text-sm hover:text-accent">
-                      {item.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </aside>
       </section>
 
-      <MethodBrief tool={tool} brief={brief} activeMethod={result.method} />
-
+      {related.length > 0 && (
+        <p className="mt-6 text-sm text-muted">
+          Nearby:{" "}
+          {related.map((item, index) => (
+            <span key={item.id}>
+              {index > 0 ? " · " : null}
+              <Link to="/tool/$toolId" params={{ toolId: item.id }} className="text-fg hover:text-accent">
+                {item.title}
+              </Link>
+            </span>
+          ))}
+        </p>
+      )}
       {printScope && (
         <section className="print-sheet mt-8">
           <p className="eyebrow">Caliper · calculation snapshot</p>
@@ -371,6 +414,11 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       )}
     </div>
   );
+}
+
+function tidyDisplay(display: string) {
+  if (!/^-?\d+\.\d+$/.test(display)) return display;
+  return display.replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "");
 }
 
 function pickKnown(search: Record<string, string>, toolId: ToolId) {

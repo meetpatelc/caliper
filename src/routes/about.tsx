@@ -21,7 +21,7 @@ const unsuitable = [
 function AboutPage() {
   return (
     <div className="page-wrap max-w-3xl">
-      <p className="eyebrow text-accent">About Caliper</p>
+      <p className="eyebrow">About Caliper</p>
       <h1 className="display-title mt-4">Clear limits make a better engineering tool.</h1>
       <p className="mt-5 text-base leading-7 text-muted">
         Caliper is a public, local-first mechanical workspace for transparent preliminary calculation. {tools.length} models run in the browser. Saving a snapshot does not require an account.

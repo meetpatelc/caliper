@@ -56,7 +56,7 @@ function Library() {
               setQuery(value);
               void navigate({ search: (prev) => ({ ...prev, q: value || undefined }), replace: true });
             }}
-            placeholder="Search tool, output, or source"
+            placeholder="Search NPSH, axial, LMTD…"
             className="h-9 w-full bg-transparent text-sm outline-none placeholder:text-muted"
           />
         </label>
@@ -101,7 +101,7 @@ function Library() {
                     <strong className="block">{tool.title}</strong>
                     <small className="text-muted">{tool.description}</small>
                   </span>
-                  <span className="font-mono text-[11px] text-muted">{tool.outputLabel}</span>
+                  <span className="font-mono text-xs text-muted">{tool.outputLabel}</span>
                   <span className="flex items-center gap-2 text-xs text-muted">
                     {favorites.includes(tool.id as ToolId) && <Star size={12} className="text-mark" fill="currentColor" />}
                     {tool.contract.validation}
@@ -124,7 +124,10 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={cn("rounded-full border px-3 py-1.5 text-xs", active ? "border-accent bg-accent text-accent-fg" : "border-border text-muted hover:text-fg")}
+      className={cn(
+        "min-h-10 rounded-full border px-3 py-2 text-xs",
+        active ? "border-accent bg-accent text-accent-fg" : "border-border text-muted hover:text-fg",
+      )}
     >
       {children}
     </button>

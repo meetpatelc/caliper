@@ -13,7 +13,7 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: APP_NAME },
       { name: "description", content: `${APP_NAME} is a unit-aware engineering workspace: ${MODEL_COUNT} calculators with methods, assumptions, and sources in the same frame as the result.` },
-      { name: "theme-color", content: "#12100e" },
+      { name: "theme-color", content: "#e8eaed" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -36,12 +36,12 @@ function RootDocument() {
   const bare = pathname === "/login";
 
   return (
-    <html lang="en" className="dark antialiased" suppressHydrationWarning>
+    <html lang="en" className="light antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('caliper-theme');var r=document.documentElement;if(t==='light'){r.classList.remove('dark');r.classList.add('light')}else{r.classList.add('dark');r.classList.remove('light')}}catch(e){}`,
+            __html: `try{var t=localStorage.getItem('caliper-metrology-theme');var r=document.documentElement;if(t==='dark'){r.classList.add('dark');r.classList.remove('light')}else{r.classList.add('light');r.classList.remove('dark')}}catch(e){}`,
           }}
         />
       </head>

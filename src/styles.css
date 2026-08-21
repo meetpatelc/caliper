@@ -4,42 +4,42 @@
 @theme {
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --color-bg: #12100e;
-  --color-surface: #1c1915;
-  --color-elevated: #25211c;
-  --color-fg: #ece7dc;
-  --color-muted: #a39888;
-  --color-accent: #e08a4a;
-  --color-accent-fg: #1a1008;
-  --color-mark: #e0b14a;
-  --color-border: #2f2a24;
-  --color-danger: #e07058;
-  --color-ok: #7dba7a;
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.875rem;
+  --color-bg: #e8eaed;
+  --color-surface: #f4f5f7;
+  --color-elevated: #ffffff;
+  --color-fg: #1b1e24;
+  --color-muted: #5c6370;
+  --color-accent: #c8102e;
+  --color-accent-fg: #ffffff;
+  --color-mark: #c8102e;
+  --color-border: #cfd3da;
+  --color-danger: #9b1830;
+  --color-ok: #2f6f4e;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
 }
 
 html {
   --desk-amber: var(--color-mark);
-  --desk-cyan-wash: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  --desk-cyan-wash: color-mix(in srgb, var(--color-accent) 12%, transparent);
   --desk-ink: var(--color-fg);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-html.light {
-  --color-bg: #f3eee4;
-  --color-surface: #fffdf8;
-  --color-elevated: #f7f1e6;
-  --color-fg: #1c1915;
-  --color-muted: #6b6358;
-  --color-accent: #b4532a;
-  --color-accent-fg: #fff8f2;
-  --color-mark: #9a6b10;
-  --color-border: #ddd4c6;
-  --color-danger: #b42318;
-  --color-ok: #3f7d43;
-  color-scheme: light;
+html.dark {
+  --color-bg: #14161a;
+  --color-surface: #1c1f26;
+  --color-elevated: #262a33;
+  --color-fg: #e8eaed;
+  --color-muted: #8b909a;
+  --color-accent: #e23b4c;
+  --color-accent-fg: #ffffff;
+  --color-mark: #e23b4c;
+  --color-border: #2e333d;
+  --color-danger: #f07178;
+  --color-ok: #5ea86a;
+  color-scheme: dark;
 }
 
 @layer base {
@@ -78,6 +78,13 @@ html.light {
   }
 }
 
+.more-menu > summary {
+  list-style: none;
+}
+.more-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
@@ -99,20 +106,22 @@ html.light {
   line-height: 1.05;
 }
 
+.proto-desk .diagram-surface {
+  min-height: 132px;
+  padding: 0.75rem;
+}
+
 .mechanical-diagram {
   margin-inline: auto;
 }
 
 .diagram-surface {
   display: grid;
-  min-height: 220px;
+  min-height: 148px;
   place-items: center;
-  border: 1px solid var(--color-border);
-  background:
-    linear-gradient(var(--color-border) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px) 0 0 / 24px 24px,
-    var(--color-surface);
-  padding: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0.75rem 1rem;
 }
 
 @media print {

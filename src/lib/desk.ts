@@ -2,7 +2,7 @@ import { tools, type ToolId } from "@/lib/catalog";
 import { domains } from "@/lib/platform";
 
 export const APP_NAME = "Caliper";
-export const APP_TAGLINE = "Engineering models, in view.";
+export const APP_TAGLINE = "Set the numbers. Keep the model in frame.";
 export const MODEL_COUNT = tools.length;
 
 export const activeDomains = domains.map((domain) => {
@@ -15,6 +15,22 @@ export const activeDomains = domains.map((domain) => {
 });
 
 export const releasedDomains = activeDomains.filter((domain) => domain.state === "released");
+
+export function savedHeadline(resultJson: string): string {
+  try {
+    const values = JSON.parse(resultJson)?.values as { display?: string; unit?: string }[] | undefined;
+    const first = values?.[0];
+    if (!first?.display) return "";
+    return `${first.display} ${first.unit ?? ""}`.trim();
+  } catch {
+    return "";
+  }
+}
+
+export function openDeskSearch() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event("caliper:open-search"));
+}
 
 export function isFieldHidden(toolId: ToolId, key: string, input: Record<string, string>) {
   if (toolId === "section" && ((key === "height" && input.shape !== "rectangle") || (key === "innerDiameter" && input.shape !== "annulus"))) {

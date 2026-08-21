@@ -37,7 +37,7 @@ function ReferencePage() {
             <article key={dataset.id} className="rounded-xl border border-border bg-surface p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="eyebrow text-accent">{dataset.id.replace(/-/g, " ")}</p>
+                  <p className="eyebrow">{dataset.id.replace(/-/g, " ")}</p>
                   <h3 className="mt-1 text-lg font-semibold">{dataset.title}</h3>
                 </div>
                 <a href={dataset.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Open ${dataset.sourceLabel}`}>
@@ -76,7 +76,7 @@ function ReferencePage() {
             return (
               <section key={domain.id}>
                 <div className="mb-2 flex items-center justify-between">
-                  <p className="eyebrow text-accent">{domain.label}</p>
+                  <p className="eyebrow">{domain.label}</p>
                   <span className="font-mono text-xs text-muted">{domainTools.length}</span>
                 </div>
                 <div className="overflow-hidden rounded-lg border border-border">

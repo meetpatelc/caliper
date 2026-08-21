@@ -135,27 +135,26 @@
   color: var(--desk-amber);
 }
 :root {
-  color-scheme: dark;
   --desk-canvas: var(--color-bg);
-  --desk-canvas-raised: #151a1b;
-  --desk-instrument: #171f20;
-  --desk-instrument-deep: #111718;
-  --desk-editorial: #171c1d;
-  --desk-line: rgba(238, 241, 237, .12);
-  --desk-line-strong: rgba(88, 231, 225, .35);
-  --desk-ink: #eef1ed;
-  --desk-ink-soft: #c0cbc5;
-  --desk-muted: #94a19c;
+  --desk-canvas-raised: var(--color-surface);
+  --desk-instrument: var(--color-surface);
+  --desk-instrument-deep: var(--color-bg);
+  --desk-editorial: var(--color-surface);
+  --desk-line: color-mix(in srgb, var(--color-fg) 12%, transparent);
+  --desk-line-strong: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  --desk-ink: var(--color-fg);
+  --desk-ink-soft: var(--color-muted);
+  --desk-muted: var(--color-muted);
   --desk-cyan: var(--color-accent);
-  --desk-cyan-ink: #85f6e8;
-  --desk-cyan-wash: rgba(88, 231, 225, .08);
-  --desk-amber: #ffbf73;
-  --desk-amber-ink: #ffd298;
-  --desk-amber-wash: rgba(255, 191, 115, .08);
-  --desk-shadow: 0 16px 38px rgba(0, 0, 0, .24);
-  --desk-grid: rgba(88, 231, 225, .055);
-  --desk-rail: #111719;
-  --desk-rail-ink: #edf3ef;
+  --desk-cyan-ink: var(--color-accent);
+  --desk-cyan-wash: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --desk-amber: var(--color-mark);
+  --desk-amber-ink: var(--color-mark);
+  --desk-amber-wash: color-mix(in srgb, var(--color-mark) 10%, transparent);
+  --desk-shadow: 0 16px 38px color-mix(in srgb, var(--color-fg) 8%, transparent);
+  --desk-grid: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --desk-rail: var(--color-fg);
+  --desk-rail-ink: var(--color-bg);
 }
 
 .fits-diagram,.stack-diagram,.position-diagram,.mmc-diagram,.motion-diagram,.inertia-diagram,.pneumatic-diagram,.clamp-diagram {
@@ -178,23 +177,23 @@
   font: 9px "DM Mono",monospace;
   letter-spacing: .12em;
   padding: 9px;
-  color: #a6fff4;
+  color: var(--color-accent);
 }
 .fits-hole {
   top: 28%;
 }
 .fits-shaft {
   top: 56%;
-  border-color: #ffbf73;
+  border-color: var(--color-mark);
   background: rgba(255,191,115,.13);
-  color: #ffe0b3;
+  color: var(--color-mark);
 }
 .fits-diagram b {
   position: absolute;
   right: 12%;
   top: 45%;
   font: 9px "DM Mono",monospace;
-  color: #aebbb6;
+  color: var(--color-muted);
 }
 .stack-line {
   position: absolute;
@@ -207,7 +206,7 @@
   position: absolute;
   top: 34%;
   font: 11px "DM Mono",monospace;
-  color: #c8d7d1;
+  color: var(--color-muted);
 }
 .stack-diagram span:nth-of-type(1) {
   left: 20%;
@@ -222,7 +221,7 @@
   position: absolute;
   top: 60%;
   left: 48%;
-  color: #ffcf92;
+  color: var(--color-mark);
   font: 12px "DM Mono",monospace;
 }
 .position-zone {
@@ -256,14 +255,14 @@
   left: 60%;
   top: 39%;
   font-size: 22px;
-  color: #ffbf73;
+  color: var(--color-mark);
 }
 .position-diagram span {
   position: absolute;
   left: 64%;
   top: 56%;
   font: 10px "DM Mono",monospace;
-  color: #c6d4cf;
+  color: var(--color-muted);
 }
 .mmc-boundary {
   position: absolute;
@@ -276,7 +275,7 @@
 .mmc-boundary.outer {
   width: 120px;
   height: 120px;
-  border-color: #ffbf73;
+  border-color: var(--color-mark);
 }
 .mmc-boundary.inner {
   width: 72px;
@@ -289,12 +288,12 @@
 .mmc-diagram b {
   left: 25%;
   top: 26%;
-  color: #a9fff2;
+  color: var(--color-accent);
 }
 .mmc-diagram span {
   right: 25%;
   bottom: 24%;
-  color: #ffd89e;
+  color: var(--color-mark);
 }
 .motion-profile {
   position: absolute;
@@ -302,15 +301,15 @@
   right: 15%;
   top: 30%;
   height: 70px;
-  border-left: 2px solid #aefbf2;
-  border-bottom: 2px solid #aefbf2;
+  border-left: 2px solid var(--color-accent);
+  border-bottom: 2px solid var(--color-accent);
   clip-path: polygon(0 100%,22% 10%,72% 10%,100% 100%,100% 100%,0 100%);
   background: linear-gradient(135deg,transparent 48%,rgba(88,231,225,.22) 49% 51%,transparent 52%);
 }
 .motion-diagram span,.motion-diagram b {
   position: absolute;
   font: 10px "DM Mono",monospace;
-  color: #c6d4cf;
+  color: var(--color-muted);
 }
 .motion-diagram span:nth-of-type(1) {
   left: 25%;
@@ -345,7 +344,7 @@
   left: 45%;
   width: 46px;
   height: 46px;
-  border-color: #ffbf73;
+  border-color: var(--color-mark);
 }
 .inertia-motor {
   right: 18%;
@@ -359,17 +358,17 @@
 .inertia-diagram span:nth-of-type(1) {
   left: 22%;
   top: 28%;
-  color: #a9fff2;
+  color: var(--color-accent);
 }
 .inertia-diagram span:nth-of-type(2) {
   left: 48%;
   bottom: 24%;
-  color: #ffd89e;
+  color: var(--color-mark);
 }
 .inertia-diagram b {
   right: 22%;
   top: 28%;
-  color: #a9fff2;
+  color: var(--color-accent);
 }
 .pneumatic-body {
   position: absolute;
