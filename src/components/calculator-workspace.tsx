@@ -367,6 +367,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     );
                   })}
                 </div>
+                <p className="mt-5 font-mono text-sm text-accent">{result.method}</p>
                 <div className="mt-5 flex flex-wrap gap-2">
                     <Button variant="accent" onClick={saveLocal}>
                       <Save size={13} />
@@ -388,7 +389,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       </section>
 
       {related.length > 0 && (
-        <p className="mt-6 text-sm text-muted">
+        <p className="no-print mt-6 text-sm text-muted">
           Nearby:{" "}
           {related.map((item, index) => (
             <span key={item.id}>
@@ -400,8 +401,33 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           ))}
         </p>
       )}
+
+      {!result.errors.length && (
+        <section className="no-print mt-8 border-t border-border pt-6" aria-labelledby="method-title">
+          <p className="eyebrow">Method</p>
+          <h2 id="method-title" className="mt-1 text-lg font-semibold tracking-[-0.03em]">
+            What this number is
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">{tool.description}</p>
+          <p className="mt-4 font-mono text-sm text-accent">{result.method}</p>
+          <ul className="mt-4 grid max-w-2xl gap-1.5 text-sm leading-6 text-muted">
+            {tool.assumptions.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          {result.warnings[0] ? <p className="mt-4 max-w-2xl text-sm leading-6 text-muted">{result.warnings[0]}</p> : null}
+          {tool.sourceUrl ? (
+            <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex text-sm text-accent hover:underline">
+              {tool.sourceLabel}
+            </a>
+          ) : (
+            <p className="mt-4 text-sm text-muted">{tool.sourceLabel}</p>
+          )}
+        </section>
+      )}
+
       {printScope && (
-        <section className="print-sheet mt-8">
+        <section className="print-sheet mt-8 hidden print:block">
           <p className="eyebrow">Caliper · calculation snapshot</p>
           <h1>{printScope.title}</h1>
           <p>Formula version {printScope.formulaVersion}</p>
