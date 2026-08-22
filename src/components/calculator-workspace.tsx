@@ -71,6 +71,26 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
 
   const result = useMemo(() => (tool ? calculateTool(tool.id, input) : null), [tool, input]);
 
+  const displayGroups = useMemo(() => {
+    if (!result || result.errors.length) return [];
+    return groupResultValues(result.values).map((group) => {
+      const spec = unitSwitchFor(group.primary.unit);
+      const stored = resultUnit[group.label] ?? (spec ? spec.engine : group.primary.unit);
+      const numeric = parseShop(group.primary.display);
+      let shown = tidyDisplay(group.primary.display);
+      if (spec && Number.isFinite(numeric) && stored !== spec.engine && stored !== group.primary.unit) {
+        try {
+          shown = formatShop(convertShop(spec.family, numeric, group.primary.unit, stored));
+        } catch {
+          shown = tidyDisplay(group.primary.display);
+        }
+      }
+      const options = spec ? spec.options : [group.primary, ...group.alternatives].map((item) => item.unit);
+      const unitLabel = spec ? shopLabel(spec.family, stored) : group.primary.unit;
+      return { group, spec, stored, shown, options, canSwitch: options.length > 1, unitLabel };
+    });
+  }, [result, resultUnit]);
+
   useEffect(() => {
     if (!tool) return;
     const handle = window.setTimeout(() => {
@@ -214,6 +234,19 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
 
       <p className="eyebrow">{tool.kicker}</p>
       <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">{tool.title}</h1>
+      {displayGroups[0] ? (
+        <p className="mt-2 font-mono text-2xl font-medium tabular-nums tracking-tight lg:hidden">
+          {displayGroups[0].shown} {displayGroups[0].unitLabel}
+          {displayGroups.length > 1 ? (
+            <span className="mt-1 block text-sm font-normal text-muted">
+              {displayGroups
+                .slice(1)
+                .map((item) => `${item.shown} ${item.unitLabel}`)
+                .join(" · ")}
+            </span>
+          ) : null}
+        </p>
+      ) : null}
 
       <section className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border lg:grid-cols-[minmax(240px,320px)_minmax(0,1fr)]">
         <aside id="inputs" className="bg-surface p-4 sm:p-5">
@@ -222,7 +255,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
             <Button variant="ghost" size="sm" onClick={() => {
                 const next = { ...initialInputs[tool.id] };
                 setInput(next);
-                setDisplayUnit(Object.fromEntries(fields.map((field) => [field.key, field.unit ?? ""])));
+                setDisplayUnit(Object.fromEntries(fields.map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""])));
                 setDisplayInput(Object.fromEntries(fields.map((field) => [field.key, next[field.key] ?? ""])));
                 toast.success("Example restored.");
               }}
@@ -328,21 +361,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
             ) : (
               <>
                 <div className="mt-4 grid gap-4">
-                  {groupResultValues(result.values).map((group) => {
-                    const spec = unitSwitchFor(group.primary.unit);
-                    const stored = resultUnit[group.label] ?? (spec ? spec.engine : group.primary.unit);
-                    const numeric = parseShop(group.primary.display);
-                    let shown = tidyDisplay(group.primary.display);
-                    if (spec && Number.isFinite(numeric) && stored !== spec.engine && stored !== group.primary.unit) {
-                      try {
-                        shown = formatShop(convertShop(spec.family, numeric, group.primary.unit, stored));
-                      } catch {
-                        shown = tidyDisplay(group.primary.display);
-                      }
-                    }
-                    const options = spec ? spec.options : [group.primary, ...group.alternatives].map((item) => item.unit);
-                    const canSwitch = options.length > 1;
-                    return (
+                  {displayGroups.map(({ group, spec, stored, shown, options, canSwitch, unitLabel }) => (
                       <div key={group.label} className="grid gap-1.5">
                         <span className="text-sm">{group.label}</span>
                         <span className="flex items-center gap-2">
@@ -360,12 +379,11 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                               ))}
                             </UnitSelect>
                           ) : (
-                            <UnitBadge>{group.primary.unit}</UnitBadge>
+                            <UnitBadge>{unitLabel}</UnitBadge>
                           )}
                         </span>
                       </div>
-                    );
-                  })}
+                    ))}
                 </div>
                 <p className="mt-5 font-mono text-sm text-accent">{result.method}</p>
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -406,22 +424,32 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
         <section className="no-print mt-8 border-t border-border pt-6" aria-labelledby="method-title">
           <p className="eyebrow">Method</p>
           <h2 id="method-title" className="mt-1 text-lg font-semibold tracking-[-0.03em]">
-            What this number is
+            Equation, when, and don’t
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">{tool.description}</p>
           <p className="mt-4 font-mono text-sm text-accent">{result.method}</p>
-          <ul className="mt-4 grid max-w-2xl gap-1.5 text-sm leading-6 text-muted">
-            {tool.assumptions.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          {result.warnings[0] ? <p className="mt-4 max-w-2xl text-sm leading-6 text-muted">{result.warnings[0]}</p> : null}
+          <div className="mt-5 grid max-w-2xl gap-5 sm:grid-cols-2">
+            <div>
+              <p className="text-sm font-medium">When</p>
+              <ul className="mt-2 grid gap-1.5 text-sm leading-6 text-muted">
+                {tool.assumptions.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Don’t</p>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                {result.warnings[0] ?? "This is a first-pass number, not a code check or approval."}
+              </p>
+            </div>
+          </div>
           {tool.sourceUrl ? (
-            <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex text-sm text-accent hover:underline">
+            <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="mt-5 inline-flex text-sm text-accent hover:underline">
               {tool.sourceLabel}
             </a>
           ) : (
-            <p className="mt-4 text-sm text-muted">{tool.sourceLabel}</p>
+            <p className="mt-5 text-sm text-muted">{tool.sourceLabel}</p>
           )}
         </section>
       )}
