@@ -4,6 +4,8 @@ The **ready desk**: **166** unit-aware calculators. Open a model, set the number
 
 Sibling to [Gauge](https://github.com/meetpatelc/gauge) — Gauge is the atlas and studio (write and publish a model). Caliper is the finished library.
 
+Shared look: [@instrument/ui](https://github.com/meetpatelc/instrument-ui) (tokens + Button / Field / Panel).
+
 Caliper is a **preliminary screening desk**, not a design approval, sealed calculation, or code-compliance tool. Verify every output against the geometry, loading, material, and specifications that apply to the actual project.
 
 ## Features
