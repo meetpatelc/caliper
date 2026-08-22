@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, CircleAlert, Copy, RotateCcw, Save, Star } from "lucide-react";
+import { ArrowLeft, CircleAlert, Copy, Link2, RotateCcw, Save, Star } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
 import { convertShop, formatShop, parseShop, shopLabel, unitSwitchFor } from "@/lib/fieldUnits";
-import { coerceSearchValue, stringifySearchPlain } from "@/lib/search-params";
+import { coerceSearchValue, sharePath, stringifySearchPlain } from "@/lib/search-params";
 import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
@@ -74,8 +74,12 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   useEffect(() => {
     if (!tool) return;
     const handle = window.setTimeout(() => {
-      lastWrittenSearch.current = stringifySearchPlain(pickKnown(input, tool.id));
+      const desired = stringifySearchPlain(pickKnown(input, tool.id));
+      lastWrittenSearch.current = desired;
       void navigate({ to: "/tool/$toolId", params: { toolId: tool.id }, search: input, replace: true, resetScroll: false });
+      if (desired && window.location.search !== desired) {
+        window.history.replaceState(window.history.state, "", `${window.location.pathname}${desired}`);
+      }
     }, 280);
     return () => window.clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- persist the live input map; tool object identity is not the trigger
@@ -140,6 +144,21 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       setDisplayInput((current) => ({ ...current, [key]: formatShop(convertShop(spec.family, engineValue, spec.engine, nextUnit)) }));
     } catch {
       /* keep the typed value */
+    }
+  };
+
+  const copyLink = async () => {
+    const path = sharePath(
+      tool.id,
+      input,
+      toolFields[tool.id].map((field) => field.key),
+    );
+    const href = `${window.location.origin}${path}`;
+    try {
+      await navigator.clipboard.writeText(href);
+      toast.success("Link copied. It opens this model with these numbers.");
+    } catch {
+      toast.error("Clipboard unavailable. Copy the address bar instead.");
     }
   };
 
@@ -355,7 +374,11 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     </Button>
                     <Button onClick={copySummary}>
                       <Copy size={13} />
-                      Copy
+                      Copy result
+                    </Button>
+                    <Button onClick={copyLink}>
+                      <Link2 size={13} />
+                      Copy link
                     </Button>
                   </div>
               </>

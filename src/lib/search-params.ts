@@ -43,6 +43,17 @@ export function stringifySearchPlain(search: Record<string, unknown>): string {
   return text ? `?${text}` : "";
 }
 
+export function sharePath(toolId: string, input: Record<string, unknown>, allowedKeys: string[]) {
+  const allowed = new Set(allowedKeys);
+  const next: Record<string, string> = {};
+  for (const [key, value] of Object.entries(input)) {
+    if (!allowed.has(key)) continue;
+    const text = coerceSearchValue(value);
+    if (text !== undefined && text !== "") next[key] = text;
+  }
+  return `/tool/${toolId}${stringifySearchPlain(next)}`;
+}
+
 export function toolSearchFromUnknown(search: Record<string, unknown>): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [key, value] of Object.entries(search)) {
