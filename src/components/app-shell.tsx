@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { SignedIn, SignedOut, UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { CommandPalette } from "@/components/command-palette";
+import { FamilySwitch } from "@/components/family-switch";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { SIBLING } from "@/lib/desk";
 import { cn } from "@/lib/utils";
@@ -69,9 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
       <header className="no-print sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-xl">
         <div className="flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-5">
-          <Link to="/" className="wordmark shrink-0 pr-2">
-            CALIPER
-          </Link>
+          <FamilySwitch />
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
             {primaryNav.map((item) => {
               const Icon = item.icon;
@@ -162,7 +161,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button type="button" className="absolute inset-0 bg-fg/45" aria-label="Close menu" onClick={() => setMenuOpen(false)} />
           <aside className="absolute inset-y-0 right-0 flex w-72 flex-col border-l border-border bg-bg p-5">
             <div className="mb-6 flex items-center justify-between">
-              <p className="wordmark">CALIPER</p>
+              <FamilySwitch />
               <Button variant="outline" size="icon" className="size-9" aria-label="Close" onClick={() => setMenuOpen(false)}>
                 <X size={16} />
               </Button>
