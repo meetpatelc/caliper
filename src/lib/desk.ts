@@ -3,6 +3,13 @@ import { domains } from "@/lib/platform";
 
 export const APP_NAME = "Caliper";
 export const APP_TAGLINE = "Set the numbers. Keep the model in frame.";
+export const APP_JOB = "The ready desk — open a model and get a number.";
+export const SIBLING = {
+  name: "Gauge",
+  job: "Write and publish a model",
+  url: "https://meadow-prairie-bamboo-civic.grok.me",
+  repo: "https://github.com/meetpatelc/gauge",
+} as const;
 export const MODEL_COUNT = tools.length;
 
 export const activeDomains = domains.map((domain) => {

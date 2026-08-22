@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { SignedIn, SignedOut, UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { CommandPalette } from "@/components/command-palette";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { SIBLING } from "@/lib/desk";
 import { cn } from "@/lib/utils";
 
 const primaryNav = [
@@ -67,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
       <header className="no-print sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-xl">
         <div className="flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-5">
-          <Link to="/" className="shrink-0 pr-2 text-sm font-semibold tracking-[0.22em]">
+          <Link to="/" className="wordmark shrink-0 pr-2">
             CALIPER
           </Link>
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
@@ -80,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   to={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-elevated hover:text-fg",
+                    buttonVariants({ variant: "ghost" }),
                     active && "bg-elevated text-fg",
                   )}
                 >
@@ -93,17 +95,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setPaletteOpen(true)}
-            className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-md border border-border bg-surface px-3 text-sm text-muted hover:border-accent hover:text-fg md:max-w-xl"
+            className={cn(buttonVariants({ variant: "outline" }), "min-w-0 flex-1 justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg md:max-w-xl")}
           >
             <Search size={15} className="shrink-0" />
             <span className="flex-1 truncate text-left">Search models…</span>
             <kbd className="hidden rounded border border-border px-1.5 py-0.5 font-mono text-[10px] md:inline">{shortcut}</kbd>
           </button>
           <details className="more-menu relative hidden lg:block">
-            <summary className="cursor-pointer list-none rounded-md px-3 py-2 text-sm text-muted hover:bg-elevated hover:text-fg">
+            <summary className={cn(buttonVariants({ variant: "ghost" }), "cursor-pointer list-none")}>
               More
             </summary>
-            <div className="absolute right-0 z-40 mt-1 w-44 overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg">
+            <div className="absolute right-0 z-40 mt-1 w-44 overflow-hidden rounded-md border border-border bg-surface py-1 shadow-menu">
               {moreNav.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -119,14 +121,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               })}
             </div>
           </details>
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="icon"
             onClick={toggleTheme}
-            className="hidden size-10 place-items-center rounded-md border border-border sm:grid"
+            className="hidden sm:inline-flex"
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          </Button>
           <div className="hidden min-w-0 items-center justify-end sm:flex">
             {isPending ? (
               <div className="h-8 w-24 animate-pulse rounded-full bg-elevated" />
@@ -136,20 +139,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </SignedIn>
             ) : (
               <SignedOut>
-                <Link to="/login" className="rounded-md border border-border px-3 py-2 text-sm hover:bg-elevated">
+                <Link to="/login" className={buttonVariants({ variant: "outline" })}>
                   Sign in
                 </Link>
               </SignedOut>
             )}
           </div>
-          <button
-            type="button"
-            className="grid size-10 shrink-0 place-items-center rounded-md border border-border lg:hidden"
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 lg:hidden"
             aria-label="Open menu"
             onClick={() => setMenuOpen(true)}
           >
             <Menu size={18} />
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -158,10 +162,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button type="button" className="absolute inset-0 bg-fg/45" aria-label="Close menu" onClick={() => setMenuOpen(false)} />
           <aside className="absolute inset-y-0 right-0 flex w-72 flex-col border-l border-border bg-bg p-5">
             <div className="mb-6 flex items-center justify-between">
-              <p className="text-sm font-semibold tracking-[0.22em]">CALIPER</p>
-              <button type="button" className="grid size-9 place-items-center rounded-md border border-border" aria-label="Close" onClick={() => setMenuOpen(false)}>
+              <p className="wordmark">CALIPER</p>
+              <Button variant="outline" size="icon" className="size-9" aria-label="Close" onClick={() => setMenuOpen(false)}>
                 <X size={16} />
-              </button>
+              </Button>
             </div>
             <nav className="grid gap-1">
               {drawerNav.map((item) => {
@@ -181,21 +185,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             </nav>
             <div className="mt-auto grid gap-3 border-t border-border pt-4">
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border text-sm hover:bg-elevated"
-              >
+              <Button variant="outline" onClick={toggleTheme}>
                 {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
                 {theme === "dark" ? "Light theme" : "Dark theme"}
-              </button>
+              </Button>
               {user ? (
                 <SignedIn>
                   <UserButton />
                 </SignedIn>
               ) : (
                 <SignedOut>
-                  <Link to="/login" onClick={() => setMenuOpen(false)} className="inline-flex h-10 items-center justify-center rounded-md border border-border px-3 text-sm hover:bg-elevated">
+                  <Link to="/login" onClick={() => setMenuOpen(false)} className={buttonVariants()}>
                     Sign in
                   </Link>
                 </SignedOut>
@@ -209,8 +209,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main id="main-content">{children}</main>
       <footer className="no-print border-t border-border px-5 py-6 text-sm text-muted">
         <div className="mx-auto flex w-[min(1180px,100%)] flex-wrap items-center justify-between gap-3">
-          <p>Caliper · first-pass models, not a design stamp</p>
+          <p>Caliper · ready desk, not a design stamp</p>
           <div className="flex flex-wrap gap-4">
+            <a href={SIBLING.url} className="hover:text-fg">{SIBLING.name}</a>
             <Link to="/projects" className="hover:text-fg">Projects</Link>
             <Link to="/review" className="hover:text-fg">Review</Link>
             <Link to="/reference" className="hover:text-fg">Methods</Link>

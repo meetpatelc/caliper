@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 import { tools } from "@/lib/catalog";
+import { SIBLING } from "@/lib/desk";
 
 export const Route = createFileRoute("/about")({ component: AboutPage });
 
@@ -22,9 +23,16 @@ function AboutPage() {
   return (
     <div className="page-wrap max-w-3xl">
       <p className="eyebrow">About Caliper</p>
-      <h1 className="display-title mt-4">Clear limits make a better engineering tool.</h1>
+      <h1 className="display-title mt-4">The ready desk.</h1>
       <p className="mt-5 text-base leading-7 text-muted">
-        Caliper is a public, local-first mechanical workspace for transparent preliminary calculation. {tools.length} models run in the browser. Saving a snapshot does not require an account.
+        Caliper is a local-first workspace of {tools.length} finished calculators. Open a model, set the numbers, keep the result. Saving a snapshot does not require an account.
+      </p>
+      <p className="mt-4 text-base leading-7 text-muted">
+        {SIBLING.name} is the sibling: atlas and studio — {SIBLING.job.toLowerCase()}.{" "}
+        <a href={SIBLING.url} className="text-accent">
+          Open {SIBLING.name}
+        </a>
+        .
       </p>
       <p className="mt-6 font-mono text-[11px] tracking-[0.14em] text-muted">PRELIMINARY ONLY · PROJECT CONTEXT REQUIRED · INDEPENDENT REVIEW</p>
       <div className="mt-10 grid gap-5 md:grid-cols-2">

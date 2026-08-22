@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Clock3, Search, ShieldCheck, Star } from "lucide-react";
 import { tools } from "@/lib/catalog";
-import { APP_NAME, MODEL_COUNT, openDeskSearch, releasedDomains, savedHeadline } from "@/lib/desk";
+import { APP_NAME, MODEL_COUNT, openDeskSearch, releasedDomains, savedHeadline, SIBLING } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
+import { buttonVariants } from "@/components/ui/button";
+import { panelClass, panelHoverClass } from "@/components/ui/panel";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -25,14 +28,14 @@ function Home() {
     <div>
       <section className="border-b border-border bg-surface">
         <div className="page-wrap py-10 sm:py-16">
-          <p className="eyebrow">{APP_NAME} · SI-first</p>
+          <p className="eyebrow">{APP_NAME} · ready desk</p>
           <h1 className="display-title mt-4 max-w-3xl">
             Set the numbers.
             <br />
             Keep the model in frame.
           </h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-muted">
-            A defensible number — units, method, and boundary in the same frame — before you open a spreadsheet.
+            {MODEL_COUNT} finished models. Open one, set the inputs, read the result. No account.
           </p>
           <button
             type="button"
@@ -45,6 +48,13 @@ function Home() {
           </button>
           <p className="mt-5 font-mono text-xs tracking-[0.12em] text-muted">
             {MODEL_COUNT} MODELS · DECLARED UNITS · PRELIMINARY ONLY
+          </p>
+          <p className="mt-3 max-w-xl text-sm text-muted">
+            To write your own, that’s{" "}
+            <a href={SIBLING.url} className="text-accent hover:text-fg">
+              {SIBLING.name}
+            </a>
+            .
           </p>
         </div>
       </section>
@@ -59,7 +69,7 @@ function Home() {
                 const tool = tools.find((item) => item.id === record.toolId);
                 const headline = savedHeadline(record.resultJson);
                 return (
-                  <li key={record.id} className="rounded-lg border border-border bg-surface px-4 py-3">
+                  <li key={record.id} className={cn(panelClass, "px-4 py-3")}>
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <Link
@@ -81,14 +91,11 @@ function Home() {
                           to="/tool/$toolId"
                           params={{ toolId: record.toolId }}
                           search={{ ...record.input, restore: "1" }}
-                          className="inline-flex h-10 items-center rounded-md bg-accent px-3 text-sm font-medium text-accent-fg"
+                          className={buttonVariants({ variant: "accent" })}
                         >
                           Reopen
                         </Link>
-                        <Link
-                          to="/review"
-                          className="inline-flex h-10 items-center rounded-md border border-border px-3 text-sm hover:bg-elevated"
-                        >
+                        <Link to="/review" className={buttonVariants()}>
                           Review
                         </Link>
                       </div>
@@ -115,7 +122,7 @@ function Home() {
                       <Link
                         to="/tool/$toolId"
                         params={{ toolId: tool!.id }}
-                        className="flex items-center justify-between rounded-md border border-border px-3 py-3 hover:bg-elevated"
+                        className={cn(panelHoverClass, "flex items-center justify-between px-3 py-3")}
                       >
                         <span>{tool!.title}</span>
                         <Search size={14} className="text-muted" />
@@ -135,7 +142,7 @@ function Home() {
                       <Link
                         to="/tool/$toolId"
                         params={{ toolId: tool!.id }}
-                        className="flex items-center justify-between rounded-md border border-border px-3 py-3 hover:bg-elevated"
+                        className={cn(panelHoverClass, "flex items-center justify-between px-3 py-3")}
                       >
                         <span>{tool!.title}</span>
                         <Star size={14} className="text-mark" fill="currentColor" />
@@ -157,7 +164,7 @@ function Home() {
                 key={domain.id}
                 to="/library"
                 search={{ domain: domain.id }}
-                className="rounded-lg border border-border p-4 hover:bg-elevated"
+                className={cn(panelHoverClass, "p-4")}
               >
                 <p className="font-medium">{domain.label}</p>
                 <p className="mt-1 text-sm text-muted">{domain.note}</p>
@@ -183,7 +190,7 @@ function Home() {
                 key={tool!.id}
                 to="/tool/$toolId"
                 params={{ toolId: tool!.id }}
-                className="rounded-lg border border-border bg-surface p-4 hover:border-accent"
+                className={cn(panelClass, "p-4 hover:border-accent")}
               >
                 <p className="eyebrow">{tool!.category}</p>
                 <h3 className="mt-2 text-lg font-semibold">{tool!.title}</h3>
@@ -194,7 +201,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="mt-14 flex flex-wrap items-start justify-between gap-6 rounded-xl border border-border bg-surface p-6">
+        <section className={cn(panelClass, "mt-14 flex flex-wrap items-start justify-between gap-6 p-6")}>
           <div className="max-w-xl">
             <ShieldCheck className="text-accent" size={22} />
             <h2 className="mt-3 text-xl font-semibold">A first-pass check is not a design stamp.</h2>

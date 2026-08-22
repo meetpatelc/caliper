@@ -5,6 +5,9 @@ import { searchableToolText, tools, type ToolId } from "@/lib/catalog";
 import { releasedDomains } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { controlClass } from "@/components/ui/field";
+import { panelClass } from "@/components/ui/panel";
 import type { EngineeringDomain } from "@/lib/platform";
 
 type LibrarySearch = { domain?: string; q?: string };
@@ -44,10 +47,10 @@ function Library() {
           <p className="eyebrow">Library</p>
           <h1 className="display-title mt-3">Every released model.</h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-muted">
-            {tools.length} calculators across {releasedDomains.length} domains. Filter, search, then open a workspace with its method still attached.
+            {tools.length} ready calculators across {releasedDomains.length} domains. Filter, search, open. This is the desk — not a studio.
           </p>
         </div>
-        <label className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2">
+        <label className={cn(controlClass, "flex h-auto items-center gap-2 bg-surface py-1")}>
           <Search size={16} className="text-muted" />
           <input
             value={query}
@@ -89,7 +92,7 @@ function Library() {
               </div>
               <span className="font-mono text-xs text-muted">{groupTools.length}</span>
             </div>
-            <div className="overflow-hidden rounded-lg border border-border">
+            <div className={panelClass}>
               {groupTools.map((tool) => (
                 <Link
                   key={tool.id}
@@ -120,16 +123,8 @@ function Library() {
 
 function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        "min-h-10 rounded-full border px-3 py-2 text-xs",
-        active ? "border-accent bg-accent text-accent-fg" : "border-border text-muted hover:text-fg",
-      )}
-    >
+    <Button type="button" aria-pressed={active} variant={active ? "accent" : "outline"} onClick={onClick} className="text-xs">
       {children}
-    </button>
+    </Button>
   );
 }
