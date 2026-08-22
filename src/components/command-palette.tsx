@@ -45,7 +45,7 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
   return (
     <div className="fixed inset-0 z-50">
       <button type="button" className="absolute inset-0 bg-fg/45" aria-label="Close search" onClick={() => onOpenChange(false)} />
-      <div className="relative mx-auto mt-[12vh] w-[min(640px,calc(100%-1.5rem))] overflow-hidden rounded-lg border border-border bg-surface shadow-2xl">
+      <div className="relative mx-auto mt-[12vh] w-[min(640px,calc(100%-1.5rem))] overflow-hidden rounded-lg border border-border bg-surface shadow-menu">
         <Command
           label="Search Caliper"
           className="bg-surface text-fg"

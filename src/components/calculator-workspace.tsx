@@ -3,6 +3,8 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, CircleAlert, Copy, RotateCcw, Save, Star } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
+import { Button } from "@/components/ui/button";
+import { Field, Input, Select, UnitBadge, UnitSelect, controlClass } from "@/components/ui/field";
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
@@ -173,14 +175,10 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           <ArrowLeft size={15} />
           All models
         </Link>
-        <button
-          type="button"
-          onClick={() => toggleFavorite(tool.id)}
-          className={cn("inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm hover:bg-elevated", pinned && "border-mark text-mark")}
-        >
+        <Button variant={pinned ? "mark" : "outline"} onClick={() => toggleFavorite(tool.id)}>
           <Star size={14} fill={pinned ? "currentColor" : "none"} />
           {pinned ? "Pinned" : "Pin"}
-        </button>
+        </Button>
       </div>
 
       <p className="eyebrow">{tool.kicker}</p>
@@ -190,10 +188,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
         <aside id="inputs" className="bg-surface p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold">Inputs</h2>
-            <button
-              type="button"
-              className="inline-flex items-center gap-1 text-xs text-muted hover:text-fg"
-              onClick={() => {
+            <Button variant="ghost" size="sm" onClick={() => {
                 const next = { ...initialInputs[tool.id] };
                 setInput(next);
                 setDisplayUnit(Object.fromEntries(fields.map((field) => [field.key, field.unit ?? ""])));
@@ -203,7 +198,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
             >
               <RotateCcw size={13} />
               Example
-            </button>
+            </Button>
           </div>
           <div className="mt-4 grid gap-4">
             {fields.map((field) => {
@@ -213,25 +208,20 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               const fieldId = `${tool.id}-${field.key}`;
               const fieldError = result.errors.find((error) => error.toLowerCase().includes(field.label.toLowerCase()));
               return (
-                <label key={field.key} htmlFor={fieldId} className="grid gap-1.5">
-                  <span className="flex items-baseline gap-2 text-sm">
-                    {field.label}
-                    {field.symbol ? <em className="font-mono text-xs not-italic text-accent">{field.symbol}</em> : null}
-                  </span>
+                <Field key={field.key} htmlFor={fieldId} label={field.label} symbol={field.symbol} error={fieldError}>
                   {field.kind === "select" || converterUnit ? (
-                    <select
+                    <Select
                       id={fieldId}
                       value={input[field.key] ?? ""}
                       onChange={(event) => update(field.key, event.target.value)}
                       aria-invalid={Boolean(fieldError)}
-                      className={cn("h-10 rounded-md border border-border bg-bg px-3 text-sm", fieldError && "border-danger")}
                     >
                       {options?.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   ) : field.kind === "text" ? (
                     field.key === "observations" ? (
                       <textarea
@@ -239,48 +229,44 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                         rows={4}
                         value={input[field.key] ?? ""}
                         onChange={(event) => update(field.key, event.target.value)}
-                        className={cn("rounded-md border border-border bg-bg px-3 py-2 text-sm", fieldError && "border-danger")}
+                        className={cn(controlClass, "h-auto py-2", fieldError && "border-danger")}
                       />
                     ) : (
-                      <input
+                      <Input
                         id={fieldId}
                         type="text"
                         value={input[field.key] ?? ""}
                         onChange={(event) => update(field.key, event.target.value)}
-                        className={cn("h-10 rounded-md border border-border bg-bg px-3 text-sm", fieldError && "border-danger")}
+                        aria-invalid={Boolean(fieldError)}
                       />
                     )
                   ) : (
                     <span className="flex gap-2">
-                      <input
+                      <Input
                         id={fieldId}
                         inputMode="decimal"
                         value={displayInput[field.key] ?? input[field.key] ?? ""}
                         onChange={(event) => onNumberChange(field.key, event.target.value, field.unit)}
-                        className={cn("h-10 min-w-0 flex-1 rounded-md border border-border bg-bg px-3 font-mono text-sm tabular-nums", fieldError && "border-danger")}
+                        aria-invalid={Boolean(fieldError)}
                       />
                       {unitSwitchFor(field.unit) && tool.id !== "converter" ? (
-                        <select
+                        <UnitSelect
                           aria-label={`${field.label} unit`}
                           value={displayUnit[field.key] || field.unit}
                           onChange={(event) => onUnitChange(field.key, event.target.value, field.unit)}
-                          className="h-10 w-[4.75rem] shrink-0 rounded-md border border-border bg-bg px-1 font-mono text-xs"
                         >
                           {unitSwitchFor(field.unit)!.options.map((option) => (
                             <option key={option} value={option}>
                               {option}
                             </option>
                           ))}
-                        </select>
+                        </UnitSelect>
                       ) : field.unit ? (
-                        <span className="grid h-10 w-[4.75rem] shrink-0 place-items-center rounded-md border border-border bg-bg font-mono text-xs text-muted">
-                          {field.unit}
-                        </span>
+                        <UnitBadge>{field.unit}</UnitBadge>
                       ) : null}
                     </span>
                   )}
-                  {fieldError ? <small className="text-xs leading-4 text-danger">{fieldError}</small> : null}
-                </label>
+                </Field>
               );
             })}
           </div>
@@ -320,22 +306,19 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                         <span className="flex items-center gap-2">
                           <p className="min-w-0 flex-1 font-mono text-3xl font-medium tabular-nums tracking-tight">{shown}</p>
                           {canSwitch ? (
-                            <select
+                            <UnitSelect
                               aria-label={`${group.label} unit`}
                               value={unit}
                               onChange={(event) => setResultUnit((current) => ({ ...current, [group.label]: event.target.value }))}
-                              className="h-10 w-[4.75rem] shrink-0 rounded-md border border-border bg-bg px-1 font-mono text-xs"
                             >
                               {options.map((option) => (
                                 <option key={option} value={option}>
                                   {option}
                                 </option>
                               ))}
-                            </select>
+                            </UnitSelect>
                           ) : (
-                            <span className="grid h-10 w-[4.75rem] shrink-0 place-items-center rounded-md border border-border bg-bg font-mono text-xs text-muted">
-                              {group.primary.unit}
-                            </span>
+                            <UnitBadge>{group.primary.unit}</UnitBadge>
                           )}
                         </span>
                       </div>
@@ -343,14 +326,14 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                   })}
                 </div>
                 <div className="mt-5 flex flex-wrap gap-2">
-                    <button type="button" className="h-10 rounded-md bg-accent px-3 text-sm font-medium text-accent-fg" onClick={saveLocal}>
-                      <Save size={13} className="mr-1 inline" />
+                    <Button variant="accent" onClick={saveLocal}>
+                      <Save size={13} />
                       Save this check
-                    </button>
-                    <button type="button" className="h-10 rounded-md border border-border px-3 text-sm hover:bg-elevated" onClick={copySummary}>
-                      <Copy size={13} className="mr-1 inline" />
+                    </Button>
+                    <Button onClick={copySummary}>
+                      <Copy size={13} />
                       Copy
-                    </button>
+                    </Button>
                   </div>
               </>
             )}
