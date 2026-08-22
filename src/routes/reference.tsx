@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { tools } from "@/lib/catalog";
 import { releasedDomains } from "@/lib/desk";
+import { panelClass } from "@/components/ui/panel";
 import { governedReferenceData } from "@/lib/referenceData";
 
 export const Route = createFileRoute("/reference")({ component: ReferencePage });
@@ -34,7 +35,7 @@ function ReferencePage() {
         <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">Version, range, and source before a value.</h2>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {governedReferenceData.map((dataset) => (
-            <article key={dataset.id} className="rounded-xl border border-border bg-surface p-5">
+            <article key={dataset.id} className={`${panelClass} p-5`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="eyebrow">{dataset.id.replace(/-/g, " ")}</p>

@@ -11,6 +11,10 @@ import {
   type ReviewArea,
 } from "@/lib/reviewRules";
 import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemplates";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input, Select, controlClass } from "@/components/ui/field";
+import { panelClass, panelHoverClass } from "@/components/ui/panel";
+import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
 
 type ReviewSearch = { id?: string };
@@ -156,7 +160,7 @@ function ReviewPage() {
       <div className="mt-8 grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
         <aside className="grid h-fit gap-1 rounded-lg border border-border p-2">
           {reviewAreas.map((item) => (
-            <button key={item.id} type="button" onClick={() => setArea(item.id)} className={`rounded-md px-3 py-2 text-left text-sm ${area === item.id ? "bg-elevated" : "text-muted hover:text-fg"}`}>
+            <button key={item.id} type="button" onClick={() => setArea(item.id)} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start", area === item.id && "bg-elevated text-fg")}>
               {item.label}
             </button>
           ))}
@@ -165,7 +169,7 @@ function ReviewPage() {
           {activeRules.map((rule) => {
             const on = complete.includes(rule.id);
             return (
-              <button key={rule.id} type="button" onClick={() => setComplete((current) => (on ? current.filter((id) => id !== rule.id) : [...current, rule.id]))} className="flex gap-3 rounded-lg border border-border p-4 text-left hover:bg-elevated">
+              <button key={rule.id} type="button" onClick={() => setComplete((current) => (on ? current.filter((id) => id !== rule.id) : [...current, rule.id]))} className={cn(panelHoverClass, "flex w-full gap-3 p-4 text-left")}>
                 <span className={`mt-0.5 grid size-5 place-items-center rounded-sm border ${on ? "border-ok bg-ok text-bg" : "border-border"}`}>
                   {on && <Check size={12} />}
                 </span>
@@ -181,42 +185,42 @@ function ReviewPage() {
       </div>
 
       <section className="mt-12 grid gap-8 lg:grid-cols-2">
-        <div className="rounded-xl border border-border p-5">
+        <div className={cn(panelClass, "p-5")}>
           <p className="eyebrow">Trade study</p>
           <h2 className="mt-1 text-xl font-semibold">Weighted comparison</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <label className="grid gap-1 text-xs text-muted">
               Option A
-              <input value={optionAName} onChange={(event) => setOptionAName(event.target.value)} className="h-10 rounded-md border border-border bg-bg px-3 text-sm text-fg" />
+              <Input value={optionAName} onChange={(event) => setOptionAName(event.target.value)} />
             </label>
             <label className="grid gap-1 text-xs text-muted">
               Option B
-              <input value={optionBName} onChange={(event) => setOptionBName(event.target.value)} className="h-10 rounded-md border border-border bg-bg px-3 text-sm text-fg" />
+              <Input value={optionBName} onChange={(event) => setOptionBName(event.target.value)} />
             </label>
           </div>
           <div className="mt-4 grid gap-3">
             {criteria.map((criterion, index) => (
               <div key={index} className="grid gap-2 rounded-md border border-border p-3 sm:grid-cols-[1fr_70px_70px_70px_auto]">
-                <input value={criterion.label} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, label: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 text-sm" />
-                <input value={criterion.weight} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, weight: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 font-mono text-sm" aria-label="Weight" />
-                <input value={criterion.optionA} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionA: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 font-mono text-sm" aria-label="A score" />
-                <input value={criterion.optionB} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionB: event.target.value } : item)))} className="h-10 rounded-md border border-border bg-bg px-2 font-mono text-sm" aria-label="B score" />
-                <button type="button" className="grid size-10 place-items-center" onClick={() => setCriteria((current) => (current.length === 1 ? current : current.filter((_, i) => i !== index)))} aria-label="Remove">
+                <Input value={criterion.label} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, label: event.target.value } : item)))} />
+                <Input value={criterion.weight} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, weight: event.target.value } : item)))} className="font-mono" aria-label="Weight" />
+                <Input value={criterion.optionA} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionA: event.target.value } : item)))} className="font-mono" aria-label="A score" />
+                <Input value={criterion.optionB} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionB: event.target.value } : item)))} className="font-mono" aria-label="B score" />
+                <Button variant="ghost" size="icon" onClick={() => setCriteria((current) => (current.length === 1 ? current : current.filter((_, i) => i !== index)))} aria-label="Remove">
                   <Minus size={14} />
-                </button>
+                </Button>
               </div>
             ))}
           </div>
-          <button type="button" className="mt-3 inline-flex items-center gap-1 text-sm text-accent" onClick={() => setCriteria((current) => [...current, { label: "New criterion", weight: "1", optionA: "5", optionB: "5" }])}>
+          <Button variant="ghost" className="mt-3 text-accent" onClick={() => setCriteria((current) => [...current, { label: "New criterion", weight: "1", optionA: "5", optionB: "5" }])}>
             <Plus size={14} /> Add criterion
-          </button>
+          </Button>
           {trade.error ? <p className="mt-4 text-sm text-danger">{trade.error}</p> : trade.result && (
             <p className="mt-4 font-mono text-sm">
               {optionAName}: {trade.result.normalizedA.toFixed(2)} · {optionBName}: {trade.result.normalizedB.toFixed(2)}
             </p>
           )}
         </div>
-        <div className="rounded-xl border border-border p-5">
+        <div className={cn(panelClass, "p-5")}>
           <p className="eyebrow">FMEA arithmetic</p>
           <h2 className="mt-1 text-xl font-semibold">Severity × occurrence × detection</h2>
           <div className="mt-4 grid grid-cols-3 gap-3">
@@ -229,18 +233,18 @@ function ReviewPage() {
             ).map(([label, value, setter]) => (
               <label key={label} className="grid gap-1 text-xs text-muted">
                 {label}
-                <input value={value} onChange={(event) => setter(event.target.value)} className="h-10 rounded-md border border-border bg-bg px-3 font-mono text-sm text-fg" />
+                <Input value={value} onChange={(event) => setter(event.target.value)} className="font-mono" />
               </label>
             ))}
           </div>
           {fmea.error ? <p className="mt-4 text-sm text-danger">{fmea.error}</p> : fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>}
           <label className="mt-6 grid gap-2 text-xs text-muted">
             Selection workflow
-            <select value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)} className="h-10 rounded-md border border-border bg-bg px-3 text-sm text-fg">
+            <Select value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)}>
               {selectionWorkflows.map((item) => (
                 <option key={item.id} value={item.id}>{item.title}</option>
               ))}
-            </select>
+            </Select>
           </label>
           <p className="mt-3 text-sm text-muted">{activeWorkflow.scope}</p>
           <ul className="mt-3 grid gap-2">
@@ -260,25 +264,25 @@ function ReviewPage() {
         </div>
       </section>
 
-      <section className="mt-10 rounded-xl border border-border p-5">
+      <section className={cn(panelClass, "mt-10 p-5")}>
         <p className="eyebrow">Record</p>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <input value={title} onChange={(event) => setTitle(event.target.value)} className="h-11 rounded-md border border-border bg-bg px-3 text-sm" placeholder="Snapshot title" />
-          <select value={templateKind} onChange={(event) => setTemplateKind(event.target.value as DocumentTemplateKind)} className="h-11 rounded-md border border-border bg-bg px-3 text-sm">
+          <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Snapshot title" />
+          <Select value={templateKind} onChange={(event) => setTemplateKind(event.target.value as DocumentTemplateKind)}>
             <option value="report">Report template</option>
             <option value="checklist">Checklist template</option>
             <option value="designBasis">Design-basis record</option>
             <option value="changeSummary">Change-summary record</option>
-          </select>
+          </Select>
         </div>
-        <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className="mt-3 w-full rounded-md border border-border bg-bg px-3 py-2 text-sm" placeholder="Notes (optional)" />
+        <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className={cn(controlClass, "mt-3 h-auto w-full py-2")} placeholder="Notes (optional)" />
         <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" onClick={persist} className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg">
+          <Button variant="accent" onClick={persist}>
             <Save size={15} /> Save locally
-          </button>
-          <button type="button" onClick={download} className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm">
+          </Button>
+          <Button onClick={download}>
             <Download size={15} /> Download markdown
-          </button>
+          </Button>
         </div>
         {reviews.length > 0 && <p className="mt-4 text-sm text-muted">{reviews.length} snapshot{reviews.length === 1 ? "" : "s"} stored in this browser. Open one from Projects to continue.</p>}
       </section>

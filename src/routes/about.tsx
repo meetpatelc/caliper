@@ -34,9 +34,9 @@ function AboutPage() {
         </a>
         .
       </p>
-      <p className="mt-6 font-mono text-[11px] tracking-[0.14em] text-muted">PRELIMINARY ONLY · PROJECT CONTEXT REQUIRED · INDEPENDENT REVIEW</p>
+      <p className="eyebrow mt-6">Preliminary only · project context required · independent review</p>
       <div className="mt-10 grid gap-5 md:grid-cols-2">
-        <div className="rounded-xl border border-ok/30 p-5">
+        <div className="rounded-lg border border-ok/30 p-5">
           <p className="eyebrow text-ok">Designed to support</p>
           <ul className="mt-4 grid gap-3 text-sm leading-6">
             {suitable.map((item) => (
@@ -47,7 +47,7 @@ function AboutPage() {
             ))}
           </ul>
         </div>
-        <div className="rounded-xl border border-mark/40 p-5">
+        <div className="rounded-lg border border-mark/40 p-5">
           <p className="eyebrow text-mark">Not provided</p>
           <ul className="mt-4 grid gap-3 text-sm leading-6">
             {unsuitable.map((item) => (

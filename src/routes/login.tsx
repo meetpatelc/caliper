@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GROK_PROVIDERS, authEnabled, signIn } from "@/lib/auth/client";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/login")({ component: Login });
 
@@ -7,7 +8,7 @@ function Login() {
   return (
     <main className="grid min-h-dvh place-items-center bg-bg px-6 text-fg">
       <div className="w-full max-w-sm">
-        <Link to="/" className="text-sm font-semibold tracking-[0.22em]">
+        <Link to="/" className="wordmark">
           CALIPER
         </Link>
         <h1 className="mt-6 text-2xl font-semibold tracking-[-0.03em]">Sign in</h1>
@@ -17,14 +18,13 @@ function Login() {
         <div className="mt-6 grid gap-2">
           {authEnabled ? (
             GROK_PROVIDERS.map((provider) => (
-              <button
+              <Button
                 key={provider.providerId}
-                type="button"
+                className="w-full"
                 onClick={() => signIn(provider.providerId, { callbackURL: "/" })}
-                className="w-full rounded-md border border-border px-4 py-2.5 text-sm hover:bg-elevated"
               >
                 Continue with {provider.label}
-              </button>
+              </Button>
             ))
           ) : (
             <p className="text-sm text-muted">Sign-in is disabled.</p>

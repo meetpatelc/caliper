@@ -173,7 +173,7 @@
   left: 28%;
   width: 44%;
   border: 1px solid var(--color-accent);
-  background: rgba(88,231,225,.16);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   font: 9px "DM Mono",monospace;
   letter-spacing: .12em;
   padding: 9px;
@@ -304,7 +304,7 @@
   border-left: 2px solid var(--color-accent);
   border-bottom: 2px solid var(--color-accent);
   clip-path: polygon(0 100%,22% 10%,72% 10%,100% 100%,100% 100%,0 100%);
-  background: linear-gradient(135deg,transparent 48%,rgba(88,231,225,.22) 49% 51%,transparent 52%);
+  background: linear-gradient(135deg,transparent 48%,color-mix(in srgb, var(--color-accent) 22%, transparent) 49% 51%,transparent 52%);
 }
 .motion-diagram span,.motion-diagram b {
   position: absolute;
@@ -405,8 +405,8 @@
   border: 2px solid var(--color-accent);
   border-left-width: 9px;
   border-right-width: 9px;
-  background: repeating-linear-gradient(90deg,rgba(88,231,225,.08) 0 16px,transparent 16px 32px);
-  box-shadow: inset 0 0 20px rgba(88,231,225,.08), 0 0 22px rgba(88,231,225,.08);
+  background: repeating-linear-gradient(90deg,color-mix(in srgb, var(--color-accent) 8%, transparent) 0 16px,transparent 16px 32px);
+  box-shadow: inset 0 0 20px color-mix(in srgb, var(--color-accent) 8%, transparent), 0 0 22px color-mix(in srgb, var(--color-accent) 8%, transparent);
 }
 .axial-diagram .arrow {
   color: var(--color-mark);
@@ -427,7 +427,7 @@
   height: 5px;
   border-radius: 999px;
   background: var(--color-accent);
-  box-shadow: 0 0 17px rgba(88,231,225,.15);
+  box-shadow: 0 0 17px color-mix(in srgb, var(--color-accent) 15%, transparent);
 }
 .beam-diagram .wall {
   position: absolute;
@@ -480,7 +480,7 @@
   left: 50%;
   width: 10px;
   border: 2px solid var(--color-accent);
-  background: rgba(88,231,225,.1);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
   transform: translateX(-50%);
 }
 .compression {
@@ -511,7 +511,7 @@
   bottom: 24px;
   left: 24px;
   border: 2px solid var(--color-accent);
-  background: rgba(88,231,225,.08);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
 }
 .section-circle > i {
   border-radius: 50%;
@@ -577,7 +577,7 @@
   border-bottom: 2px solid var(--color-accent);
   border-left: 2px solid var(--color-accent);
   clip-path: polygon(0 0,100% 100%,0 100%);
-  background: linear-gradient(135deg,transparent 49.4%,var(--color-accent) 49.7%,var(--color-accent) 50.5%,transparent 50.8%),rgba(88,231,225,.08);
+  background: linear-gradient(135deg,transparent 49.4%,var(--color-accent) 49.7%,var(--color-accent) 50.5%,transparent 50.8%),color-mix(in srgb, var(--color-accent) 8%, transparent);
 }
 .triangle-leg {
   position: absolute;
@@ -671,7 +671,7 @@
   height: 82px;
   border-top: 2px solid var(--color-accent);
   border-bottom: 2px solid var(--color-accent);
-  background: repeating-linear-gradient(90deg,rgba(88,231,225,.08) 0 13px,transparent 13px 26px);
+  background: repeating-linear-gradient(90deg,color-mix(in srgb, var(--color-accent) 8%, transparent) 0 13px,transparent 13px 26px);
 }
 .cylinder-cap {
   position: absolute;
@@ -680,7 +680,7 @@
   height: 82px;
   border: 2px solid var(--color-accent);
   border-radius: 50%;
-  background: rgba(88,231,225,.06);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 .cap-left {
   left: 10px;
@@ -711,7 +711,7 @@
   width: 94px;
   height: 94px;
   border: 2px solid var(--color-accent);
-  background: repeating-linear-gradient(45deg,rgba(88,231,225,.07) 0 9px,transparent 9px 18px);
+  background: repeating-linear-gradient(45deg,color-mix(in srgb, var(--color-accent) 7%, transparent) 0 9px,transparent 9px 18px);
   box-shadow: 14px -14px 0 -12px var(--color-accent), 14px -14px 0 -10px var(--color-surface);
 }
 .density-mass {
@@ -745,7 +745,7 @@
   height: 62px;
   border: 2px solid var(--color-accent);
   border-radius: 6px;
-  background: rgba(88,231,225,.08);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
 }
 .newton-force {
   position: absolute;
@@ -785,7 +785,7 @@
   height: 38px;
   border: 2px solid var(--color-accent);
   border-radius: 7px 11px 7px 7px;
-  background: rgba(88,231,225,.09);
+  background: color-mix(in srgb, var(--color-accent) 9%, transparent);
 }
 .kinetic-speed {
   position: absolute;

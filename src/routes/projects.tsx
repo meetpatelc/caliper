@@ -2,8 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { FolderPlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/field";
+import { panelClass } from "@/components/ui/panel";
 import { getTool } from "@/lib/catalog";
 import { useDeskStore } from "@/lib/workspace-store";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/projects")({ component: ProjectsPage });
 
@@ -38,23 +42,24 @@ function ProjectsPage() {
           toast.success("Project created.");
         }}
       >
-        <input value={name} onChange={(event) => setName(event.target.value)} placeholder="New project name" className="h-11 min-w-[220px] flex-1 rounded-md border border-border bg-surface px-3 text-sm" />
-        <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-accent px-4 text-sm font-medium text-accent-fg">
+        <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="New project name" className="min-w-[220px]" />
+        <Button type="submit" variant="accent">
           <FolderPlus size={16} /> Create
-        </button>
+        </Button>
       </form>
 
       {projects.length > 0 && (
         <div className="mt-6 flex flex-wrap gap-2">
           {projects.map((project) => (
-            <button
+            <Button
               key={project.id}
               type="button"
+              variant={project.id === projectId ? "accent" : "outline"}
               onClick={() => setActiveProject(project.id)}
-              className={`rounded-full border px-3 py-1.5 text-xs ${project.id === projectId ? "border-accent bg-accent text-accent-fg" : "border-border text-muted"}`}
+              className="text-xs"
             >
               {project.name}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -68,16 +73,16 @@ function ProjectsPage() {
             {visible.map((record) => {
               const tool = getTool(record.toolId);
               return (
-                <li key={record.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-4 py-3">
+                <li key={record.id} className={cn(panelClass, "flex flex-wrap items-center justify-between gap-3 px-4 py-3")}>
                   <div>
                     <Link to="/tool/$toolId" params={{ toolId: record.toolId }} search={{ ...record.input, restore: "1" }} className="font-medium hover:text-accent">
                       {record.title}
                     </Link>
                     <p className="font-mono text-[11px] text-muted">{tool?.title} · {new Date(record.savedAt).toLocaleString()}</p>
                   </div>
-                  <button type="button" className="grid size-9 place-items-center text-muted hover:text-danger" aria-label="Delete snapshot" onClick={() => deleteCalculation(record.id)}>
+                  <Button variant="ghost" size="icon" className="size-9 text-muted hover:text-danger" aria-label="Delete snapshot" onClick={() => deleteCalculation(record.id)}>
                     <Trash2 size={15} />
-                  </button>
+                  </Button>
                 </li>
               );
             })}
@@ -92,16 +97,16 @@ function ProjectsPage() {
         ) : (
           <ul className="mt-4 grid gap-2">
             {reviews.map((record) => (
-              <li key={record.id} className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+              <li key={record.id} className={cn(panelClass, "flex items-center justify-between px-4 py-3")}>
                 <div>
                   <Link to="/review" search={{ id: record.id }} className="font-medium hover:text-accent">
                     {record.title}
                   </Link>
                   <p className="font-mono text-[11px] text-muted">{record.area} · {new Date(record.savedAt).toLocaleString()}</p>
                 </div>
-                <button type="button" className="grid size-9 place-items-center text-muted hover:text-danger" aria-label="Delete review" onClick={() => deleteReview(record.id)}>
+                <Button variant="ghost" size="icon" className="size-9 text-muted hover:text-danger" aria-label="Delete review" onClick={() => deleteReview(record.id)}>
                   <Trash2 size={15} />
-                </button>
+                </Button>
               </li>
             ))}
           </ul>

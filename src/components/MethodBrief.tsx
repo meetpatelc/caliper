@@ -1,6 +1,7 @@
 import { BookOpenText, CircleAlert, ClipboardList, Compass, Sigma } from "lucide-react";
 import type { ToolDefinition } from "@/lib/catalog";
 import type { ToolBrief } from "@/lib/toolBriefs";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function MethodBrief({ tool, brief, activeMethod }: { tool: ToolDefinition; brief: ToolBrief; activeMethod: string }) {
   return (
@@ -12,7 +13,7 @@ export default function MethodBrief({ tool, brief, activeMethod }: { tool: ToolD
             Read the model before the number.
           </h2>
         </div>
-        <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 font-mono text-[11px] text-accent hover:bg-elevated">
+        <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className={buttonVariants()}>
           <BookOpenText size={14} />
           {tool.sourceLabel}
         </a>
