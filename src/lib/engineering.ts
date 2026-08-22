@@ -1642,7 +1642,7 @@ const calculateCylinder = (input: Record<string, string>): CalculationState => {
 const calculateDensity = (input: Record<string, string>): CalculationState => {
   const mass = finite(input.mass, "Mass"); const volumeLitres = finite(input.volume, "Volume"); const volume = volumeLitres * 1e-3; const density = mass / volume;
   return {
-    values: [quantity("density", "Average density", density, density, "kg/m³"), quantity("specificVolume", "Specific volume", 1 / density, 1 / density, "m³/kg"), quantity("specificGravity", "Specific gravity vs. water", density, density / 1000, "—")],
+    values: [quantity("density", "Average density", density, density, "kg/m³"), quantity("specificVolume", "Specific volume", 1 / density, 1 / density, "m³/kg"), quantity("specificGravity", "Specific gravity vs. water", density / 1000, density / 1000, "—")],
     warnings: ["Average density is derived only from the mass and volume entered here. It is not a condition-specific material-property lookup and should not be used as one."],
     errors: [],
     method: "ρ = m / V · v = 1 / ρ",
@@ -2068,10 +2068,11 @@ const calculateTorsionSpring = (input: Record<string, string>): CalculationState
   const modulus = finite(input.modulus, "Elastic modulus");
   const angle = finite(input.angle, "Angular deflection", false);
   if (meanDiameter <= wire) throw new Error("Mean coil diameter must be larger than wire diameter.");
-  const rate = (modulus * 1000 * wire ** 4) / (10.8 * meanDiameter * activeCoils);
+  const ratePerTurn = (modulus * 1000 * wire ** 4) / (10.8 * meanDiameter * activeCoils);
+  const rate = ratePerTurn / 360;
   const moment = rate * angle;
   const bendingStress = (32 * Math.abs(moment)) / (Math.PI * wire ** 3);
-  return { values: [quantity("rate", "Ideal angular spring rate", rate, rate, "N·mm/deg"), quantity("moment", "Applied spring moment", moment, moment, "N·mm"), quantity("stress", "Nominal wire bending stress", bendingStress, bendingStress, "MPa"), quantity("index", "Spring index", meanDiameter / wire, meanDiameter / wire, "—")], warnings: ["This is an elementary round-wire torsion-spring screen using stated modulus, geometry, and angle. It excludes leg geometry, coil contact, set, stress correction factors, fatigue, material heat treatment, residual stress, winding direction, coil clearance, tolerances, mounting, and design approval."], errors: [], method: "kθ = E·d⁴/(10.8·D·n) · M = kθ·θ · σnom = 32M/(πd³)" };
+  return { values: [quantity("rate", "Ideal angular spring rate", rate, rate, "N·mm/deg"), quantity("moment", "Applied spring moment", moment, moment, "N·mm"), quantity("stress", "Nominal wire bending stress", bendingStress, bendingStress, "MPa"), quantity("index", "Spring index", meanDiameter / wire, meanDiameter / wire, "—")], warnings: ["This is an elementary round-wire torsion-spring screen using stated modulus, geometry, and angle. The 10.8 coefficient is a per-turn (360°) rate; it is divided by 360 so the displayed rate is per degree. It excludes leg geometry, coil contact, set, stress correction factors, fatigue, material heat treatment, residual stress, winding direction, coil clearance, tolerances, mounting, and design approval."], errors: [], method: "k_360 = E·d⁴/(10.8·D·n) · kθ = k_360/360 · M = kθ·θ · σnom = 32M/(πd³)" };
 };
 
 const calculateKeyway = (input: Record<string, string>): CalculationState => {
@@ -2130,7 +2131,9 @@ const calculateProductionMetrics = (input: Record<string, string>): CalculationS
   const goodCount = finite(input.goodCount, "Good first-pass count", false);
   const demand = finite(input.demand, "Demand in window");
   const operators = finite(input.operators, "Assigned operators");
+  if (stopTime < 0) throw new Error("Stop time cannot be negative.");
   if (stopTime >= plannedTime) throw new Error("Stop time must be smaller than planned production time.");
+  if (goodCount <= 0) throw new Error("Good first-pass count must be greater than zero.");
   if (goodCount > totalCount) throw new Error("Good first-pass count cannot exceed total count.");
   const runTime = plannedTime - stopTime;
   const availability = runTime / plannedTime;
@@ -2244,10 +2247,11 @@ const calculateControlChart = (input: Record<string, string>): CalculationState 
   const constants = controlChartConstants[subgroupSize]!;
   const means = subgroupMeans();
   const variations = subgroupVariations();
+  const isRange = mode === "xbarR";
+  if (variations.some((value) => value < 0)) throw new Error(isRange ? "Subgroup ranges cannot be negative." : "Subgroup standard deviations cannot be negative.");
   if (means.length !== variations.length) throw new Error("Subgroup means and variations must have the same number of entered summaries.");
   const grandMean = means.reduce((sum, value) => sum + value, 0) / means.length;
   const averageVariation = variations.reduce((sum, value) => sum + value, 0) / variations.length;
-  const isRange = mode === "xbarR";
   const xFactor = isRange ? constants.a2 : constants.a3;
   const variationLowerFactor = isRange ? constants.d3 : constants.b3;
   const variationUpperFactor = isRange ? constants.d4 : constants.b4;
@@ -2299,9 +2303,9 @@ const calculateShaftDesign = (input: Record<string, string>): CalculationState =
   const centralDeflection = centerLoad * length ** 3 / (48 * youngModulus * 1000 * areaMoment);
   const lengthM = length / 1000;
   const areaMomentM4 = areaMoment * 1e-12;
-  const criticalOmega = Math.PI / lengthM ** 2 * Math.sqrt(youngModulus * 1e9 * areaMomentM4 / lineMass);
+  const criticalOmega = Math.PI ** 2 / lengthM ** 2 * Math.sqrt(youngModulus * 1e9 * areaMomentM4 / lineMass);
   const criticalRpm = criticalOmega * 60 / (2 * Math.PI);
-  return { values: [quantity("minimumDiameter", "Minimum torsion-only diameter", minimumDiameter, minimumDiameter, "mm"), quantity("torsionalStress", "Torsional shear stress", torsionalStress, torsionalStress, "MPa"), quantity("twist", "Torsional twist", twistRadians, twistRadians * 180 / Math.PI, "deg"), quantity("centralDeflection", "Central-load deflection", centralDeflection, centralDeflection, "mm"), quantity("criticalRpm", "First-mode critical-speed estimate", criticalRpm, criticalRpm, "rpm")], warnings: ["This is a solid circular shaft screen: torsion-only allowable sizing, Saint-Venant twist, a simply-supported single central-load deflection, and a uniform simply-supported first-mode speed estimate. It excludes combined fatigue, stress concentrations, keyway effects, bearing/support flexibility, damping, unbalance, couplings, attached disks, distributed auxiliary masses, thermal effects, buckling, alignment, and rotor-dynamics validation."], errors: [], method: "dmin = ∛(16T/πτallow) · τ = 16T/(πd³) · θ = TL/(GJ) · δcenter = FL³/(48EI) · ω₁ = (π/L²)√(EI/m′)" };
+  return { values: [quantity("minimumDiameter", "Minimum torsion-only diameter", minimumDiameter, minimumDiameter, "mm"), quantity("torsionalStress", "Torsional shear stress", torsionalStress, torsionalStress, "MPa"), quantity("twist", "Torsional twist", twistRadians, twistRadians * 180 / Math.PI, "deg"), quantity("centralDeflection", "Central-load deflection", centralDeflection, centralDeflection, "mm"), quantity("criticalRpm", "First-mode critical-speed estimate", criticalRpm, criticalRpm, "rpm")], warnings: ["This is a solid circular shaft screen: torsion-only allowable sizing, Saint-Venant twist, a simply-supported single central-load deflection, and a uniform simply-supported first-mode speed estimate. It excludes combined fatigue, stress concentrations, keyway effects, bearing/support flexibility, damping, unbalance, couplings, attached disks, distributed auxiliary masses, thermal effects, buckling, alignment, and rotor-dynamics validation."], errors: [], method: "dmin = ∛(16T/πτallow) · τ = 16T/(πd³) · θ = TL/(GJ) · δcenter = FL³/(48EI) · ω₁ = (π²/L²)√(EI/m′)" };
 };
 
 const calculateBearingLoad = (input: Record<string, string>): CalculationState => {
