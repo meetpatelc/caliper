@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, CircleAlert, Copy, RotateCcw, Save, Star } from "lucide-react";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
 import { convertShop, formatShop, parseShop, shopLabel, unitSwitchFor } from "@/lib/fieldUnits";
+import { coerceSearchValue, stringifySearchPlain } from "@/lib/search-params";
 import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
@@ -33,6 +34,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       toolFields[tool.id].map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""]),
     );
   });
+  const lastWrittenSearch = useRef(stringifySearchPlain(pickKnown(search, tool?.id ?? "axial")));
   const favorites = useDeskStore((state) => state.favorites);
   const toggleFavorite = useDeskStore((state) => state.toggleFavorite);
   const touchRecent = useDeskStore((state) => state.touchRecent);
@@ -44,28 +46,35 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
 
   useEffect(() => {
     if (!tool) return;
-    const next = { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
+    const fromUrl = pickKnown(search, tool.id);
+    const next = { ...initialInputs[tool.id], ...fromUrl };
     setInput(next);
     setResultUnit({});
     setDisplayUnit(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""])));
     setDisplayInput(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, next[field.key] ?? ""])));
+    lastWrittenSearch.current = stringifySearchPlain(fromUrl);
     touchRecent(tool.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset inputs only when the model changes
   }, [tool?.id]);
 
   useEffect(() => {
-    if (!tool || search.restore !== "1") return;
-    const restored = { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
-    setInput(restored);
-    void navigate({ to: "/tool/$toolId", params: { toolId: tool.id }, search: restored, replace: true, resetScroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- restore flag is the trigger; full search object churns with debounce
-  }, [tool?.id, search.restore, navigate]);
+    if (!tool) return;
+    const fromUrl = pickKnown(search, tool.id);
+    const incoming = stringifySearchPlain(fromUrl);
+    if (incoming === lastWrittenSearch.current) return;
+    const next = { ...initialInputs[tool.id], ...fromUrl };
+    setInput(next);
+    setDisplayInput(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, next[field.key] ?? ""])));
+    lastWrittenSearch.current = incoming;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- apply URL changes; tool object identity is not the trigger
+  }, [tool?.id, search]);
 
   const result = useMemo(() => (tool ? calculateTool(tool.id, input) : null), [tool, input]);
 
   useEffect(() => {
     if (!tool) return;
     const handle = window.setTimeout(() => {
+      lastWrittenSearch.current = stringifySearchPlain(pickKnown(input, tool.id));
       void navigate({ to: "/tool/$toolId", params: { toolId: tool.id }, search: input, replace: true, resetScroll: false });
     }, 280);
     return () => window.clearTimeout(handle);
@@ -425,7 +434,8 @@ function pickKnown(search: Record<string, string>, toolId: ToolId) {
   const allowed = new Set(toolFields[toolId].map((field) => field.key));
   const next: Record<string, string> = {};
   for (const [key, value] of Object.entries(search)) {
-    if (allowed.has(key) && typeof value === "string") next[key] = value;
+    const text = coerceSearchValue(value);
+    if (allowed.has(key) && text !== undefined && text !== "") next[key] = text;
   }
   return next;
 }

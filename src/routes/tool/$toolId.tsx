@@ -1,14 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CalculatorWorkspace } from "@/components/calculator-workspace";
+import { toolSearchFromUnknown } from "@/lib/search-params";
 
 export const Route = createFileRoute("/tool/$toolId")({
-  validateSearch: (search: Record<string, unknown>) => {
-    const out: Record<string, string> = {};
-    for (const [key, value] of Object.entries(search)) {
-      if (typeof value === "string") out[key] = value;
-    }
-    return out;
-  },
+  validateSearch: (search: Record<string, unknown>) => toolSearchFromUnknown(search),
   component: ToolRoute,
 });
 
