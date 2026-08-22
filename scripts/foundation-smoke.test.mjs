@@ -29,6 +29,12 @@ test("bar(g) remains a label: 1 bar(g) = 1 bar", () => {
   assert.equal(convertQuantity("pressure", 1, "bar(g)", "bar").converted, 1);
 });
 
+test("absolute temperature is affine: 32 °F → 0 °C; ΔT is linear", () => {
+  assert.equal(convertQuantity("temperature", 32, "°F", "°C").converted, 0);
+  assert.equal(convertQuantity("temperatureDelta", 1, "temperatureDelta.K", "temperatureDelta.degC").converted, 1);
+  assert.notEqual(convertQuantity("temperature", 1, "°F", "K").converted, 1);
+});
+
 test("Caliper menu uses unit ids; original extras (MN, yd) stay; Gauge-only families stay out", () => {
   assert.deepEqual(
     unitsForFamily("force").map((unit) => unit.id),

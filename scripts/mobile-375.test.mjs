@@ -51,3 +51,21 @@ test("375 px: beamDiagram shows the span sketch, no overflow", { skip: !ready },
   assert.ok(labels.some((label) => /supported span|point load/i.test(label ?? "")), String(labels));
   assert.match(body, /Support span/);
 });
+
+test("375 px: Library and Review do not overflow; Projects Create stays disabled", { skip: !ready }, async () => {
+  const browser = await chromium.launch({ args: ["--no-sandbox"] });
+  const page = await browser.newPage({ viewport: { width: 375, height: 812 } });
+  for (const path of ["/library", "/review"]) {
+    await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+    await page.waitForTimeout(250);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    );
+    assert.equal(overflow, false, `${path} overflow`);
+  }
+  await page.goto(`${BASE}/projects`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(250);
+  const disabled = await page.getByRole("button", { name: /Create/ }).isDisabled();
+  await browser.close();
+  assert.equal(disabled, true);
+});
