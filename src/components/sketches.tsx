@@ -36,6 +36,28 @@ export function AxialSketch() {
   );
 }
 
+export function BeamDiagramSketch() {
+  return (
+    <Plate label="Simply supported span with point load and uniform load">
+      <path d="M70 88 H370" {...ink} />
+      <path d="M90 88 L78 114 H102 Z" {...ink} />
+      <path d="M350 88 L338 114 H362 Z" {...ink} />
+      <path d="M90 44 H350" className="text-accent" {...ink} />
+      <path d="M110 44 V56 M150 44 V56 M190 44 V56 M230 44 V56 M270 44 V56 M310 44 V56" className="text-accent" {...ink} />
+      <path d="M110 56 L104 50 M110 56 L116 50 M190 56 L184 50 M190 56 L196 50 M270 56 L264 50 M270 56 L276 50" className="text-accent" {...ink} />
+      <path d="M186 88 V62" className="text-accent" {...ink} />
+      <path d="M186 62 L178 74 M186 62 L194 74" className="text-accent" {...ink} />
+      <T x="200" y="56" accent>P</T>
+      <T x="220" y="38" accent>w</T>
+      <path d="M90 132 H350" {...dim} />
+      <path d="M90 126 V138 M350 126 V138" {...dim} />
+      <T x="220" y="152">L</T>
+      <path d="M90 70 H186" {...dim} />
+      <T x="138" y="66">a</T>
+    </Plate>
+  );
+}
+
 export function BeamSketch({ cantilever }: { cantilever?: boolean }) {
   return (
     <Plate label={cantilever ? "Cantilever with end point load" : "Simply supported beam, center load"}>
@@ -328,6 +350,8 @@ export function ToolSketch({ toolId, variant }: { toolId: ToolId; variant?: stri
       return <AxialSketch />;
     case "beam":
       return <BeamSketch cantilever={variant === "cantilever"} />;
+    case "beamDiagram":
+      return <BeamDiagramSketch />;
     case "stability":
       return <ColumnSketch />;
     case "section":

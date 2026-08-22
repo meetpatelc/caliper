@@ -21,6 +21,10 @@ test("Caliper converter uses the shared engine: 1 in → 0.0254 m", () => {
   assert.equal(convertQuantity("length", 1, "in", "m").converted, 0.0254);
 });
 
+test("Caliper input unit change keeps the quantity: 10 kN → 10000 N", () => {
+  assert.equal(convertQuantity("force", 10, "kN", "N").converted, 10000);
+});
+
 test("bar(g) remains a label: 1 bar(g) = 1 bar", () => {
   assert.equal(convertQuantity("pressure", 1, "bar(g)", "bar").converted, 1);
 });

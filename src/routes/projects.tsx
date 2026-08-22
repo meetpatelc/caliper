@@ -36,14 +36,23 @@ function ProjectsPage() {
         className="mt-8 flex flex-wrap gap-2"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!name.trim()) return;
+          if (!name.trim()) {
+            toast.error("Name the project first.");
+            return;
+          }
           createProject(name);
           setName("");
           toast.success("Project created.");
         }}
       >
-        <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="New project name" className="min-w-[220px]" />
-        <Button type="submit" variant="accent">
+        <Input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="New project name"
+          className="min-w-[220px]"
+          aria-label="New project name"
+        />
+        <Button type="submit" variant="accent" disabled={!name.trim()}>
           <FolderPlus size={16} /> Create
         </Button>
       </form>
