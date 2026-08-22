@@ -8,7 +8,8 @@ import { Field, Input, Select, UnitBadge, UnitSelect, controlClass } from "@/com
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
-import { convertShop, formatShop, parseShop, unitSwitchFor } from "@/lib/fieldUnits";
+import { convertShop, formatShop, parseShop, shopLabel, unitSwitchFor } from "@/lib/fieldUnits";
+import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
@@ -28,7 +29,9 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   });
   const [displayUnit, setDisplayUnit] = useState<Record<string, string>>(() => {
     if (!tool) return {};
-    return Object.fromEntries(toolFields[tool.id].map((field) => [field.key, field.unit ?? ""]));
+    return Object.fromEntries(
+      toolFields[tool.id].map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""]),
+    );
   });
   const favorites = useDeskStore((state) => state.favorites);
   const toggleFavorite = useDeskStore((state) => state.toggleFavorite);
@@ -44,7 +47,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     const next = { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
     setInput(next);
     setResultUnit({});
-    setDisplayUnit(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, field.unit ?? ""])));
+    setDisplayUnit(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""])));
     setDisplayInput(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, next[field.key] ?? ""])));
     touchRecent(tool.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset inputs only when the model changes
@@ -204,15 +207,26 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
             {fields.map((field) => {
               if (isFieldHidden(tool.id, field.key, input)) return null;
               const converterUnit = tool.id === "converter" && (field.key === "from" || field.key === "to");
-              const options = converterUnit ? conversionUnits(input.category as ConversionGroup).map((unit) => ({ value: unit, label: unit })) : field.options;
+              const converterOptions = converterUnit
+                ? conversionUnits(input.category as ConversionGroup).map((unit) => ({
+                    value: unit,
+                    label: unitSymbol(input.category as UnitFamilyId, unit),
+                  }))
+                : null;
+              const options = converterOptions ?? field.options;
               const fieldId = `${tool.id}-${field.key}`;
               const fieldError = result.errors.find((error) => error.toLowerCase().includes(field.label.toLowerCase()));
+              const spec = unitSwitchFor(field.unit);
               return (
                 <Field key={field.key} htmlFor={fieldId} label={field.label} symbol={field.symbol} error={fieldError}>
                   {field.kind === "select" || converterUnit ? (
                     <Select
                       id={fieldId}
-                      value={input[field.key] ?? ""}
+                      value={
+                        converterUnit
+                          ? unitId(input.category as UnitFamilyId, input[field.key] ?? "")
+                          : (input[field.key] ?? "")
+                      }
                       onChange={(event) => update(field.key, event.target.value)}
                       aria-invalid={Boolean(fieldError)}
                     >
@@ -249,15 +263,15 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                         onChange={(event) => onNumberChange(field.key, event.target.value, field.unit)}
                         aria-invalid={Boolean(fieldError)}
                       />
-                      {unitSwitchFor(field.unit) && tool.id !== "converter" ? (
+                      {spec && tool.id !== "converter" ? (
                         <UnitSelect
                           aria-label={`${field.label} unit`}
-                          value={displayUnit[field.key] || field.unit}
+                          value={displayUnit[field.key] || spec.engine}
                           onChange={(event) => onUnitChange(field.key, event.target.value, field.unit)}
                         >
-                          {unitSwitchFor(field.unit)!.options.map((option) => (
+                          {spec.options.map((option) => (
                             <option key={option} value={option}>
-                              {option}
+                              {shopLabel(spec.family, option)}
                             </option>
                           ))}
                         </UnitSelect>
@@ -288,12 +302,12 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                 <div className="mt-4 grid gap-4">
                   {groupResultValues(result.values).map((group) => {
                     const spec = unitSwitchFor(group.primary.unit);
-                    const unit = resultUnit[group.label] ?? group.primary.unit;
+                    const stored = resultUnit[group.label] ?? (spec ? spec.engine : group.primary.unit);
                     const numeric = parseShop(group.primary.display);
                     let shown = tidyDisplay(group.primary.display);
-                    if (spec && Number.isFinite(numeric) && unit !== group.primary.unit) {
+                    if (spec && Number.isFinite(numeric) && stored !== spec.engine && stored !== group.primary.unit) {
                       try {
-                        shown = formatShop(convertShop(spec.family, numeric, group.primary.unit, unit));
+                        shown = formatShop(convertShop(spec.family, numeric, group.primary.unit, stored));
                       } catch {
                         shown = tidyDisplay(group.primary.display);
                       }
@@ -305,15 +319,15 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                         <span className="text-sm">{group.label}</span>
                         <span className="flex items-center gap-2">
                           <p className="min-w-0 flex-1 font-mono text-3xl font-medium tabular-nums tracking-tight">{shown}</p>
-                          {canSwitch ? (
+                          {canSwitch && spec ? (
                             <UnitSelect
                               aria-label={`${group.label} unit`}
-                              value={unit}
+                              value={stored}
                               onChange={(event) => setResultUnit((current) => ({ ...current, [group.label]: event.target.value }))}
                             >
                               {options.map((option) => (
                                 <option key={option} value={option}>
-                                  {option}
+                                  {shopLabel(spec.family, option)}
                                 </option>
                               ))}
                             </UnitSelect>

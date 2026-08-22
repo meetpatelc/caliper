@@ -5,7 +5,7 @@
  */
 
 import type { ToolId } from "@/lib/catalog";
-import { convertQuantity, isUnitFamilyId, unitFamilyOptions, unitsForFamily, type UnitFamilyId } from "@/lib/units";
+import { convertQuantity, isUnitFamilyId, unitFamilyOptions, unitSymbol, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 
 export type FieldKind = "number" | "select" | "text";
 export type FieldDefinition = {
@@ -3634,11 +3634,13 @@ const calculateConverter = (input: Record<string, string>): CalculationState => 
   const category = input.category;
   const value = finite(input.value, "Value", false);
   const conversion = convertQuantity(category, value, input.from, input.to);
+  const toLabel = unitSymbol(category, input.to);
+  const fromLabel = unitSymbol(category, input.from);
   return {
-    values: [quantity("converted", "Converted value", conversion.converted, conversion.converted, input.to, 7), quantity("canonical", "Canonical SI value", conversion.canonical, conversion.canonical, conversion.canonicalUnit, 7)],
+    values: [quantity("converted", "Converted value", conversion.converted, conversion.converted, toLabel, 7), quantity("canonical", "Canonical SI value", conversion.canonical, conversion.canonical, conversion.canonicalUnit, 7)],
     warnings: ["Only units from the same quantity family are available together. Display precision is rounded; the canonical value is retained separately."],
     errors: [],
-    method: `Canonical SI conversion: ${input.from} → ${conversion.canonicalUnit} → ${input.to}`,
+    method: `Canonical SI conversion: ${fromLabel} → ${conversion.canonicalUnit} → ${toLabel}`,
   };
 };
 

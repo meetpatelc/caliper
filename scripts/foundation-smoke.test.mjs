@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { convertQuantity } from "@instrument/units";
 import { calculateTool } from "../src/lib/engineering.ts";
+import { unitsForFamily } from "../src/lib/units.ts";
 
 test("Caliper axial: 50 kN / 1200 mm² → 41.666… MPa via calculateTool", () => {
   const result = calculateTool("axial", { force: "50", area: "1200", length: "250", modulus: "200" });
@@ -22,4 +23,12 @@ test("Caliper converter uses the shared engine: 1 in → 0.0254 m", () => {
 
 test("bar(g) remains a label: 1 bar(g) = 1 bar", () => {
   assert.equal(convertQuantity("pressure", 1, "bar(g)", "bar").converted, 1);
+});
+
+test("Caliper menu uses unit ids; original extras (MN, yd) stay; Gauge-only families stay out", () => {
+  assert.deepEqual(
+    unitsForFamily("force").map((unit) => unit.id),
+    ["force.N", "force.kN", "force.MN", "force.lbf"],
+  );
+  assert.ok(unitsForFamily("length").some((unit) => unit.id === "length.yd"));
 });
