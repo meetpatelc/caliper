@@ -1,0 +1,1946 @@
+{
+  "hertzContact": {
+    "values": [
+      {
+        "key": "reducedModulus",
+        "label": "Reduced elastic modulus",
+        "raw": 58605196327.4077,
+        "display": "58.605",
+        "unit": "GPa"
+      },
+      {
+        "key": "contactRadius",
+        "label": "Contact radius",
+        "raw": 0.0004250357524709563,
+        "display": "0.42504",
+        "unit": "mm"
+      },
+      {
+        "key": "contactDiameter",
+        "label": "Contact diameter",
+        "raw": 0.0008500715049419126,
+        "display": "0.85007",
+        "unit": "mm"
+      },
+      {
+        "key": "peakPressure",
+        "label": "Peak Hertz pressure",
+        "raw": 1321479605.324006,
+        "display": "1,321.5",
+        "unit": "MPa"
+      },
+      {
+        "key": "indentation",
+        "label": "Elastic approach",
+        "raw": 0.000015054615906546003,
+        "display": "15.055",
+        "unit": "µm"
+      }
+    ],
+    "warnings": [
+      "This is a smooth, frictionless, elastic, isotropic, homogeneous sphere-on-flat normal-contact screen. It excludes roughness, friction, plasticity, coatings, fatigue, thermal effects, surface finish, material selection, life, safety, and approval."
+    ],
+    "errors": [],
+    "method": "1/E* = (1−ν₁²)/E₁ + (1−ν₂²)/E₂ · a = [3FR/(4E*)]^(1/3) · p₀ = 3F/(2πa²)"
+  },
+  "deflectionCheck": {
+    "values": [
+      {
+        "key": "referenceDeflection",
+        "label": "Declared-reference deflection",
+        "raw": 6.666666666666667,
+        "display": "6.6667",
+        "unit": "mm"
+      },
+      {
+        "key": "deflectionRatio",
+        "label": "Declared deflection / reference",
+        "raw": 0.75,
+        "display": "0.75",
+        "unit": "—"
+      },
+      {
+        "key": "arithmeticDifference",
+        "label": "Reference minus declared deflection",
+        "raw": 1.666666666666667,
+        "display": "1.6667",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This compares a user-entered calculated deflection to a user-entered span/reference denominator. It does not select a limit, validate the upstream deflection model, establish a serviceability requirement, judge adequacy, apply a code, or approve a design."
+    ],
+    "errors": [],
+    "method": "δreference = L / nreference · ratio = δdeclared / δreference"
+  },
+  "plateBuckling": {
+    "values": [
+      {
+        "key": "criticalStress",
+        "label": "Elastic critical buckling stress",
+        "raw": 104.1189035719317,
+        "display": "104.12",
+        "unit": "MPa"
+      },
+      {
+        "key": "slendernessRatio",
+        "label": "Declared thickness / reference-width ratio",
+        "raw": 0.012,
+        "display": "0.012",
+        "unit": "—"
+      },
+      {
+        "key": "elasticPlateStiffnessTerm",
+        "label": "Elastic plate stiffness term",
+        "raw": 180761.98536793696,
+        "display": "180,762",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This calculates only the declared simply supported isotropic elastic plate-buckling relation using a user-entered coefficient. It does not select boundary conditions, load case, reference width, or buckling coefficient; and excludes plasticity, residual stress, geometric imperfections, post-buckling, stiffeners, connections, code requirements, safety factors, adequacy, and approval."
+    ],
+    "errors": [],
+    "method": "σcr = kπ²E/[12(1−ν²)](t/b)²"
+  },
+  "ballScrewLife": {
+    "values": [
+      {
+        "key": "nominalLifeRevolutions",
+        "label": "Nominal life",
+        "raw": 27000000,
+        "display": "27,000,000",
+        "unit": "rev"
+      },
+      {
+        "key": "idealTravelDistance",
+        "label": "Ideal travel distance",
+        "raw": 270,
+        "display": "270",
+        "unit": "km"
+      },
+      {
+        "key": "rotatingTimeHours",
+        "label": "Literal rotating time",
+        "raw": 375,
+        "display": "375",
+        "unit": "h"
+      },
+      {
+        "key": "literalElapsedTimeHours",
+        "label": "Literal elapsed time at declared travel fraction",
+        "raw": 937.5,
+        "display": "937.5",
+        "unit": "h"
+      },
+      {
+        "key": "ratingToLoadRatio",
+        "label": "Declared dynamic-rating / axial-load ratio",
+        "raw": 3,
+        "display": "3",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This applies the cited constant-direction axial ball-screw nominal-life relation using user-entered dynamic rating and axial load, then makes ideal lead/speed/travel-fraction conversions. It does not derive equivalent loads, model shocks, vibration, fluctuating duty, mounting, lubrication, alignment, preload, screw/nut selection, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "L10 = (Ca/Fa)³·10⁶ rev · s = L10·Ph · telapsed = L10/[60n·ftravel]"
+  },
+  "driveTrain": {
+    "values": [
+      {
+        "key": "totalRatio",
+        "label": "Declared total reduction ratio",
+        "raw": 12,
+        "display": "12",
+        "unit": "—"
+      },
+      {
+        "key": "totalEfficiency",
+        "label": "Declared total efficiency",
+        "raw": 0.9216,
+        "display": "92.16",
+        "unit": "%"
+      },
+      {
+        "key": "outputSpeed",
+        "label": "Literal output speed",
+        "raw": 150,
+        "display": "150",
+        "unit": "rpm"
+      },
+      {
+        "key": "outputTorque",
+        "label": "Literal output torque",
+        "raw": 132.7104,
+        "display": "132.71",
+        "unit": "N·m"
+      },
+      {
+        "key": "inputPower",
+        "label": "Literal input power",
+        "raw": 2.261946710584651,
+        "display": "2.2619",
+        "unit": "kW"
+      },
+      {
+        "key": "outputPower",
+        "label": "Literal output power",
+        "raw": 2.084610088474814,
+        "display": "2.0846",
+        "unit": "kW"
+      },
+      {
+        "key": "arithmeticLoss",
+        "label": "Declared-efficiency arithmetic loss",
+        "raw": 0.17733662210983675,
+        "display": "0.17734",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This multiplies user-entered series ratios and efficiencies, then applies ideal speed/torque/power relationships. It does not select a gearbox or stage configuration; predict individual loss, efficiency, backlash, stiffness, lubrication, temperature, inertia, dynamics, rating, reliability, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "rtotal = r1r2r3 · ηtotal = η1η2η3 · n2 = n1/rtotal · T2 = T1rtotalηtotal"
+  },
+  "gripperHold": {
+    "values": [
+      {
+        "key": "verticalLoad",
+        "label": "Declared vertical payload load",
+        "raw": 21.6133,
+        "display": "21.613",
+        "unit": "N"
+      },
+      {
+        "key": "totalGripForce",
+        "label": "Declared total normal gripping force",
+        "raw": 216.13299999999998,
+        "display": "216.13",
+        "unit": "N"
+      },
+      {
+        "key": "forcePerJaw",
+        "label": "Literal normal-force share per jaw",
+        "raw": 108.06649999999999,
+        "display": "108.07",
+        "unit": "N"
+      },
+      {
+        "key": "forceMultiplier",
+        "label": "Declared force multiplier",
+        "raw": 2,
+        "display": "2",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This applies a declared friction-only vertical-hold relation for equally sharing parallel grip contacts. It does not select a gripper, jaw, pad, pressure, or actuator; calculate contact geometry/stress, lateral or moment loads, compliance, force curves, dynamic shock, payload security, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "Fgrip = m(g + a)·S/μ · Fj = Fgrip/z"
+  },
+  "pneumaticDemandBudget": {
+    "values": [
+      {
+        "key": "aggregateCycleRate",
+        "label": "Literal aggregate active cycle rate",
+        "raw": 48,
+        "display": "48",
+        "unit": "cycles/min"
+      },
+      {
+        "key": "averageNormalizedFlow",
+        "label": "Literal average normalized air demand",
+        "raw": 57.599999999999994,
+        "display": "57.6",
+        "unit": "NL/min"
+      },
+      {
+        "key": "referenceSupplyFlow",
+        "label": "Declared reference supply flow",
+        "raw": 100,
+        "display": "100",
+        "unit": "NL/min"
+      },
+      {
+        "key": "referenceFlowRatio",
+        "label": "Literal demand / reference-flow ratio",
+        "raw": 0.576,
+        "display": "0.576",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This aggregates only user-declared normalized air demand, cycle rate, active-device count, and active-time fraction. It does not derive cylinder consumption; select or size a compressor, FRL, tubing, valve, or vacuum generator; model pressure-drop networks, air storage, leaks, duty transients, compressor curves, air quality, capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "nactive = ncycle·z·D/100 · Qavg = qcycle·nactive · ratio = Qavg/Qref"
+  },
+  "hydraulicLossBudget": {
+    "values": [
+      {
+        "key": "lossPower",
+        "label": "Literal hydraulic pressure-drop power",
+        "raw": 2.5,
+        "display": "2.5",
+        "unit": "kW"
+      },
+      {
+        "key": "averageLossPower",
+        "label": "Literal active-time-scaled loss power",
+        "raw": 1,
+        "display": "1",
+        "unit": "kW"
+      },
+      {
+        "key": "lossEnergyPerHour",
+        "label": "Literal loss energy per elapsed hour",
+        "raw": 1,
+        "display": "1",
+        "unit": "kWh/elapsed h"
+      },
+      {
+        "key": "activeTimeFraction",
+        "label": "Declared active-time fraction",
+        "raw": 40,
+        "display": "40",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This multiplies only a declared pressure drop by a declared flow, then scales the result by a declared active-time fraction. It does not select a pump, valve, hose, reservoir, accumulator, cooler, or component; infer system efficiency; model networks, temperature, fluid properties, accumulators, heat rejection, duty cycles beyond the stated scalar fraction, capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "Ploss = Δp·Q/600 · Pavg = Ploss·D/100 · Eper elapsed hour = Pavg·1 h"
+  },
+  "vacuumLeakageBudget": {
+    "values": [
+      {
+        "key": "averageLeakageDemand",
+        "label": "Literal average normalized leakage demand",
+        "raw": 5,
+        "display": "5",
+        "unit": "NL/min"
+      },
+      {
+        "key": "referenceSuctionFlow",
+        "label": "Declared reference suction flow",
+        "raw": 8,
+        "display": "8",
+        "unit": "NL/min"
+      },
+      {
+        "key": "referenceSuctionRatio",
+        "label": "Literal leakage demand / reference-flow ratio",
+        "raw": 0.625,
+        "display": "0.625",
+        "unit": "—"
+      },
+      {
+        "key": "leakageVolumePerHour",
+        "label": "Literal leakage volume per elapsed hour",
+        "raw": 300,
+        "display": "300",
+        "unit": "NL/elapsed h"
+      }
+    ],
+    "warnings": [
+      "This aggregates only user-declared normalized leakage demand, active vacuum-point count, and active-time fraction. It does not infer leakage from workpiece geometry, surface condition, conductance, porous materials, vacuum level, response time, or test data; select a vacuum generator, pump, pad, or number of pads; assess capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "Qleak,avg = qleak·z·D/100 · ratio = Qleak,avg/Qref · Vper elapsed hour = 60·Qleak,avg"
+  },
+  "hydraulicAccumulatorState": {
+    "values": [
+      {
+        "key": "gasVolumeAtMaximum",
+        "label": "Literal gas volume at declared maximum pressure",
+        "raw": 4.5,
+        "display": "4.5",
+        "unit": "L"
+      },
+      {
+        "key": "gasVolumeAtMinimum",
+        "label": "Literal gas volume at declared minimum pressure",
+        "raw": 7.5,
+        "display": "7.5",
+        "unit": "L"
+      },
+      {
+        "key": "usableFluidVolume",
+        "label": "Literal usable fluid-volume difference",
+        "raw": 3,
+        "display": "3",
+        "unit": "L"
+      },
+      {
+        "key": "polytropicExponent",
+        "label": "Declared polytropic exponent",
+        "raw": 1,
+        "display": "1",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This applies a user-declared ideal polytropic gas-state relation to declared absolute pressures and precharge gas volume. It does not select an accumulator, precharge, gas, vessel technology, safety device, or operating pressure; infer temperature, derive a transient duty cycle, model flow/response, heat transfer, seal condition, capacity, safety, suitability, code compliance, or approval."
+    ],
+    "errors": [],
+    "method": "P₀·V₀ⁿ = P·Vⁿ · V(P) = V₀·(P₀/P)^(1/n) · ΔVfluid = V(Pmin) − V(Pmax)"
+  },
+  "pumpSystemHeadPoint": {
+    "values": [
+      {
+        "key": "systemHead",
+        "label": "Literal declared system head at flow point",
+        "raw": 18,
+        "display": "18",
+        "unit": "m"
+      },
+      {
+        "key": "staticHead",
+        "label": "Declared static-head offset",
+        "raw": 10,
+        "display": "10",
+        "unit": "m"
+      },
+      {
+        "key": "quadraticLossHead",
+        "label": "Literal declared quadratic loss head",
+        "raw": 8,
+        "display": "8",
+        "unit": "m"
+      },
+      {
+        "key": "flowPoint",
+        "label": "Declared flow point",
+        "raw": 4,
+        "display": "4",
+        "unit": "L/s"
+      }
+    ],
+    "warnings": [
+      "This adds only a declared static-head offset to a declared quadratic-loss coefficient at one declared flow point. It does not derive the coefficient; model pipe, fitting, or valve losses; generate a full curve; find an operating point; compare a pump curve; select a pump; determine NPSH, capacity, efficiency, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "Hsystem(Q) = Hstatic + K·Q²"
+  },
+  "thermalRcStep": {
+    "values": [
+      {
+        "key": "timeConstant",
+        "label": "Literal thermal time constant",
+        "raw": 100,
+        "display": "100",
+        "unit": "s"
+      },
+      {
+        "key": "temperatureRise",
+        "label": "Literal ideal temperature rise at elapsed time",
+        "raw": 25.284822353142307,
+        "display": "25.285",
+        "unit": "K"
+      },
+      {
+        "key": "nodeTemperature",
+        "label": "Literal ideal node temperature",
+        "raw": 50.2848223531423,
+        "display": "50.285",
+        "unit": "°C"
+      },
+      {
+        "key": "steadyStateRise",
+        "label": "Literal ideal steady-state temperature rise",
+        "raw": 40,
+        "display": "40",
+        "unit": "K"
+      }
+    ],
+    "warnings": [
+      "This applies a user-declared constant power step to one ideal thermal RC node. It does not derive resistance or capacitance; determine thermal paths; select a heat sink, TIM, fan, or cooler; model multi-node conduction, convection, radiation, variable power, spatial temperature, material properties, junction limits, capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "τ = R·C · ΔT(t) = P·R·(1 − e^(−t/τ)) · Tnode = Tamb + ΔT(t)"
+  },
+  "compressibleMassFlow": {
+    "values": [
+      {
+        "key": "massFlow",
+        "label": "Literal ideal compressible mass flow",
+        "raw": 3.483329396590051,
+        "display": "3.4833",
+        "unit": "kg/s"
+      },
+      {
+        "key": "machNumber",
+        "label": "Declared Mach number",
+        "raw": 0.5,
+        "display": "0.5",
+        "unit": "—"
+      },
+      {
+        "key": "flowArea",
+        "label": "Declared flow area",
+        "raw": 0.01,
+        "display": "0.01",
+        "unit": "m²"
+      },
+      {
+        "key": "totalPressure",
+        "label": "Declared total pressure",
+        "raw": 200000,
+        "display": "200,000",
+        "unit": "Pa"
+      }
+    ],
+    "warnings": [
+      "This applies NASA’s stated ideal isentropic mass-flow relation only to user-declared area, total state, Mach number, specific-heat ratio, and gas constant. It does not determine Mach number, gas properties, choking, nozzle or duct geometry, pressure losses, heat transfer, flow regime, capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "ṁ = (A·pt/√Tt)·√(γ/R)·M·[1 + ((γ − 1)/2)·M²]^(−(γ + 1)/(2(γ − 1)))"
+  },
+  "machiningTimeBudget": {
+    "values": [
+      {
+        "key": "cuttingTime",
+        "label": "Literal cutting time",
+        "raw": 2,
+        "display": "2",
+        "unit": "min"
+      },
+      {
+        "key": "nonCutAllowance",
+        "label": "Declared non-cut time allowance",
+        "raw": 0.2,
+        "display": "0.2",
+        "unit": "min"
+      },
+      {
+        "key": "totalTime",
+        "label": "Literal declared total time",
+        "raw": 2.2,
+        "display": "2.2",
+        "unit": "min"
+      },
+      {
+        "key": "totalTimeSeconds",
+        "label": "Literal declared total time",
+        "raw": 132,
+        "display": "132",
+        "unit": "s"
+      }
+    ],
+    "warnings": [
+      "This divides only user-declared cutting length by declared feed rate and adds a declared non-cut allowance. It does not select tools, feeds, speeds, materials, machines, or process strategy; calculate tool life, quality, cost, capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "tcut = Lcut / Ffeed · ttotal = tcut + tallowance"
+  },
+  "threePhasePower": {
+    "values": [
+      {
+        "key": "apparentPower",
+        "label": "Literal three-phase apparent power",
+        "raw": 24.94153162899183,
+        "display": "24.942",
+        "unit": "kVA"
+      },
+      {
+        "key": "realPower",
+        "label": "Literal three-phase real power",
+        "raw": 21.200301884643054,
+        "display": "21.2",
+        "unit": "kW"
+      },
+      {
+        "key": "lineVoltage",
+        "label": "Declared line-to-line voltage",
+        "raw": 480,
+        "display": "480",
+        "unit": "V"
+      },
+      {
+        "key": "lineCurrent",
+        "label": "Declared line current",
+        "raw": 30,
+        "display": "30",
+        "unit": "A"
+      }
+    ],
+    "warnings": [
+      "This applies only the balanced scalar three-phase relation to user-declared line voltage, line current, and power factor. It does not determine phase balance, harmonics, conductor or breaker size, protection, voltage drop, grounding, available fault current, power-quality compliance, capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "S = √3·VLL·I · P = S·PF"
+  },
+  "sheetBendAllowance": {
+    "values": [
+      {
+        "key": "bendAllowance",
+        "label": "Literal single-bend allowance",
+        "raw": 2.356194490192345,
+        "display": "2.3562",
+        "unit": "mm"
+      },
+      {
+        "key": "bendDeduction",
+        "label": "Literal single-bend deduction",
+        "raw": 1.6438055098076547,
+        "display": "1.6438",
+        "unit": "mm"
+      },
+      {
+        "key": "neutralAxisRadius",
+        "label": "Literal neutral-axis radius",
+        "raw": 1.5,
+        "display": "1.5",
+        "unit": "mm"
+      },
+      {
+        "key": "bendAngle",
+        "label": "Declared bend angle",
+        "raw": 90,
+        "display": "90",
+        "unit": "°"
+      }
+    ],
+    "warnings": [
+      "This applies only the stated single-bend allowance and deduction relations to user-declared angle, inside radius, thickness, and K factor. It does not select material, K factor, tooling, bend radius, bend method, process sequence, multi-bend flat pattern, tolerance, manufacturability, cost, capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "BA = θ·(π/180)·(R + K·T) · BD = 2·(R + T)·tan(θ/2) − BA"
+  },
+  "splineLoad": {
+    "values": [
+      {
+        "key": "tangentialForce",
+        "label": "Tangential torque force",
+        "raw": 12000,
+        "display": "12,000",
+        "unit": "N"
+      },
+      {
+        "key": "effectiveToothCount",
+        "label": "Declared effective loaded teeth",
+        "raw": 6,
+        "display": "6",
+        "unit": "teeth"
+      },
+      {
+        "key": "forcePerEffectiveTooth",
+        "label": "Force per declared effective tooth",
+        "raw": 2000,
+        "display": "2,000",
+        "unit": "N"
+      },
+      {
+        "key": "nominalFlankPressure",
+        "label": "Nominal effective-tooth flank pressure",
+        "raw": 19.047619047619047,
+        "display": "19.048",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This is declared spline geometry and load-share arithmetic only. It excludes standards, tooth form, fit, root stress, fatigue, wear, misalignment, contact distribution, capacity, safety, and approval."
+    ],
+    "errors": [],
+    "method": "Ft = 2T/Dp · zeffective = z·ηshare · Ftooth = Ft/zeffective · pnominal = Ftooth/(Le·he)"
+  },
+  "gearMeshForce": {
+    "values": [
+      {
+        "key": "tangentialForce",
+        "label": "Pitch-line tangential force",
+        "raw": 2500,
+        "display": "2,500",
+        "unit": "N"
+      },
+      {
+        "key": "radialForce",
+        "label": "Declared-angle radial force",
+        "raw": 909.9255856655059,
+        "display": "909.93",
+        "unit": "N"
+      },
+      {
+        "key": "axialForce",
+        "label": "Declared-angle axial force",
+        "raw": 669.8729810778067,
+        "display": "669.87",
+        "unit": "N"
+      },
+      {
+        "key": "resultantForce",
+        "label": "Resultant mesh force",
+        "raw": 2743.4821636429097,
+        "display": "2,743.5",
+        "unit": "N"
+      }
+    ],
+    "warnings": [
+      "This is a static pitch-circle force decomposition for a user-defined parallel-axis spur or helical mesh. It excludes tooth geometry, mesh stiffness, shaft/bearing support, backlash, lubrication, vibration, tooth strength, durability, safety, and approval."
+    ],
+    "errors": [],
+    "method": "Ft = 2T/dp · Fr = Ft·tan(αt) · Fa = Ft·tan(β) · FN = √(Ft² + Fr² + Fa²)"
+  },
+  "threadTensileArea": {
+    "values": [
+      {
+        "key": "effectiveDiameter",
+        "label": "Empirical tensile-area diameter",
+        "raw": 10.3581605,
+        "display": "10.358",
+        "unit": "mm"
+      },
+      {
+        "key": "tensileArea",
+        "label": "External thread tensile stress area",
+        "raw": 84.2667354164293,
+        "display": "84.267",
+        "unit": "mm²"
+      }
+    ],
+    "warnings": [
+      "This is an empirical external metric-thread tensile-area relation from user-entered basic major diameter and pitch. It does not select a thread standard, determine material strength, preload, fatigue, stripping, tightening torque, acceptance, safety, or approval."
+    ],
+    "errors": [],
+    "method": "At = 0.7854(D − 0.938194P)²"
+  },
+  "toleranceStack": {
+    "values": [
+      {
+        "key": "worstCase",
+        "label": "Worst-case stack tolerance",
+        "raw": 0.18000000000000002,
+        "display": "0.18",
+        "unit": "mm"
+      },
+      {
+        "key": "rss",
+        "label": "RSS stack tolerance",
+        "raw": 0.11575836902790226,
+        "display": "0.11576",
+        "unit": "mm"
+      },
+      {
+        "key": "worstMin",
+        "label": "Worst-case lower result",
+        "raw": 99.82,
+        "display": "99.82",
+        "unit": "mm"
+      },
+      {
+        "key": "worstMax",
+        "label": "Worst-case upper result",
+        "raw": 100.18,
+        "display": "100.18",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "RSS is a statistical combination only when contributors are independent and the stated distribution assumption is justified. This is a linear one-dimensional stack, not a complete GD&T or assembly analysis; it makes no compliance, yield, or tolerance-recommendation claim."
+    ],
+    "errors": [],
+    "method": "TWC = Σ|tᵢ| · TRSS = √(Σtᵢ²), up to six visible contributors"
+  },
+  "weldGroup": {
+    "values": [
+      {
+        "key": "totalLineLength",
+        "label": "Total effective line length",
+        "raw": 200,
+        "display": "200",
+        "unit": "mm"
+      },
+      {
+        "key": "unitPolarMoment",
+        "label": "Unit-throat polar line property",
+        "raw": 486666.6666666666,
+        "display": "486,667",
+        "unit": "mm³"
+      },
+      {
+        "key": "endpointRadius",
+        "label": "Farthest endpoint radius",
+        "raw": 64.03124237432849,
+        "display": "64.031",
+        "unit": "mm"
+      },
+      {
+        "key": "directLineLoad",
+        "label": "Direct shear line load",
+        "raw": 60,
+        "display": "60",
+        "unit": "N/mm"
+      },
+      {
+        "key": "torsionalEndpointLineLoad",
+        "label": "Endpoint torsional line load",
+        "raw": 105.25683677971807,
+        "display": "105.26",
+        "unit": "N/mm"
+      },
+      {
+        "key": "quadratureLineLoad",
+        "label": "Quadrature line-load magnitude",
+        "raw": 121.15693000762364,
+        "display": "121.16",
+        "unit": "N/mm"
+      }
+    ],
+    "warnings": [
+      "This is a two-equal-parallel-line, unit-throat preliminary weld-group model. The displayed quadrature magnitude is not a maximum vector resultant or code check. It does not model arbitrary weld geometry, throat/leg sizing, directional loading, vector addition at endpoints, eccentric force geometry, bending, fatigue, residual stress, distortion, heat input, weld procedure/quality, code provisions, capacity, safety, or approval."
+    ],
+    "errors": [],
+    "method": "Ltotal = 2L · Ju = Lb²/2 + L³/6 · qdirect = F/Ltotal · qtorsion,end = M·rmax/Ju"
+  },
+  "threadDesign": {
+    "values": [
+      {
+        "key": "targetTapDrill",
+        "label": "Target tap drill at stated engagement",
+        "raw": 8.875,
+        "display": "8.875",
+        "unit": "mm"
+      },
+      {
+        "key": "fullEngagementTapDrill",
+        "label": "Basic major-minus-pitch drill",
+        "raw": 8.5,
+        "display": "8.5",
+        "unit": "mm"
+      },
+      {
+        "key": "engagedThreads",
+        "label": "Engaged thread pitches",
+        "raw": 8,
+        "display": "8",
+        "unit": "—"
+      },
+      {
+        "key": "rootShearArea",
+        "label": "Reviewed root-shear area",
+        "raw": 202.3716335382872,
+        "display": "202.37",
+        "unit": "mm²"
+      },
+      {
+        "key": "pullOutCapacity",
+        "label": "User-property thread-stripping capacity",
+        "raw": 18213.447018445848,
+        "display": "18,213",
+        "unit": "N"
+      },
+      {
+        "key": "utilization",
+        "label": "Applied load / screening capacity",
+        "raw": 0.24707020013523967,
+        "display": "24.707",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This combines source-stated basic metric tap-drill arithmetic with the reviewed internal-thread root-shear-area relation using user-entered TPI, minimum external major diameter, maximum internal pitch diameter, engagement length, and shear strength. It does not select a thread standard, fit/class, drill, tap, material, allowable, or actual engagement; it excludes load distribution, bending, fatigue, torque/tension interaction, thread damage, installation effects, joint stiffness, and acceptance/compliance."
+    ],
+    "errors": [],
+    "method": "Dtap = Dmajor − P·E · Ats = πnLeDsmin[1/(2n)+0.57735(Dsmin−Enmax)] · Fscreen = Atsτallow"
+  },
+  "orificeFlow": {
+    "values": [
+      {
+        "key": "volumetricFlow",
+        "label": "Incompressible volumetric flow",
+        "raw": 0.0076758386422075935,
+        "display": "7.6758",
+        "unit": "L/s"
+      },
+      {
+        "key": "massFlow",
+        "label": "Mass flow",
+        "raw": 7.6758386422075935,
+        "display": "7.6758",
+        "unit": "kg/s"
+      },
+      {
+        "key": "throatVelocity",
+        "label": "Orifice mean velocity",
+        "raw": 3.909272519305986,
+        "display": "3.9093",
+        "unit": "m/s"
+      },
+      {
+        "key": "pressureDrop",
+        "label": "Stated pressure difference",
+        "raw": 20000,
+        "display": "20,000",
+        "unit": "Pa"
+      },
+      {
+        "key": "diameterRatio",
+        "label": "Orifice / pipe diameter ratio",
+        "raw": 0.49019607843137253,
+        "display": "0.4902",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This is a steady incompressible pressure-drop screen with user-entered discharge coefficient and circular geometry. It excludes gases/compressibility, choked flow, cavitation, viscosity/Reynolds effects, non-Newtonian fluids, temperature change, pulsation, installation requirements, upstream/downstream disturbance, meter calibration, uncertainty, permanent pressure loss, and acceptance/compliance."
+    ],
+    "errors": [],
+    "method": "Q = CdA2√[2(p1−p2)/(ρ(1−β⁴))] · ṁ = ρQ · β = D2/D1"
+  },
+  "fatigueConcentration": {
+    "values": [
+      {
+        "key": "kf",
+        "label": "Fatigue stress concentration",
+        "raw": 1.9000000000000001,
+        "display": "1.9",
+        "unit": "—"
+      },
+      {
+        "key": "effectiveStress",
+        "label": "Kf-adjusted nominal stress",
+        "raw": 228.00000000000003,
+        "display": "228",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This direct Kf relation uses user-entered Kt and notch sensitivity. It does not derive geometry, material behavior, fatigue strength, allowable stress, safety factor, life, or design approval."
+    ],
+    "errors": [],
+    "method": "Kf = 1 + q(Kt − 1) · σeffective = Kfσnom"
+  },
+  "planetaryGear": {
+    "values": [
+      {
+        "key": "ratio",
+        "label": "Fixed-ring reduction ratio",
+        "raw": 5,
+        "display": "5",
+        "unit": ":1"
+      },
+      {
+        "key": "planetTeeth",
+        "label": "Nominal planet teeth",
+        "raw": 36,
+        "display": "36",
+        "unit": "teeth"
+      },
+      {
+        "key": "spacingQuotient",
+        "label": "Planet-spacing tooth quotient",
+        "raw": 24,
+        "display": "24",
+        "unit": "—"
+      },
+      {
+        "key": "carrierSpeed",
+        "label": "Ideal carrier output speed",
+        "raw": 300,
+        "display": "300",
+        "unit": "rpm"
+      },
+      {
+        "key": "carrierTorque",
+        "label": "Declared-efficiency carrier torque",
+        "raw": 46,
+        "display": "46",
+        "unit": "N·m"
+      }
+    ],
+    "warnings": [
+      "This is a fixed-ring, sun-input, carrier-output tooth and ratio screen. It does not verify complete planetary assembly, module/pressure angle compatibility, interference, load sharing, tooth stress, bearing loads, efficiency, heat, backlash, lubrication, durability, service duty, safety, or product selection."
+    ],
+    "errors": [],
+    "method": "i = 1 + Nr/Ns · Np = (Nr − Ns)/2 · ncarrier = nsun/i · Tcarrier = Tsun iη"
+  },
+  "torqueSpeedDuty": {
+    "values": [
+      {
+        "key": "angularAcceleration",
+        "label": "Angular acceleration",
+        "raw": 314.1592653589793,
+        "display": "314.16",
+        "unit": "rad/s²"
+      },
+      {
+        "key": "accelerationTorque",
+        "label": "Inertia acceleration torque",
+        "raw": 0.6283185307179586,
+        "display": "0.62832",
+        "unit": "N·m"
+      },
+      {
+        "key": "requiredTorque",
+        "label": "Direct required acceleration torque",
+        "raw": 1.8283185307179586,
+        "display": "1.8283",
+        "unit": "N·m"
+      },
+      {
+        "key": "shaftPower",
+        "label": "Duty-point shaft power",
+        "raw": 0.2871916032262812,
+        "display": "0.28719",
+        "unit": "kW"
+      },
+      {
+        "key": "torqueMargin",
+        "label": "Stated torque minus direct requirement",
+        "raw": 0.6716814692820414,
+        "display": "0.67168",
+        "unit": "N·m"
+      }
+    ],
+    "warnings": [
+      "This one-duty-point arithmetic uses user-entered reflected inertia, load torque, and available torque. It does not generate a motor torque-speed curve, assess peak/rated/RMS capacity, efficiency, thermal behavior, gearing, safety factor, tuning, motor or drive selection, or design approval."
+    ],
+    "errors": [],
+    "method": "α = Δn(2π/60)/ta · Tacc = Jα · Treq = Tload + Tacc · P = Treqω"
+  },
+  "pneumaticCycleTime": {
+    "values": [
+      {
+        "key": "extendVolume",
+        "label": "Ideal extend volume",
+        "raw": 392699.0816987241,
+        "display": "0.3927",
+        "unit": "L"
+      },
+      {
+        "key": "retractVolume",
+        "label": "Ideal retract volume",
+        "raw": 329867.2286269283,
+        "display": "0.32987",
+        "unit": "L"
+      },
+      {
+        "key": "extendSpeed",
+        "label": "Ideal extend speed",
+        "raw": 254.64790894703253,
+        "display": "254.65",
+        "unit": "mm/s"
+      },
+      {
+        "key": "retractSpeed",
+        "label": "Ideal retract speed",
+        "raw": 303.15227255599115,
+        "display": "303.15",
+        "unit": "mm/s"
+      },
+      {
+        "key": "extendTime",
+        "label": "Ideal extend time",
+        "raw": 0.7853981633974483,
+        "display": "0.7854",
+        "unit": "s"
+      },
+      {
+        "key": "retractTime",
+        "label": "Ideal retract time",
+        "raw": 0.6597344572538565,
+        "display": "0.65973",
+        "unit": "s"
+      }
+    ],
+    "warnings": [
+      "This screen uses the user-declared actual volumetric flow at the cylinder. Do not enter SCFM, NL/min, or free-air flow unless it has already been converted to actual cylinder conditions. It does not model compressibility, pressure, valve Cv, tubing, flow controls, leakage, friction, load, acceleration, cushioning, end stops, or real cycle-time validation."
+    ],
+    "errors": [],
+    "method": "Ahead = πD²/4 · Aannulus = π(D² − d²)/4 · v = Qactual/A · t = L/v"
+  },
+  "additiveBuild": {
+    "values": [
+      {
+        "key": "partMass",
+        "label": "Declared part material mass",
+        "raw": 124,
+        "display": "124",
+        "unit": "g"
+      },
+      {
+        "key": "supportMass",
+        "label": "Declared support material mass",
+        "raw": 18.6,
+        "display": "18.6",
+        "unit": "g"
+      },
+      {
+        "key": "totalMaterialMass",
+        "label": "Part plus support material mass",
+        "raw": 142.6,
+        "display": "142.6",
+        "unit": "g"
+      },
+      {
+        "key": "effectiveBuildVolume",
+        "label": "Support-adjusted build volume",
+        "raw": 114.99999999999999,
+        "display": "115",
+        "unit": "cm³"
+      },
+      {
+        "key": "buildTime",
+        "label": "Effective build time",
+        "raw": 5.749999999999999,
+        "display": "5.75",
+        "unit": "h"
+      },
+      {
+        "key": "materialCost",
+        "label": "Declared material cost",
+        "raw": 4.2780000000000005,
+        "display": "4.278",
+        "unit": "currency"
+      },
+      {
+        "key": "machineCost",
+        "label": "Declared machine-time cost",
+        "raw": 45.99999999999999,
+        "display": "46",
+        "unit": "currency"
+      },
+      {
+        "key": "directCost",
+        "label": "Direct estimated cost",
+        "raw": 55.27799999999999,
+        "display": "55.278",
+        "unit": "currency"
+      }
+    ],
+    "warnings": [
+      "This is a direct estimate from user-entered volume, density, support factor, effective build rate, and cost rates. It does not read CAD/STL data, infer wall thickness, orientation, support geometry, infill, nesting, layer parameters, warmup/cooldown, setup, labor, post-processing, energy, scrap, yield, scheduling, machine availability, material qualification, printability, quality, lead time, quotation, or process/material/machine selection."
+    ],
+    "errors": [],
+    "method": "mpart = Vρ · msupport = mpart s · teffective = V(1+s)/R · Cdirect = (mpart + msupport)cm + teffective ch + C0"
+  },
+  "gravityMoment": {
+    "values": [
+      {
+        "key": "gravityForce",
+        "label": "Weight force",
+        "raw": 98.10000000000001,
+        "display": "98.1",
+        "unit": "N"
+      },
+      {
+        "key": "perpendicularLeverArm",
+        "label": "Gravity perpendicular lever arm",
+        "raw": 0.14999999999999997,
+        "display": "0.15",
+        "unit": "m"
+      },
+      {
+        "key": "gravityMoment",
+        "label": "Signed gravity moment",
+        "raw": 14.714999999999998,
+        "display": "14.715",
+        "unit": "N·m"
+      },
+      {
+        "key": "residualMoment",
+        "label": "Counter moment minus gravity moment",
+        "raw": 5.285000000000002,
+        "display": "5.285",
+        "unit": "N·m"
+      }
+    ],
+    "warnings": [
+      "This is a static single-point-mass, planar gravity-moment screen. It does not solve an over-center, toggle, or four-bar linkage; calculate actuator force/travel, joint reactions, locking, force amplification, self-locking, spring forces, friction, contact, dynamic/inertial loads, deflection, collision, stability, guard requirements, safety, or certification. Enter moments using a declared common sign convention and validate the real mechanism independently."
+    ],
+    "errors": [],
+    "method": "W = mg · r⊥ = r sin θ · Mg = mgr sin θ · Mresidual = Mc − Mg"
+  },
+  "pitchCircle": {
+    "values": [
+      {
+        "key": "radius",
+        "label": "Pitch-circle radius",
+        "raw": 50,
+        "display": "50",
+        "unit": "mm"
+      },
+      {
+        "key": "angularPitch",
+        "label": "Equal angular pitch",
+        "raw": 60,
+        "display": "60",
+        "unit": "°"
+      },
+      {
+        "key": "adjacentChord",
+        "label": "Adjacent-center chord",
+        "raw": 49.99999999999999,
+        "display": "50",
+        "unit": "mm"
+      },
+      {
+        "key": "firstX",
+        "label": "First-hole nominal X",
+        "raw": 50,
+        "display": "50",
+        "unit": "mm"
+      },
+      {
+        "key": "firstY",
+        "label": "First-hole nominal Y",
+        "raw": 0,
+        "display": "0",
+        "unit": "mm"
+      },
+      {
+        "key": "oppositeX",
+        "label": "180° opposite nominal X",
+        "raw": -50,
+        "display": "-50",
+        "unit": "mm"
+      },
+      {
+        "key": "oppositeY",
+        "label": "180° opposite nominal Y",
+        "raw": 6.123233995736766e-15,
+        "display": "0",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This is equal-spacing nominal pitch-circle geometry only. It does not create CAD/CAM/G-code, select fasteners, calculate hole diameter or tolerance, interpret GD&T, establish datum references, assess positional accuracy, balance rotating components, determine manufacturability, or approve a drawing or part."
+    ],
+    "errors": [],
+    "method": "r = PCD/2 · Δθ = 360°/n · chord = 2r sin(π/n) · xi = r cos(θ₀+iΔθ) · yi = r sin(θ₀+iΔθ)"
+  },
+  "regularPolygon": {
+    "values": [
+      {
+        "key": "perimeter",
+        "label": "Perimeter",
+        "raw": 120,
+        "display": "120",
+        "unit": "mm"
+      },
+      {
+        "key": "apothem",
+        "label": "Apothem",
+        "raw": 17.320508075688775,
+        "display": "17.321",
+        "unit": "mm"
+      },
+      {
+        "key": "circumradius",
+        "label": "Circumradius",
+        "raw": 20.000000000000004,
+        "display": "20",
+        "unit": "mm"
+      },
+      {
+        "key": "interiorAngle",
+        "label": "Each interior angle",
+        "raw": 120,
+        "display": "120",
+        "unit": "°"
+      },
+      {
+        "key": "area",
+        "label": "Regular-polygon area",
+        "raw": 1039.2304845413264,
+        "display": "1,039.2",
+        "unit": "mm²"
+      }
+    ],
+    "warnings": [
+      "This is planar regular-polygon closed-form geometry: every side and every interior angle are assumed equal. It does not calculate irregular polygons, tolerance zones, CAD/CAM geometry, feature position, material area allowance, manufacturability, structural response, or drawing compliance."
+    ],
+    "errors": [],
+    "method": "P = ns · a = s/[2 tan(π/n)] · R = s/[2 sin(π/n)] · α = (n−2)180°/n · A = aP/2"
+  },
+  "eccentricBoltGroup": {
+    "values": [
+      {
+        "key": "moment",
+        "label": "Applied eccentric moment",
+        "raw": 800000,
+        "display": "800",
+        "unit": "N·m"
+      },
+      {
+        "key": "directShear",
+        "label": "Direct shear per equal joint",
+        "raw": 2000,
+        "display": "2,000",
+        "unit": "N"
+      },
+      {
+        "key": "torsionalShear",
+        "label": "Torsional shear magnitude per joint",
+        "raw": 2000,
+        "display": "2,000",
+        "unit": "N"
+      },
+      {
+        "key": "conservativeMaximum",
+        "label": "Conservative scalar joint shear",
+        "raw": 4000,
+        "display": "4,000",
+        "unit": "N"
+      },
+      {
+        "key": "nominalShearStress",
+        "label": "Nominal maximum shank shear stress",
+        "raw": 50.929581789406505,
+        "display": "50.93",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This is an equal-bolt, concentric circular-pattern, in-plane eccentric-shear screen. The displayed maximum is a conservative scalar sum of direct and torsional shear magnitudes rather than a resolved individual-bolt vector. It does not model arbitrary coordinates, unequal fastener stiffness, preload, friction/slip, axial tension, prying, out-of-plane loads, plate flexibility, interactions, fatigue, material allowables, failure, selection, or approval."
+    ],
+    "errors": [],
+    "method": "M = Fe · Vdirect = F/n · Σr² = nr² · Vtorsion = Mr/Σr² = M/(nr) · Vconservative = Vdirect + Vtorsion · τnom = Vconservative/(πd²/4)"
+  },
+  "vacuumEvacuation": {
+    "values": [
+      {
+        "key": "pressureRatio",
+        "label": "Declared pressure ratio p₁/p₂",
+        "raw": 10,
+        "display": "10",
+        "unit": "—"
+      },
+      {
+        "key": "idealTime",
+        "label": "Ideal constant-speed evacuation time",
+        "raw": 23.02585092994046,
+        "display": "23.026",
+        "unit": "s"
+      },
+      {
+        "key": "requiredEffectiveSpeed",
+        "label": "Effective speed for declared time target",
+        "raw": 11.51292546497023,
+        "display": "11.513",
+        "unit": "L/s"
+      },
+      {
+        "key": "declaredToRequiredSpeedRatio",
+        "label": "Declared / required effective-speed ratio",
+        "raw": 0.8685889638065035,
+        "display": "0.86859",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This is a single constant-effective-speed, ideal logarithmic evacuation interval using user-declared vessel volume and effective pumping speed. It does not calculate pump curves, conductance, piping/network losses, leakage, desorption/outgassing, vapour load, thermal behavior, gas composition, compressible/choked flow, equipment sizing, pump selection, capacity, life, safety, or approval. Real evacuation time can be longer than this ideal arithmetic result."
+    ],
+    "errors": [],
+    "method": "t = (V/S) ln(p₁/p₂) · Srequired = (V/ttarget) ln(p₁/p₂)"
+  },
+  "toggleForce": {
+    "values": [
+      {
+        "key": "mechanicalAdvantage",
+        "label": "Ideal symmetric toggle mechanical advantage",
+        "raw": 5.7150261513806715,
+        "display": "5.715",
+        "unit": "—"
+      },
+      {
+        "key": "outputForce",
+        "label": "Ideal axial toggle output force",
+        "raw": 2000.259152983235,
+        "display": "2,000.3",
+        "unit": "N"
+      },
+      {
+        "key": "tangent",
+        "label": "Declared-angle tangent",
+        "raw": 0.08748866352592401,
+        "display": "0.087489",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This is an ideal, symmetric, planar, pre-dead-centre two-link toggle relation with a knee input perpendicular to the link line. It excludes link length and kinematics, frame/guide deflection, pin stress and clearance, friction, compliance, off-axis loading, stroke, actuation, over-centre travel, locking/self-locking, latch retention, material strength, fatigue, safety, and approval. It deliberately rejects the near-singular 0.5° and below range."
+    ],
+    "errors": [],
+    "method": "MA = 1/[2 tan(θ)] · Fout = Fin · MA"
+  },
+  "pneumaticLineLoss": {
+    "values": [
+      {
+        "key": "area",
+        "label": "Declared pipe flow area",
+        "raw": 0.0005557163244934985,
+        "display": "555.72",
+        "unit": "mm²"
+      },
+      {
+        "key": "velocity",
+        "label": "Mean upstream-density air velocity",
+        "raw": 17.994792593351274,
+        "display": "17.995",
+        "unit": "m/s"
+      },
+      {
+        "key": "pressureLoss",
+        "label": "Declared-density Darcy major loss",
+        "raw": 20390.45258647359,
+        "display": "20.39",
+        "unit": "kPa"
+      },
+      {
+        "key": "lossRatio",
+        "label": "Major loss / upstream absolute pressure",
+        "raw": 0.033984087644122654,
+        "display": "3.3984",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This is a low-pressure straight-pipe compressed-air approximation using user-entered upstream density and Darcy friction factor. It is valid only while the calculated major loss remains below 10% of upstream absolute pressure. It excludes fittings/minor losses, networks, elevation, density/temperature variation, choked flow, compressor or valve selection, line sizing, capacity, safety, and approval."
+    ],
+    "errors": [],
+    "method": "A = πD²/4 · v = Q/A · Δp = f(L/D)(ρv²/2) · guard: Δp/p₁ < 10%"
+  },
+  "tappingTorque": {
+    "values": [
+      {
+        "key": "torque",
+        "label": "User-coefficient first-estimate tapping torque",
+        "raw": 3,
+        "display": "3",
+        "unit": "N·m"
+      },
+      {
+        "key": "mechanicalPower",
+        "label": "Ideal mechanical spindle power",
+        "raw": 0.15707963267948966,
+        "display": "0.15708",
+        "unit": "kW"
+      },
+      {
+        "key": "diameterCube",
+        "label": "Declared diameter cubed",
+        "raw": 1000,
+        "display": "1,000",
+        "unit": "mm³"
+      }
+    ],
+    "warnings": [
+      "This is a planning-only user-coefficient torque and mechanical-power arithmetic screen. It does not choose a tap, thread form, drill size, material, hardness, lubricant, cutting speed, engagement percentage, feed, tool life, machine capability, process parameters, or approve a tap operation."
+    ],
+    "errors": [],
+    "method": "T = k·d³·e · P = Tω = 2πTn/(60·1000)"
+  },
+  "threadMachiningTime": {
+    "values": [
+      {
+        "key": "feedRate",
+        "label": "Declared pitch-feed rate",
+        "raw": 750,
+        "display": "750",
+        "unit": "mm/min"
+      },
+      {
+        "key": "cuttingTimePerPass",
+        "label": "Declared travel time per pass",
+        "raw": 2.4,
+        "display": "2.4",
+        "unit": "s"
+      },
+      {
+        "key": "totalCuttingTime",
+        "label": "Declared repeated travel time",
+        "raw": 14.399999999999999,
+        "display": "14.4",
+        "unit": "s"
+      },
+      {
+        "key": "totalTime",
+        "label": "Declared travel + reversal time",
+        "raw": 21.599999999999998,
+        "display": "21.6",
+        "unit": "s"
+      }
+    ],
+    "warnings": [
+      "This is declared thread-travel arithmetic only. It does not infer thread form, tool path, starts, infeed schedule, stock allowance, material, cutting conditions, tool life, machine acceleration, setup, non-cutting sequence, process suitability, or approval."
+    ],
+    "errors": [],
+    "method": "vf = p·n · tpass = L/vf · 60 · ttotal = N(tpass + tr)"
+  },
+  "minorLosses": {
+    "values": [
+      {
+        "key": "dynamicPressure",
+        "label": "Declared-section dynamic pressure",
+        "raw": 3125,
+        "display": "3,125",
+        "unit": "Pa"
+      },
+      {
+        "key": "pressureLoss",
+        "label": "Declared-coefficient minor pressure loss",
+        "raw": 13125,
+        "display": "13,125",
+        "unit": "Pa"
+      },
+      {
+        "key": "headLoss",
+        "label": "Equivalent liquid head loss",
+        "raw": 1.338377529533531,
+        "display": "1.3384",
+        "unit": "m"
+      }
+    ],
+    "warnings": [
+      "This is a user-entered aggregate-coefficient minor-loss arithmetic screen only. It does not choose or derive fitting coefficients, calculate friction or major loss, size pipe, model networks, elevation, compressibility, cavitation, transient effects, viscosity/temperature variation, pressure rating, equipment selection, safety, or approval."
+    ],
+    "errors": [],
+    "method": "Δpminor = ΣK·ρv²/2 · hminor = Δp/(ρg)"
+  },
+  "submergedPlane": {
+    "values": [
+      {
+        "key": "area",
+        "label": "Rectangle area",
+        "raw": 0.96,
+        "display": "0.96",
+        "unit": "m²"
+      },
+      {
+        "key": "resultantForce",
+        "label": "Hydrostatic resultant force",
+        "raw": 23535.96,
+        "display": "23.536",
+        "unit": "kN"
+      },
+      {
+        "key": "centroidalInertia",
+        "label": "Rectangle centroidal second moment",
+        "raw": 0.051200000000000016,
+        "display": "0.0512",
+        "unit": "m⁴"
+      },
+      {
+        "key": "centerOffset",
+        "label": "Center-of-pressure offset below centroid",
+        "raw": 0.02133333333333334,
+        "display": "0.021333",
+        "unit": "m"
+      },
+      {
+        "key": "centerDepth",
+        "label": "Center-of-pressure depth below free surface",
+        "raw": 2.521333333333333,
+        "display": "2.5213",
+        "unit": "m"
+      }
+    ],
+    "warnings": [
+      "This is a fully submerged vertical rectangular-plane, constant-density hydrostatic arithmetic screen only. It does not analyze inclined or curved surfaces, variable density, free-surface motion, vessel or support structure, plate stress, fasteners, pressure rating, installation, safety, or approval."
+    ],
+    "errors": [],
+    "method": "F = ρgycA · Ix = bh³/12 · yCP = yc + Ix/(Ayc)"
+  },
+  "thermalResistance": {
+    "values": [
+      {
+        "key": "hotConvectionResistance",
+        "label": "Declared hot-side convection resistance",
+        "raw": 0.008333333333333333,
+        "display": "0.0083333",
+        "unit": "K/W"
+      },
+      {
+        "key": "wallResistance",
+        "label": "Declared wall conduction resistance",
+        "raw": 0.026041666666666668,
+        "display": "0.026042",
+        "unit": "K/W"
+      },
+      {
+        "key": "coldConvectionResistance",
+        "label": "Declared cold-side convection resistance",
+        "raw": 0.022222222222222223,
+        "display": "0.022222",
+        "unit": "K/W"
+      },
+      {
+        "key": "totalResistance",
+        "label": "Declared series thermal resistance",
+        "raw": 0.07659722222222223,
+        "display": "0.076597",
+        "unit": "K/W"
+      },
+      {
+        "key": "totalTemperatureDifference",
+        "label": "Temperature difference at declared heat rate",
+        "raw": 38.298611111111114,
+        "display": "38.299",
+        "unit": "K"
+      }
+    ],
+    "warnings": [
+      "This is a declared, one-dimensional series-resistance arithmetic screen. It does not derive convection coefficients, infer contact conditions, model radiation, phase change, parallel heat paths, thermal bridges, temperature-dependent properties, material selection, service-temperature rating, equipment suitability, safety, or approval."
+    ],
+    "errors": [],
+    "method": "Rtotal = 1/(hhAh) + L/(kAw) + Rc + 1/(hcAc) · ΔT = Q̇Rtotal"
+  },
+  "ballScrewSizing": {
+    "values": [
+      {
+        "key": "linearSpeed",
+        "label": "Ideal linear speed",
+        "raw": 0.2,
+        "display": "0.2",
+        "unit": "m/s"
+      },
+      {
+        "key": "torque",
+        "label": "Declared-efficiency drive torque",
+        "raw": 4.420970641441537,
+        "display": "4.421",
+        "unit": "N·m"
+      },
+      {
+        "key": "power",
+        "label": "Mechanical drive power",
+        "raw": 0.5555555555555555,
+        "display": "0.55556",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This is a steady lead-torque screen for a user-defined ball screw. It excludes preload, bearing and seal torque, drive inertia, acceleration/deceleration, critical speed, buckling, deflection, column load, screw/nut selection, life, lubrication, backlash, thermal effects, motor or gearbox selection, controls, safety, and system approval."
+    ],
+    "errors": [],
+    "method": "v = Pn/60000 · T = FaP/(2πη) · Pmech = Tω"
+  },
+  "rackPinion": {
+    "values": [
+      {
+        "key": "feedForce",
+        "label": "Horizontal feed force",
+        "raw": 184.80665,
+        "display": "184.81",
+        "unit": "N"
+      },
+      {
+        "key": "linearSpeed",
+        "label": "Requested linear speed",
+        "raw": 1.2,
+        "display": "1.2",
+        "unit": "m/s"
+      },
+      {
+        "key": "torque",
+        "label": "Pinion torque",
+        "raw": 7.392265999999999,
+        "display": "7.3923",
+        "unit": "N·m"
+      },
+      {
+        "key": "rpm",
+        "label": "Pinion speed at requested linear speed",
+        "raw": 286.47889756541156,
+        "display": "286.48",
+        "unit": "rpm"
+      },
+      {
+        "key": "power",
+        "label": "Mechanical linear power",
+        "raw": 0.22176798,
+        "display": "0.22177",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This is a horizontal, lumped-mass rack-and-pinion screen using user-entered friction, acceleration, external force, and pitch diameter. It excludes vertical/gravity axes, service factors, shock, gear mesh efficiency, tooth strength, backlash, lubrication, rack/pinion selection, gearbox or motor selection, rail loads, stiffness, positioning accuracy, controls, safety, and system approval."
+    ],
+    "errors": [],
+    "method": "Fr = mgμ + ma + Fe · Tp = Frdp/2 · np = 60v/(πdp) · P = Frv"
+  },
+  "beltAxis": {
+    "values": [
+      {
+        "key": "steadyForce",
+        "label": "Steady guide-friction force",
+        "raw": 5.88399,
+        "display": "5.884",
+        "unit": "N"
+      },
+      {
+        "key": "rpm",
+        "label": "Drive-pulley speed",
+        "raw": 477.46482927568604,
+        "display": "477.46",
+        "unit": "rpm"
+      },
+      {
+        "key": "torque",
+        "label": "Declared-efficiency drive torque",
+        "raw": 0.19186923913043477,
+        "display": "0.19187",
+        "unit": "N·m"
+      },
+      {
+        "key": "power",
+        "label": "Mechanical linear power",
+        "raw": 0.008825985,
+        "display": "0.008826",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This is a horizontal, steady-speed belt-axis screen using user-entered guide friction and efficiency. It excludes acceleration, belt stretch and tension, tooth engagement, pulley/belt selection, external process load, vertical/gravity axes, inertia, positioning accuracy, rail load, thermal/duty limits, motor or gearbox selection, controls, safety, and system approval."
+    ],
+    "errors": [],
+    "method": "Fa = mgμ · np = 60v/(πdp) · T = Fadp/(2η) · P = Fav"
+  },
+  "hydraulicCylinder": {
+    "values": [
+      {
+        "key": "extendForce",
+        "label": "Ideal extension force",
+        "raw": 80424.77193189871,
+        "display": "80.425",
+        "unit": "kN"
+      },
+      {
+        "key": "retractForce",
+        "label": "Ideal retraction force",
+        "raw": 54977.871437821384,
+        "display": "54.978",
+        "unit": "kN"
+      },
+      {
+        "key": "extendVolume",
+        "label": "Extension swept volume",
+        "raw": 2.513274122871835,
+        "display": "2.5133",
+        "unit": "L"
+      },
+      {
+        "key": "retractVolume",
+        "label": "Retraction swept volume",
+        "raw": 1.718058482431918,
+        "display": "1.7181",
+        "unit": "L"
+      },
+      {
+        "key": "extendSpeed",
+        "label": "Ideal extension speed",
+        "raw": 99.47183943243458,
+        "display": "99.472",
+        "unit": "mm/s"
+      },
+      {
+        "key": "retractSpeed",
+        "label": "Ideal retraction speed",
+        "raw": 145.51309082687573,
+        "display": "145.51",
+        "unit": "mm/s"
+      },
+      {
+        "key": "extendTime",
+        "label": "Ideal extension travel time",
+        "raw": 5.02654824574367,
+        "display": "5.0265",
+        "unit": "s"
+      },
+      {
+        "key": "retractTime",
+        "label": "Ideal retraction travel time",
+        "raw": 3.4361169648638366,
+        "display": "3.4361",
+        "unit": "s"
+      }
+    ],
+    "warnings": [
+      "This is ideal double-acting cylinder arithmetic using declared pressure and steady delivered flow. It excludes pressure drops, friction/seal losses, side loading, rod buckling, cushioning, compressibility, valve dynamics, acceleration, mounting, structural loads, duty cycle, temperature, component ratings, and circuit or safety design."
+    ],
+    "errors": [],
+    "method": "Ap = πD²/4 · Aa = Ap−πd²/4 · F = pA · V = As · v = Q/A · t = s/v"
+  },
+  "hydraulicPump": {
+    "values": [
+      {
+        "key": "idealFlow",
+        "label": "Ideal outlet flow",
+        "raw": 37.5,
+        "display": "37.5",
+        "unit": "L/min"
+      },
+      {
+        "key": "actualFlow",
+        "label": "Declared-efficiency outlet flow",
+        "raw": 34.5,
+        "display": "34.5",
+        "unit": "L/min"
+      },
+      {
+        "key": "hydraulicPower",
+        "label": "Hydraulic output power",
+        "raw": 10.35,
+        "display": "10.35",
+        "unit": "kW"
+      },
+      {
+        "key": "shaftPower",
+        "label": "Declared-efficiency shaft input power",
+        "raw": 12.321428571428571,
+        "display": "12.321",
+        "unit": "kW"
+      },
+      {
+        "key": "theoreticalTorque",
+        "label": "Theoretical pressure-displacement input torque",
+        "raw": 71.6197243913529,
+        "display": "71.62",
+        "unit": "N·m"
+      }
+    ],
+    "warnings": [
+      "This is a steady positive-displacement pump screen using user-entered displacement, pressure, and efficiencies. It does not select a pump, motor, drive, relief setting, fluid, line, reservoir, cooling method, or rating; model cavitation, leakage beyond the declared efficiency, pressure ripple, heat balance, transient load, or component/system safety; or approve a fluid-power system."
+    ],
+    "errors": [],
+    "method": "Qideal = Vd·n · Qdeclared = ηvQideal · Phyd = ΔpQ/600 · Pin = Phyd/ηo · Ttheory = ΔpVd/(2π)"
+  },
+  "hydraulicMotor": {
+    "values": [
+      {
+        "key": "theoreticalTorque",
+        "label": "Theoretical shaft torque",
+        "raw": 127.32395447351627,
+        "display": "127.32",
+        "unit": "N·m"
+      },
+      {
+        "key": "actualTorque",
+        "label": "Declared-efficiency shaft torque",
+        "raw": 112.04507993669431,
+        "display": "112.05",
+        "unit": "N·m"
+      },
+      {
+        "key": "idealSpeed",
+        "label": "Ideal shaft speed",
+        "raw": 900,
+        "display": "900",
+        "unit": "rpm"
+      },
+      {
+        "key": "actualSpeed",
+        "label": "Declared-efficiency shaft speed",
+        "raw": 828,
+        "display": "828",
+        "unit": "rpm"
+      },
+      {
+        "key": "hydraulicPower",
+        "label": "Hydraulic input power",
+        "raw": 12,
+        "display": "12",
+        "unit": "kW"
+      },
+      {
+        "key": "shaftPower",
+        "label": "Declared-efficiency shaft output",
+        "raw": 9.715200000000001,
+        "display": "9.7152",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This is a steady positive-displacement hydraulic-motor screen using user-entered displacement, pressure, flow, and efficiencies. It does not select a motor, evaluate starting torque, load matching, speed limits, pressure ratings, leakage beyond the declared efficiencies, fluid condition, temperature, cavitation, heat, braking, controls, structural mounting, system transients, or safety/compliance."
+    ],
+    "errors": [],
+    "method": "Ttheory = ΔpVd/(2π) · Tdeclared = ηmTtheory · nideal = Q/Vd · ndeclar​ed = ηvnideal · Pshaft = Tω"
+  },
+  "hydraulicLine": {
+    "values": [
+      {
+        "key": "area",
+        "label": "Internal flow area",
+        "raw": 0.00020106192982974675,
+        "display": "201.06",
+        "unit": "mm²"
+      },
+      {
+        "key": "velocity",
+        "label": "Mean line velocity",
+        "raw": 2.486795985810865,
+        "display": "2.4868",
+        "unit": "m/s"
+      },
+      {
+        "key": "majorLoss",
+        "label": "Declared-fluid Darcy major loss",
+        "raw": 49279.97937926509,
+        "display": "49.28",
+        "unit": "kPa"
+      },
+      {
+        "key": "referenceRatio",
+        "label": "Mean velocity / declared reference",
+        "raw": 0.6216989964527162,
+        "display": "62.17",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This calculates mean velocity and a user-factor Darcy major loss in one constant-ID, straight, steady hydraulic line. It does not select hose, tube, or pipe size; prescribe an acceptable velocity or friction factor; calculate Reynolds number, fittings/minor losses, bends, networks, elevation, surge, cavitation, viscosity/temperature variation, pressure rating, routing, hydraulic-system safety, or approval."
+    ],
+    "errors": [],
+    "method": "A = πDi²/4 · vmean = Q/A · Δpmajor = f(L/Di)(ρv²/2) · comparison = vmean/vref"
+  },
+  "pressFit": {
+    "values": [
+      {
+        "key": "interference",
+        "label": "Diametral interference",
+        "raw": 0.02499999999999858,
+        "display": "0.025",
+        "unit": "mm"
+      },
+      {
+        "key": "geometryFactor",
+        "label": "Reference hub geometry factor",
+        "raw": 0.6,
+        "display": "0.6",
+        "unit": "—"
+      },
+      {
+        "key": "contactPressure",
+        "label": "Reference contact pressure",
+        "raw": 59.99999999999659,
+        "display": "60",
+        "unit": "MPa"
+      },
+      {
+        "key": "frictionForce",
+        "label": "Friction holding / assembly-force estimate",
+        "raw": 70685.83470576632,
+        "display": "70.686",
+        "unit": "kN"
+      },
+      {
+        "key": "holdingTorque",
+        "label": "Friction holding-torque estimate",
+        "raw": 1767.145867644158,
+        "display": "1,767.1",
+        "unit": "N·m"
+      }
+    ],
+    "warnings": [
+      "This follows a simplified single-modulus, Lame-style hub geometry-factor relation with uniform interface pressure and user-entered friction. It does not split shaft and hub compliance, select a tolerance, assess yield or fit class, model temperature/assembly method/surface texture, include centrifugal unloading or dynamic/fatigue behavior, rate equipment, or approve a joint."
+    ],
+    "errors": [],
+    "method": "δ = Ds−Di · p = (δ/Di)E[(Do²−Di²)/(Do²+Di²)] · Fμ = πDiLpμ · Tμ = FμDi/2"
+  }
+}

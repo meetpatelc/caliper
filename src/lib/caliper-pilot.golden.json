@@ -1,0 +1,496 @@
+{
+  "boltPreload": {
+    "values": [
+      {
+        "key": "preload",
+        "label": "Nominal preload",
+        "raw": 33333.33333333333,
+        "display": "33.333",
+        "unit": "kN"
+      },
+      {
+        "key": "lower",
+        "label": "Estimated lower preload",
+        "raw": 24999.999999999996,
+        "display": "25",
+        "unit": "kN"
+      },
+      {
+        "key": "upper",
+        "label": "Estimated upper preload",
+        "raw": 41666.66666666666,
+        "display": "41.667",
+        "unit": "kN"
+      }
+    ],
+    "warnings": [
+      "Torque is an indirect and friction-sensitive way to create preload. This screen does not determine allowable preload, bolt proof/yield, thread strength, joint stiffness, separation, fatigue, thermal effects, relaxation, lubrication procedure, or a safe tightening specification."
+    ],
+    "errors": [],
+    "method": "P = T / (K·D) · uncertainty band = P(1 ± u)"
+  },
+  "thinVessel": {
+    "values": [
+      {
+        "key": "hoop",
+        "label": "Ideal hoop membrane stress",
+        "raw": 30000000,
+        "display": "30",
+        "unit": "MPa"
+      },
+      {
+        "key": "longitudinal",
+        "label": "Ideal longitudinal membrane stress",
+        "raw": 15000000,
+        "display": "15",
+        "unit": "MPa"
+      },
+      {
+        "key": "diameterThickness",
+        "label": "Inside diameter-to-thickness ratio",
+        "raw": 50,
+        "display": "50",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This is a closed cylindrical thin-shell membrane-stress relationship. It excludes thick-wall behavior, discontinuities, heads, nozzles, welds, external pressure, fatigue, corrosion allowance, material allowables, code requirements, relief sizing, and pressure-vessel certification."
+    ],
+    "errors": [],
+    "method": "σhoop = pD/(2t) · σlong = pD/(4t), closed thin cylinder"
+  },
+  "keyway": {
+    "values": [
+      {
+        "key": "tangentialForce",
+        "label": "Shaft tangential force",
+        "raw": 10000,
+        "display": "10,000",
+        "unit": "N"
+      },
+      {
+        "key": "shearStress",
+        "label": "Nominal key shear stress",
+        "raw": 16666666.666666666,
+        "display": "16.667",
+        "unit": "MPa"
+      },
+      {
+        "key": "bearingStress",
+        "label": "Nominal key bearing stress",
+        "raw": 50000000,
+        "display": "50",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This is a single rectangular-key, steady-torque direct-stress screen. It excludes key/keyway standards selection, root stress concentration, shaft weakening, fit clearance, hub deformation, multiple keys, load sharing, assembly, fatigue, material allowables, lubrication, transients, and design approval."
+    ],
+    "errors": [],
+    "method": "Ft = 2T/D · τkey = Ft/(wL) · σbearing = Ft/[(h/2)L]"
+  },
+  "goodmanFatigue": {
+    "values": [
+      {
+        "key": "adjustedAlternating",
+        "label": "Kf-adjusted alternating stress",
+        "raw": 128,
+        "display": "128",
+        "unit": "MPa"
+      },
+      {
+        "key": "adjustedMean",
+        "label": "Kf-adjusted mean stress",
+        "raw": 96,
+        "display": "96",
+        "unit": "MPa"
+      },
+      {
+        "key": "utilization",
+        "label": "Linear Goodman utilization",
+        "raw": 0.8711111111111112,
+        "display": "0.87111",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This high-cycle linear Goodman screen does not establish a pass/fail criterion or model endurance modifiers, yield, low-cycle fatigue, multiaxial loading, reliability, life, or design approval."
+    ],
+    "errors": [],
+    "method": "σa = Kfσa,nom · σm = Kfσm,nom · U = σa/Sn + σm/Su"
+  },
+  "gearRatio": {
+    "values": [
+      {
+        "key": "ratio",
+        "label": "Speed reduction ratio",
+        "raw": 3,
+        "display": "3",
+        "unit": ":1"
+      },
+      {
+        "key": "outputRpm",
+        "label": "Ideal output speed",
+        "raw": 600,
+        "display": "600",
+        "unit": "rpm"
+      },
+      {
+        "key": "outputTorque",
+        "label": "Efficiency-adjusted output torque",
+        "raw": 49.68,
+        "display": "49.68",
+        "unit": "N·m"
+      },
+      {
+        "key": "inputPower",
+        "label": "Input mechanical power",
+        "raw": 3392.9200658769764,
+        "display": "3.3929",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This screen covers one ideal external gear pair with a user-entered efficiency. It excludes tooth geometry, mesh force, strength, backlash, lubrication, shaft/bearing load, thermal behavior, vibration, noise, duty cycle, and gearbox or component selection."
+    ],
+    "errors": [],
+    "method": "i = z₂/z₁ · n₂ = n₁/i · T₂ = T₁iη"
+  },
+  "wormDrive": {
+    "values": [
+      {
+        "key": "ratio",
+        "label": "Ideal worm reduction ratio",
+        "raw": 50,
+        "display": "50",
+        "unit": ":1"
+      },
+      {
+        "key": "outputSpeed",
+        "label": "Ideal wheel output speed",
+        "raw": 28,
+        "display": "28",
+        "unit": "rpm"
+      },
+      {
+        "key": "outputTorque",
+        "label": "Declared-efficiency wheel torque",
+        "raw": 175,
+        "display": "175",
+        "unit": "N·m"
+      }
+    ],
+    "warnings": [
+      "This is a one-stage ideal tooth-ratio screen with a user-entered efficiency. It does not select a worm set, predict efficiency or self-locking, model tooth contact/stress, heat, lubrication, backlash, noise, duty, durability, safety, or product suitability."
+    ],
+    "errors": [],
+    "method": "i = Zw/S · nout = nin/i · Tout = Tin iη"
+  },
+  "beltTension": {
+    "values": [
+      {
+        "key": "drivingTension",
+        "label": "Torque-induced driving tension difference",
+        "raw": 1600,
+        "display": "1,600",
+        "unit": "N"
+      },
+      {
+        "key": "declaredLooseSide",
+        "label": "Declared loose-side tension",
+        "raw": 350,
+        "display": "350",
+        "unit": "N"
+      },
+      {
+        "key": "tightSideTension",
+        "label": "Declared tight-side tension sum",
+        "raw": 1950,
+        "display": "1,950",
+        "unit": "N"
+      }
+    ],
+    "warnings": [
+      "This is a torque-to-driving-tension difference and stated loose-side sum only. It excludes pretension selection, wrap, friction, slip, fatigue, speed capability, bearing loading, belt/chain selection, safety, and approval."
+    ],
+    "errors": [],
+    "method": "ΔF = T/rp · Ftight = ΔF + Floose,declared"
+  },
+  "frictionClutch": {
+    "values": [
+      {
+        "key": "frictionTorque",
+        "label": "Declared friction-interface torque",
+        "raw": 152.32000000000002,
+        "display": "152.32",
+        "unit": "N·m"
+      },
+      {
+        "key": "demandRatio",
+        "label": "Friction torque / declared demand",
+        "raw": 1.2693333333333334,
+        "display": "1.2693",
+        "unit": "—"
+      },
+      {
+        "key": "arithmeticDifference",
+        "label": "Friction torque minus declared demand",
+        "raw": 32.32000000000002,
+        "display": "32.32",
+        "unit": "N·m"
+      }
+    ],
+    "warnings": [
+      "This is a stated uniform-friction torque relation for a user-defined clutch or brake interface. It excludes temperature, energy absorption, wear, pressure distribution, actuation, engagement dynamics, material selection, capacity, safety, and approval."
+    ],
+    "errors": [],
+    "method": "Tfriction = z·μ·Fa·rm · ratio = Tfriction / Tdeclared"
+  },
+  "cuttingPower": {
+    "values": [
+      {
+        "key": "cuttingPower",
+        "label": "Ideal cutting power",
+        "raw": 3.720000000000001,
+        "display": "3.72",
+        "unit": "kW"
+      },
+      {
+        "key": "machinePower",
+        "label": "Declared-efficiency machine input",
+        "raw": 4.650000000000001,
+        "display": "4.65",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "Direct turning power screen only; parameter/tool selection, chip-thickness effects, chatter, thermal limits, wear, machine limits, safety, and production approval are excluded."
+    ],
+    "errors": [],
+    "method": "Pc = ap f vc Kc /(60 × 10³) · Pmachine = Pc/η"
+  },
+  "drillPointDepth": {
+    "values": [
+      {
+        "key": "pointDepth",
+        "label": "Geometric drill-point depth",
+        "raw": 2.4852813742385704,
+        "display": "2.4853",
+        "unit": "mm"
+      },
+      {
+        "key": "programmedDepth",
+        "label": "Programmed depth for declared full diameter",
+        "raw": 27.48528137423857,
+        "display": "27.485",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "Ideal conical-point geometry only; drilling variation, wear, runout, breakthrough allowance, workholding, machine motion, cutting parameters, safety, and manufacturing approval are excluded."
+    ],
+    "errors": [],
+    "method": "hpoint = (D/2)/tan(θ/2) · hprogram = hfull + hpoint"
+  },
+  "fixtureClamping": {
+    "values": [
+      {
+        "key": "designHorizontalForce",
+        "label": "Multiplier-adjusted horizontal force",
+        "raw": 3600,
+        "display": "3,600",
+        "unit": "N"
+      },
+      {
+        "key": "requiredNormalForce",
+        "label": "Friction-only required normal force",
+        "raw": 18947.36842105263,
+        "display": "18,947",
+        "unit": "N"
+      },
+      {
+        "key": "frictionCapacity",
+        "label": "Friction capacity at required normal force",
+        "raw": 3599.9999999999995,
+        "display": "3,600",
+        "unit": "N"
+      }
+    ],
+    "warnings": [
+      "This is a friction-only horizontal-force screen. It does not analyze stops, lift, moments, clamp geometry, load distribution, workpiece deformation, vibration, dynamic loads, machine table stiffness, clamp capacity, fixture selection, or safety approval."
+    ],
+    "errors": [],
+    "method": "Fdesign = Fcut M · Nrequired = Fdesign/μ · Ffriction = μN"
+  },
+  "pickPlaceCycle": {
+    "values": [
+      {
+        "key": "cycleTime",
+        "label": "Declared repeated cycle time",
+        "raw": 3.0999999999999996,
+        "display": "3.1",
+        "unit": "s"
+      },
+      {
+        "key": "hourlyThroughput",
+        "label": "Ideal hourly throughput",
+        "raw": 1161.2903225806454,
+        "display": "1,161.3",
+        "unit": "cycles/h"
+      },
+      {
+        "key": "batchTime",
+        "label": "Declared-cycle batch duration",
+        "raw": 5.166666666666666,
+        "display": "5.1667",
+        "unit": "min"
+      }
+    ],
+    "warnings": [
+      "This is a repeated timing sum from user-entered travel, dwell, and auxiliary times. It does not simulate robot paths, acceleration, blending, queuing, overlap, controller behavior, reach, collision, faults, payload limits, uptime, safety, or throughput guarantees."
+    ],
+    "errors": [],
+    "method": "tcycle = tout + tback + tpick + tplace + taux · throughput = 3600/tcycle · tbatch = Ntcycle"
+  },
+  "payloadInertia": {
+    "values": [
+      {
+        "key": "payloadMass",
+        "label": "Declared total payload mass",
+        "raw": 7,
+        "display": "7",
+        "unit": "kg"
+      },
+      {
+        "key": "cgMoment",
+        "label": "Payload mass × CG distance",
+        "raw": 1.05,
+        "display": "1.05",
+        "unit": "kg·m"
+      },
+      {
+        "key": "pointMassInertia",
+        "label": "Point-mass payload inertia",
+        "raw": 0.1575,
+        "display": "0.1575",
+        "unit": "kg·m²"
+      }
+    ],
+    "warnings": [
+      "This is a one-axis point-mass approximation using a single declared flange-to-CG distance. It does not calculate a full inertia tensor, model EOAT/product geometry, determine robot payload or axis limits, evaluate reach, motion, collision, capacity, safety, certification, or robot selection."
+    ],
+    "errors": [],
+    "method": "mpayload = me + mp · first moment = mpayload r · Ipoint = mpayload r²"
+  },
+  "reynoldsNumber": {
+    "values": [
+      {
+        "key": "reynolds",
+        "label": "Reynolds number",
+        "raw": 30000,
+        "display": "30,000",
+        "unit": "—"
+      },
+      {
+        "key": "kinematicViscosity",
+        "label": "Declared-condition kinematic viscosity",
+        "raw": 0.000001,
+        "display": "0.000001",
+        "unit": "m²/s"
+      },
+      {
+        "key": "thresholdRatio",
+        "label": "Ratio to declared reference threshold",
+        "raw": 13.043478260869565,
+        "display": "13.043",
+        "unit": "×"
+      }
+    ],
+    "warnings": [
+      "This is a declared-property Reynolds-number arithmetic screen only. It does not classify a flow regime, select a friction factor or heat/mass-transfer correlation, calculate pressure loss, infer fluid properties, account for roughness, entrance effects, non-Newtonian behavior, multiphase flow, compressibility, geometry, equipment suitability, safety, or approval."
+    ],
+    "errors": [],
+    "method": "Re = ρuDh/μ = uDh/ν · ν = μ/ρ · ratio = Re/Reref"
+  },
+  "buoyancyForce": {
+    "values": [
+      {
+        "key": "buoyancy",
+        "label": "Constant-density buoyant force",
+        "raw": 117.6798,
+        "display": "117.68",
+        "unit": "N"
+      },
+      {
+        "key": "weight",
+        "label": "Declared object gravitational weight",
+        "raw": 98.06649999999999,
+        "display": "98.066",
+        "unit": "N"
+      },
+      {
+        "key": "netUpwardForce",
+        "label": "Buoyancy minus declared weight",
+        "raw": 19.61330000000001,
+        "display": "19.613",
+        "unit": "N"
+      },
+      {
+        "key": "displacedMass",
+        "label": "Mass of declared displaced fluid",
+        "raw": 12,
+        "display": "12",
+        "unit": "kg"
+      }
+    ],
+    "warnings": [
+      "This is constant-density displaced-volume force arithmetic only. It does not determine float or vessel stability, immersion equilibrium, free-surface effects, restoring moments, geometry, structural adequacy, material selection, pressure rating, installation conditions, safety, or approval."
+    ],
+    "errors": [],
+    "method": "FB = ρf·g·Vd · W = m·g · Fnet = FB − W"
+  },
+  "flywheelEnergy": {
+    "values": [
+      {
+        "key": "initialAngularSpeed",
+        "label": "Initial angular speed",
+        "raw": 62.83185307179586,
+        "display": "62.832",
+        "unit": "rad/s"
+      },
+      {
+        "key": "finalAngularSpeed",
+        "label": "Final angular speed",
+        "raw": 188.49555921538757,
+        "display": "188.5",
+        "unit": "rad/s"
+      },
+      {
+        "key": "initialEnergy",
+        "label": "Initial rotational kinetic energy",
+        "raw": 1579.1367041742974,
+        "display": "1.5791",
+        "unit": "kJ"
+      },
+      {
+        "key": "finalEnergy",
+        "label": "Final rotational kinetic energy",
+        "raw": 14212.230337568673,
+        "display": "14.212",
+        "unit": "kJ"
+      },
+      {
+        "key": "energyChange",
+        "label": "Final minus initial energy",
+        "raw": 12633.093633394376,
+        "display": "12.633",
+        "unit": "kJ"
+      }
+    ],
+    "warnings": [
+      "This is a rigid-body two-state rotational kinetic-energy calculation. It excludes rotating-body stress, containment, balance, overspeed, acceleration torque, transient dynamics, losses, material selection, safety, and approval."
+    ],
+    "errors": [],
+    "method": "ω = 2πn/60 · E = ½Iω² · ΔE = E2 − E1"
+  }
+}

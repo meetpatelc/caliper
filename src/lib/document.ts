@@ -9,6 +9,9 @@ import { quantitySymbol } from "@/lib/quantity-symbols";
 import { band1Documents } from "@/lib/library-band1";
 import { leftoverDocuments } from "@/lib/library-leftovers";
 import { atlasDocuments } from "@/lib/library-atlas";
+import { pilotDocuments } from "@/lib/library-pilot";
+import { wave2Documents } from "@/lib/library-wave2";
+import { nearDocuments } from "@/lib/library-near";
 import type { EngineeringDomain } from "@/lib/platform";
 
 export type InstrumentField = {
@@ -143,6 +146,9 @@ export const libraryDocuments: Record<string, InstrumentDocument> = {
   ...band1Documents,
   ...leftoverDocuments,
   ...atlasDocuments,
+  ...pilotDocuments,
+  ...wave2Documents,
+  ...nearDocuments,
 };
 
 export function isStudioDocument(document: InstrumentDocument) {

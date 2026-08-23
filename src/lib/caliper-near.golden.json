@@ -1,0 +1,375 @@
+{
+  "sheetMetalBend": {
+    "values": [
+      {
+        "key": "bendAllowance",
+        "label": "Bend allowance",
+        "raw": 4.131194339470578,
+        "display": "4.1312",
+        "unit": "mm"
+      },
+      {
+        "key": "outsideSetback",
+        "label": "Outside setback",
+        "raw": 3.4999999999999996,
+        "display": "3.5",
+        "unit": "mm"
+      },
+      {
+        "key": "bendDeduction",
+        "label": "Bend deduction",
+        "raw": 2.8688056605294214,
+        "display": "2.8688",
+        "unit": "mm"
+      },
+      {
+        "key": "flatLength",
+        "label": "One-bend flat-length estimate",
+        "raw": 87.13119433947058,
+        "display": "87.131",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This is nominal one-bend K-factor arithmetic with user-entered inputs. It excludes K-factor selection, bend-radius rules, springback, tooling, grain direction, forming method, material condition, tolerances, bend relief, multi-bend sequencing, collision, and manufacturing qualification."
+    ],
+    "errors": [],
+    "method": "BA = (π/180)B(IR + K·MT) · OSSB = tan(B/2)(IR + MT) · BD = 2OSSB − BA · Flat = L₁ + L₂ − BD"
+  },
+  "productionMetrics": {
+    "values": [
+      {
+        "key": "takt",
+        "label": "Takt time",
+        "raw": 48,
+        "display": "48",
+        "unit": "s/unit"
+      },
+      {
+        "key": "runTime",
+        "label": "Run time",
+        "raw": 420,
+        "display": "420",
+        "unit": "min"
+      },
+      {
+        "key": "throughput",
+        "label": "Actual throughput",
+        "raw": 1.1904761904761905,
+        "display": "1.1905",
+        "unit": "units/min"
+      },
+      {
+        "key": "capacity",
+        "label": "Ideal-window capacity",
+        "raw": 640,
+        "display": "640",
+        "unit": "units"
+      },
+      {
+        "key": "availability",
+        "label": "Availability",
+        "raw": 0.875,
+        "display": "87.5",
+        "unit": "%"
+      },
+      {
+        "key": "performance",
+        "label": "Performance",
+        "raw": 0.8928571428571429,
+        "display": "89.286",
+        "unit": "%"
+      },
+      {
+        "key": "quality",
+        "label": "First-pass quality",
+        "raw": 0.96,
+        "display": "96",
+        "unit": "%"
+      },
+      {
+        "key": "oee",
+        "label": "Overall equipment effectiveness",
+        "raw": 0.75,
+        "display": "75",
+        "unit": "%"
+      },
+      {
+        "key": "laborContent",
+        "label": "Labor content per good unit",
+        "raw": 4,
+        "display": "4",
+        "unit": "labor-min/unit"
+      },
+      {
+        "key": "utilization",
+        "label": "Machine utilization",
+        "raw": 0.875,
+        "display": "87.5",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This reports arithmetic from user-entered production records and uses the declared ideal cycle time. It does not validate downtime event classification, count integrity, rework policy, demand forecasting, labor allocation, targets, bottleneck behavior, shift calendars, routing, or a productivity conclusion."
+    ],
+    "errors": [],
+    "method": "Run = PPT−ST · A = Run/PPT · P = ICT·N/Run · Q = G/N · OEE = A·P·Q · takt = PPT/D"
+  },
+  "gageRr": {
+    "values": [
+      {
+        "key": "repeatabilityVariance",
+        "label": "Repeatability variance component",
+        "raw": 0.005000000000000098,
+        "display": "0.005",
+        "unit": "unit²"
+      },
+      {
+        "key": "operatorVariance",
+        "label": "Operator variance component",
+        "raw": 0.019999999999972814,
+        "display": "0.02",
+        "unit": "unit²"
+      },
+      {
+        "key": "interactionVariance",
+        "label": "Part × operator variance component",
+        "raw": 0,
+        "display": "0",
+        "unit": "unit²"
+      },
+      {
+        "key": "partVariance",
+        "label": "Part-to-part variance component",
+        "raw": 49.99999999999996,
+        "display": "50",
+        "unit": "unit²"
+      },
+      {
+        "key": "gageRrVariance",
+        "label": "Total Gage R&R variance",
+        "raw": 0.024999999999972912,
+        "display": "0.025",
+        "unit": "unit²"
+      },
+      {
+        "key": "gageRrShare",
+        "label": "Gage R&R share of observed study variance",
+        "raw": 0.0004997501249369904,
+        "display": "0.049975",
+        "unit": "%"
+      },
+      {
+        "key": "repeatabilitySd",
+        "label": "Repeatability standard deviation",
+        "raw": 0.07071067811865545,
+        "display": "0.070711",
+        "unit": "unit"
+      }
+    ],
+    "warnings": [
+      "This is a fixed balanced crossed 2-operator × 2-part × 2-trial ANOVA screen with non-negative component estimates. It does not support other study designs, test significance, assess normality, establish stability, assess bias/linearity/resolution, calculate uncertainty, classify Gage R&R adequacy, or approve a measurement system."
+    ],
+    "errors": [],
+    "method": "Crossed ANOVA: SSPart, SSOperator, SSPart×Operator, SSRepeatability · VarRepeat = MSRepeat · VarOperator = max[(MSOperator−MSInteraction)/(a·n),0]"
+  },
+  "measurementUncertainty": {
+    "values": [
+      {
+        "key": "combinedStandard",
+        "label": "Combined standard uncertainty",
+        "raw": 0.05477225575051661,
+        "display": "0.054772",
+        "unit": "unit"
+      },
+      {
+        "key": "expanded",
+        "label": "Expanded uncertainty",
+        "raw": 0.10954451150103323,
+        "display": "0.10954",
+        "unit": "unit"
+      },
+      {
+        "key": "relativeExpanded",
+        "label": "Relative expanded uncertainty",
+        "raw": 0.004381780460041329,
+        "display": "0.43818",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This is root-sum-square arithmetic for user-entered independent standard uncertainty components in compatible units. It does not select distributions, convert stated intervals to standard uncertainties, evaluate correlations or sensitivity coefficients, determine degrees of freedom, choose a coverage factor, assert coverage probability, or certify a result."
+    ],
+    "errors": [],
+    "method": "uc = √(uA² + uCal² + uRes² + uEnv²) · U = k·uc"
+  },
+  "thermalRadiation": {
+    "values": [
+      {
+        "key": "netRadiation",
+        "label": "Net radiation from surface",
+        "raw": 653.3838994088649,
+        "display": "653.38",
+        "unit": "W"
+      },
+      {
+        "key": "heatFlux",
+        "label": "Net radiative heat flux",
+        "raw": 544.4865828407208,
+        "display": "544.49",
+        "unit": "W/m²"
+      },
+      {
+        "key": "emittedPower",
+        "label": "Surface emitted radiation",
+        "raw": 1055.3991826160652,
+        "display": "1,055.4",
+        "unit": "W"
+      }
+    ],
+    "warnings": [
+      "This is gray-surface Stefan–Boltzmann exchange to large isothermal surroundings using user-entered emissivity and absolute temperatures. It excludes finite-surface view factors, enclosure geometry, spectral and directional behavior, participating gases/flames, reflections, solar load, convection, conduction, insulation, and transient temperature response."
+    ],
+    "errors": [],
+    "method": "qnet = εσA(Ts⁴ − Tsur⁴) · q''net = εσ(Ts⁴ − Tsur⁴)"
+  },
+  "shaftDesign": {
+    "values": [
+      {
+        "key": "minimumDiameter",
+        "label": "Minimum torsion-only diameter",
+        "raw": 23.35088649881472,
+        "display": "23.351",
+        "unit": "mm"
+      },
+      {
+        "key": "torsionalStress",
+        "label": "Torsional shear stress",
+        "raw": 32.594932345220165,
+        "display": "32.595",
+        "unit": "MPa"
+      },
+      {
+        "key": "twist",
+        "label": "Torsional twist",
+        "raw": 0.0195569594071321,
+        "display": "1.1205",
+        "unit": "deg"
+      },
+      {
+        "key": "centralDeflection",
+        "label": "Central-load deflection",
+        "raw": 0.586708782213963,
+        "display": "0.58671",
+        "unit": "mm"
+      },
+      {
+        "key": "criticalRpm",
+        "label": "First-mode critical-speed estimate",
+        "raw": 18126.067698019877,
+        "display": "18,126",
+        "unit": "rpm"
+      }
+    ],
+    "warnings": [
+      "This is a solid circular shaft screen: torsion-only allowable sizing, Saint-Venant twist, a simply-supported single central-load deflection, and a uniform simply-supported first-mode speed estimate. It excludes combined fatigue, stress concentrations, keyway effects, bearing/support flexibility, damping, unbalance, couplings, attached disks, distributed auxiliary masses, thermal effects, buckling, alignment, and rotor-dynamics validation."
+    ],
+    "errors": [],
+    "method": "dmin = ∛(16T/πτallow) · τ = 16T/(πd³) · θ = TL/(GJ) · δcenter = FL³/(48EI) · ω₁ = (π²/L²)√(EI/m′)"
+  },
+  "bearingLoad": {
+    "values": [
+      {
+        "key": "equivalentLoad",
+        "label": "Equivalent dynamic load",
+        "raw": 2400,
+        "display": "2,400",
+        "unit": "N"
+      },
+      {
+        "key": "requiredDynamicRating",
+        "label": "Required basic dynamic rating",
+        "raw": 6514.602279827775,
+        "display": "6,514.6",
+        "unit": "N"
+      },
+      {
+        "key": "staticRatio",
+        "label": "Static rating ratio C0/P0",
+        "raw": 4,
+        "display": "4",
+        "unit": "—"
+      },
+      {
+        "key": "dn",
+        "label": "DN value",
+        "raw": 63000,
+        "display": "63,000",
+        "unit": "mm·rpm"
+      },
+      {
+        "key": "dnRatio",
+        "label": "DN / user-stated limit",
+        "raw": 0.63,
+        "display": "63",
+        "unit": "%"
+      },
+      {
+        "key": "preloadRatio",
+        "label": "Preload / equivalent-load ratio",
+        "raw": 0.125,
+        "display": "12.5",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This is constant-load basic rating arithmetic using user-entered bearing-specific X/Y factors, exponent, static load, and DN limit. It does not select a bearing, provide factor or limit values, model variable duty, use a modified-life method, assess lubricant/contamination/temperature, determine preload or stiffness, assess static adequacy, or replace a bearing manufacturer calculation."
+    ],
+    "errors": [],
+    "method": "P = XFr + YFa · Creq = P·L10^(1/p) · static ratio = C0/P0 · DN = d·n"
+  },
+  "filletWeld": {
+    "values": [
+      {
+        "key": "throat",
+        "label": "Effective throat thickness",
+        "raw": 4.242,
+        "display": "4.242",
+        "unit": "mm"
+      },
+      {
+        "key": "effectiveArea",
+        "label": "Effective throat area",
+        "raw": 848.4,
+        "display": "848.4",
+        "unit": "mm²"
+      },
+      {
+        "key": "directStress",
+        "label": "Direct throat shear stress",
+        "raw": 58.934464875058936,
+        "display": "58.934",
+        "unit": "MPa"
+      },
+      {
+        "key": "requiredLeg",
+        "label": "Required leg at stated allowable",
+        "raw": 2.438667512071404,
+        "display": "2.4387",
+        "unit": "mm"
+      },
+      {
+        "key": "heatInput",
+        "label": "Electrical heat input",
+        "raw": 0.6912,
+        "display": "0.6912",
+        "unit": "kJ/mm"
+      }
+    ],
+    "warnings": [
+      "This is equal-leg fillet-weld direct-load arithmetic with user-entered allowable, plus electrical heat input from user-entered arc settings. It excludes weld group eccentricity, bending/torsion, nonuniform load sharing, longitudinal/transverse direction effects, fatigue, residual stress, discontinuities, base-metal failure, electrode/process selection, code provisions, weld procedure qualification, heat-affected-zone effects, distortion, preheat/interpass control, inspection, and compliance."
+    ],
+    "errors": [],
+    "method": "t = 0.707a · Aeff = 0.707aLn · τ = F/Aeff · amin = F/(0.707Lτallow n) · HI = VI·60·η/(1000v)"
+  }
+}
