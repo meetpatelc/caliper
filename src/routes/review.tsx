@@ -16,7 +16,7 @@ import { Field, Input, Select, controlClass } from "@/components/ui/field";
 import { panelClass, panelHoverClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
-import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { useDeskStatus } from "@/lib/desk-mode";
 
 type ReviewSearch = { id?: string };
 
@@ -39,7 +39,7 @@ function ReviewPage() {
   const { id: restoreId } = Route.useSearch();
   const saveReview = useDeskStore((state) => state.saveReview);
   const reviews = useDeskStore((state) => state.reviews);
-  const { user } = useCurrentUserState();
+  const { accountMode } = useDeskStatus();
   const [area, setArea] = useState<ReviewArea>("engineering");
   const [complete, setComplete] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
@@ -139,7 +139,7 @@ function ReviewPage() {
       area,
       payloadJson: JSON.stringify({ complete, workflowId, workflowChecks, notes, criteria, optionAName, optionBName, severity, occurrence, detection }),
     });
-    toast.success(user ? "Review snapshot saved on this account." : "Review snapshot saved on this device.");
+    toast.success(accountMode ? "Review snapshot saved on this account." : "Review snapshot saved on this device.");
   };
 
   const download = () => {

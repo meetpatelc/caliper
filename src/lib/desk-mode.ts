@@ -1,36 +1,131 @@
+import { useSyncExternalStore } from "react";
 import type { StateStorage } from "zustand/middleware";
+import { toast } from "sonner";
+
+export const DESK_STORAGE_KEY = "caliper-desk-v1";
+
+export type DeskStatus = {
+  accountMode: boolean;
+  hydrating: boolean;
+  fallback: boolean;
+};
 
 /** True while the in-memory desk is the signed-in account (do not write localStorage). */
 let accountMode = false;
 /** True while the first account fetch/claim is in flight (queue remote writes). */
 let hydrating = false;
+/** True when the account desk could not be loaded; unsigned snapshot is showing. */
+let fallback = false;
 const pendingWrites: Array<() => Promise<unknown>> = [];
+const listeners = new Set<() => void>();
+let snapshot: DeskStatus = { accountMode: false, hydrating: false, fallback: false };
+let writeFailToastAt = 0;
+
+function publish() {
+  snapshot = { accountMode, hydrating, fallback };
+  for (const listen of listeners) listen();
+}
+
+export function subscribeDeskStatus(listen: () => void) {
+  listeners.add(listen);
+  return () => {
+    listeners.delete(listen);
+  };
+}
+
+export function getDeskStatus(): DeskStatus {
+  return snapshot;
+}
+
+export function useDeskStatus(): DeskStatus {
+  return useSyncExternalStore(subscribeDeskStatus, getDeskStatus, getDeskStatus);
+}
 
 export function isAccountMode() {
   return accountMode;
 }
 
 export function setAccountMode(value: boolean) {
+  if (accountMode === value) {
+    if (!value) pendingWrites.length = 0;
+    return;
+  }
   accountMode = value;
   if (!value) pendingWrites.length = 0;
+  publish();
 }
 
 export function setDeskHydrating(value: boolean) {
+  if (hydrating === value) return;
   hydrating = value;
+  publish();
+}
+
+export function setDeskFallback(value: boolean) {
+  if (fallback === value) return;
+  fallback = value;
+  publish();
 }
 
 export function shouldSyncAccount() {
   return accountMode && !hydrating;
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function retryAccountCall<T>(run: () => Promise<T>, attempts = 3): Promise<T> {
+  let last: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await run();
+    } catch (error) {
+      last = error;
+      if (i < attempts - 1) await delay(250 * (i + 1));
+    }
+  }
+  throw last;
+}
+
+const DESK_WRITE_TOAST = "desk-write";
+
+function notifyWriteFailed() {
+  if (!accountMode) return;
+  const now = Date.now();
+  if (now - writeFailToastAt < 4000) return;
+  writeFailToastAt = now;
+  toast.error("Could not save on this account. Try again.", { id: DESK_WRITE_TOAST });
+}
+
+async function runAccountWrite(run: () => Promise<unknown>) {
+  let last: unknown;
+  for (let i = 0; i < 3; i++) {
+    try {
+      const value = await run();
+      toast.dismiss(DESK_WRITE_TOAST);
+      return value;
+    } catch (error) {
+      last = error;
+      if (i < 2 && accountMode) {
+        toast.loading("Still saving on this account…", { id: DESK_WRITE_TOAST });
+        await delay(250 * (i + 1));
+      }
+    }
+  }
+  notifyWriteFailed();
+  throw last;
+}
+
 export function enqueueAccountWrite(run: () => Promise<unknown>) {
   if (!accountMode) return;
+  const wrapped = () => runAccountWrite(run);
   if (hydrating) {
-    pendingWrites.push(run);
+    pendingWrites.push(wrapped);
     return;
   }
-  void run().catch(() => {
-    /* signed-out or network */
+  void wrapped().catch(() => {
+    /* already toasted */
   });
 }
 
@@ -40,7 +135,7 @@ export async function flushAccountWrites() {
     try {
       await run();
     } catch {
-      /* signed-out or network */
+      /* runAccountWrite already toasted */
     }
   }
   return batch.length;
@@ -107,4 +202,35 @@ export function deskPersistStorage(): StateStorage {
       }
     },
   };
+}
+
+/**
+ * After a successful claim, drop the copied Favourites / Project / Review rows
+ * from this browser so an emptied account cannot resurrect them. Recents stay.
+ */
+export function consumeClaimedUnsignedDesk() {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const raw = localStorage.getItem(DESK_STORAGE_KEY);
+    const existing = raw
+      ? (JSON.parse(raw) as { state?: Record<string, unknown>; version?: number })
+      : { state: {} as Record<string, unknown>, version: 0 };
+    localStorage.setItem(
+      DESK_STORAGE_KEY,
+      JSON.stringify({
+        ...existing,
+        state: {
+          ...(existing.state ?? {}),
+          favorites: [],
+          projects: [],
+          calculations: [],
+          reviews: [],
+          activeProjectId: null,
+          recents: existing.state?.recents ?? [],
+        },
+      }),
+    );
+  } catch {
+    /* private mode */
+  }
 }

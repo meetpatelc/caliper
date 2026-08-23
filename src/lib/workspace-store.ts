@@ -10,7 +10,7 @@ import {
   saveReviewAccount,
   setFavoriteAccount,
 } from "@/lib/desk-account";
-import { deskPersistStorage, enqueueAccountWrite } from "@/lib/desk-mode";
+import { DESK_STORAGE_KEY, deskPersistStorage, enqueueAccountWrite } from "@/lib/desk-mode";
 
 export type SavedCalculation = {
   id: string;
@@ -122,7 +122,7 @@ export const useDeskStore = create<DeskState>()(
       },
     }),
     {
-      name: "caliper-desk-v1",
+      name: DESK_STORAGE_KEY,
       storage: createJSONStorage(() => deskPersistStorage()),
     },
   ),

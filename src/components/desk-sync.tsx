@@ -1,9 +1,21 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
+import { toast } from "sonner";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { claimDesk, getDesk, type DeskSnapshot } from "@/lib/desk-account";
-import { flushAccountWrites, isAccountMode, setAccountMode, setDeskHydrating } from "@/lib/desk-mode";
+import { WORKSHOP_KEY } from "@/gauge/lib/brand";
+import {
+  consumeClaimedUnsignedDesk,
+  flushAccountWrites,
+  isAccountMode,
+  retryAccountCall,
+  setAccountMode,
+  setDeskFallback,
+  setDeskHydrating,
+} from "@/lib/desk-mode";
 import { useWorkshop } from "@/gauge/lib/workshop-store";
 import { useDeskStore } from "@/lib/workspace-store";
+
+let syncGeneration = 0;
 
 function snapshotLocal(): DeskSnapshot {
   const desk = useDeskStore.getState();
@@ -40,23 +52,84 @@ function applyDesk(desk: DeskSnapshot) {
   useWorkshop.setState({ items: desk.drafts, hasHydrated: true });
 }
 
+function blankAccountView() {
+  const recents = useDeskStore.getState().recents;
+  useDeskStore.setState({
+    favorites: [],
+    projects: [],
+    calculations: [],
+    reviews: [],
+    activeProjectId: null,
+    recents,
+  });
+  useWorkshop.setState({ items: [], hasHydrated: false });
+}
+
+function consumeClaimedWorkshop() {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const raw = localStorage.getItem(WORKSHOP_KEY);
+    const existing = raw
+      ? (JSON.parse(raw) as { state?: Record<string, unknown>; version?: number })
+      : { state: {} as Record<string, unknown>, version: 0 };
+    localStorage.setItem(
+      WORKSHOP_KEY,
+      JSON.stringify({
+        ...existing,
+        state: { ...(existing.state ?? {}), items: [] },
+      }),
+    );
+  } catch {
+    /* private mode */
+  }
+}
+
+async function restoreUnsignedDesk() {
+  setAccountMode(false);
+  await useDeskStore.persist.rehydrate();
+  await useWorkshop.persist.rehydrate();
+  useWorkshop.setState({ hasHydrated: true });
+}
+
 async function joinAccountDesk() {
+  const local = isAccountMode()
+    ? { favorites: [], projects: [], calculations: [], reviews: [], drafts: [] }
+    : snapshotLocal();
+  const gen = ++syncGeneration;
+  setDeskFallback(false);
   setAccountMode(true);
   setDeskHydrating(true);
-  useWorkshop.setState({ hasHydrated: false });
+  blankAccountView();
+  if (typeof requestAnimationFrame === "function") {
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  }
+  if (gen !== syncGeneration) return;
   try {
-    let remote = await getDesk();
-    const local = snapshotLocal();
+    let remote = await retryAccountCall(() => getDesk());
+    if (gen !== syncGeneration) return;
+    let claimed = false;
     if (!hasWork(remote) && hasWork(local)) {
-      remote = await claimDesk({ data: local });
+      remote = await retryAccountCall(() => claimDesk({ data: local }));
+      claimed = hasWork(remote);
     }
+    if (gen !== syncGeneration) return;
     applyDesk(remote);
+    if (claimed) {
+      consumeClaimedUnsignedDesk();
+      consumeClaimedWorkshop();
+    }
   } catch {
-    useWorkshop.setState({ hasHydrated: true });
+    if (gen !== syncGeneration) return;
+    setDeskFallback(true);
+    await restoreUnsignedDesk();
+    toast.error("Could not load the account desk. Showing this device.");
   } finally {
+    if (gen !== syncGeneration) return;
     setDeskHydrating(false);
     const queued = await flushAccountWrites();
-    if (queued) {
+    if (queued && gen === syncGeneration) {
       try {
         applyDesk(await getDesk());
       } catch {
@@ -67,21 +140,22 @@ async function joinAccountDesk() {
 }
 
 async function leaveAccountDesk() {
-  if (!isAccountMode()) {
+  syncGeneration += 1;
+  setDeskHydrating(false);
+  setDeskFallback(false);
+  const wasAccount = isAccountMode();
+  if (!wasAccount) {
     useWorkshop.setState({ hasHydrated: true });
     return;
   }
-  setDeskHydrating(false);
-  setAccountMode(false);
-  await useDeskStore.persist.rehydrate();
-  await useWorkshop.persist.rehydrate();
+  await restoreUnsignedDesk();
 }
 
 /** Keeps Favourites / Project / Studio on the signed-in account. Recents stay in this browser. */
 export function DeskSync() {
   const { user, isPending } = useCurrentUserState();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isPending) return;
     if (!user) {
       void leaveAccountDesk();

@@ -9,6 +9,7 @@ import { panelClass } from "@/components/ui/panel";
 import { getTool } from "@/lib/catalog";
 import { savedHeadline } from "@/lib/desk";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { useDeskStatus } from "@/lib/desk-mode";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 
@@ -29,8 +30,10 @@ function ProjectPage() {
   const deleteReview = useDeskStore((state) => state.deleteReview);
   const activeProjectId = useDeskStore((state) => state.activeProjectId);
   const [name, setName] = useState("");
-  const { user } = useCurrentUserState();
-  const signedIn = Boolean(user);
+  const { isPending } = useCurrentUserState();
+  const { accountMode, hydrating, fallback } = useDeskStatus();
+  const onAccount = accountMode;
+  const loadingDesk = hydrating || isPending;
   const projectId = activeProjectId ?? projects[0]?.id ?? null;
   const visible = calculations.filter((item) => (projectId ? item.projectId === projectId : true));
   const empty = items.length === 0 && calculations.length === 0 && reviews.length === 0;
@@ -40,11 +43,20 @@ function ProjectPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Project</p>
-          <h1 className="display-title mt-3">{signedIn ? "On this account." : "On this device."}</h1>
+          <h1 className="display-title mt-3">
+            {onAccount ? "On this account." : fallback || (!isPending && !hydrating) ? "On this device." : "Loading."}
+          </h1>
+          {loadingDesk ? (
+            <p className="mt-4 text-sm text-muted" role="status">
+              {hydrating ? "Loading the account desk." : "Loading."}
+            </p>
+          ) : (
           <p className="mt-4 max-w-xl text-base leading-7 text-muted">
-            {signedIn
+            {onAccount
               ? "Drafts, saved checks, and reviews follow this account. Write in "
-              : "Drafts, saved checks, and reviews stay on this device until you sign in. Write in "}
+              : fallback
+                ? "The account desk could not be loaded. Write in "
+                : "Drafts, saved checks, and reviews stay on this device until you sign in. Write in "}
             <Link to="/studio" className="text-accent hover:text-fg">
               Studio
             </Link>{" "}
@@ -54,6 +66,7 @@ function ProjectPage() {
             </Link>
             .
           </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           <Link to="/review" className={buttonVariants({ variant: "outline" })}>
@@ -73,7 +86,7 @@ function ProjectPage() {
         </div>
       </div>
 
-      {empty ? (
+      {loadingDesk ? null : empty ? (
         <p className={cn(panelClass, "mt-10 p-6 text-sm text-muted")}>
           Nothing here yet. Open a model and save a check, write one in Studio, or start a review.
         </p>
@@ -81,8 +94,8 @@ function ProjectPage() {
 
       <section className="mt-10">
         <h2 className="text-xl font-semibold">Your models</h2>
-        {items.length === 0 ? (
-          <p className="mt-3 text-sm text-muted">{signedIn ? "No drafts on this account." : "No drafts on this device."}</p>
+        {loadingDesk ? null : items.length === 0 ? (
+          <p className="mt-3 text-sm text-muted">{onAccount ? "No drafts on this account." : "No drafts on this device."}</p>
         ) : (
           <ul className="mt-4 grid gap-3">
             {items.map((item) => (
@@ -177,7 +190,7 @@ function ProjectPage() {
             ))}
           </div>
         )}
-        {visible.length === 0 ? (
+        {loadingDesk ? null : visible.length === 0 ? (
           <p className="mt-4 text-sm text-muted">No snapshots yet. Open a model and press Save.</p>
         ) : (
           <ul className="mt-4 grid gap-2">

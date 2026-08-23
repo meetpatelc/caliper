@@ -4,6 +4,7 @@ import { RedirectToSignIn } from "@/lib/auth/gates";
 import { authClient } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { tools } from "@/lib/catalog";
+import { useDeskStatus } from "@/lib/desk-mode";
 import { useDeskStore } from "@/lib/workspace-store";
 import { useWorkshop } from "@/gauge/lib/workshop-store";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
   const calculations = useDeskStore((state) => state.calculations);
   const reviews = useDeskStore((state) => state.reviews);
   const drafts = useWorkshop((state) => state.items);
+  const { hydrating, fallback, accountMode } = useDeskStatus();
   const favouriteTools = favorites
     .map((id) => tools.find((tool) => tool.id === id))
     .filter(Boolean);
@@ -93,33 +95,44 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
       </section>
 
       <section className={cn(panelClass, "mt-4 p-5")}>
-        <p className="eyebrow">On this account</p>
-        <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
-          <div>
-            <dt className="text-muted">Favourites</dt>
-            <dd className="mt-1 font-mono tabular-nums">{favouriteTools.length}</dd>
-          </div>
-          <div>
-            <dt className="text-muted">Drafts</dt>
-            <dd className="mt-1 font-mono tabular-nums">{drafts.length}</dd>
-          </div>
-          <div>
-            <dt className="text-muted">Saved checks</dt>
-            <dd className="mt-1 font-mono tabular-nums">{calculations.length + reviews.length}</dd>
-          </div>
-        </dl>
-        {favouriteTools.length ? (
-          <ul className="mt-4 grid gap-1">
-            {favouriteTools.map((tool) => (
-              <li key={tool!.id}>
-                <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="block py-1.5 text-sm hover:text-accent">
-                  {tool!.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <p className="eyebrow">{accountMode ? "On this account" : "On this device"}</p>
+        {fallback ? (
+          <p className="mt-2 text-sm text-muted">Could not load the account desk. Counts below are this device.</p>
+        ) : null}
+        {hydrating ? (
+          <p className="mt-3 text-sm text-muted" role="status">
+            Loading the account desk.
+          </p>
         ) : (
-          <p className="mt-4 text-sm text-muted">No favourites yet. Star a model in the library.</p>
+          <>
+            <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
+              <div>
+                <dt className="text-muted">Favourites</dt>
+                <dd className="mt-1 font-mono tabular-nums">{favouriteTools.length}</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Drafts</dt>
+                <dd className="mt-1 font-mono tabular-nums">{drafts.length}</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Saved checks</dt>
+                <dd className="mt-1 font-mono tabular-nums">{calculations.length + reviews.length}</dd>
+              </div>
+            </dl>
+            {favouriteTools.length ? (
+              <ul className="mt-4 grid gap-1">
+                {favouriteTools.map((tool) => (
+                  <li key={tool!.id}>
+                    <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="block py-1.5 text-sm hover:text-accent">
+                      {tool!.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm text-muted">No favourites yet. Star a model in the library.</p>
+            )}
+          </>
         )}
         <Link to="/workshop" className="mt-3 inline-block text-sm text-accent hover:text-fg">
           Open Project

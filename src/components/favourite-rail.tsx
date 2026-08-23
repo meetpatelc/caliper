@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { tools } from "@/lib/catalog";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { useDeskStatus } from "@/lib/desk-mode";
 import { useDeskStore } from "@/lib/workspace-store";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
@@ -7,6 +9,9 @@ import { cn } from "@/lib/utils";
 /** Sits in the viewport gutter, outside the 1180px page wrap. Hidden when the gutter is too narrow. */
 export function FavouriteRail() {
   const favorites = useDeskStore((state) => state.favorites);
+  const { hydrating } = useDeskStatus();
+  const { isPending } = useCurrentUserState();
+  const loading = hydrating || isPending;
   const favouriteTools = favorites
     .map((id) => tools.find((tool) => tool.id === id))
     .filter(Boolean);
@@ -19,10 +24,15 @@ export function FavouriteRail() {
         right: "0.75rem",
       }}
       aria-label="Favourite models"
+      aria-busy={loading || undefined}
     >
       <div className={cn(panelClass, "pointer-events-auto max-h-full overflow-auto p-4")}>
         <p className="eyebrow">Favourite</p>
-        {favouriteTools.length ? (
+        {loading ? (
+          <p className="mt-3 text-sm text-muted" role="status">
+            {hydrating ? "Loading the account desk." : "Loading."}
+          </p>
+        ) : favouriteTools.length ? (
           <ul className="mt-3 grid gap-1">
             {favouriteTools.map((tool) => (
               <li key={tool!.id}>

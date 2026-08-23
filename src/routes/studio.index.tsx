@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, FilePlus, PenLine } from "lucide-react";
 import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { useDeskStatus } from "@/lib/desk-mode";
 import { studioDocuments } from "@/lib/document";
 import { Button, buttonVariants, panelClass, panelHoverClass } from "@instrument/ui";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ function StudioHome() {
   const createStarter = useWorkshop((state) => state.createStarter);
   const createFrom = useWorkshop((state) => state.createFrom);
   const items = useWorkshop((state) => state.items).slice(0, 6);
+  const { hydrating } = useDeskStatus();
 
   const open = (item: { id: string }) => {
     navigate({ to: "/studio/$id", params: { id: item.id } });
@@ -56,7 +58,11 @@ function StudioHome() {
         Project →
       </Link>
 
-      {items.length > 0 && (
+      {hydrating ? (
+        <p className="mt-12 text-sm text-muted" role="status">
+          Loading the account desk.
+        </p>
+      ) : items.length > 0 ? (
         <section className="mt-12">
           <p className="eyebrow">Your drafts</p>
           <ul className="mt-4 grid gap-2">
@@ -74,7 +80,7 @@ function StudioHome() {
             ))}
           </ul>
         </section>
-      )}
+      ) : null}
 
       <section className="mt-12">
         <p className="eyebrow">Start from a published model</p>
