@@ -90,7 +90,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             type="button"
             variant="outline"
             onClick={() => setPaletteOpen(true)}
-            aria-label="Search models"
+            aria-label="Search"
             className="min-h-10 min-w-0 flex-1 justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg"
           >
             <Search size={15} className="shrink-0" />
@@ -135,11 +135,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               type="button"
               variant="outline"
               onClick={() => setPaletteOpen(true)}
-              aria-label="Search models"
+              aria-label="Search"
               className="min-h-10 w-[min(28rem,32vw)] justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg"
             >
               <Search size={15} className="shrink-0" />
-              <span className="flex-1 truncate text-left">Search models…</span>
+              <span className="flex-1 truncate text-left">Search…</span>
               <kbd className="rounded-md border border-border px-1.5 py-0.5 font-mono text-xs">{shortcut}</kbd>
             </Button>
             <Button
