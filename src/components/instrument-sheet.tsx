@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { instrumentClass } from "@/components/ui/panel";
 
 /** One instrument glass: optional drawing band, then aligned Inputs | Results. */
 export function InstrumentSheet({
@@ -18,7 +19,7 @@ export function InstrumentSheet({
   compact?: boolean;
 }) {
   return (
-    <div className="overflow-hidden rounded-md border border-border bg-border">
+    <div className={instrumentClass}>
       {diagram ? <div className="diagram-surface">{diagram}</div> : null}
       <div className={cn("grid gap-px", compact ? "grid-cols-1" : "lg:grid-cols-2")}>
         <div className="bg-surface p-4 sm:p-5">

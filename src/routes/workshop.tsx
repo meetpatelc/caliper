@@ -4,10 +4,11 @@ import { ClipboardList, FolderPlus, PenLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkshop } from "@/gauge/lib/workshop-store";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/field";
+import { Field, Input } from "@/components/ui/field";
 import { panelClass } from "@/components/ui/panel";
 import { getTool } from "@/lib/catalog";
 import { savedHeadline } from "@/lib/desk";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,8 @@ function ProjectPage() {
   const deleteReview = useDeskStore((state) => state.deleteReview);
   const activeProjectId = useDeskStore((state) => state.activeProjectId);
   const [name, setName] = useState("");
+  const { user } = useCurrentUserState();
+  const signedIn = Boolean(user);
   const projectId = activeProjectId ?? projects[0]?.id ?? null;
   const visible = calculations.filter((item) => (projectId ? item.projectId === projectId : true));
   const empty = items.length === 0 && calculations.length === 0 && reviews.length === 0;
@@ -37,9 +40,11 @@ function ProjectPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Project</p>
-          <h1 className="display-title mt-3">On this device.</h1>
+          <h1 className="display-title mt-3">{signedIn ? "On this account." : "On this device."}</h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-muted">
-            Drafts, saved checks, and reviews stay here. Sign in with email to keep an account; the work itself is still on this computer. Write in{" "}
+            {signedIn
+              ? "Drafts, saved checks, and reviews follow this account. Write in "
+              : "Drafts, saved checks, and reviews stay on this device until you sign in. Write in "}
             <Link to="/studio" className="text-accent hover:text-fg">
               Studio
             </Link>{" "}
@@ -69,7 +74,7 @@ function ProjectPage() {
       </div>
 
       {empty ? (
-        <p className="mt-10 rounded-md border border-border bg-surface p-6 text-sm text-muted">
+        <p className={cn(panelClass, "mt-10 p-6 text-sm text-muted")}>
           Nothing here yet. Open a model and save a check, write one in Studio, or start a review.
         </p>
       ) : null}
@@ -77,7 +82,7 @@ function ProjectPage() {
       <section className="mt-10">
         <h2 className="text-xl font-semibold">Your models</h2>
         {items.length === 0 ? (
-          <p className="mt-3 text-sm text-muted">No drafts on this device.</p>
+          <p className="mt-3 text-sm text-muted">{signedIn ? "No drafts on this account." : "No drafts on this device."}</p>
         ) : (
           <ul className="mt-4 grid gap-3">
             {items.map((item) => (
@@ -98,7 +103,7 @@ function ProjectPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-9 text-muted hover:text-danger"
+                      className="size-10 text-muted hover:text-danger"
                       aria-label={`Delete ${item.title}`}
                       onClick={() => {
                         removeModel(item.id);
@@ -119,7 +124,7 @@ function ProjectPage() {
         <h2 className="text-xl font-semibold">Saved checks</h2>
         <p className="mt-2 text-sm text-muted">Optional folders. The red one is the folder in use, not a trial of the product.</p>
         <form
-          className="mt-4 flex flex-wrap gap-2"
+          className="mt-4 flex flex-wrap items-end gap-2"
           onSubmit={(event) => {
             event.preventDefault();
             if (!name.trim()) {
@@ -131,13 +136,15 @@ function ProjectPage() {
             toast.success("Project created.");
           }}
         >
-          <Input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Folder name"
-            className="min-w-[220px]"
-            aria-label="New project name"
-          />
+          <div className="min-w-[220px] flex-1">
+            <Field htmlFor="folder-name" label="Folder name">
+              <Input
+                id="folder-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+            </Field>
+          </div>
           <Button type="submit" variant="accent" disabled={!name.trim()}>
             <FolderPlus size={16} /> Create
           </Button>
@@ -150,14 +157,14 @@ function ProjectPage() {
                   type="button"
                   variant={project.id === projectId ? "accent" : "outline"}
                   onClick={() => setActiveProject(project.id)}
-                  className="rounded-r-none text-xs"
+                  className="rounded-r-none"
                 >
                   {project.name}
                 </Button>
                 <Button
                   type="button"
                   variant={project.id === projectId ? "accent" : "outline"}
-                  className="rounded-l-none border-l-0 px-2 text-xs"
+                  className="rounded-l-none border-l-0 px-2"
                   aria-label={`Delete ${project.name}`}
                   onClick={() => {
                     deleteProject(project.id);
@@ -196,7 +203,7 @@ function ProjectPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="size-9 text-muted hover:text-danger"
+                    className="size-10 text-muted hover:text-danger"
                     aria-label="Delete snapshot"
                     onClick={() => deleteCalculation(record.id)}
                   >
@@ -226,7 +233,7 @@ function ProjectPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-9 text-muted hover:text-danger"
+                  className="size-10 text-muted hover:text-danger"
                   aria-label="Delete review"
                   onClick={() => deleteReview(record.id)}
                 >

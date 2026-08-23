@@ -1,6 +1,16 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import type { ToolId } from "@/lib/catalog";
+import {
+  createProjectAccount,
+  deleteCalculationAccount,
+  deleteProjectAccount,
+  deleteReviewAccount,
+  saveCalculationAccount,
+  saveReviewAccount,
+  setFavoriteAccount,
+} from "@/lib/desk-account";
+import { deskPersistStorage, enqueueAccountWrite } from "@/lib/desk-mode";
 
 export type SavedCalculation = {
   id: string;
@@ -48,19 +58,26 @@ type DeskState = {
 const uid = () =>
   typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `id-${Date.now()}-${Math.random()}`;
 
+function sync(run: () => Promise<unknown>) {
+  enqueueAccountWrite(run);
+}
+
 export const useDeskStore = create<DeskState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       favorites: [],
       recents: [],
       projects: [],
       calculations: [],
       reviews: [],
       activeProjectId: null,
-      toggleFavorite: (id) =>
+      toggleFavorite: (id) => {
+        const on = !get().favorites.includes(id);
         set((state) => ({
-          favorites: state.favorites.includes(id) ? state.favorites.filter((item) => item !== id) : [id, ...state.favorites],
-        })),
+          favorites: on ? [id, ...state.favorites] : state.favorites.filter((item) => item !== id),
+        }));
+        sync(() => setFavoriteAccount({ data: { toolId: id, on } }));
+      },
       touchRecent: (id) =>
         set((state) => ({
           recents: [id, ...state.recents.filter((item) => item !== id)].slice(0, 12),
@@ -68,10 +85,11 @@ export const useDeskStore = create<DeskState>()(
       createProject: (name) => {
         const project: DeskProject = { id: uid(), name: name.trim() || "Untitled project", createdAt: new Date().toISOString() };
         set((state) => ({ projects: [project, ...state.projects], activeProjectId: project.id }));
+        sync(() => createProjectAccount({ data: project }));
         return project;
       },
       setActiveProject: (id) => set({ activeProjectId: id }),
-      deleteProject: (id) =>
+      deleteProject: (id) => {
         set((state) => {
           const projects = state.projects.filter((item) => item.id !== id);
           return {
@@ -79,21 +97,34 @@ export const useDeskStore = create<DeskState>()(
             calculations: state.calculations.filter((item) => item.projectId !== id),
             activeProjectId: state.activeProjectId === id ? (projects[0]?.id ?? null) : state.activeProjectId,
           };
-        }),
+        });
+        sync(() => deleteProjectAccount({ data: id }));
+      },
       saveCalculation: (entry) => {
         const record: SavedCalculation = { ...entry, id: uid(), savedAt: new Date().toISOString() };
         set((state) => ({ calculations: [record, ...state.calculations] }));
+        sync(() => saveCalculationAccount({ data: record }));
         return record;
       },
-      deleteCalculation: (id) => set((state) => ({ calculations: state.calculations.filter((item) => item.id !== id) })),
+      deleteCalculation: (id) => {
+        set((state) => ({ calculations: state.calculations.filter((item) => item.id !== id) }));
+        sync(() => deleteCalculationAccount({ data: id }));
+      },
       saveReview: (entry) => {
         const record: ReviewSnapshot = { ...entry, id: uid(), savedAt: new Date().toISOString() };
         set((state) => ({ reviews: [record, ...state.reviews] }));
+        sync(() => saveReviewAccount({ data: record }));
         return record;
       },
-      deleteReview: (id) => set((state) => ({ reviews: state.reviews.filter((item) => item.id !== id) })),
+      deleteReview: (id) => {
+        set((state) => ({ reviews: state.reviews.filter((item) => item.id !== id) }));
+        sync(() => deleteReviewAccount({ data: id }));
+      },
     }),
-    { name: "caliper-desk-v1" },
+    {
+      name: "caliper-desk-v1",
+      storage: createJSONStorage(() => deskPersistStorage()),
+    },
   ),
 );
 

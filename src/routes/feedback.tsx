@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { submitFeedback } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { controlClass } from "@/components/ui/field";
+import { Field, controlClass } from "@/components/ui/field";
 import { panelHoverClass } from "@/components/ui/panel";
 
 export const Route = createFileRoute("/feedback")({ component: FeedbackPage });
@@ -60,10 +60,9 @@ function FeedbackPage() {
             </label>
           </div>
         </fieldset>
-        <label className="mt-6 grid gap-2">
-          <span className="text-sm">Full message</span>
-          <textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={12} className={cn(controlClass, "h-auto py-2")} placeholder="Paste steps, values, and URLs." />
-        </label>
+        <Field htmlFor="feedback-message" label="Full message">
+          <textarea id="feedback-message" value={message} onChange={(event) => setMessage(event.target.value)} rows={12} className={cn(controlClass, "h-auto py-2")} placeholder="Paste steps, values, and URLs." />
+        </Field>
         <Button type="submit" variant="accent" disabled={pending} className="mt-4">
           <Send size={16} />
           {pending ? "Submitting" : "Submit"}

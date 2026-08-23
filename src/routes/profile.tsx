@@ -63,12 +63,12 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
   return (
     <div className="page-wrap max-w-xl">
       <p className="eyebrow">Account</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">Profile</h1>
+      <h1 className="page-title mt-1">Profile</h1>
       <p className="mt-3 max-w-lg text-sm leading-6 text-muted">
-        This is your Instrument account. Favourites and Project still live on this device.
+        This is your Instrument account. Favourites, drafts, and Project live here.
       </p>
 
-      <section className={cn(panelClass, "mt-8 bg-surface p-5")}>
+      <section className={cn(panelClass, "mt-8 p-5")}>
         <div className="flex items-center gap-3">
           <span className="grid size-12 place-items-center rounded-md border border-border bg-elevated text-lg font-medium">
             {initial}
@@ -92,8 +92,8 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
         </form>
       </section>
 
-      <section className={cn(panelClass, "mt-4 bg-surface p-5")}>
-        <p className="eyebrow">On this device</p>
+      <section className={cn(panelClass, "mt-4 p-5")}>
+        <p className="eyebrow">On this account</p>
         <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
           <div>
             <dt className="text-muted">Favourites</dt>

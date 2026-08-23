@@ -42,9 +42,9 @@ function Login() {
         <Link to="/" className="wordmark">
           Instrument
         </Link>
-        <h1 className="mt-6 text-2xl font-semibold tracking-[-0.03em]">{mode === "up" ? "Create an account" : "Sign in"}</h1>
+        <h1 className="page-title mt-6">{mode === "up" ? "Create an account" : "Sign in"}</h1>
         <p className="mt-2 text-sm leading-6 text-muted">
-          Email and a password. No Google or X. Favourites and Project still save on this device.
+          Email and a password. No Google or X. Sign in and Favourites, Project, and Studio drafts follow the account. Without an account they stay on this device.
         </p>
         {authEnabled ? (
           <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
@@ -87,16 +87,17 @@ function Login() {
         ) : (
           <p className="mt-6 text-sm text-muted">Sign-in is disabled.</p>
         )}
-        <button
+        <Button
           type="button"
-          className="mt-4 text-sm text-accent hover:text-fg"
+          variant="ghost"
+          className="mt-4 px-0 text-accent hover:text-fg"
           onClick={() => {
             setError(null);
             setMode((current) => (current === "up" ? "in" : "up"));
           }}
         >
           {mode === "up" ? "Already have an account? Sign in" : "Need an account? Create one"}
-        </button>
+        </Button>
         <div>
           <Link to="/" className="mt-6 inline-block text-sm text-muted hover:text-fg">
             Back to the library

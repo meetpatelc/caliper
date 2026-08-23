@@ -35,7 +35,17 @@ export const Route = createFileRoute("/c/$slug")({
 function CalculatorPage() {
   const { slug } = Route.useParams();
   const workshop = useWorkshop((state) => state.items);
+  const hasHydrated = useWorkshop((state) => state.hasHydrated);
   const calculator = findCalculator(slug, workshop);
+
+  if (!hasHydrated && !calculator) {
+    return (
+      <div className="page-wrap">
+        <p className="eyebrow">Instrument</p>
+        <div className="mt-6 h-40 animate-pulse rounded-md bg-surface" />
+      </div>
+    );
+  }
 
   if (!calculator) {
     return (

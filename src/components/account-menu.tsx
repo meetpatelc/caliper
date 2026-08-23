@@ -48,28 +48,30 @@ export function AccountMenu() {
 
   return (
     <div ref={rootRef} className="relative">
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Account"
         onClick={() => setOpen((current) => !current)}
-        className={cn(buttonVariants({ variant: "outline", size: "icon" }), "overflow-hidden")}
+        className="overflow-hidden"
       >
         {user.profileImageUrl ? (
           <img src={user.profileImageUrl} alt="" className="size-full object-cover" />
         ) : (
           <span className="text-sm font-medium">{initial}</span>
         )}
-      </button>
+      </Button>
       {open ? (
-        <div role="menu" className={cn(panelClass, "absolute right-0 top-full z-40 mt-1 w-56 bg-surface p-2")}>
+        <div role="menu" className={cn(panelClass, "absolute right-0 top-full z-40 mt-1 w-56 p-2")}>
           <p className="truncate px-2 pt-1 text-sm font-medium">{user.displayName || "Account"}</p>
           {user.primaryEmail ? <p className="truncate px-2 pb-2 text-xs text-muted">{user.primaryEmail}</p> : null}
           <Link
             to="/profile"
             role="menuitem"
-            className="block rounded-md px-2 py-2 text-sm hover:bg-elevated"
+            className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}
             onClick={() => setOpen(false)}
           >
             Profile
@@ -77,14 +79,14 @@ export function AccountMenu() {
           <Link
             to="/settings"
             role="menuitem"
-            className="block rounded-md px-2 py-2 text-sm hover:bg-elevated"
+            className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}
             onClick={() => setOpen(false)}
           >
             Account settings
           </Link>
           <Button
             variant="ghost"
-            className="w-full justify-start px-2 text-sm"
+            className="w-full justify-start"
             disabled={signingOut}
             onClick={() => {
               setSigningOut(true);

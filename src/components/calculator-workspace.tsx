@@ -23,6 +23,7 @@ import { quantitySymbol } from "@/lib/quantity-symbols";
 import { inlineRelations } from "@/lib/formula-display";
 import { useDeskStore } from "@/lib/workspace-store";
 import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { cn } from "@/lib/utils";
 
 export function CalculatorWorkspace({ toolId, search }: { toolId: string; search: Record<string, string> }) {
@@ -61,6 +62,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   const createProject = useDeskStore((state) => state.createProject);
   const saveCalculation = useDeskStore((state) => state.saveCalculation);
   const createFrom = useWorkshop((state) => state.createFrom);
+  const { user } = useCurrentUserState();
   const libraryDocument = tool ? libraryDocuments[tool.id] : undefined;
 
   useEffect(() => {
@@ -254,7 +256,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       method: result.method,
       resultJson: JSON.stringify({ values: result.values, warnings: result.warnings }),
     });
-    toast.success("Saved on this device. Reopen it from Project.");
+    toast.success(user ? "Saved on this account. Reopen it from Project." : "Saved on this device. Reopen it from Project.");
   };
 
   const related = relatedTools(tool.id);

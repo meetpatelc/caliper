@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ClipboardList, Folder, LayoutGrid, Menu, Moon, PenLine, Search, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { CommandPalette } from "@/components/command-palette";
-import { FamilySwitch } from "@/components/family-switch";
-import { OverlayDialog } from "@/components/overlay-dialog";
-import { FavouriteRail } from "@/components/favourite-rail";
 import { AccountMenu } from "@/components/account-menu";
+import { CommandPalette } from "@/components/command-palette";
+import { DeskSync } from "@/components/desk-sync";
+import { FamilySwitch } from "@/components/family-switch";
+import { FavouriteRail } from "@/components/favourite-rail";
+import { OverlayDialog } from "@/components/overlay-dialog";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PARENT_NAME, THEME_KEY } from "@/lib/instrument";
@@ -84,28 +85,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="no-print sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-xl">
         <div className="flex h-14 items-center gap-2 px-3 md:hidden">
           <FamilySwitch />
-          <button
+          <Button
             ref={searchTriggerRef}
             type="button"
+            variant="outline"
             onClick={() => setPaletteOpen(true)}
             aria-label="Search models"
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "min-h-10 min-w-0 flex-1 justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg",
-            )}
+            className="min-h-10 min-w-0 flex-1 justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg"
           >
             <Search size={15} className="shrink-0" />
             <span className="truncate">Search</span>
-          </button>
-          <button
+          </Button>
+          <Button
             ref={menuTriggerRef}
             type="button"
-            className={cn(buttonVariants({ variant: "outline", size: "icon" }), "shrink-0")}
+            variant="outline"
+            size="icon"
+            className="shrink-0"
             aria-label="Open menu"
             onClick={() => setMenuOpen(true)}
           >
             <Menu size={18} />
-          </button>
+          </Button>
         </div>
         <div className="relative hidden h-14 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:px-5">
           <div className="justify-self-start">
@@ -129,20 +130,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 );
               })}
             </nav>
-            <button
+            <Button
               ref={searchTriggerRef}
               type="button"
+              variant="outline"
               onClick={() => setPaletteOpen(true)}
               aria-label="Search models"
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "min-h-10 w-[min(28rem,32vw)] justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg",
-              )}
+              className="min-h-10 w-[min(28rem,32vw)] justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg"
             >
               <Search size={15} className="shrink-0" />
               <span className="flex-1 truncate text-left">Search models…</span>
-              <kbd className="rounded border border-border px-1.5 py-0.5 font-mono text-[10px]">{shortcut}</kbd>
-            </button>
+              <kbd className="rounded-md border border-border px-1.5 py-0.5 font-mono text-xs">{shortcut}</kbd>
+            </Button>
             <Button
               variant="outline"
               size="icon"
@@ -166,7 +165,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div className="mb-6 flex items-center justify-between">
           <FamilySwitch />
-          <Button variant="outline" size="icon" className="size-9" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
+          <Button variant="outline" size="icon" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
             <X size={16} />
           </Button>
         </div>
@@ -180,20 +179,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 to={item.href}
                 onClick={() => setMenuOpen(false)}
                 aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex min-h-11 items-center gap-2 rounded-md px-3 py-3 text-sm hover:bg-elevated",
-                  active && "bg-elevated text-fg",
-                )}
+                className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start", active && "bg-elevated text-fg")}
               >
                 <Icon size={16} />
                 {item.label}
               </Link>
             );
           })}
-          <Link to="/about" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm text-muted hover:bg-elevated hover:text-fg">
+          <Link to="/about" onClick={() => setMenuOpen(false)} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start text-muted")}>
             About & limits
           </Link>
-          <Link to="/feedback" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm text-muted hover:bg-elevated hover:text-fg">
+          <Link to="/feedback" onClick={() => setMenuOpen(false)} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start text-muted")}>
             Feedback
           </Link>
           <DrawerAccount onClose={() => setMenuOpen(false)} />
@@ -207,6 +203,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </OverlayDialog>
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} restoreFocusTo={searchTriggerRef} />
+      <DeskSync />
       <main id="main-content">{children}</main>
       <FavouriteRail />
       <footer className="no-print border-t border-border px-5 py-6 text-sm text-muted">
@@ -243,17 +240,17 @@ function DrawerAccount({ onClose }: { onClose: () => void }) {
   if (isPending) return <div className="h-11 animate-pulse rounded-md bg-elevated" />;
   if (!user) {
     return (
-      <Link to="/login" onClick={onClose} className="rounded-md px-3 py-3 text-sm hover:bg-elevated">
+      <Link to="/login" onClick={onClose} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}>
         Sign in
       </Link>
     );
   }
   return (
     <>
-      <Link to="/profile" onClick={onClose} className="rounded-md px-3 py-3 text-sm hover:bg-elevated">
+      <Link to="/profile" onClick={onClose} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}>
         Profile
       </Link>
-      <Link to="/settings" onClick={onClose} className="rounded-md px-3 py-3 text-sm hover:bg-elevated">
+      <Link to="/settings" onClick={onClose} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}>
         Account settings
       </Link>
     </>

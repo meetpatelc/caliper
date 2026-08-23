@@ -7,7 +7,7 @@ import { MODEL_COUNT, releasedDomains, savedHeadline } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { panelClass, panelHoverClass } from "@/components/ui/panel";
+import { panelHoverClass } from "@/components/ui/panel";
 import { GoverningRelation } from "@/components/governing-relation";
 import type { EngineeringDomain } from "@/lib/platform";
 
@@ -67,27 +67,25 @@ function Home() {
               const tool = tools.find((item) => item.id === record.toolId);
               const headline = savedHeadline(record.resultJson);
               return (
-                <Link
-                  key={record.id}
-                  to="/tool/$toolId"
-                  params={{ toolId: record.toolId }}
-                  search={{ ...record.input, restore: "1" }}
-                  className={cn(panelClass, "px-3 py-2 text-sm hover:border-accent")}
-                >
-                  <span className="font-medium">{tool?.title ?? record.title}</span>
-                  {headline ? <span className="ml-2 font-mono text-xs text-muted">{headline}</span> : null}
-                </Link>
+                <Button key={record.id} asChild variant="outline">
+                  <Link
+                    to="/tool/$toolId"
+                    params={{ toolId: record.toolId }}
+                    search={{ ...record.input, restore: "1" }}
+                    className="whitespace-nowrap"
+                  >
+                    <span>{tool?.title ?? record.title}</span>
+                    {headline ? <span className="font-mono text-xs text-muted">{headline}</span> : null}
+                  </Link>
+                </Button>
               );
             })}
             {recentTools.map((tool) => (
-              <Link
-                key={tool!.id}
-                to="/tool/$toolId"
-                params={{ toolId: tool!.id }}
-                className={cn(panelClass, "px-3 py-2 text-sm hover:border-accent")}
-              >
-                {tool!.title}
-              </Link>
+              <Button key={tool!.id} asChild variant="outline">
+                <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="whitespace-nowrap">
+                  {tool!.title}
+                </Link>
+              </Button>
             ))}
           </div>
         </section>
@@ -139,8 +137,10 @@ function Home() {
                     >
                       <span className="flex items-start justify-between gap-2">
                         <strong className="text-base font-semibold tracking-[-0.02em]">{tool.title}</strong>
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="icon"
                           aria-label={
                             favorites.includes(tool.id as ToolId) ? "Remove from favourites" : "Add to favourites"
                           }
@@ -151,7 +151,7 @@ function Home() {
                             toggleFavorite(tool.id as ToolId);
                           }}
                           className={cn(
-                            "mt-0.5 shrink-0 rounded p-0.5 text-mark hover:text-mark",
+                            "size-8 shrink-0 text-mark hover:text-mark",
                             favorites.includes(tool.id as ToolId)
                               ? "opacity-100"
                               : "text-muted opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100",
@@ -161,7 +161,7 @@ function Home() {
                             size={14}
                             fill={favorites.includes(tool.id as ToolId) ? "currentColor" : "none"}
                           />
-                        </button>
+                        </Button>
                       </span>
                       <span className="line-clamp-2 text-sm leading-5 text-muted">{tool.description}</span>
                       {formula ? <GoverningRelation formula={formula} className="text-xs leading-5" /> : null}
@@ -191,7 +191,7 @@ function Home() {
 
 function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
-    <Button type="button" aria-pressed={active} variant={active ? "accent" : "outline"} onClick={onClick} className="text-xs">
+    <Button type="button" aria-pressed={active} variant={active ? "accent" : "outline"} size="sm" onClick={onClick} className="whitespace-nowrap">
       {children}
     </Button>
   );

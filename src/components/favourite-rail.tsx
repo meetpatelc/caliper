@@ -20,7 +20,7 @@ export function FavouriteRail() {
       }}
       aria-label="Favourite models"
     >
-      <div className={cn(panelClass, "pointer-events-auto max-h-full overflow-auto bg-surface p-4")}>
+      <div className={cn(panelClass, "pointer-events-auto max-h-full overflow-auto p-4")}>
         <p className="eyebrow">Favourite</p>
         {favouriteTools.length ? (
           <ul className="mt-3 grid gap-1">

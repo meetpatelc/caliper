@@ -82,6 +82,30 @@
   }
 }
 
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.instrument-sheet {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-border);
+}
+
+[cmdk-group-heading] {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding-inline: 0.75rem;
+  padding-block: 0.35rem;
+}
+
 /* Kit accent hover:bg-mark is the same red; darken it outside layers so utilities cannot hide it. */
 button.bg-accent:hover:not(:disabled) {
   background-color: color-mix(in srgb, var(--color-accent) 78%, #111) !important;

@@ -23,7 +23,7 @@ function StudioEdit() {
     return (
       <div className="page-wrap max-w-xl">
         <p className="eyebrow">Studio</p>
-        <h1 className="display-title mt-3">Draft not on this device.</h1>
+        <h1 className="display-title mt-3">That draft is not here.</h1>
         <Link to="/workshop" className={buttonVariants({ variant: "ghost" })}>
           Back to Project
         </Link>

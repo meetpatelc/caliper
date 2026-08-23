@@ -60,7 +60,7 @@ export function CommandPalette({
         <Command.List className="max-h-[min(420px,60vh)] overflow-auto p-2">
           <Command.Empty className="px-3 py-6 text-sm text-muted">No match. Try “beam”, “NPSH”, or “axial”.</Command.Empty>
           {recents.length > 0 && (
-            <Command.Group heading="Recent" className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
+            <Command.Group heading="Recent" className="px-1 py-1">
               {recents
                 .map((id) => tools.find((tool) => tool.id === id))
                 .filter(Boolean)
@@ -78,7 +78,7 @@ export function CommandPalette({
             </Command.Group>
           )}
           {favorites.filter((id) => !recentIds.has(id)).length > 0 && (
-            <Command.Group heading="Favourite" className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
+            <Command.Group heading="Favourite" className="px-1 py-1">
               {favorites
                 .filter((id) => !recentIds.has(id))
                 .map((id) => tools.find((tool) => tool.id === id))
@@ -96,7 +96,7 @@ export function CommandPalette({
                 ))}
             </Command.Group>
           )}
-          <Command.Group heading="Pages" className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
+          <Command.Group heading="Pages" className="px-1 py-1">
             {pages.map((page) => (
               <Command.Item
                 key={page.href}
@@ -109,7 +109,7 @@ export function CommandPalette({
             ))}
           </Command.Group>
           {workshop.length > 0 && (
-            <Command.Group heading="Project" className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
+            <Command.Group heading="Project" className="px-1 py-1">
               {workshop.map((item) => (
                 <Command.Item
                   key={`yours-${item.id}`}
@@ -127,7 +127,7 @@ export function CommandPalette({
             const group = tools.filter((tool) => tool.contract.domain === domain.id && !recentIds.has(tool.id) && !favoriteIds.has(tool.id));
             if (!group.length) return null;
             return (
-              <Command.Group key={domain.id} heading={domain.label} className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
+              <Command.Group key={domain.id} heading={domain.label} className="px-1 py-1">
                 {group.map((tool) => (
                   <Command.Item
                     key={tool.id}
@@ -142,7 +142,7 @@ export function CommandPalette({
               </Command.Group>
             );
           })}
-          <Command.Group className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
+          <Command.Group className="px-1 py-1">
             {officialCalculators
               .filter((item) => item.slug !== "iso-286-fits")
               .map((item) => (

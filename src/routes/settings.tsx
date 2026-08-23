@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { authClient, signOut } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { wipeDesk } from "@/lib/desk-account";
 import { THEME_KEY } from "@/lib/instrument";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
@@ -69,6 +70,7 @@ function SettingsBody({ email }: { email: string }) {
     setDeleteMessage(null);
     setDeleting(true);
     try {
+      await wipeDesk();
       const { error } = await authClient.deleteUser({ password: deletePassword });
       if (error) {
         setDeleteMessage(error.message || "Could not delete the account.");
@@ -85,7 +87,7 @@ function SettingsBody({ email }: { email: string }) {
   return (
     <div className="page-wrap max-w-xl">
       <p className="eyebrow">Account</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">Settings</h1>
+      <h1 className="page-title mt-1">Settings</h1>
       <p className="mt-3 max-w-lg text-sm leading-6 text-muted">
         Password, appearance, and the account itself. Name and email live on{" "}
         <Link to="/profile" className="text-accent hover:text-fg">
@@ -94,12 +96,12 @@ function SettingsBody({ email }: { email: string }) {
         .
       </p>
 
-      <section className={cn(panelClass, "mt-8 bg-surface p-5")}>
+      <section className={cn(panelClass, "mt-8 p-5")}>
         <p className="eyebrow">Signed in as</p>
         <p className="mt-2 text-sm">{email || "—"}</p>
       </section>
 
-      <section className={cn(panelClass, "mt-4 bg-surface p-5")}>
+      <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">Appearance</p>
         <div className="mt-4 flex gap-2">
           <Button type="button" variant={theme === "light" ? "accent" : "outline"} onClick={() => applyTheme("light")}>
@@ -111,7 +113,7 @@ function SettingsBody({ email }: { email: string }) {
         </div>
       </section>
 
-      <section className={cn(panelClass, "mt-4 bg-surface p-5")}>
+      <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">Password</p>
         <form className="mt-4 grid gap-4" onSubmit={savePassword}>
           <Field htmlFor="settings-current" label="Current password">
@@ -140,9 +142,9 @@ function SettingsBody({ email }: { email: string }) {
         </form>
       </section>
 
-      <section className={cn(panelClass, "mt-4 bg-surface p-5")}>
+      <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">Session</p>
-        <p className="mt-2 text-sm leading-6 text-muted">Sign out on this browser. Favourites and Project stay on the device.</p>
+        <p className="mt-2 text-sm leading-6 text-muted">Sign out on this browser. Favourites and Project stay on the account.</p>
         <Button
           className="mt-4"
           variant="outline"
@@ -156,10 +158,10 @@ function SettingsBody({ email }: { email: string }) {
         </Button>
       </section>
 
-      <section className={cn(panelClass, "mt-4 bg-surface p-5")}>
+      <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">Delete account</p>
         <p className="mt-2 text-sm leading-6 text-muted">
-          Removes the email account. It does not erase local favourites or Project on this computer.
+          Removes the email account and the Favourites, Project, and Studio drafts on it. Work that never left this browser stays.
         </p>
         <form className="mt-4 grid gap-4" onSubmit={removeAccount}>
           <Field htmlFor="settings-delete" label="Password to confirm">

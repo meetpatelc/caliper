@@ -4,6 +4,7 @@ import { tools } from "@/lib/catalog";
 import { releasedDomains } from "@/lib/desk";
 import { panelClass } from "@/components/ui/panel";
 import { governedReferenceData } from "@/lib/referenceData";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/reference")({ component: ReferencePage });
 
@@ -22,7 +23,7 @@ function ReferencePage() {
           ["02", "Check the quantity", "Keep units compatible and inspect display precision before comparing sources."],
           ["03", "Check the context", "Treat every output as a starting point for independent project-specific verification."],
         ].map(([n, title, copy]) => (
-          <li key={n} className="rounded-lg border border-border p-4">
+          <li key={n} className={cn(panelClass, "p-4")}>
             <p className="font-mono text-xs text-accent">{n}</p>
             <h2 className="mt-2 font-semibold">{title}</h2>
             <p className="mt-2 text-sm leading-6 text-muted">{copy}</p>
@@ -46,10 +47,22 @@ function ReferencePage() {
                 </a>
               </div>
               <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-muted">
-                <div><dt className="text-[10px] uppercase tracking-wider">Version</dt><dd className="text-fg">{dataset.version}</dd></div>
-                <div><dt className="text-[10px] uppercase tracking-wider">Source</dt><dd className="text-fg">{dataset.sourceLabel}</dd></div>
-                <div><dt className="text-[10px] uppercase tracking-wider">Coverage</dt><dd>{dataset.coverage}</dd></div>
-                <div><dt className="text-[10px] uppercase tracking-wider">Range</dt><dd>{dataset.range}</dd></div>
+                <div>
+                  <dt className="eyebrow">Version</dt>
+                  <dd className="text-fg">{dataset.version}</dd>
+                </div>
+                <div>
+                  <dt className="eyebrow">Source</dt>
+                  <dd className="text-fg">{dataset.sourceLabel}</dd>
+                </div>
+                <div>
+                  <dt className="eyebrow">Coverage</dt>
+                  <dd>{dataset.coverage}</dd>
+                </div>
+                <div>
+                  <dt className="eyebrow">Range</dt>
+                  <dd>{dataset.range}</dd>
+                </div>
               </dl>
               <div className="mt-4 grid gap-2">
                 {dataset.values.map((record) => (
@@ -80,7 +93,7 @@ function ReferencePage() {
                   <p className="eyebrow">{domain.label}</p>
                   <span className="font-mono text-xs text-muted">{domainTools.length}</span>
                 </div>
-                <div className="overflow-hidden rounded-lg border border-border">
+                <div className={cn(panelClass)}>
                   {domainTools.map((tool) => (
                     <div key={tool.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 last:border-b-0">
                       <Link to="/tool/$toolId" params={{ toolId: tool.id }} className="font-medium hover:text-accent">

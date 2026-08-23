@@ -35,7 +35,7 @@ export function InstrumentPage({
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : <span />}
       </div>
       <p className="eyebrow">{kicker}</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">{title}</h1>
+      <h1 className="page-title mt-1">{title}</h1>
       <div className="mt-5">{children}</div>
       {nearby}
       {method}

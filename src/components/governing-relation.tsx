@@ -25,7 +25,7 @@ export function GoverningRelation({ formula, className }: { formula: string; cla
   }, [inline, parts.length]);
 
   return (
-    <div ref={boxRef} className={cn("relative font-mono text-accent", className)}>
+    <div ref={boxRef} className={cn("relative overflow-hidden font-mono text-accent", className)}>
       <span
         ref={measureRef}
         className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap"

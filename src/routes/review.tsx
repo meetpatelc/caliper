@@ -12,10 +12,11 @@ import {
 } from "@/lib/reviewRules";
 import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemplates";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Input, Select, controlClass } from "@/components/ui/field";
+import { Field, Input, Select, controlClass } from "@/components/ui/field";
 import { panelClass, panelHoverClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
 
 type ReviewSearch = { id?: string };
 
@@ -38,6 +39,7 @@ function ReviewPage() {
   const { id: restoreId } = Route.useSearch();
   const saveReview = useDeskStore((state) => state.saveReview);
   const reviews = useDeskStore((state) => state.reviews);
+  const { user } = useCurrentUserState();
   const [area, setArea] = useState<ReviewArea>("engineering");
   const [complete, setComplete] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
@@ -56,7 +58,7 @@ function ReviewPage() {
     if (!restoreId) return;
     const record = useDeskStore.getState().reviews.find((item) => item.id === restoreId);
     if (!record) {
-      toast.error("That review snapshot is no longer in this browser.");
+      toast.error("That review snapshot is no longer here.");
       return;
     }
     try {
@@ -137,7 +139,7 @@ function ReviewPage() {
       area,
       payloadJson: JSON.stringify({ complete, workflowId, workflowChecks, notes, criteria, optionAName, optionBName, severity, occurrence, detection }),
     });
-    toast.success("Review snapshot saved locally.");
+    toast.success(user ? "Review snapshot saved on this account." : "Review snapshot saved on this device.");
   };
 
   const download = () => {
@@ -158,18 +160,18 @@ function ReviewPage() {
       </p>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
-        <aside className="grid h-fit gap-1 rounded-lg border border-border p-2">
+        <aside className={cn(panelClass, "grid h-fit gap-1 p-2")}>
           {reviewAreas.map((item) => (
-            <button key={item.id} type="button" onClick={() => setArea(item.id)} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start", area === item.id && "bg-elevated text-fg")}>
+            <Button key={item.id} type="button" variant="ghost" onClick={() => setArea(item.id)} className={cn("w-full justify-start", area === item.id && "bg-elevated text-fg")}>
               {item.label}
-            </button>
+            </Button>
           ))}
         </aside>
         <div className="grid gap-4">
           {activeRules.map((rule) => {
             const on = complete.includes(rule.id);
             return (
-              <button key={rule.id} type="button" onClick={() => setComplete((current) => (on ? current.filter((id) => id !== rule.id) : [...current, rule.id]))} className={cn(panelHoverClass, "flex w-full gap-3 p-4 text-left")}>
+              <Button key={rule.id} type="button" variant="outline" onClick={() => setComplete((current) => (on ? current.filter((id) => id !== rule.id) : [...current, rule.id]))} className={cn(panelHoverClass, "h-auto w-full justify-start gap-3 p-4 text-left")}>
                 <span className={`mt-0.5 grid size-5 place-items-center rounded-sm border ${on ? "border-ok bg-ok text-bg" : "border-border"}`}>
                   {on && <Check size={12} />}
                 </span>
@@ -178,7 +180,7 @@ function ReviewPage() {
                   <small className="text-muted">{rule.prompt}</small>
                   <em className="mt-1 block text-xs not-italic text-muted">Evidence: {rule.evidence}</em>
                 </span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -189,18 +191,16 @@ function ReviewPage() {
           <p className="eyebrow">Trade study</p>
           <h2 className="mt-1 text-xl font-semibold">Weighted comparison</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <label className="grid gap-1 text-xs text-muted">
-              Option A
-              <Input value={optionAName} onChange={(event) => setOptionAName(event.target.value)} />
-            </label>
-            <label className="grid gap-1 text-xs text-muted">
-              Option B
-              <Input value={optionBName} onChange={(event) => setOptionBName(event.target.value)} />
-            </label>
+            <Field htmlFor="option-a" label="Option A">
+              <Input id="option-a" value={optionAName} onChange={(event) => setOptionAName(event.target.value)} />
+            </Field>
+            <Field htmlFor="option-b" label="Option B">
+              <Input id="option-b" value={optionBName} onChange={(event) => setOptionBName(event.target.value)} />
+            </Field>
           </div>
           <div className="mt-4 grid gap-3">
             {criteria.map((criterion, index) => (
-              <fieldset key={index} className="grid min-w-0 gap-2 rounded-md border border-border p-3 sm:grid-cols-[1fr_70px_70px_70px_auto]">
+              <fieldset key={index} className={cn(panelClass, "grid min-w-0 gap-2 p-3 sm:grid-cols-[1fr_70px_70px_70px_auto]")}>
                 <legend className="sr-only">Criterion {index + 1}</legend>
                 <Input
                   value={criterion.label}
@@ -236,21 +236,19 @@ function ReviewPage() {
                 ["Detection", detection, setDetection],
               ] as const
             ).map(([label, value, setter]) => (
-              <label key={label} className="grid gap-1 text-xs text-muted">
-                {label}
-                <Input value={value} onChange={(event) => setter(event.target.value)} className="font-mono" />
-              </label>
+              <Field key={label} htmlFor={`fmea-${label}`} label={label}>
+                <Input id={`fmea-${label}`} value={value} onChange={(event) => setter(event.target.value)} className="font-mono" />
+              </Field>
             ))}
           </div>
           {fmea.error ? <p className="mt-4 text-sm text-danger">{fmea.error}</p> : fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>}
-          <label className="mt-6 grid min-w-0 gap-2 text-xs text-muted">
-            Selection workflow
-            <Select className="w-full min-w-0 max-w-full" value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)}>
+          <Field htmlFor="review-workflow" label="Selection workflow">
+            <Select id="review-workflow" className="w-full min-w-0 max-w-full" value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)}>
               {selectionWorkflows.map((item) => (
                 <option key={item.id} value={item.id}>{item.title}</option>
               ))}
             </Select>
-          </label>
+          </Field>
           <p className="mt-3 text-sm text-muted">{activeWorkflow.scope}</p>
           <ul className="mt-3 grid gap-2">
             {activeWorkflow.evidence.map((item, index) => {
@@ -258,10 +256,10 @@ function ReviewPage() {
               const on = workflowChecks.includes(id);
               return (
                 <li key={id}>
-                  <button type="button" onClick={() => setWorkflowChecks((current) => (on ? current.filter((entry) => entry !== id) : [...current, id]))} className="flex w-full items-start gap-2 text-left text-sm">
+                  <Button type="button" variant="ghost" onClick={() => setWorkflowChecks((current) => (on ? current.filter((entry) => entry !== id) : [...current, id]))} className="h-auto w-full justify-start gap-2 text-left">
                     <span className={`mt-0.5 size-4 rounded-sm border ${on ? "border-ok bg-ok" : "border-border"}`} />
                     {item}
-                  </button>
+                  </Button>
                 </li>
               );
             })}
@@ -272,27 +270,24 @@ function ReviewPage() {
       <section className={cn(panelClass, "mt-10 min-w-0 overflow-hidden p-5")}>
         <p className="eyebrow">Record</p>
         <div className="mt-3 grid min-w-0 gap-3 md:grid-cols-2">
-          <label className="grid min-w-0 gap-1 text-xs text-muted">
-            Snapshot title
-            <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Evidence review" />
-          </label>
-          <label className="grid min-w-0 gap-1 text-xs text-muted">
-            Export template
-            <Select className="w-full min-w-0 max-w-full" value={templateKind} onChange={(event) => setTemplateKind(event.target.value as DocumentTemplateKind)}>
+          <Field htmlFor="review-title" label="Snapshot title">
+            <Input id="review-title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Evidence review" />
+          </Field>
+          <Field htmlFor="review-template" label="Export template">
+            <Select id="review-template" className="w-full min-w-0 max-w-full" value={templateKind} onChange={(event) => setTemplateKind(event.target.value as DocumentTemplateKind)}>
               <option value="report">Report template</option>
               <option value="checklist">Checklist template</option>
               <option value="designBasis">Design-basis record</option>
               <option value="changeSummary">Change-summary record</option>
             </Select>
-          </label>
+          </Field>
         </div>
-        <label className="mt-3 grid gap-1 text-xs text-muted">
-          Notes
-          <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className={cn(controlClass, "mt-0 h-auto w-full min-w-0 py-2")} placeholder="Optional context for this snapshot" />
-        </label>
+        <Field htmlFor="review-notes" label="Notes">
+          <textarea id="review-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className={cn(controlClass, "mt-0 h-auto w-full min-w-0 py-2")} placeholder="Optional context for this snapshot" />
+        </Field>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="accent" onClick={persist}>
-            <Save size={15} /> Save locally
+            <Save size={15} /> Save snapshot
           </Button>
           <Button onClick={download}>
             <Download size={15} /> Download markdown
@@ -300,7 +295,7 @@ function ReviewPage() {
         </div>
         {reviews.length > 0 && (
           <p className="mt-4 text-sm text-muted">
-            {reviews.length} snapshot{reviews.length === 1 ? "" : "s"} stored in this browser. Open one from{" "}
+            {reviews.length} snapshot{reviews.length === 1 ? "" : "s"} saved. Open one from{" "}
             <Link to="/workshop" className="text-accent hover:text-fg">
               Project
             </Link>{" "}

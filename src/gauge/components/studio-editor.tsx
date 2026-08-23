@@ -16,7 +16,8 @@ import { validateExpression } from "@instrument/formula";
 import { rewriteIdentifier, toIdentifier } from "@/gauge/lib/identifiers";
 import { unitFamilyOptions, unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { uniqueSlug, useWorkshop } from "@/gauge/lib/workshop-store";
-import { Button, buttonVariants } from "@instrument/ui";
+import { Button, buttonVariants, panelClass } from "@instrument/ui";
+import { Field as FormField, Input, Select, controlClass } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -138,7 +139,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
     const published = { ...next, published: true };
     setDraft(published);
     upsert(published);
-    toast.success("Published to this device’s atlas.");
+    toast.success("Published.");
   };
 
   const retract = () => {
@@ -155,9 +156,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Studio</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{draft.title}</h1>
+          <h1 className="page-title mt-2">{draft.title}</h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-            Drafts autosave on this device. Use it immediately. Method is only required to publish.
+            Drafts autosave. Signed in, they live on your account. Method is only required to publish.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -190,31 +191,29 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
       <div className="mt-6 grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div>
           {step === "name" && (
-            <fieldset className="grid gap-3 rounded-md border border-border bg-surface p-4">
+            <fieldset className={cn(panelClass, "grid gap-3 p-4")}>
               <p className="eyebrow">What is this instrument</p>
-              <label className="grid gap-1 text-sm">
-                Title
-                <input
+              <FormField htmlFor="studio-title" label="Title">
+                <Input
+                  id="studio-title"
                   autoFocus
-                  className="field-control"
                   value={draft.title}
                   placeholder="Pipe mean velocity"
                   onChange={(event) => setDraft({ ...draft, title: event.target.value })}
                 />
-              </label>
-              <label className="grid gap-1 text-sm">
-                One-line description
+              </FormField>
+              <FormField htmlFor="studio-description" label="One-line description">
                 <textarea
-                  className="field-control h-24 py-2"
+                  id="studio-description"
+                  className={cn(controlClass, "h-24 py-2")}
                   value={draft.description}
                   placeholder="What it computes, and when you would reach for it."
                   onChange={(event) => setDraft({ ...draft, description: event.target.value })}
                 />
-              </label>
-              <label className="grid gap-1 text-sm">
-                Domain
-                <select
-                  className="field-control"
+              </FormField>
+              <FormField htmlFor="studio-domain" label="Domain">
+                <Select
+                  id="studio-domain"
                   value={draft.domain}
                   onChange={(event) => setDraft({ ...draft, domain: event.target.value as WorkshopCalculator["domain"] })}
                 >
@@ -223,8 +222,8 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       {domain.label}
                     </option>
                   ))}
-                </select>
-              </label>
+                </Select>
+              </FormField>
               <p className="font-mono text-xs text-muted">slug · {draft.slug}</p>
               <Button variant="accent" className="mt-2" onClick={() => setStep("engine")}>
                 Next — engine
@@ -234,7 +233,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
 
           {step === "engine" && (
             <div className="grid gap-6">
-              <fieldset className="grid gap-3 rounded-md border border-border bg-surface p-4">
+              <fieldset className={cn(panelClass, "grid gap-3 p-4")}>
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="eyebrow">Inputs</p>
@@ -264,10 +263,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                   </Button>
                 </div>
                 {draft.fields.map((field, index) => (
-                  <div key={`${field.id}-${index}`} className="grid gap-2 rounded-md border border-border bg-elevated p-3">
+                  <div key={`${field.id}-${index}`} className={cn(panelClass, "grid gap-2 bg-elevated p-3")}>
                     <div className="flex items-center gap-2">
-                      <input
-                        className="field-control"
+                      <Input
                         value={field.label}
                         onChange={(event) => renameField(index, event.target.value)}
                         aria-label="Quantity name"
@@ -285,8 +283,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       </Button>
                     </div>
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_5.5rem_6rem]">
-                      <select
-                        className="field-control"
+                      <Select
                         value={field.family ?? ""}
                         onChange={(event) => {
                           const value = event.target.value;
@@ -305,10 +302,10 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                             {option.label}
                           </option>
                         ))}
-                      </select>
-                      <input
-                        className="field-control tabular-nums"
-                        value={Number.isFinite(field.defaultValue) ? field.defaultValue : ""}
+                      </Select>
+                      <Input
+                        inputMode="decimal"
+                        value={Number.isFinite(field.defaultValue) ? String(field.defaultValue) : ""}
                         onChange={(event) => {
                           const value = Number(event.target.value);
                           if (Number.isFinite(value)) patchField(index, { defaultValue: value });
@@ -316,8 +313,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         aria-label="Typical value"
                       />
                       {field.family ? (
-                        <select
-                          className="field-control"
+                        <Select
                           value={unitId(field.family, field.defaultUnit)}
                           onChange={(event) => patchField(index, { defaultUnit: event.target.value })}
                           aria-label="Unit"
@@ -327,10 +323,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                               {unit.label}
                             </option>
                           ))}
-                        </select>
+                        </Select>
                       ) : (
-                        <input
-                          className="field-control"
+                        <Input
                           value={field.defaultUnit}
                           onChange={(event) => patchField(index, { defaultUnit: event.target.value || "1" })}
                           aria-label="Unit"
@@ -342,7 +337,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                 ))}
               </fieldset>
 
-              <fieldset className="grid gap-3 rounded-md border border-border bg-surface p-4">
+              <fieldset className={cn(panelClass, "grid gap-3 p-4")}>
                 <div className="flex items-center justify-between gap-3">
                   <p className="eyebrow">Results</p>
                   {draft.outputs.length < 6 && (
@@ -371,10 +366,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                   )}
                 </div>
                 {draft.outputs.map((output, index) => (
-                  <div key={`${output.id}-${index}`} className="grid gap-2 rounded-md border border-border bg-elevated p-3">
+                  <div key={`${output.id}-${index}`} className={cn(panelClass, "grid gap-2 bg-elevated p-3")}>
                     <div className="flex items-center gap-2">
-                      <input
-                        className="field-control"
+                      <Input
                         value={output.label}
                         onChange={(event) => patchOutput(index, { label: event.target.value })}
                         placeholder="What comes out"
@@ -395,9 +389,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         </Button>
                       )}
                     </div>
-                    <input
+                    <Input
                       ref={index === activeOutput ? expressionRef : undefined}
-                      className={cn("field-control font-mono", formulaErrors[index] && "border-danger")}
+                      className={cn("font-mono", formulaErrors[index] && "border-danger")}
                       value={output.expression}
                       onFocus={() => setActiveOutput(index)}
                       onChange={(event) => patchOutput(index, { expression: event.target.value })}
@@ -412,8 +406,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       </p>
                     ) : null}
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_7rem]">
-                      <select
-                        className="field-control"
+                      <Select
                         value={output.family ?? ""}
                         aria-label={`${output.label || "Result"} quantity family`}
                         onChange={(event) => {
@@ -432,10 +425,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                             {option.label}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                       {output.family ? (
-                        <select
-                          className="field-control"
+                        <Select
                           value={unitId(output.family, output.defaultUnit)}
                           aria-label={`${output.label || "Result"} default unit`}
                           onChange={(event) => patchOutput(index, { defaultUnit: event.target.value })}
@@ -445,10 +437,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                               {unit.label}
                             </option>
                           ))}
-                        </select>
+                        </Select>
                       ) : (
-                        <input
-                          className="field-control"
+                        <Input
                           value={output.defaultUnit}
                           aria-label={`${output.label || "Result"} default unit`}
                           onChange={(event) => patchOutput(index, { defaultUnit: event.target.value || "1" })}
@@ -462,7 +453,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                     <Button
                       key={field.id}
                       size="sm"
-                      className="h-10 min-h-10 font-mono sm:h-8 sm:min-h-8"
+                      className="font-mono"
                       onClick={() => insertIntoExpression(field.id)}
                     >
                       {field.id}
@@ -472,7 +463,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                     <Button
                       key={op}
                       size="sm"
-                      className="h-10 min-h-10 min-w-10 px-2 font-mono text-muted sm:h-8 sm:min-h-8"
+                      className="min-w-10 px-2 font-mono text-muted"
                       onClick={() => insertIntoExpression(op === "sqrt(" ? "sqrt(" : op)}
                     >
                       {op === "sqrt(" ? "√" : op}
@@ -480,15 +471,15 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                   ))}
                 </div>
                 {formulaError ? null : <p className="text-sm text-ok">Formula evaluates.</p>}
-                <label className="grid gap-1 text-sm">
-                  How it should read on the page
-                  <input
-                    className="field-control font-mono"
+                <FormField htmlFor="studio-formula" label="How it should read on the page">
+                  <Input
+                    id="studio-formula"
+                    className="font-mono"
                     value={draft.formula}
                     onChange={(event) => setDraft({ ...draft, formula: event.target.value })}
                     placeholder="V = 4 Q / (π D²)"
                   />
-                </label>
+                </FormField>
                 <Button variant="accent" onClick={() => setStep("method")}>
                   Next — method
                 </Button>
@@ -497,69 +488,73 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
           )}
 
           {step === "method" && (
-            <fieldset className="grid gap-3 rounded-md border border-border bg-surface p-4">
+            <fieldset className={cn(panelClass, "grid gap-3 p-4")}>
               <p className="eyebrow">Method brief</p>
               <p className="text-sm leading-6 text-muted">
-                Required to publish. Skip while you are still checking the number on this device.
+                Required to publish. Skip while you are still checking the number.
               </p>
-              <label className="grid gap-1 text-sm">
-                Purpose
+              <FormField htmlFor="studio-purpose" label="Purpose">
                 <textarea
-                  className="field-control h-20 py-2"
+                  id="studio-purpose"
+                  className={cn(controlClass, "h-20 py-2")}
                   value={draft.purpose}
                   placeholder="What question this answers."
                   onChange={(event) => setDraft({ ...draft, purpose: event.target.value })}
                 />
-              </label>
-              <label className="grid gap-1 text-sm">
-                Assumptions (one per line)
+              </FormField>
+              <FormField htmlFor="studio-assumptions" label="Assumptions (one per line)">
                 <textarea
-                  className="field-control h-24 py-2"
+                  id="studio-assumptions"
+                  className={cn(controlClass, "h-24 py-2")}
                   value={draft.assumptions.join("\n")}
                   placeholder={"Steady flow.\nIncompressible."}
                   onChange={(event) =>
                     setDraft({ ...draft, assumptions: event.target.value.split("\n").filter(Boolean) })
                   }
                 />
-              </label>
-              <label className="grid gap-1 text-sm">
-                Boundary — what this is not
+              </FormField>
+              <FormField htmlFor="studio-boundary" label="Boundary — what this is not">
                 <textarea
-                  className="field-control h-20 py-2"
+                  id="studio-boundary"
+                  className={cn(controlClass, "h-20 py-2")}
                   value={draft.boundary}
                   placeholder="Not a code check. Not valid outside the stated geometry."
                   onChange={(event) => setDraft({ ...draft, boundary: event.target.value })}
                 />
-              </label>
-              <label className="grid gap-1 text-sm">
-                How to read the result
+              </FormField>
+              <FormField htmlFor="studio-interpretation" label="How to read the result">
                 <textarea
-                  className="field-control h-20 py-2"
+                  id="studio-interpretation"
+                  className={cn(controlClass, "h-20 py-2")}
                   value={draft.interpretation}
                   placeholder="Treat this as a screen, then apply the project factor of safety."
                   onChange={(event) => setDraft({ ...draft, interpretation: event.target.value })}
                 />
-              </label>
+              </FormField>
               <div className="grid gap-2 sm:grid-cols-2">
-                <input
-                  className="field-control"
-                  value={draft.sourceLabel}
-                  onChange={(event) => setDraft({ ...draft, sourceLabel: event.target.value })}
-                  placeholder="Source label"
-                />
-                <input
-                  className="field-control"
-                  value={draft.sourceUrl}
-                  onChange={(event) => setDraft({ ...draft, sourceUrl: event.target.value })}
-                  placeholder="https://"
-                />
+                <FormField htmlFor="studio-source-label" label="Source label">
+                  <Input
+                    id="studio-source-label"
+                    value={draft.sourceLabel}
+                    onChange={(event) => setDraft({ ...draft, sourceLabel: event.target.value })}
+                    placeholder="Source label"
+                  />
+                </FormField>
+                <FormField htmlFor="studio-source-url" label="Source URL">
+                  <Input
+                    id="studio-source-url"
+                    value={draft.sourceUrl}
+                    onChange={(event) => setDraft({ ...draft, sourceUrl: event.target.value })}
+                    placeholder="https://"
+                  />
+                </FormField>
               </div>
             </fieldset>
           )}
 
           {confirmDelete ? (
             <div className="mt-6 flex flex-wrap items-center gap-3 text-sm">
-              <span>Delete this draft on this device?</span>
+              <span>Delete this draft?</span>
               <Button
                 variant="ghost"
                 className="text-danger"
@@ -581,7 +576,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
           )}
         </div>
 
-        <aside className="rounded-md border border-border bg-surface p-4 lg:sticky lg:top-20 lg:self-start">
+        <aside className={cn(panelClass, "p-4 lg:sticky lg:top-20 lg:self-start")}>
           <p className="eyebrow">Live instrument</p>
           <p className="mt-1 text-sm text-muted">Edits compute immediately. Units convert to SI before the formula runs.</p>
           <div className="mt-4">

@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 import { tools } from "@/lib/catalog";
 import { PARENT_NAME } from "@/lib/instrument";
+import { panelClass } from "@/components/ui/panel";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/about")({ component: AboutPage });
 
@@ -42,14 +44,14 @@ function AboutPage() {
         <Link to="/workshop" className="text-accent">
           Project
         </Link>{" "}
-        is drafts, saved checks, and review snapshots on this device. Method, assumptions, and limits also sit on each model.
+        is drafts, saved checks, and review snapshots — on this device until you sign in, then on your account. Method, assumptions, and limits also sit on each model.
       </p>
       <p className="mt-4 text-base leading-7 text-muted">
-        Saving a snapshot or a Studio draft does not require an account.
+        Saving a snapshot or a Studio draft does not require an account. Sign in and that work can follow you.
       </p>
       <p className="eyebrow mt-6">Preliminary only · project context required · independent review</p>
       <div className="mt-10 grid gap-5 md:grid-cols-2">
-        <div className="rounded-lg border border-ok/30 p-5">
+        <div className={cn(panelClass, "border-ok/30 p-5")}>
           <p className="eyebrow text-ok">Designed to support</p>
           <ul className="mt-4 grid gap-3 text-sm leading-6">
             {suitable.map((item) => (
@@ -60,7 +62,7 @@ function AboutPage() {
             ))}
           </ul>
         </div>
-        <div className="rounded-lg border border-mark/40 p-5">
+        <div className={cn(panelClass, "border-mark/40 p-5")}>
           <p className="eyebrow text-mark">Not provided</p>
           <ul className="mt-4 grid gap-3 text-sm leading-6">
             {unsuitable.map((item) => (

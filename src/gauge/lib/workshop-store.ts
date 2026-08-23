@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import {
   asCalculatorDefinition,
   emptyCalculator,
@@ -10,6 +10,8 @@ import {
 import { WORKSHOP_KEY } from "@/gauge/lib/brand";
 import { OFFICIAL_SLUGS } from "@/gauge/lib/catalog";
 import type { InstrumentDocument } from "@/lib/document";
+import { deleteDraftAccount, upsertDraftAccount } from "@/lib/desk-account";
+import { accountGuardedStorage, enqueueAccountWrite } from "@/lib/desk-mode";
 import { slugify } from "@/lib/utils";
 
 type WorkshopState = {
@@ -61,39 +63,54 @@ function normalizeWorkshopItem(item: WorkshopCalculator): WorkshopCalculator {
   };
 }
 
+function syncDraft(item: WorkshopCalculator) {
+  const data = JSON.parse(JSON.stringify(item)) as WorkshopCalculator;
+  enqueueAccountWrite(() => upsertDraftAccount({ data }));
+}
+
 export const useWorkshop = create<WorkshopState>()(
   persist(
     (set, get) => ({
       hasHydrated: false,
       items: [],
       setHasHydrated: (value) => set({ hasHydrated: value }),
-      upsert: (item) =>
+      upsert: (item) => {
+        const next = { ...item, updatedAt: new Date().toISOString() };
         set((state) => {
-          const next = state.items.filter((entry) => entry.id !== item.id);
-          return { items: [{ ...item, updatedAt: new Date().toISOString() }, ...next] };
-        }),
+          const rest = state.items.filter((entry) => entry.id !== item.id);
+          return { items: [next, ...rest] };
+        });
+        syncDraft(next);
+      },
       createBlank: () => {
         const item = toItem(emptyCalculator(), "Untitled calculator", get().items);
         set((state) => ({ items: [item, ...state.items] }));
+        syncDraft(item);
         return item;
       },
       createStarter: () => {
         const seed = starterCalculator();
         const item = toItem(seed, seed.title, get().items);
         set((state) => ({ items: [item, ...state.items] }));
+        syncDraft(item);
         return item;
       },
       createFrom: (seed) => {
         const item = toItem(asCalculatorDefinition(seed), `${seed.title} (copy)`, get().items);
         set((state) => ({ items: [item, ...state.items] }));
+        syncDraft(item);
         return item;
       },
-      remove: (id) => set((state) => ({ items: state.items.filter((item) => item.id !== id) })),
+      remove: (id) => {
+        set((state) => ({ items: state.items.filter((item) => item.id !== id) }));
+        enqueueAccountWrite(() => deleteDraftAccount({ data: id }));
+      },
       get: (id) => get().items.find((item) => item.id === id),
       bySlug: (slug) => get().items.find((item) => item.slug === slug),
     }),
     {
       name: WORKSHOP_KEY,
+      storage: createJSONStorage(() => accountGuardedStorage()),
       partialize: (state) => ({ items: state.items }),
       onRehydrateStorage: () => (state) => {
         if (state?.items?.length) {

@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, FilePlus, PenLine } from "lucide-react";
 import { useWorkshop } from "@/gauge/lib/workshop-store";
 import { studioDocuments } from "@/lib/document";
-import { buttonVariants, panelHoverClass } from "@instrument/ui";
+import { Button, buttonVariants, panelClass, panelHoverClass } from "@instrument/ui";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/studio/")({ component: StudioHome });
@@ -27,9 +27,10 @@ function StudioHome() {
         first number.
       </p>
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <button
+        <Button
           type="button"
-          className="flex min-h-28 flex-col items-start justify-between rounded-md bg-accent px-5 py-4 text-left text-accent-fg"
+          variant="accent"
+          className="h-auto min-h-28 flex-col items-start justify-between px-5 py-4 text-left"
           onClick={() => open(createBlank())}
         >
           <FilePlus size={18} />
@@ -37,10 +38,11 @@ function StudioHome() {
             <span className="block text-base font-medium">Create from scratch</span>
             <span className="mt-1 block text-sm text-accent-fg/80">Empty inputs. You name the quantities.</span>
           </span>
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="flex min-h-28 flex-col items-start justify-between rounded-md border border-border bg-surface px-5 py-4 text-left hover:bg-elevated"
+          variant="outline"
+          className={cn(panelClass, "h-auto min-h-28 flex-col items-start justify-between px-5 py-4 text-left")}
           onClick={() => open(createStarter())}
         >
           <PenLine size={18} />
@@ -48,7 +50,7 @@ function StudioHome() {
             <span className="block text-base font-medium">Start from a working example</span>
             <span className="mt-1 block text-sm text-muted">Axial stress, already computing. Rename it.</span>
           </span>
-        </button>
+        </Button>
       </div>
       <Link to="/workshop" className={cn(buttonVariants({ variant: "ghost" }), "mt-4")}>
         Project →
@@ -80,9 +82,10 @@ function StudioHome() {
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {studioDocuments().map((item) => (
             <li key={item.slug}>
-              <button
+              <Button
                 type="button"
-                className={cn(panelHoverClass, "flex min-h-10 w-full items-center justify-between gap-3 px-3 py-3 text-left")}
+                variant="outline"
+                className={cn(panelHoverClass, "h-auto min-h-10 w-full justify-between gap-3 px-3 py-3 text-left")}
                 onClick={() => open(createFrom(item))}
               >
                 <span>
@@ -90,7 +93,7 @@ function StudioHome() {
                   <span className="font-mono text-xs text-muted">{item.formula}</span>
                 </span>
                 <Copy size={14} className="shrink-0 text-accent" />
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
