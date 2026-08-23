@@ -17,11 +17,13 @@ function ProjectPage() {
   const navigate = useNavigate();
   const items = useWorkshop((state) => state.items);
   const createBlank = useWorkshop((state) => state.createBlank);
+  const removeModel = useWorkshop((state) => state.remove);
   const projects = useDeskStore((state) => state.projects);
   const calculations = useDeskStore((state) => state.calculations);
   const reviews = useDeskStore((state) => state.reviews);
   const createProject = useDeskStore((state) => state.createProject);
   const setActiveProject = useDeskStore((state) => state.setActiveProject);
+  const deleteProject = useDeskStore((state) => state.deleteProject);
   const deleteCalculation = useDeskStore((state) => state.deleteCalculation);
   const deleteReview = useDeskStore((state) => state.deleteReview);
   const activeProjectId = useDeskStore((state) => state.activeProjectId);
@@ -93,6 +95,18 @@ function ProjectPage() {
                     <Link to="/studio/$id" params={{ id: item.id }} className={buttonVariants({ variant: "accent" })}>
                       Edit
                     </Link>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 text-muted hover:text-danger"
+                      aria-label={`Delete ${item.title}`}
+                      onClick={() => {
+                        removeModel(item.id);
+                        toast.success("Model removed.");
+                      }}
+                    >
+                      <Trash2 size={15} />
+                    </Button>
                   </div>
                 </div>
               </li>
@@ -103,6 +117,7 @@ function ProjectPage() {
 
       <section className="mt-12" id="checks">
         <h2 className="text-xl font-semibold">Saved checks</h2>
+        <p className="mt-2 text-sm text-muted">Optional folders. The red one is the folder in use, not a trial of the product.</p>
         <form
           className="mt-4 flex flex-wrap gap-2"
           onSubmit={(event) => {
@@ -119,7 +134,7 @@ function ProjectPage() {
           <Input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="New project name"
+            placeholder="Folder name"
             className="min-w-[220px]"
             aria-label="New project name"
           />
@@ -130,15 +145,28 @@ function ProjectPage() {
         {projects.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {projects.map((project) => (
-              <Button
-                key={project.id}
-                type="button"
-                variant={project.id === projectId ? "accent" : "outline"}
-                onClick={() => setActiveProject(project.id)}
-                className="text-xs"
-              >
-                {project.name}
-              </Button>
+              <span key={project.id} className="inline-flex items-center">
+                <Button
+                  type="button"
+                  variant={project.id === projectId ? "accent" : "outline"}
+                  onClick={() => setActiveProject(project.id)}
+                  className="rounded-r-none text-xs"
+                >
+                  {project.name}
+                </Button>
+                <Button
+                  type="button"
+                  variant={project.id === projectId ? "accent" : "outline"}
+                  className="rounded-l-none border-l-0 px-2 text-xs"
+                  aria-label={`Delete ${project.name}`}
+                  onClick={() => {
+                    deleteProject(project.id);
+                    toast.success(`${project.name} removed.`);
+                  }}
+                >
+                  <Trash2 size={13} />
+                </Button>
+              </span>
             ))}
           </div>
         )}

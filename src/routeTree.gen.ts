@@ -15,9 +15,11 @@ import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ReferenceRouteImport } from './routes/reference'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as WorkshopRouteImport } from './routes/workshop'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
@@ -56,6 +58,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -69,6 +76,11 @@ const ReferenceRoute = ReferenceRouteImport.update({
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudioRoute = StudioRouteImport.update({
@@ -114,9 +126,11 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
+  '/settings': typeof SettingsRoute
   '/studio': typeof StudioRouteWithChildren
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
@@ -132,9 +146,11 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
+  '/settings': typeof SettingsRoute
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
   '/studio/$id': typeof StudioIdRoute
@@ -150,9 +166,11 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
+  '/settings': typeof SettingsRoute
   '/studio': typeof StudioRouteWithChildren
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
@@ -170,9 +188,11 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/library'
     | '/login'
+    | '/profile'
     | '/projects'
     | '/reference'
     | '/review'
+    | '/settings'
     | '/studio'
     | '/workshop'
     | '/c/$slug'
@@ -188,9 +208,11 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/library'
     | '/login'
+    | '/profile'
     | '/projects'
     | '/reference'
     | '/review'
+    | '/settings'
     | '/workshop'
     | '/c/$slug'
     | '/studio/$id'
@@ -205,9 +227,11 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/library'
     | '/login'
+    | '/profile'
     | '/projects'
     | '/reference'
     | '/review'
+    | '/settings'
     | '/studio'
     | '/workshop'
     | '/c/$slug'
@@ -224,9 +248,11 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   ProjectsRoute: typeof ProjectsRoute
   ReferenceRoute: typeof ReferenceRoute
   ReviewRoute: typeof ReviewRoute
+  SettingsRoute: typeof SettingsRoute
   StudioRoute: typeof StudioRouteWithChildren
   WorkshopRoute: typeof WorkshopRoute
   CSlugRoute: typeof CSlugRoute
@@ -278,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects': {
       id: '/projects'
       path: '/projects'
@@ -297,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/studio': {
@@ -371,9 +411,11 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   ProjectsRoute: ProjectsRoute,
   ReferenceRoute: ReferenceRoute,
   ReviewRoute: ReviewRoute,
+  SettingsRoute: SettingsRoute,
   StudioRoute: StudioRouteWithChildren,
   WorkshopRoute: WorkshopRoute,
   CSlugRoute: CSlugRoute,

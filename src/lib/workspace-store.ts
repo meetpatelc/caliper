@@ -38,6 +38,7 @@ type DeskState = {
   touchRecent: (id: ToolId) => void;
   createProject: (name: string) => DeskProject;
   setActiveProject: (id: string | null) => void;
+  deleteProject: (id: string) => void;
   saveCalculation: (entry: Omit<SavedCalculation, "id" | "savedAt">) => SavedCalculation;
   deleteCalculation: (id: string) => void;
   saveReview: (entry: Omit<ReviewSnapshot, "id" | "savedAt">) => ReviewSnapshot;
@@ -70,6 +71,15 @@ export const useDeskStore = create<DeskState>()(
         return project;
       },
       setActiveProject: (id) => set({ activeProjectId: id }),
+      deleteProject: (id) =>
+        set((state) => {
+          const projects = state.projects.filter((item) => item.id !== id);
+          return {
+            projects,
+            calculations: state.calculations.filter((item) => item.projectId !== id),
+            activeProjectId: state.activeProjectId === id ? (projects[0]?.id ?? null) : state.activeProjectId,
+          };
+        }),
       saveCalculation: (entry) => {
         const record: SavedCalculation = { ...entry, id: uid(), savedAt: new Date().toISOString() };
         set((state) => ({ calculations: [record, ...state.calculations] }));

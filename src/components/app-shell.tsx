@@ -5,7 +5,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { FamilySwitch } from "@/components/family-switch";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { FavouriteRail } from "@/components/favourite-rail";
-import { UserButton } from "@/lib/auth/gates";
+import { AccountMenu } from "@/components/account-menu";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PARENT_NAME, THEME_KEY } from "@/lib/instrument";
@@ -151,7 +151,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             </Button>
-            <AuthSlot />
+            <AccountMenu />
           </div>
           <div />
         </div>
@@ -196,7 +196,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link to="/feedback" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm text-muted hover:bg-elevated hover:text-fg">
             Feedback
           </Link>
-          <AuthSlot />
+          <DrawerAccount onClose={() => setMenuOpen(false)} />
         </nav>
         <div className="mt-auto grid gap-3 border-t border-border pt-4">
           <Button variant="outline" onClick={toggleTheme}>
@@ -238,15 +238,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AuthSlot() {
+function DrawerAccount({ onClose }: { onClose: () => void }) {
   const { user, isPending } = useCurrentUserState();
-  if (isPending) {
-    return <div className="h-10 w-24 shrink-0 animate-pulse rounded-md bg-elevated" aria-hidden="true" />;
+  if (isPending) return <div className="h-11 animate-pulse rounded-md bg-elevated" />;
+  if (!user) {
+    return (
+      <Link to="/login" onClick={onClose} className="rounded-md px-3 py-3 text-sm hover:bg-elevated">
+        Sign in
+      </Link>
+    );
   }
-  if (user) return <UserButton />;
   return (
-    <Link to="/login" className={cn(buttonVariants({ variant: "outline" }))}>
-      Sign in
-    </Link>
+    <>
+      <Link to="/profile" onClick={onClose} className="rounded-md px-3 py-3 text-sm hover:bg-elevated">
+        Profile
+      </Link>
+      <Link to="/settings" onClick={onClose} className="rounded-md px-3 py-3 text-sm hover:bg-elevated">
+        Account settings
+      </Link>
+    </>
   );
 }
