@@ -25,6 +25,7 @@ const FAMILIES = [
   "energy",
   "power",
   "temperature",
+  "temperatureDelta",
   "density",
   "dynamicViscosity",
   "kinematicViscosity",
@@ -37,6 +38,10 @@ const FAMILIES = [
   "charge",
   "strain",
   "secondMoment",
+  "dimensionless",
+  "specificHeat",
+  "thermalConductivity",
+  "stiffness",
 ] as const;
 
 const DOMAIN: Record<string, "foundation" | "mechanics" | "fluids" | "thermal" | "electrical"> = {
@@ -54,6 +59,8 @@ const DOMAIN: Record<string, "foundation" | "mechanics" | "fluids" | "thermal" |
   speed: "mechanics",
   strain: "mechanics",
   secondMoment: "mechanics",
+  stiffness: "mechanics",
+  dimensionless: "foundation",
   density: "fluids",
   dynamicViscosity: "fluids",
   kinematicViscosity: "fluids",
@@ -61,6 +68,9 @@ const DOMAIN: Record<string, "foundation" | "mechanics" | "fluids" | "thermal" |
   energy: "thermal",
   power: "thermal",
   temperature: "thermal",
+  temperatureDelta: "thermal",
+  specificHeat: "thermal",
+  thermalConductivity: "thermal",
   frequency: "electrical",
   voltage: "electrical",
   current: "electrical",
@@ -97,6 +107,7 @@ const MENU: Record<(typeof FAMILIES)[number], readonly string[]> = {
   energy: ["energy.J", "energy.kJ", "energy.MJ", "energy.Wh", "energy.kWh", "energy.Btu"],
   power: ["power.W", "power.kW", "power.MW", "power.hp", "power.Btu_h"],
   temperature: ["temperature.K", "temperature.degC", "temperature.degF", "temperature.degR"],
+  temperatureDelta: ["temperatureDelta.K", "temperatureDelta.degC", "temperatureDelta.degF"],
   density: ["density.kg_m3", "density.g_cm3", "density.lbm_ft3", "density.lbm_in3"],
   dynamicViscosity: ["dynamicViscosity.Pa_s", "dynamicViscosity.cP", "dynamicViscosity.P"],
   kinematicViscosity: ["kinematicViscosity.m2_s", "kinematicViscosity.cSt", "kinematicViscosity.ft2_s"],
@@ -115,6 +126,10 @@ const MENU: Record<(typeof FAMILIES)[number], readonly string[]> = {
   charge: ["charge.C", "charge.Ah", "charge.mAh"],
   strain: ["strain.one", "strain.micro"],
   secondMoment: ["secondMoment.m4", "secondMoment.cm4", "secondMoment.mm4", "secondMoment.in4"],
+  dimensionless: ["dimensionless.one", "dimensionless.percent"],
+  specificHeat: ["specificHeat.J_kg_K", "specificHeat.kJ_kg_K"],
+  thermalConductivity: ["thermalConductivity.W_m_K"],
+  stiffness: ["stiffness.N_m", "stiffness.N_mm", "stiffness.lbf_in"],
 };
 
 export type UnitFamilyId = (typeof FAMILIES)[number];
@@ -154,11 +169,16 @@ export const unitFamilyOptions = kitOptions
   .filter((option) => isUnitFamilyId(option.value))
   .map((option) => ({ ...option, domain: DOMAIN[option.value] ?? "foundation" }));
 
-export const unitsForFamily = (familyId: UnitFamilyId) =>
-  (MENU[familyId] ?? []).map((id) => {
+export const unitsForFamily = (familyId: UnitFamilyId, allowed?: string[]) => {
+  const all = (MENU[familyId] ?? []).map((id) => {
     const unit = resolveUnit(familyId, id);
     return { id: unit.id, value: unit.id, label: unit.symbol };
   });
+  if (!allowed?.length) return all;
+  const allow = new Set(allowed.map((token) => resolveUnit(familyId, token).id));
+  const filtered = all.filter((unit) => allow.has(unit.id));
+  return filtered.length ? filtered : all;
+};
 
 export const convertQuantity = (familyId: UnitFamilyId, value: number, fromUnit: string, toUnit: string) => {
   const result = convert(familyId, value, fromUnit, toUnit);

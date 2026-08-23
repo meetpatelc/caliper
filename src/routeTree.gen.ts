@@ -11,14 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as LibraryRouteImport } from './routes/library'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ReferenceRouteImport } from './routes/reference'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as StudioRouteImport } from './routes/studio'
+import { Route as WorkshopRouteImport } from './routes/workshop'
+import { Route as CSlugRouteImport } from './routes/c.$slug'
+import { Route as StudioIndexRouteImport } from './routes/studio.index'
+import { Route as StudioIdRouteImport } from './routes/studio.$id'
 import { Route as ToolToolIdRouteImport } from './routes/tool/$toolId'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +34,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtlasRoute = AtlasRouteImport.update({
+  id: '/atlas',
+  path: '/atlas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedbackRoute = FeedbackRouteImport.update({
   id: '/feedback',
   path: '/feedback',
@@ -38,11 +47,6 @@ const FeedbackRoute = FeedbackRouteImport.update({
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -60,104 +64,148 @@ const ReviewRoute = ReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkshopRoute = WorkshopRouteImport.update({
+  id: '/workshop',
+  path: '/workshop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CSlugRoute = CSlugRouteImport.update({
+  id: '/c/$slug',
+  path: '/c/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioIndexRoute = StudioIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StudioRoute,
+} as any)
+const StudioIdRoute = StudioIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => StudioRoute,
+} as any)
 const ToolToolIdRoute = ToolToolIdRouteImport.update({
   id: '/tool/$toolId',
   path: '/tool/$toolId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/atlas': typeof AtlasRoute
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
-  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
+  '/studio': typeof StudioRouteWithChildren
+  '/workshop': typeof WorkshopRoute
+  '/c/$slug': typeof CSlugRoute
+  '/studio/$id': typeof StudioIdRoute
   '/tool/$toolId': typeof ToolToolIdRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/studio/': typeof StudioIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/atlas': typeof AtlasRoute
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
-  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
+  '/workshop': typeof WorkshopRoute
+  '/c/$slug': typeof CSlugRoute
+  '/studio/$id': typeof StudioIdRoute
   '/tool/$toolId': typeof ToolToolIdRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/studio': typeof StudioIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/atlas': typeof AtlasRoute
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
-  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
+  '/studio': typeof StudioRouteWithChildren
+  '/workshop': typeof WorkshopRoute
+  '/c/$slug': typeof CSlugRoute
+  '/studio/$id': typeof StudioIdRoute
   '/tool/$toolId': typeof ToolToolIdRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/studio/': typeof StudioIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/atlas'
     | '/feedback'
     | '/library'
-    | '/login'
     | '/projects'
     | '/reference'
     | '/review'
+    | '/studio'
+    | '/workshop'
+    | '/c/$slug'
+    | '/studio/$id'
     | '/tool/$toolId'
-    | '/api/auth/$'
+    | '/studio/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/atlas'
     | '/feedback'
     | '/library'
-    | '/login'
     | '/projects'
     | '/reference'
     | '/review'
+    | '/workshop'
+    | '/c/$slug'
+    | '/studio/$id'
     | '/tool/$toolId'
-    | '/api/auth/$'
+    | '/studio'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/atlas'
     | '/feedback'
     | '/library'
-    | '/login'
     | '/projects'
     | '/reference'
     | '/review'
+    | '/studio'
+    | '/workshop'
+    | '/c/$slug'
+    | '/studio/$id'
     | '/tool/$toolId'
-    | '/api/auth/$'
+    | '/studio/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AtlasRoute: typeof AtlasRoute
   FeedbackRoute: typeof FeedbackRoute
   LibraryRoute: typeof LibraryRoute
-  LoginRoute: typeof LoginRoute
   ProjectsRoute: typeof ProjectsRoute
   ReferenceRoute: typeof ReferenceRoute
   ReviewRoute: typeof ReviewRoute
+  StudioRoute: typeof StudioRouteWithChildren
+  WorkshopRoute: typeof WorkshopRoute
+  CSlugRoute: typeof CSlugRoute
   ToolToolIdRoute: typeof ToolToolIdRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -176,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/atlas': {
+      id: '/atlas'
+      path: '/atlas'
+      fullPath: '/atlas'
+      preLoaderRoute: typeof AtlasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feedback': {
       id: '/feedback'
       path: '/feedback'
@@ -188,13 +243,6 @@ declare module '@tanstack/react-router' {
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof LibraryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -218,6 +266,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workshop': {
+      id: '/workshop'
+      path: '/workshop'
+      fullPath: '/workshop'
+      preLoaderRoute: typeof WorkshopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$slug': {
+      id: '/c/$slug'
+      path: '/c/$slug'
+      fullPath: '/c/$slug'
+      preLoaderRoute: typeof CSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio/': {
+      id: '/studio/'
+      path: '/'
+      fullPath: '/studio/'
+      preLoaderRoute: typeof StudioIndexRouteImport
+      parentRoute: typeof StudioRoute
+    }
+    '/studio/$id': {
+      id: '/studio/$id'
+      path: '/$id'
+      fullPath: '/studio/$id'
+      preLoaderRoute: typeof StudioIdRouteImport
+      parentRoute: typeof StudioRoute
+    }
     '/tool/$toolId': {
       id: '/tool/$toolId'
       path: '/tool/$toolId'
@@ -225,27 +308,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolToolIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
+
+interface StudioRouteChildren {
+  StudioIdRoute: typeof StudioIdRoute
+  StudioIndexRoute: typeof StudioIndexRoute
+}
+
+const StudioRouteChildren: StudioRouteChildren = {
+  StudioIdRoute: StudioIdRoute,
+  StudioIndexRoute: StudioIndexRoute,
+}
+
+const StudioRouteWithChildren =
+  StudioRoute._addFileChildren(StudioRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AtlasRoute: AtlasRoute,
   FeedbackRoute: FeedbackRoute,
   LibraryRoute: LibraryRoute,
-  LoginRoute: LoginRoute,
   ProjectsRoute: ProjectsRoute,
   ReferenceRoute: ReferenceRoute,
   ReviewRoute: ReviewRoute,
+  StudioRoute: StudioRouteWithChildren,
+  WorkshopRoute: WorkshopRoute,
+  CSlugRoute: CSlugRoute,
   ToolToolIdRoute: ToolToolIdRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

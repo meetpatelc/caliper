@@ -1,22 +1,20 @@
 {
-  "name": "caliper",
+  "name": "instrument",
   "private": true,
   "sideEffects": false,
   "type": "module",
-  "engines": {
-    "node": ">=22"
-  },
   "overrides": {
     "nf3": "0.3.17"
   },
   "scripts": {
-    "dev": "vite dev --host 0.0.0.0 --port 8080",
-    "build": "vite build",
+    "dev": "node scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080",
+    "build": "node scripts/with-app-env.mjs vite build && npm run db:migrate",
     "db:migrate": "node scripts/migrate.mjs",
-    "build:dev": "vite build --mode development",
-    "preview": "vite preview",
+    "build:dev": "node scripts/with-app-env.mjs vite build --mode development",
+    "preview": "node scripts/with-app-env.mjs vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --import ./scripts/alias-register.mjs --test 'scripts/**/*.test.mjs'",
+    "check:auth": "node scripts/check-auth-invariant.mjs",
+    "test": "node --test 'scripts/**/*.test.mjs' && node --experimental-strip-types --import ./scripts/alias-register.mjs --test src/lib/app-data/app-data.test.ts src/lib/auth/gate-identity.test.ts src/gauge/test/unit-preserve.test.mjs src/lib/formula-corrections.test.mjs src/lib/caliper-band1.test.mjs packages/formula/test/formula.test.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -25,6 +23,7 @@
     "@hookform/resolvers": "^5.7.0",
     "@instrument/ui": "github:meetpatelc/instrument-ui#v0.1.0",
     "@instrument/units": "github:meetpatelc/instrument-units#v0.1.2",
+    "@instrument/formula": "file:packages/formula",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -57,6 +56,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.0.0",
+    "jose": "6.2.9",
     "kysely": "^0.28.5",
     "lucide-react": "^0.510.0",
     "pg": "^8.16.3",

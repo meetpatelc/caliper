@@ -6,6 +6,7 @@
 
 import type { ToolId } from "@/lib/catalog";
 import { convertQuantity, isUnitFamilyId, unitFamilyOptions, unitSymbol, unitsForFamily, type UnitFamilyId } from "@/lib/units";
+import { libraryDocuments, runLibraryDocument } from "@/lib/document";
 
 export type FieldKind = "number" | "select" | "text";
 export type FieldDefinition = {
@@ -18,7 +19,7 @@ export type FieldDefinition = {
   options?: { value: string; label: string }[];
 };
 
-export type CalculationValue = { key: string; label: string; raw: number; display: string; unit: string };
+export type CalculationValue = { key: string; label: string; raw: number; display: string; unit: string; symbol?: string };
 export type CalculationState = {
   values: CalculationValue[];
   warnings: string[];
@@ -86,6 +87,11 @@ export const toolFields: Record<ToolId, FieldDefinition[]> = {
     { key: "mass", label: "Mass", symbol: "m", helper: "Constant translating mass.", kind: "number", unit: "kg" },
     { key: "speed", label: "Speed", symbol: "v", helper: "Classical translational speed magnitude.", kind: "number", unit: "m/s" },
   ],
+  gravitationalPe: [
+    { key: "mass", label: "Mass", symbol: "m", helper: "Mass of the body whose height changes.", kind: "number", unit: "kg" },
+    { key: "height", label: "Height", symbol: "h", helper: "Height measured along the gravity vector, relative to a chosen datum.", kind: "number", unit: "m" },
+    { key: "gravity", label: "Gravity", symbol: "g", helper: "Local gravitational acceleration, treated as constant.", kind: "number", unit: "m/s²" },
+  ],
   hydrostatic: [
     { key: "density", label: "Liquid density", symbol: "ρ", helper: "User-entered density for the stated liquid condition.", kind: "number", unit: "kg/m³" },
     { key: "depth", label: "Vertical depth", symbol: "h", helper: "Vertical distance below the free surface, not an inclined path length.", kind: "number", unit: "m" },
@@ -94,6 +100,10 @@ export const toolFields: Record<ToolId, FieldDefinition[]> = {
     { key: "area1", label: "First flow area", symbol: "A₁", helper: "Area normal to the mean flow direction at section 1.", kind: "number", unit: "mm²" },
     { key: "velocity1", label: "First mean velocity", symbol: "v₁", helper: "User-entered mean velocity at section 1.", kind: "number", unit: "m/s" },
     { key: "area2", label: "Second flow area", symbol: "A₂", helper: "Area normal to the mean flow direction at section 2.", kind: "number", unit: "mm²" },
+  ],
+  pipeVelocity: [
+    { key: "flow", label: "Volumetric flow", symbol: "Q", helper: "Steady volumetric flow through a circular full-flowing pipe.", kind: "number", unit: "L/s" },
+    { key: "diameter", label: "Inside diameter", symbol: "D", helper: "Internal diameter of the circular passage.", kind: "number", unit: "mm" },
   ],
   sensibleHeat: [
     { key: "mass", label: "Mass", symbol: "m", helper: "Mass of the material undergoing temperature change.", kind: "number", unit: "kg" },
@@ -223,7 +233,7 @@ export const toolFields: Record<ToolId, FieldDefinition[]> = {
   ],
   thermalExpansion: [
     { key: "length", label: "Initial length", symbol: "L₀", helper: "Unloaded length at the stated initial temperature.", kind: "number", unit: "mm" },
-    { key: "cte", label: "Linear expansion coefficient", symbol: "α", helper: "User-entered average CTE over the stated temperature interval.", kind: "number", unit: "µm/m·K" },
+    { key: "cte", label: "Linear expansion coefficient", symbol: "α", helper: "Signed average CTE over the stated temperature interval. Negative means contraction on heating.", kind: "number", unit: "µm/m·K" },
     { key: "deltaT", label: "Temperature change", symbol: "ΔT", helper: "Final minus initial temperature. Positive = heating.", kind: "number", unit: "K or °C" },
   ],
   thermalStress: [
@@ -244,6 +254,10 @@ export const toolFields: Record<ToolId, FieldDefinition[]> = {
     { key: "elevation1", label: "Station 1 elevation", symbol: "z₁", helper: "Elevation relative to one common arbitrary datum.", kind: "number", unit: "m" },
     { key: "velocity2", label: "Station 2 velocity", symbol: "v₂", helper: "Mean speed at station 2 on the selected streamline.", kind: "number", unit: "m/s" },
     { key: "elevation2", label: "Station 2 elevation", symbol: "z₂", helper: "Elevation relative to the same datum as station 1.", kind: "number", unit: "m" },
+  ],
+  dynamicPressure: [
+    { key: "density", label: "Density", symbol: "ρ", helper: "Free-stream or mean-duct density at the stated condition.", kind: "number", unit: "kg/m³" },
+    { key: "speed", label: "Speed", symbol: "V", helper: "Free-stream or mean duct speed.", kind: "number", unit: "m/s" },
   ],
   combinedStress: [
     { key: "axialStress", label: "Axial normal stress", symbol: "σa", helper: "Signed normal stress from direct axial loading at the point of interest.", kind: "number", unit: "MPa" },
@@ -302,7 +316,7 @@ export const toolFields: Record<ToolId, FieldDefinition[]> = {
     { key: "rpm", label: "Spindle speed", symbol: "n", helper: "Constant spindle speed during the stated cut.", kind: "number", unit: "rpm" },
     { key: "feedPerRev", label: "Feed per revolution", symbol: "fr", helper: "User-entered axial feed per spindle revolution.", kind: "number", unit: "mm/rev" },
     { key: "depth", label: "Cutting depth per hole", symbol: "ld", helper: "Entered drilling depth only; add approach and breakthrough separately if required.", kind: "number", unit: "mm" },
-    { key: "holes", label: "Hole count", symbol: "i", helper: "Number of identical holes under the same stated process condition.", kind: "number", unit: "holes" },
+    { key: "holes", label: "Hole count", symbol: "i", helper: "Whole number of identical holes under the same stated process condition.", kind: "number", unit: "holes" },
   ],
   turningMrr: [
     { key: "depth", label: "Radial depth of cut", symbol: "ap", helper: "User-entered radial engagement depth under the stated turning condition.", kind: "number", unit: "mm" },
@@ -1153,8 +1167,10 @@ export const initialInputs: Record<ToolId, Record<string, string>> = {
   density: { mass: "7.85", volume: "1" },
   newton: { mass: "10", acceleration: "2.5" },
   kinetic: { mass: "1000", speed: "20" },
+  gravitationalPe: { mass: "80", height: "2", gravity: "9.80665" },
   hydrostatic: { density: "1000", depth: "2.5" },
   continuity: { area1: "1000", velocity1: "2", area2: "400" },
+  pipeVelocity: { flow: "8", diameter: "80" },
   sensibleHeat: { mass: "10", specificHeat: "4.186", deltaT: "25" },
   ohm: { voltage: "24", resistance: "12" },
   fits: { holeMin: "25.000", holeMax: "25.021", shaftMin: "24.980", shaftMax: "24.993" },
@@ -1179,6 +1195,7 @@ export const initialInputs: Record<ToolId, Record<string, string>> = {
   thermalStress: { modulus: "200", cte: "12", deltaT: "65" },
   planeConduction: { conductivity: "0.8", area: "2.5", thickness: "120", hotTemperature: "80", coldTemperature: "20" },
   bernoulli: { density: "1000", velocity1: "1.5", elevation1: "0", velocity2: "3.0", elevation2: "0" },
+  dynamicPressure: { density: "1.225", speed: "20" },
   combinedStress: { axialStress: "45", bendingStress: "75", shearStress: "30" },
   thinVessel: { pressure: "1.2", diameter: "600", thickness: "12" },
   leadScrew: { axialForce: "4", lead: "10", efficiency: "82", rpm: "600" },
@@ -1327,30 +1344,9 @@ const round = (value: number, significant = 5) => {
 const quantity = (key: string, label: string, raw: number, value: number, unit: string, significant = 5): CalculationValue => ({ key, label, raw, display: round(value, significant), unit });
 
 const fromKiloNewton = (value: number) => value * 1000;
-const fromSquareMillimetre = (value: number) => value * 1e-6;
 const fromMillimetre = (value: number) => value * 1e-3;
 const fromGigaPascal = (value: number) => value * 1e9;
 const fromCentimetre4 = (value: number) => value * 1e-8;
-
-const calculateAxial = (input: Record<string, string>): CalculationState => {
-  const force = finite(input.force, "Axial load", false);
-  const area = finite(input.area, "Cross-sectional area");
-  const length = finite(input.length, "Original length");
-  const modulus = finite(input.modulus, "Elastic modulus");
-  const f = fromKiloNewton(force);
-  const a = fromSquareMillimetre(area);
-  const l = fromMillimetre(length);
-  const e = fromGigaPascal(modulus);
-  const stress = f / a;
-  const strain = stress / e;
-  const extension = strain * l;
-  return {
-    values: [quantity("stress", "Average normal stress", stress, stress / 1e6, "MPa"), quantity("strain", "Elastic strain", strain, strain * 1e6, "µε"), quantity("extension", "Ideal length change", extension, extension * 1000, "mm")],
-    warnings: ["Average stress is a simplified measure; do not apply it at a local load introduction, notch, or connection without a suitable model."],
-    errors: [],
-    method: "σ = F / A · ε = σ / E · ΔL = FL / AE",
-  };
-};
 
 const calculateBeam = (input: Record<string, string>): CalculationState => {
   const load = fromKiloNewton(finite(input.load, "Point load"));
@@ -1395,19 +1391,6 @@ const calculateBeamDiagram = (input: Record<string, string>): CalculationState =
   return { values: [quantity("leftReaction", "Left support reaction", reactionLeft, reactionLeft / 1000, "kN"), quantity("rightReaction", "Right support reaction", reactionRight, reactionRight / 1000, "kN"), quantity("shearLeftOfPoint", "Shear left of point load", shearLeftOfPoint, shearLeftOfPoint / 1000, "kN"), quantity("shearRightOfPoint", "Shear right of point load", shearRightOfPoint, shearRightOfPoint / 1000, "kN"), quantity("momentAtPoint", "Moment at point-load location", momentAtPoint, momentAtPoint / 1000, "kN·m"), quantity("peakMoment", "Largest-magnitude bending moment", peakMoment, peakMoment / 1000, "kN·m"), quantity("peakMomentLocation", "Peak-moment location from left", peakLocation, peakLocation, "m")], warnings: ["This is a static, simply supported single-span equilibrium screen with one downward point load and/or full-span downward uniform load. It does not produce a scaled plot, deflection, stress, connection, dynamic, plasticity, code, capacity, or approval result."], errors: [], method: "RA = P(L−a)/L + wL/2 · RB = Pa/L + wL/2 · V(x) = RA − wx − P·H(x−a) · M(x) = RAx − wx²/2 − P(x−a)H(x−a)" };
 };
 
-const calculateTriangleTruss = (input: Record<string, string>): CalculationState => {
-  const span = finite(input.span, "Support span");
-  const rise = finite(input.rise, "Apex rise");
-  const load = fromKiloNewton(finite(input.apexLoad, "Declared vertical apex load"));
-  const halfSpan = span / 2;
-  const diagonalLength = Math.hypot(halfSpan, rise);
-  const sine = rise / diagonalLength;
-  const cosine = halfSpan / diagonalLength;
-  const supportReaction = load / 2;
-  const diagonalCompression = supportReaction / sine;
-  const bottomChordTension = diagonalCompression * cosine;
-  return { values: [quantity("diagonalLength", "Each diagonal member length", diagonalLength, diagonalLength, "m"), quantity("leftReaction", "Left vertical support reaction", supportReaction, supportReaction / 1000, "kN"), quantity("rightReaction", "Right vertical support reaction", supportReaction, supportReaction / 1000, "kN"), quantity("diagonalCompression", "Each diagonal axial compression magnitude", diagonalCompression, diagonalCompression / 1000, "kN"), quantity("bottomChordTension", "Bottom-chord axial tension magnitude", bottomChordTension, bottomChordTension / 1000, "kN")], warnings: ["This is a symmetric three-member, pin-jointed, two-force-member equilibrium model with one vertical apex load. It excludes arbitrary truss topology, joint rigidity, member sizing, buckling, deflection, connection design, stability, code checks, and approval."], errors: [], method: "ΣFy = 0 · RA = RB = P/2 · Ndiagonal = (P/2)/sin θ · Nbottom = Ndiagonal cos θ" };
-};
 
 const calculateHertzContact = (input: Record<string, string>): CalculationState => {
   const force = finite(input.normalForce, "Declared normal force");
@@ -1424,16 +1407,6 @@ const calculateHertzContact = (input: Record<string, string>): CalculationState 
   return { values: [quantity("reducedModulus", "Reduced elastic modulus", reducedModulus, reducedModulus / 1e9, "GPa"), quantity("contactRadius", "Contact radius", contactRadius, contactRadius * 1000, "mm"), quantity("contactDiameter", "Contact diameter", 2 * contactRadius, 2 * contactRadius * 1000, "mm"), quantity("peakPressure", "Peak Hertz pressure", peakPressure, peakPressure / 1e6, "MPa"), quantity("indentation", "Elastic approach", indentation, indentation * 1e6, "µm")], warnings: ["This is a smooth, frictionless, elastic, isotropic, homogeneous sphere-on-flat normal-contact screen. It excludes roughness, friction, plasticity, coatings, fatigue, thermal effects, surface finish, material selection, life, safety, and approval."], errors: [], method: "1/E* = (1−ν₁²)/E₁ + (1−ν₂²)/E₂ · a = [3FR/(4E*)]^(1/3) · p₀ = 3F/(2πa²)" };
 };
 
-const calculateFractureIntensity = (input: Record<string, string>): CalculationState => {
-  const geometryFactor = finite(input.geometryFactor, "Declared Mode-I geometry factor");
-  const tensileStress = finite(input.tensileStress, "Declared remote tensile stress");
-  const crackHalfLength = finite(input.crackHalfLength, "Declared crack half-length");
-  const toughnessReference = finite(input.toughnessReference, "Declared toughness reference");
-  const stressIntensity = geometryFactor * tensileStress * Math.sqrt(Math.PI * crackHalfLength / 1000);
-  const toughnessRatio = stressIntensity / toughnessReference;
-  const arithmeticDifference = toughnessReference - stressIntensity;
-  return { values: [quantity("stressIntensity", "Mode-I stress intensity", stressIntensity, stressIntensity, "MPa√m"), quantity("toughnessRatio", "Intensity / declared toughness reference", toughnessRatio, toughnessRatio, "—"), quantity("arithmeticDifference", "Declared-reference minus intensity", arithmeticDifference, arithmeticDifference, "MPa√m")], warnings: ["This is declared-geometry-factor Mode-I linear-elastic fracture-mechanics arithmetic. Stress intensity depends on detailed geometry and loading; this workspace does not infer a factor, establish LEFM applicability, determine fracture or crack growth, predict life, define inspection intervals, select a material, establish safety, or approve a design."], errors: [], method: "KI = Yσ√(πa) · ratio = KI / KIC,declared" };
-};
 
 const calculateDeflectionCheck = (input: Record<string, string>): CalculationState => {
   const declaredDeflection = finite(input.declaredDeflection, "Declared calculated deflection", false);
@@ -1446,20 +1419,6 @@ const calculateDeflectionCheck = (input: Record<string, string>): CalculationSta
   return { values: [quantity("referenceDeflection", "Declared-reference deflection", referenceDeflection, referenceDeflection, "mm"), quantity("deflectionRatio", "Declared deflection / reference", ratio, ratio, "—"), quantity("arithmeticDifference", "Reference minus declared deflection", arithmeticDifference, arithmeticDifference, "mm")], warnings: ["This compares a user-entered calculated deflection to a user-entered span/reference denominator. It does not select a limit, validate the upstream deflection model, establish a serviceability requirement, judge adequacy, apply a code, or approve a design."], errors: [], method: "δreference = L / nreference · ratio = δdeclared / δreference" };
 };
 
-const calculateBearingAdjustedLife = (input: Record<string, string>): CalculationState => {
-  const dynamicRating = finite(input.dynamicRating, "Declared dynamic rating");
-  const equivalentLoad = finite(input.equivalentLoad, "Declared equivalent load");
-  const lifeExponent = finite(input.lifeExponent, "Declared life exponent");
-  const reliabilityFactor = finite(input.reliabilityFactor, "Declared reliability factor");
-  const materialFactor = finite(input.materialFactor, "Declared material factor");
-  const otherFactor = finite(input.otherFactor, "Declared other-life factor");
-  const speed = finite(input.speed, "Declared rotating speed");
-  const basicLifeMillion = (dynamicRating / equivalentLoad) ** lifeExponent;
-  const combinedFactor = reliabilityFactor * materialFactor * otherFactor;
-  const adjustedLifeMillion = basicLifeMillion * combinedFactor;
-  const adjustedLifeHours = (adjustedLifeMillion * 1e6) / (speed * 60);
-  return { values: [quantity("basicLifeMillion", "Basic rating life", basicLifeMillion, basicLifeMillion, "million rev"), quantity("combinedFactor", "Product of declared life factors", combinedFactor, combinedFactor, "—"), quantity("adjustedLifeMillion", "Declared-factor adjusted rating life", adjustedLifeMillion, adjustedLifeMillion, "million rev"), quantity("adjustedLifeHours", "Declared-factor adjusted operating life", adjustedLifeHours, adjustedLifeHours, "h")], warnings: ["This is a basic rating-life calculation with all reliability, material, and other factors supplied by the user. It is not a bearing selection, factor lookup, reliability prediction, variable-duty, misalignment, lubrication, temperature, mounting, static-adequacy, safety, or approval analysis."], errors: [], method: "L10 = (C/P)^p · Ladj = L10·a1·a2·a3 · hours = Ladj·10^6/(60n)" };
-};
 
 const calculateFlywheelEnergy = (input: Record<string, string>): CalculationState => {
   const inertia = finite(input.inertia, "Declared rotational inertia");
@@ -1528,17 +1487,6 @@ const calculateBeltTension = (input: Record<string, string>): CalculationState =
   return { values: [quantity("drivingTension", "Torque-induced driving tension difference", drivingTension, drivingTension, "N"), quantity("declaredLooseSide", "Declared loose-side tension", looseSideTension, looseSideTension, "N"), quantity("tightSideTension", "Declared tight-side tension sum", tightSideTension, tightSideTension, "N")], warnings: ["This is a torque-to-driving-tension difference and stated loose-side sum only. It excludes pretension selection, wrap, friction, slip, fatigue, speed capability, bearing loading, belt/chain selection, safety, and approval."], errors: [], method: "ΔF = T/rp · Ftight = ΔF + Floose,declared" };
 };
 
-const calculateVesselGeometry = (input: Record<string, string>): CalculationState => {
-  const internalDiameter = finite(input.internalDiameter, "Declared internal diameter");
-  const straightLength = finite(input.straightLength, "Declared straight length");
-  const wallThickness = finite(input.wallThickness, "Declared wall thickness");
-  const internalRadius = internalDiameter / 2;
-  const outerRadius = internalRadius + wallThickness;
-  const internalVolume = Math.PI * internalRadius ** 2 * straightLength;
-  const internalWettedArea = Math.PI * internalDiameter * straightLength;
-  const shellVolume = Math.PI * (outerRadius ** 2 - internalRadius ** 2) * straightLength;
-  return { values: [quantity("internalVolume", "Straight-cylinder internal volume", internalVolume / 1e9, internalVolume / 1e6, "L"), quantity("internalWettedArea", "Straight-cylinder internal wetted area", internalWettedArea / 1e6, internalWettedArea / 1e6, "m²"), quantity("shellVolume", "Nominal straight-shell material volume", shellVolume / 1e9, shellVolume / 1e6, "L")], warnings: ["This is straight cylindrical shell geometry only. It excludes heads, nozzles, discontinuities, membrane or local stress, pressure rating, corrosion allowance, external pressure, code compliance, safety, and approval."], errors: [], method: "Vi = π(Di/2)²L · Ai = πDiL · Vshell = π[(Di/2+t)² − (Di/2)²]L" };
-};
 
 const calculateThreadTensileArea = (input: Record<string, string>): CalculationState => {
   const majorDiameter = finite(input.majorDiameter, "Declared basic major diameter");
@@ -1549,29 +1497,7 @@ const calculateThreadTensileArea = (input: Record<string, string>): CalculationS
   return { values: [quantity("effectiveDiameter", "Empirical tensile-area diameter", effectiveDiameter, effectiveDiameter, "mm"), quantity("tensileArea", "External thread tensile stress area", tensileArea, tensileArea, "mm²")], warnings: ["This is an empirical external metric-thread tensile-area relation from user-entered basic major diameter and pitch. It does not select a thread standard, determine material strength, preload, fatigue, stripping, tightening torque, acceptance, safety, or approval."], errors: [], method: "At = 0.7854(D − 0.938194P)²" };
 };
 
-const calculateCouplingTorsion = (input: Record<string, string>): CalculationState => {
-  const torque = finite(input.torque, "Declared transmitted torque");
-  const torsionalStiffness = finite(input.torsionalStiffness, "Declared torsional stiffness");
-  const twistRad = torque / torsionalStiffness;
-  const twistDeg = twistRad * 180 / Math.PI;
-  const storedEnergy = torque ** 2 / (2 * torsionalStiffness);
-  return { values: [quantity("twistRad", "Declared elastic twist", twistRad, twistRad, "rad"), quantity("twistDeg", "Declared elastic twist", twistDeg, twistDeg, "deg"), quantity("storedEnergy", "Linear elastic stored energy", storedEnergy, storedEnergy, "J")], warnings: ["This is declared linear torsional stiffness arithmetic for a coupling. It excludes coupling selection, torque capacity, flexible-element geometry, fatigue, resonance, damping, misalignment, shaft/bearing loads, safety, and approval."], errors: [], method: "θ = T/kt · U = T²/(2kt)" };
-};
 
-const calculateStability = (input: Record<string, string>): CalculationState => {
-  const k = finite(input.endCondition, "Effective-length factor");
-  const length = finite(input.length, "Unsupported length");
-  const modulus = fromGigaPascal(finite(input.modulus, "Elastic modulus"));
-  const inertia = fromCentimetre4(finite(input.inertia, "Least second moment"));
-  const effectiveLength = k * length;
-  const criticalLoad = (Math.PI ** 2 * modulus * inertia) / effectiveLength ** 2;
-  return {
-    values: [quantity("effectiveLength", "Effective length", effectiveLength, effectiveLength * 1000, "mm"), quantity("criticalLoad", "Ideal elastic critical load", criticalLoad, criticalLoad / 1000, "kN")],
-    warnings: ["This is an ideal elastic stability estimate. It excludes imperfections, residual stress, eccentricity, inelastic behavior, connection restraint, and code-required resistance checks."],
-    errors: [],
-    method: "Pcr = π²EI / (KL)²",
-  };
-};
 
 const calculateSection = (input: Record<string, string>): CalculationState => {
   const shape = input.shape;
@@ -1616,99 +1542,14 @@ const calculateTriangle = (input: Record<string, string>): CalculationState => {
   };
 };
 
-const calculateCoordinate = (input: Record<string, string>): CalculationState => {
-  const x1 = finite(input.x1, "Point A x", false); const y1 = finite(input.y1, "Point A y", false); const z1 = finite(input.z1, "Point A z", false);
-  const x2 = finite(input.x2, "Point B x", false); const y2 = finite(input.y2, "Point B y", false); const z2 = finite(input.z2, "Point B z", false);
-  const dx = x2 - x1; const dy = y2 - y1; const dz = z2 - z1; const span = Math.hypot(dx, dy, dz);
-  return {
-    values: [quantity("dx", "x displacement", dx, dx, "mm"), quantity("dy", "y displacement", dy, dy, "mm"), quantity("dz", "z displacement", dz, dz, "mm"), quantity("span", "Straight-line span", span, span, "mm")],
-    warnings: ["Coordinates must share one origin, axis convention, and unit. The result is a straight-line geometric span, not a routed path or a tolerance analysis."],
-    errors: [],
-    method: "d = √[(x₂−x₁)² + (y₂−y₁)² + (z₂−z₁)²]",
-  };
-};
 
-const calculateCylinder = (input: Record<string, string>): CalculationState => {
-  const diameter = finite(input.diameter, "Diameter"); const length = finite(input.length, "Cylinder length"); const radius = diameter / 2;
-  const endArea = Math.PI * radius ** 2; const volume = endArea * length; const lateralArea = Math.PI * diameter * length;
-  return {
-    values: [quantity("volume", "Cylinder volume", volume, volume / 1e6, "L"), quantity("endArea", "End area", endArea, endArea, "mm²"), quantity("lateralArea", "Lateral surface", lateralArea, lateralArea, "mm²"), quantity("totalSurface", "Total outer surface", lateralArea + 2 * endArea, lateralArea + 2 * endArea, "mm²")],
-    warnings: ["This is nominal closed-cylinder geometry. Wall thickness, end shape, internal fittings, deformation, and manufacturing tolerances are outside the model."],
-    errors: [],
-    method: "V = π(D/2)²L · Aend = π(D/2)² · Alateral = πDL",
-  };
-};
 
-const calculateDensity = (input: Record<string, string>): CalculationState => {
-  const mass = finite(input.mass, "Mass"); const volumeLitres = finite(input.volume, "Volume"); const volume = volumeLitres * 1e-3; const density = mass / volume;
-  return {
-    values: [quantity("density", "Average density", density, density, "kg/m³"), quantity("specificVolume", "Specific volume", 1 / density, 1 / density, "m³/kg"), quantity("specificGravity", "Specific gravity vs. water", density / 1000, density / 1000, "—")],
-    warnings: ["Average density is derived only from the mass and volume entered here. It is not a condition-specific material-property lookup and should not be used as one."],
-    errors: [],
-    method: "ρ = m / V · v = 1 / ρ",
-  };
-};
 
-const calculateNewton = (input: Record<string, string>): CalculationState => {
-  const mass = finite(input.mass, "Mass"); const acceleration = finite(input.acceleration, "Acceleration", false); const force = mass * acceleration;
-  return {
-    values: [quantity("force", "Net force", force, force, "N"), quantity("forceKilo", "Net force", force, force / 1000, "kN"), quantity("accelerationG", "Acceleration magnitude", Math.abs(acceleration) / 9.80665, Math.abs(acceleration) / 9.80665, "g")],
-    warnings: ["This is a net-force relationship in a stated inertial-frame context. It does not resolve individual loads, friction, gravity components, constraints, or a free-body diagram."],
-    errors: [],
-    method: "Fnet = ma",
-  };
-};
 
-const calculateKinetic = (input: Record<string, string>): CalculationState => {
-  const mass = finite(input.mass, "Mass"); const speed = finite(input.speed, "Speed", false); const energy = 0.5 * mass * speed ** 2; const momentum = mass * speed;
-  return {
-    values: [quantity("energy", "Kinetic energy", energy, energy / 1000, "kJ"), quantity("energyJ", "Kinetic energy", energy, energy, "J"), quantity("momentum", "Momentum magnitude", momentum, momentum, "kg·m/s")],
-    warnings: ["This is the classical translational relationship. It excludes rotational energy, deformation, drag, gradients, and relativistic behavior."],
-    errors: [],
-    method: "KE = ½mv² · p = mv",
-  };
-};
 
-const calculateHydrostatic = (input: Record<string, string>): CalculationState => {
-  const density = finite(input.density, "Liquid density"); const depth = finite(input.depth, "Vertical depth"); const pressure = density * 9.80665 * depth;
-  return {
-    values: [quantity("pressure", "Gauge pressure", pressure, pressure / 1000, "kPa"), quantity("pressureBar", "Gauge pressure", pressure, pressure / 1e5, "bar"), quantity("head", "Pressure head", depth, depth, "m liquid")],
-    warnings: ["This is the static hydrostatic relation for a uniform-density liquid. It excludes flow, gas compression, temperature-dependent density, vessel loads, and any pressure-rating or design decision."],
-    errors: [],
-    method: "pg = ρgh",
-  };
-};
 
-const calculateContinuity = (input: Record<string, string>): CalculationState => {
-  const area1 = finite(input.area1, "First flow area") * 1e-6; const velocity1 = finite(input.velocity1, "First mean velocity"); const area2 = finite(input.area2, "Second flow area") * 1e-6;
-  const flow = area1 * velocity1; const velocity2 = flow / area2;
-  return {
-    values: [quantity("flow", "Volumetric flow rate", flow, flow * 1000, "L/s"), quantity("velocity2", "Second mean velocity", velocity2, velocity2, "m/s"), quantity("areaRatio", "Area ratio A₁/A₂", area1 / area2, area1 / area2, "—")],
-    warnings: ["This is continuity for steady incompressible flow using mean section velocities. It does not calculate pressure change, loss, turbulence, cavitation, pipe sizing, or pump performance."],
-    errors: [],
-    method: "Q = A₁v₁ = A₂v₂",
-  };
-};
 
-const calculateSensibleHeat = (input: Record<string, string>): CalculationState => {
-  const mass = finite(input.mass, "Mass"); const specificHeat = finite(input.specificHeat, "Specific heat"); const deltaT = finite(input.deltaT, "Temperature change", false); const heat = mass * specificHeat * deltaT;
-  return {
-    values: [quantity("heat", "Heat transfer", heat * 1000, heat, "kJ"), quantity("heatJ", "Heat transfer", heat * 1000, heat * 1000, "J"), quantity("specificEnergy", "Energy per unit mass", specificHeat * deltaT, specificHeat * deltaT, "kJ/kg")],
-    warnings: ["The specific heat is user-entered. This approximation requires no phase change and excludes heat loss, temperature-dependent properties, mixing, reaction, and work by/on the system."],
-    errors: [],
-    method: "Q = mcΔT",
-  };
-};
 
-const calculateOhm = (input: Record<string, string>): CalculationState => {
-  const voltage = finite(input.voltage, "Applied voltage", false); const resistance = finite(input.resistance, "Resistance"); const current = voltage / resistance; const power = voltage * current;
-  return {
-    values: [quantity("current", "Circuit current", current, current, "A"), quantity("power", "Resistor power", power, power, "W"), quantity("powerMilli", "Resistor power", power, power * 1000, "mW")],
-    warnings: ["This is one ideal DC resistor with constant resistance. It does not size wire, protection, a power source, thermal management, or any electrical installation, and it excludes AC, transients, and nonlinear components."],
-    errors: [],
-    method: "V = IR · P = VI = V²/R",
-  };
-};
 
 const calculateFits = (input: Record<string, string>): CalculationState => {
   const holeMin = finite(input.holeMin, "Hole minimum", false); const holeMax = finite(input.holeMax, "Hole maximum", false); const shaftMin = finite(input.shaftMin, "Shaft minimum", false); const shaftMax = finite(input.shaftMax, "Shaft maximum", false);
@@ -1763,16 +1604,6 @@ const calculateTaylorToolLife = (input: Record<string, string>): CalculationStat
   throw new Error("Solve mode must be tool life from speed or cutting speed from tool life.");
 };
 
-const calculateCuttingForce = (input: Record<string, string>): CalculationState => {
-  const specificForce = finite(input.specificForce, "Declared specific cutting force");
-  const depth = finite(input.depth, "Depth of cut");
-  const feed = finite(input.feed, "Feed per revolution");
-  const cuttingSpeed = finite(input.cuttingSpeed, "Declared cutting speed");
-  const uncutChipArea = depth * feed;
-  const cuttingForce = specificForce * uncutChipArea;
-  const idealPower = cuttingForce * cuttingSpeed / 60_000;
-  return { values: [quantity("uncutChipArea", "Declared uncut-chip area", uncutChipArea, uncutChipArea, "mm²"), quantity("cuttingForce", "Tangential cutting force", cuttingForce, cuttingForce, "N"), quantity("idealPower", "Ideal cutting power", idealPower, idealPower, "kW"), quantity("forcePerDepth", "Force per declared depth", cuttingForce / depth, cuttingForce / depth, "N/mm")], warnings: ["This uses user-entered specific cutting force and a simplified rectangular uncut-chip area. It does not select a process, tool, material, coefficient, speed, feed, coolant, machine, or efficiency; model chip thinning, engagement, dynamics, chatter, wear, temperature, workholding, or safety; or approve machining."], errors: [], method: "Ac = ap·f · Fc = kc·Ac · Pideal = Fc·Vc/60,000" };
-};
 
 const calculateWeldGroup = (input: Record<string, string>): CalculationState => {
   const lineLength = finite(input.lineLength, "Length of each line weld");
@@ -1789,10 +1620,6 @@ const calculateWeldGroup = (input: Record<string, string>): CalculationState => 
   return { values: [quantity("totalLineLength", "Total effective line length", totalLineLength, totalLineLength, "mm"), quantity("unitPolarMoment", "Unit-throat polar line property", unitPolarMoment, unitPolarMoment, "mm³"), quantity("endpointRadius", "Farthest endpoint radius", endpointRadius, endpointRadius, "mm"), quantity("directLineLoad", "Direct shear line load", directLineLoad, directLineLoad, "N/mm"), quantity("torsionalEndpointLineLoad", "Endpoint torsional line load", torsionalEndpointLineLoad, torsionalEndpointLineLoad, "N/mm"), quantity("quadratureLineLoad", "Quadrature line-load magnitude", quadratureLineLoad, quadratureLineLoad, "N/mm")], warnings: ["This is a two-equal-parallel-line, unit-throat preliminary weld-group model. The displayed quadrature magnitude is not a maximum vector resultant or code check. It does not model arbitrary weld geometry, throat/leg sizing, directional loading, vector addition at endpoints, eccentric force geometry, bending, fatigue, residual stress, distortion, heat input, weld procedure/quality, code provisions, capacity, safety, or approval."], errors: [], method: "Ltotal = 2L · Ju = Lb²/2 + L³/6 · qdirect = F/Ltotal · qtorsion,end = M·rmax/Ju" };
 };
 
-const calculatePosition = (input: Record<string, string>): CalculationState => {
-  const x = finite(input.x, "Measured X offset", false); const y = finite(input.y, "Measured Y offset", false); const tolerance = finite(input.tolerance, "Stated position tolerance"); const radialOffset = Math.hypot(x, y); const diametricalDeviation = 2 * radialOffset; const remaining = tolerance - diametricalDeviation;
-  return { values: [quantity("diametricalDeviation", "Diametrical position deviation", diametricalDeviation, diametricalDeviation, "mm"), quantity("radialOffset", "Radial center offset", radialOffset, radialOffset, "mm"), quantity("remainingMargin", "Remaining tolerance margin", remaining, remaining, "mm")], warnings: [remaining >= 0 ? "The calculated two-dimensional deviation is within the entered tolerance. Confirm datum establishment, feature size, orientation, depth, and inspection method separately." : "The calculated two-dimensional deviation exceeds the entered tolerance. Check measurement, datum frame, tolerance callout, and feature condition before drawing a conclusion."], errors: [], method: "⌀ deviation = 2√(Δx² + Δy²)" };
-};
 
 const calculateMmc = (input: Record<string, string>): CalculationState => {
   const mmcSize = finite(input.mmcSize, "MMC size"); const actualSize = finite(input.actualSize, "Actual feature size"); const tolerance = finite(input.positionTolerance, "Position tolerance at MMC"); const isHole = input.featureType === "hole"; const bonus = isHole ? actualSize - mmcSize : mmcSize - actualSize;
@@ -1808,10 +1635,6 @@ const calculateMotionProfile = (input: Record<string, string>): CalculationState
   return { values: [quantity("acceleration", "Profile acceleration", acceleration, acceleration, "m/s²"), quantity("peakSpeed", "Peak speed", peakSpeed, peakSpeed, "m/s"), quantity("totalTime", "Total move time", totalTime, totalTime, "s"), quantity("distance", "Move distance", distance, distance * 1000, "mm")], warnings: ["This is an ideal symmetric trapezoidal/triangular profile. It excludes jerk limits, structural compliance, load inertia, friction, servo tuning, actuator force limits, and safety margins."], errors: [], method: "a = s / [ta(ta + tc)] · vmax = a·ta · T = 2ta + tc" };
 };
 
-const calculateReflectedInertia = (input: Record<string, string>): CalculationState => {
-  const load = finite(input.loadInertia, "Load inertia"); const ratio = finite(input.gearRatio, "Reduction ratio"); const motor = finite(input.motorInertia, "Motor inertia"); const reflected = load / ratio ** 2; const total = reflected + motor;
-  return { values: [quantity("reflected", "Reflected load inertia", reflected, reflected, "kg·m²"), quantity("inertiaRatio", "Reflected-to-motor inertia ratio", reflected / motor, reflected / motor, "—"), quantity("total", "Motor-side total inertia", total, total, "kg·m²")], warnings: ["This reflects one rigid load through one ideal ratio. It excludes gearbox inertia, efficiency, backlash, compliance, duty cycle, peak torque, motor control behavior, and any motor-selection decision."], errors: [], method: "Jref = JL / N² · Jtotal = JM + Jref" };
-};
 
 const calculatePneumatic = (input: Record<string, string>): CalculationState => {
   const bore = finite(input.bore, "Cylinder bore") / 1000; const rod = finite(input.rod, "Rod diameter") / 1000; const pressure = finite(input.pressure, "Operating pressure") * 1e5; const efficiency = finite(input.efficiency, "Applied force factor") / 100;
@@ -1829,11 +1652,6 @@ const calculateClampForce = (input: Record<string, string>): CalculationState =>
   return { values: [quantity("transferred", "Transferred clamp force", transferred, transferred / 1000, "kN"), quantity("pivot", "Ideal pivot-side component", pivot, pivot / 1000, "kN"), quantity("transferRatio", "Force transfer ratio", transferred / force, transferred / force, "—")], warnings: ["This is one planar transfer-angle relationship. It excludes linkage stiffness, bearing/friction variation, dynamics, buckling, contact geometry, retaining force under vibration, and machine-safety assessment."], errors: [], method: "Ftransfer = F·sin(θ)·η · Fpivot = F·|cos(θ)|" };
 };
 
-const calculateTorsion = (input: Record<string, string>): CalculationState => {
-  const torque = finite(input.torque, "Applied torque") ; const diameter = finite(input.diameter, "Shaft diameter") / 1000; const length = finite(input.length, "Shaft length") / 1000; const shearModulus = finite(input.shearModulus, "Shear modulus") * 1e9; const rpm = finite(input.rpm, "Rotational speed", false);
-  const polarMoment = Math.PI * diameter ** 4 / 32; const radius = diameter / 2; const shearStress = torque * radius / polarMoment; const twist = torque * length / (shearModulus * polarMoment); const power = torque * (2 * Math.PI * rpm / 60);
-  return { values: [quantity("shearStress", "Maximum torsional shear stress", shearStress, shearStress / 1e6, "MPa"), quantity("twistDeg", "Elastic angle of twist", twist, twist * 180 / Math.PI, "°"), quantity("power", "Transmitted mechanical power", power, power / 1000, "kW"), quantity("polarMoment", "Polar second moment", polarMoment, polarMoment * 1e12, "mm⁴")], warnings: ["This is a uniform solid circular elastic shaft under steady torque. It excludes stress concentration, combined bending, fatigue, keyways, bearings, critical speed, torsional vibration, material strength limits, and code or safety-factor decisions."], errors: [], method: "J = πD⁴/32 · τmax = Tc/J · φ = TL/GJ · P = Tω" };
-};
 
 const calculateBearingLife = (input: Record<string, string>): CalculationState => {
   const dynamicRating = finite(input.dynamicRating, "Dynamic rating"); const equivalentLoad = finite(input.equivalentLoad, "Equivalent load"); const rpm = finite(input.rpm, "Rotational speed"); const exponent = input.bearingType === "roller" ? 10 / 3 : 3; const millionRevolutions = (dynamicRating / equivalentLoad) ** exponent; const hours = millionRevolutions * 1e6 / (rpm * 60);
@@ -1847,10 +1665,6 @@ const calculateBoltPreload = (input: Record<string, string>): CalculationState =
   return { values: [quantity("preload", "Nominal preload", preload, preload / 1000, "kN"), quantity("lower", "Estimated lower preload", lower, lower / 1000, "kN"), quantity("upper", "Estimated upper preload", upper, upper / 1000, "kN")], warnings: ["Torque is an indirect and friction-sensitive way to create preload. This screen does not determine allowable preload, bolt proof/yield, thread strength, joint stiffness, separation, fatigue, thermal effects, relaxation, lubrication procedure, or a safe tightening specification."], errors: [], method: "P = T / (K·D) · uncertainty band = P(1 ± u)" };
 };
 
-const calculateMillingMrr = (input: Record<string, string>): CalculationState => {
-  const axialDepth = finite(input.axialDepth, "Axial depth"); const radialWidth = finite(input.radialWidth, "Radial engagement"); const tableFeed = finite(input.tableFeed, "Table feed"); const rate = axialDepth * radialWidth * tableFeed / 1000;
-  return { values: [quantity("rate", "Theoretical material removal rate", rate, rate, "cm³/min"), quantity("hourly", "Theoretical hourly removed volume", rate, rate * 60, "cm³/h"), quantity("chipArea", "Engaged chip cross-section", axialDepth * radialWidth, axialDepth * radialWidth, "mm²")], warnings: ["This is theoretical rectangular-engagement volume. It does not choose feeds or speeds and excludes material machinability, spindle power/torque, tool geometry, chip thinning, tool life, runout, workholding, vibration, coolant, machine limits, and process qualification."], errors: [], method: "MRR = ap·ae·Vf / 1,000" };
-};
 
 const calculateLmtd = (input: Record<string, string>): CalculationState => {
   const hotIn = finite(input.hotIn, "Hot-side inlet", false); const hotOut = finite(input.hotOut, "Hot-side outlet", false); const coldIn = finite(input.coldIn, "Cold-side inlet", false); const coldOut = finite(input.coldOut, "Cold-side outlet", false); const overallCoefficient = finite(input.overallCoefficient, "Declared overall coefficient"); const area = finite(input.area, "Declared transfer area"); const counter = input.arrangement === "counter";
@@ -1862,63 +1676,11 @@ const calculateLmtd = (input: Record<string, string>): CalculationState => {
   return { values: [quantity("lmtd", "Log mean temperature difference", lmtd, lmtd, "K or °C"), quantity("duty", "Declared-UA heat-transfer rate", duty, duty / 1000, "kW"), quantity("areaPerKilowatt", "Required area per 1 kW at declared U", requiredAreaPerKilowatt, requiredAreaPerKilowatt, "m²/kW"), quantity("delta1", "First terminal difference", delta1, delta1, "K or °C"), quantity("delta2", "Second terminal difference", delta2, delta2, "K or °C")], warnings: ["This evaluates only ideal parallel or counterflow LMTD and user-entered UA arithmetic. It excludes correction factors, phase change, heat capacity rates, fouling, heat-transfer-coefficient derivation, pressure drop, transient behavior, materials, exchanger design/selection/rating, safety, and approval."], errors: [], method: counter ? "ΔTlm = (ΔT1 − ΔT2) / ln(ΔT1/ΔT2) · Q = UAΔTlm, counterflow" : "ΔTlm = (ΔT1 − ΔT2) / ln(ΔT1/ΔT2) · Q = UAΔTlm, parallel flow" };
 };
 
-const calculateDarcy = (input: Record<string, string>): CalculationState => {
-  const factor = finite(input.frictionFactor, "Darcy friction factor"); const length = finite(input.length, "Pipe length"); const diameter = finite(input.diameter, "Hydraulic diameter") / 1000; const density = finite(input.density, "Fluid density"); const velocity = finite(input.velocity, "Mean velocity"); const pressureLoss = factor * (length / diameter) * (density * velocity ** 2 / 2); const headLoss = pressureLoss / (density * 9.80665);
-  return { values: [quantity("pressureLoss", "Major friction pressure loss", pressureLoss, pressureLoss / 1000, "kPa"), quantity("headLoss", "Head loss in flowing fluid", headLoss, headLoss, "m"), quantity("dynamicPressure", "Dynamic pressure", density * velocity ** 2 / 2, density * velocity ** 2 / 2, "Pa")], warnings: ["This is Darcy–Weisbach major loss with a user-entered Darcy factor. It excludes fittings and minor losses, elevation, pumps, compressibility, entrance/development effects, non-Newtonian behavior, transient flow, pressure rating, and any pipe-size decision."], errors: [], method: "Δp = f(L/D)(ρv²/2) · hL = Δp/(ρg)" };
-};
 
-const calculateThermalExpansion = (input: Record<string, string>): CalculationState => {
-  const length = finite(input.length, "Initial length");
-  const cte = finite(input.cte, "Linear expansion coefficient") * 1e-6;
-  const deltaT = finite(input.deltaT, "Temperature change", false);
-  const strain = cte * deltaT;
-  const extension = strain * length;
-  return { values: [quantity("extension", "Ideal free length change", extension, extension, "mm"), quantity("finalLength", "Ideal final length", length + extension, length + extension, "mm"), quantity("thermalStrain", "Free thermal strain", strain, strain * 1e6, "µε")], warnings: ["This is ideal free linear expansion using a user-entered average CTE. It excludes restraint, temperature gradients, anisotropy, phase change, joints, nonlinear material response, property variation, and thermal-stress or design decisions."], errors: [], method: "ΔL = αL₀ΔT · εth = αΔT" };
-};
 
-const calculateThermalStress = (input: Record<string, string>): CalculationState => {
-  const modulus = fromGigaPascal(finite(input.modulus, "Elastic modulus"));
-  const cte = finite(input.cte, "Linear expansion coefficient") * 1e-6;
-  const deltaT = finite(input.deltaT, "Temperature change", false);
-  const strain = cte * deltaT;
-  const stress = modulus * strain;
-  return { values: [quantity("thermalStress", "Ideal restrained thermal stress", stress, stress / 1e6, "MPa"), quantity("freeStrain", "Suppressed free thermal strain", strain, strain * 1e6, "µε"), quantity("stressMagnitude", "Stress magnitude", Math.abs(stress), Math.abs(stress) / 1e6, "MPa")], warnings: ["This represents a uniform, fully restrained, linear-elastic axial member. It is not an allowable-stress, strength, fatigue, support-stiffness, thermal-gradient, creep, joint, or code-compliance calculation."], errors: [], method: "σth = EαΔT" };
-};
 
-const calculatePlaneConduction = (input: Record<string, string>): CalculationState => {
-  const conductivity = finite(input.conductivity, "Thermal conductivity");
-  const area = finite(input.area, "Heat-flow area");
-  const thickness = finite(input.thickness, "Wall thickness") / 1000;
-  const hot = finite(input.hotTemperature, "Hot-side surface", false);
-  const cold = finite(input.coldTemperature, "Cold-side surface", false);
-  const deltaT = hot - cold;
-  const resistance = thickness / (conductivity * area);
-  const rate = deltaT / resistance;
-  return { values: [quantity("heatRate", "Conductive heat rate hot → cold", rate, rate, "W"), quantity("resistance", "Plane-wall thermal resistance", resistance, resistance, "K/W"), quantity("heatFlux", "Heat flux hot → cold", rate / area, rate / area, "W/m²")], warnings: ["This is steady, one-dimensional plane-wall conduction using one user-entered conductivity. It excludes contact resistance, convection, radiation, thermal bridges, multilayer interfaces, temperature-dependent properties, phase change, transient response, and insulation selection."], errors: [], method: "Q̇ = kA(Th − Tc)/L · Rth = L/(kA)" };
-};
 
-const calculateBernoulli = (input: Record<string, string>): CalculationState => {
-  const density = finite(input.density, "Fluid density");
-  const velocity1 = finite(input.velocity1, "Station 1 velocity");
-  const elevation1 = finite(input.elevation1, "Station 1 elevation", false);
-  const velocity2 = finite(input.velocity2, "Station 2 velocity");
-  const elevation2 = finite(input.elevation2, "Station 2 elevation", false);
-  const pressureChange = density * ((velocity1 ** 2 - velocity2 ** 2) / 2 + 9.80665 * (elevation1 - elevation2));
-  const headChange = pressureChange / (density * 9.80665);
-  return { values: [quantity("pressureChange", "Ideal pressure change p₂ − p₁", pressureChange, pressureChange / 1000, "kPa"), quantity("headChange", "Pressure-head change", headChange, headChange, "m liquid"), quantity("velocityHeadChange", "Velocity-head change", (velocity1 ** 2 - velocity2 ** 2) / (2 * 9.80665), (velocity1 ** 2 - velocity2 ** 2) / (2 * 9.80665), "m")], warnings: ["This is Bernoulli’s ideal steady, incompressible, frictionless streamline relationship with no pump, turbine, or loss term. It excludes real pipe loss, fittings, separation, compressibility, cavitation, transient flow, and pressure-rating or equipment-selection decisions."], errors: [], method: "p₁ + ½ρv₁² + ρgz₁ = p₂ + ½ρv₂² + ρgz₂" };
-};
 
-const calculateCombinedStress = (input: Record<string, string>): CalculationState => {
-  const axial = finite(input.axialStress, "Axial normal stress", false);
-  const bending = finite(input.bendingStress, "Bending normal stress", false);
-  const shear = finite(input.shearStress, "In-plane shear stress", false);
-  const normal = axial + bending;
-  const radius = Math.hypot(normal / 2, shear);
-  const principal1 = normal / 2 + radius;
-  const principal2 = normal / 2 - radius;
-  const vonMises = Math.sqrt(normal ** 2 + 3 * shear ** 2);
-  return { values: [quantity("normalStress", "Combined normal stress σx", normal, normal, "MPa"), quantity("principal1", "First principal stress σ₁", principal1, principal1, "MPa"), quantity("principal2", "Second principal stress σ₂", principal2, principal2, "MPa"), quantity("maxShear", "Maximum in-plane shear", radius, radius, "MPa"), quantity("vonMises", "Plane-stress von Mises equivalent", vonMises, vonMises, "MPa")], warnings: ["This screen adds user-entered axial and bending normal stresses and combines them with one in-plane shear stress under plane stress. It excludes local stress concentration, multiaxial/through-thickness stress, material allowables, fatigue, buckling, contact, and safety-factor decisions."], errors: [], method: "σx = σa + σb · σ₁,₂ = σx/2 ± √[(σx/2)² + τxy²] · σvm = √(σx² + 3τxy²)" };
-};
 
 const calculateThinVessel = (input: Record<string, string>): CalculationState => {
   const pressure = finite(input.pressure, "Internal gauge pressure") * 1e6;
@@ -1972,26 +1734,7 @@ const calculateGearRatio = (input: Record<string, string>): CalculationState => 
   return { values: [quantity("ratio", "Speed reduction ratio", ratio, ratio, ":1"), quantity("outputRpm", "Ideal output speed", outputRpm, outputRpm, "rpm"), quantity("outputTorque", "Efficiency-adjusted output torque", outputTorque, outputTorque, "N·m"), quantity("inputPower", "Input mechanical power", inputPower, inputPower / 1000, "kW")], warnings: ["This screen covers one ideal external gear pair with a user-entered efficiency. It excludes tooth geometry, mesh force, strength, backlash, lubrication, shaft/bearing load, thermal behavior, vibration, noise, duty cycle, and gearbox or component selection."], errors: [], method: "i = z₂/z₁ · n₂ = n₁/i · T₂ = T₁iη" };
 };
 
-const calculateBoltLoad = (input: Record<string, string>): CalculationState => {
-  const diameter = finite(input.diameter, "Bolt shank diameter") / 1000;
-  const tension = finite(input.tension, "Known tensile load", false) * 1000;
-  const shear = finite(input.shear, "Known shear load", false) * 1000;
-  const bearingLoad = finite(input.bearingLoad, "Known bearing load", false) * 1000;
-  const plateThickness = finite(input.plateThickness, "Bearing thickness") / 1000;
-  const shankArea = Math.PI * diameter ** 2 / 4;
-  const tensileStress = tension / shankArea;
-  const shearStress = shear / shankArea;
-  const bearingStress = bearingLoad / (diameter * plateThickness);
-  const equivalent = Math.sqrt(tensileStress ** 2 + 3 * shearStress ** 2);
-  return { values: [quantity("tensileStress", "Nominal shank tensile stress", tensileStress, tensileStress / 1e6, "MPa"), quantity("shearStress", "Nominal shank shear stress", shearStress, shearStress / 1e6, "MPa"), quantity("bearingStress", "Projected bearing stress", bearingStress, bearingStress / 1e6, "MPa"), quantity("equivalentStress", "Plane-stress equivalent", equivalent, equivalent / 1e6, "MPa")], warnings: ["This is a single-bolt, known-direct-load screen using nominal shank and projected bearing areas. It excludes threads/tensile-stress area, preload, joint stiffness, load distribution, eccentricity, friction, slip, prying, washer geometry, proof/yield allowables, fatigue, tear-out, thread stripping, and factor-of-safety conclusions."], errors: [], method: "σ = Ft/(πd²/4) · τ = Fs/(πd²/4) · σbearing = Fb/(dt)" };
-};
 
-const calculateSafetyMargin = (input: Record<string, string>): CalculationState => {
-  const applied = finite(input.applied, "Applied stress magnitude");
-  const allowable = finite(input.allowable, "Allowable stress");
-  const factor = allowable / applied;
-  return { values: [quantity("factor", "Allowable-to-applied factor", factor, factor, "—"), quantity("margin", "Margin of safety", factor - 1, factor - 1, "—"), quantity("utilization", "Utilization", applied / allowable, applied / allowable * 100, "%")], warnings: ["This is arithmetic on two user-entered like-for-like stress magnitudes. It does not establish an allowable, determine a governing load case, apply a design code, account for uncertainty or fatigue, or determine whether the resulting margin is acceptable."], errors: [], method: "Factor = σallow/σapp · margin = factor − 1 · utilization = σapp/σallow" };
-};
 
 const calculateCircularArc = (input: Record<string, string>): CalculationState => {
   const radius = finite(input.radius, "Radius");
@@ -2025,19 +1768,13 @@ const calculateDrillingTime = (input: Record<string, string>): CalculationState 
   const feedPerRev = finite(input.feedPerRev, "Feed per revolution");
   const depth = finite(input.depth, "Cutting depth per hole");
   const holes = finite(input.holes, "Hole count");
+  if (!Number.isInteger(holes)) throw new Error("Hole count must be a whole number.");
   const cuttingSpeed = Math.PI * diameter * rpm / 1000;
   const feedRate = feedPerRev * rpm;
   const timeMinutes = depth * holes / feedRate;
   return { values: [quantity("cuttingSpeed", "Peripheral cutting speed", cuttingSpeed, cuttingSpeed, "m/min"), quantity("feedRate", "Spindle feed rate", feedRate, feedRate, "mm/min"), quantity("timeMinutes", "Nominal cutting time", timeMinutes, timeMinutes * 60, "s"), quantity("distance", "Total programmed cutting depth", depth * holes, depth * holes, "mm")], warnings: ["This is reference machining arithmetic for constant-speed, constant-feed drilling. It excludes approach, breakthrough, retract, peck cycles, tool wear, material and coolant effects, machine acceleration, fixturing, chip evacuation, spindle limits, power, quality, and process qualification."], errors: [], method: "vc = πDcn/1000 · vf = frn · Tc = ld·i/(frn)" };
 };
 
-const calculateTurningMrr = (input: Record<string, string>): CalculationState => {
-  const depth = finite(input.depth, "Radial depth of cut");
-  const feed = finite(input.feed, "Feed per revolution");
-  const cuttingSpeed = finite(input.cuttingSpeed, "Cutting speed");
-  const rate = depth * feed * cuttingSpeed;
-  return { values: [quantity("rate", "Theoretical turning removal rate", rate, rate, "cm³/min"), quantity("hourly", "Theoretical hourly removed volume", rate * 60, rate * 60, "cm³/h"), quantity("chipSection", "Nominal chip cross-section", depth * feed, depth * feed, "mm²")], warnings: ["This is theoretical steady turning removal rate from user-entered depth, feed, and cutting speed. It excludes parameter selection, diameter variation, approach/retract, interruptions, insert geometry, tool wear, coolant, power, rigidity, chip control, machine limits, tolerance, surface integrity, and process qualification."], errors: [], method: "MRR = ap·f·Vc" };
-};
 
 const calculateProcessCapability = (input: Record<string, string>): CalculationState => {
   const lsl = finite(input.lsl, "Lower specification limit", false);
@@ -2052,14 +1789,6 @@ const calculateProcessCapability = (input: Record<string, string>): CalculationS
   return { values: [quantity("cp", "Potential capability Cp", cp, cp, "—"), quantity("cpk", "Centered capability Cpk", cpk, cpk, "—"), quantity("cpu", "Upper capability Cpu", cpu, cpu, "—"), quantity("cpl", "Lower capability Cpl", cpl, cpl, "—")], warnings: ["Cp and Cpk compare user-entered specifications with user-entered process statistics. This screen does not establish statistical control, distribution suitability, rational subgrouping, measurement-system adequacy, sampling validity, customer requirements, capability thresholds, or production acceptance."], errors: [], method: "Cp = (USL−LSL)/(6s) · Cpk = min[(USL−x̄)/(3s), (x̄−LSL)/(3s)]" };
 };
 
-const calculateExtensionSpring = (input: Record<string, string>): CalculationState => {
-  const initialTension = finite(input.initialTension, "Initial tension", false);
-  const rate = finite(input.rate, "Spring rate");
-  const extension = finite(input.extension, "Extension", false);
-  const elasticForce = rate * extension;
-  const force = initialTension + elasticForce;
-  return { values: [quantity("force", "Total extension-spring force", force, force, "N"), quantity("elasticForce", "Rate contribution", elasticForce, elasticForce, "N"), quantity("rate", "Declared spring rate", rate, rate, "N/mm")], warnings: ["This applies F = Fi + kx using user-entered rate and initial tension. It excludes hook geometry, pretension manufacture, coil contact, nonlinear travel, travel stops, fatigue, corrosion, material condition, dynamic response, and manufacturer load or life limits."], errors: [], method: "F = Fi + kx" };
-};
 
 const calculateTorsionSpring = (input: Record<string, string>): CalculationState => {
   const wire = finite(input.wire, "Wire diameter");
@@ -2363,24 +2092,6 @@ const calculateDriveRatio = (input: Record<string, string>): CalculationState =>
   return { values: [quantity("ratio", "Driven / driver ratio", ratio, ratio, "—"), quantity("outputSpeed", "Ideal output speed", outputSpeed, outputSpeed, "rpm"), quantity("outputTorque", "Output torque with stated efficiency", outputTorque, outputTorque, "N·m"), quantity("pitchLineSpeed", "Driver pitch-line speed", pitchLineSpeed, pitchLineSpeed, "m/s"), quantity("tangentialForce", "Driver tangential force", tangentialForce, tangentialForce, "N"), quantity("radialForce", "Elementary radial force component", radialForce, radialForce, "N"), quantity("axialForce", "Elementary axial force component", axialForce, axialForce, "N")], warnings: ["This is an ideal user-declared drive-ratio screen. It uses a simple pitch-circle tangential-force relation and an elementary pressure/helix-angle force decomposition; axial force is reported only for the declared helical option. It excludes component selection, planetary topology, gear tooth strength, mesh stiffness, backlash, lubrication, heat, durability, manufacturing quality, belt/chain tension, vibration, dynamic load factors, bearing reactions, and system validation."], errors: [], method: "i = N2/N1 · n2 = n1/i · T2 = T1·i·η · v = πd1n1/60 · Ft = 2T1/d1" };
 };
 
-const calculateMotionDuty = (input: Record<string, string>): CalculationState => {
-  const reflectedInertia = finite(input.reflectedInertia, "Total reflected inertia");
-  const startSpeed = finite(input.startSpeed, "Start speed", false);
-  const endSpeed = finite(input.endSpeed, "End speed", false);
-  const accelTime = finite(input.accelTime, "Speed-change time");
-  const constantTorque = finite(input.constantTorque, "Declared running torque", false);
-  const runningTime = finite(input.runningTime, "Running segment time", false);
-  const declaredDecelTorque = finite(input.declaredDecelTorque, "Declared deceleration torque", false);
-  const decelTime = finite(input.decelTime, "Deceleration segment time", false);
-  const omegaStart = startSpeed * 2 * Math.PI / 60;
-  const omegaEnd = endSpeed * 2 * Math.PI / 60;
-  const angularAcceleration = (omegaEnd - omegaStart) / accelTime;
-  const inertiaTorque = reflectedInertia * angularAcceleration;
-  const totalCycleTime = accelTime + runningTime + decelTime;
-  const rmsTorque = Math.sqrt((inertiaTorque ** 2 * accelTime + constantTorque ** 2 * runningTime + declaredDecelTorque ** 2 * decelTime) / totalCycleTime);
-  const recoverableKineticEnergyUpperBound = Math.max(0, 0.5 * reflectedInertia * (omegaStart ** 2 - omegaEnd ** 2));
-  return { values: [quantity("angularAcceleration", "Angular acceleration", angularAcceleration, angularAcceleration, "rad/s²"), quantity("inertiaTorque", "Inertia acceleration torque", inertiaTorque, inertiaTorque, "N·m"), quantity("totalCycleTime", "Declared total cycle time", totalCycleTime, totalCycleTime, "s"), quantity("rmsTorque", "Declared-duty RMS torque", rmsTorque, rmsTorque, "N·m"), quantity("recoverableKineticEnergyUpperBound", "Kinetic energy released if decelerating", recoverableKineticEnergyUpperBound, recoverableKineticEnergyUpperBound, "J")], warnings: ["This is declared-duty arithmetic: inertia acceleration torque from user-entered reflected inertia and speed change; RMS torque from three user-entered constant-torque segments; and a kinetic-energy upper bound only when the stated interval decelerates. It does not infer friction, gravity, cutting/process load, reflected inertia, motor capability, drive current, thermal limits, braking hardware, bus capacity, power regeneration, safety category, or motion-profile suitability."], errors: [], method: "α = (ω1−ω0)/tacc · Tacc = Jα · Trms = √(ΣTᵢ²tᵢ/Σtᵢ) · Ereleased = ½J(ω0²−ω1²)" };
-};
 
 const calculateFilletWeld = (input: Record<string, string>): CalculationState => {
   const legSize = finite(input.legSize, "Equal fillet leg size");
@@ -2470,11 +2181,6 @@ const calculateDrillPointDepth = (input: Record<string, string>): CalculationSta
   return { values: [quantity("pointDepth", "Geometric drill-point depth", pointDepth, pointDepth, "mm"), quantity("programmedDepth", "Programmed depth for declared full diameter", fullDepth + pointDepth, fullDepth + pointDepth, "mm")], warnings: ["Ideal conical-point geometry only; drilling variation, wear, runout, breakthrough allowance, workholding, machine motion, cutting parameters, safety, and manufacturing approval are excluded."], errors: [], method: "hpoint = (D/2)/tan(θ/2) · hprogram = hfull + hpoint" };
 };
 
-const calculateToolDeflection = (input: Record<string, string>): CalculationState => {
-  const force = finite(input.lateralForce, "Declared lateral force"), overhang = finite(input.overhang, "Free overhang") / 1000, diameter = finite(input.coreDiameter, "Declared core diameter") / 1000, modulus = finite(input.modulus, "Declared elastic modulus") * 1e9;
-  const inertia = Math.PI * diameter ** 4 / 64, deflection = force * overhang ** 3 / (3 * modulus * inertia), stress = 32 * force * overhang / (Math.PI * diameter ** 3) / 1e6;
-  return { values: [quantity("inertia", "Circular core second moment", inertia, inertia, "m⁴"), quantity("deflection", "Ideal tip deflection", deflection * 1000, deflection * 1000, "mm"), quantity("stress", "Outer-fiber bending stress", stress, stress, "MPa")], warnings: ["Elementary circular constant-section cantilever only; flutes, taper, holder/spindle/fixture compliance, contact distribution, runout, dynamics, chatter, fatigue, tool selection, safety, and production approval are excluded."], errors: [], method: "I = πd⁴/64 · δ = FL³/(3EI) · σ = 32FL/(πd³)" };
-};
 
 const calculateFatigueConcentration = (input: Record<string, string>): CalculationState => {
   const kt = finite(input.kt, "Declared theoretical stress concentration"), q = finite(input.notchSensitivity, "Declared notch sensitivity", false), nominal = finite(input.nominalStress, "Declared nominal stress", false);
@@ -2490,11 +2196,6 @@ const calculateGoodmanFatigue = (input: Record<string, string>): CalculationStat
   return { values: [quantity("adjustedAlternating", "Kf-adjusted alternating stress", adjustedAlt, adjustedAlt, "MPa"), quantity("adjustedMean", "Kf-adjusted mean stress", adjustedMean, adjustedMean, "MPa"), quantity("utilization", "Linear Goodman utilization", utilization, utilization, "—")], warnings: ["This high-cycle linear Goodman screen does not establish a pass/fail criterion or model endurance modifiers, yield, low-cycle fatigue, multiaxial loading, reliability, life, or design approval."], errors: [], method: "σa = Kfσa,nom · σm = Kfσm,nom · U = σa/Sn + σm/Su" };
 };
 
-const calculateMinerDamage = (input: Record<string, string>): CalculationState => {
-  const n1 = finite(input.cycles1, "Bin 1 applied cycles", false), N1 = finite(input.life1, "Bin 1 stated cycles to failure"), n2 = finite(input.cycles2, "Bin 2 applied cycles", false), N2 = finite(input.life2, "Bin 2 stated cycles to failure"), n3 = finite(input.cycles3, "Bin 3 applied cycles", false), N3 = finite(input.life3, "Bin 3 stated cycles to failure");
-  const d1 = n1 / N1, d2 = n2 / N2, d3 = n3 / N3, total = d1 + d2 + d3;
-  return { values: [quantity("damage1", "Bin 1 cycle ratio", d1, d1, "—"), quantity("damage2", "Bin 2 cycle ratio", d2, d2, "—"), quantity("damage3", "Bin 3 cycle ratio", d3, d3, "—"), quantity("totalDamage", "Three-bin linear damage sum", total, total, "—")], warnings: ["This three-bin Palmgren-Miner sum excludes sequence effects, stress-history generation, S-N curve fitting, nonlinear damage, crack growth, reliability, safety factors, failure prediction, and design approval."], errors: [], method: "D = n1/N1 + n2/N2 + n3/N3" };
-};
 
 const calculatePlanetaryGear = (input: Record<string, string>): CalculationState => {
   const sun = finite(input.sunTeeth, "Sun gear teeth"), ring = finite(input.ringTeeth, "Ring gear teeth"), planets = finite(input.planetCount, "Declared planet count"), speed = finite(input.inputSpeed, "Sun input speed"), torque = finite(input.inputTorque, "Sun input torque"), efficiency = finite(input.efficiency, "Declared planetary efficiency");
@@ -2587,20 +2288,6 @@ const calculatePneumaticCycleTime = (input: Record<string, string>): Calculation
   };
 };
 
-const calculateValveCv = (input: Record<string, string>): CalculationState => {
-  const cv = finite(input.cv, "Declared liquid Cv");
-  const specificGravity = finite(input.specificGravity, "Liquid specific gravity");
-  const pressureDrop = finite(input.pressureDrop, "Liquid pressure drop");
-  const flow = finite(input.flow, "Declared liquid flow");
-  const calculatedFlow = cv * Math.sqrt(pressureDrop / specificGravity);
-  const requiredCv = flow * Math.sqrt(specificGravity / pressureDrop);
-  return {
-    values: [quantity("liquidFlow", "Flow from declared Cv", calculatedFlow, calculatedFlow, "US gpm"), quantity("requiredCv", "Required Cv from declared flow", requiredCv, requiredCv, "—")],
-    warnings: ["This is a liquid-water Cv convention only. Do not use it for compressible air, pneumatic valve sizing, gas flow, flashing, choking, cavitation, viscosity correction, pressure-recovery correction, two-phase flow, or a manufacturer-specific valve rating/test condition. Confirm the supplier’s published flow method before selecting hardware."],
-    errors: [],
-    method: "Q = Cv√(ΔP/SG) · Cvrequired = Q√(SG/ΔP)",
-  };
-};
 
 const calculateVacuumHolding = (input: Record<string, string>): CalculationState => {
   const mass = finite(input.mass, "Handled mass");
@@ -2791,20 +2478,6 @@ const calculateToggleForce = (input: Record<string, string>): CalculationState =
   return { values: [quantity("mechanicalAdvantage", "Ideal symmetric toggle mechanical advantage", mechanicalAdvantage, mechanicalAdvantage, "—"), quantity("outputForce", "Ideal axial toggle output force", outputForce, outputForce, "N"), quantity("tangent", "Declared-angle tangent", tangent, tangent, "—")], warnings: ["This is an ideal, symmetric, planar, pre-dead-centre two-link toggle relation with a knee input perpendicular to the link line. It excludes link length and kinematics, frame/guide deflection, pin stress and clearance, friction, compliance, off-axis loading, stroke, actuation, over-centre travel, locking/self-locking, latch retention, material strength, fatigue, safety, and approval. It deliberately rejects the near-singular 0.5° and below range."], errors: [], method: "MA = 1/[2 tan(θ)] · Fout = Fin · MA" };
 };
 
-const calculateWristInertia = (input: Record<string, string>): CalculationState => {
-  const eoatMass = finite(input.eoatMass, "Declared EOAT mass", false);
-  const eoatCentroidalInertia = finite(input.eoatCentroidalInertia, "Declared EOAT centroidal inertia", false);
-  const eoatOffset = finite(input.eoatOffset, "EOAT flange-axis offset", false);
-  const payloadMass = finite(input.payloadMass, "Declared payload mass", false);
-  const payloadCentroidalInertia = finite(input.payloadCentroidalInertia, "Declared payload centroidal inertia", false);
-  const payloadOffset = finite(input.payloadOffset, "Payload flange-axis offset", false);
-  const eoatShift = eoatMass * eoatOffset ** 2;
-  const payloadShift = payloadMass * payloadOffset ** 2;
-  const eoatAxisInertia = eoatCentroidalInertia + eoatShift;
-  const payloadAxisInertia = payloadCentroidalInertia + payloadShift;
-  const totalInertia = eoatAxisInertia + payloadAxisInertia;
-  return { values: [quantity("totalMass", "Declared EOAT + payload mass", eoatMass + payloadMass, eoatMass + payloadMass, "kg"), quantity("eoatAxisInertia", "EOAT inertia about stated wrist axis", eoatAxisInertia, eoatAxisInertia, "kg·m²"), quantity("payloadAxisInertia", "Payload inertia about stated wrist axis", payloadAxisInertia, payloadAxisInertia, "kg·m²"), quantity("totalInertia", "Declared total wrist/tool inertia", totalInertia, totalInertia, "kg·m²")], warnings: ["This is a one-axis, user-entered parallel-axis inertia sum for two rigid declared bodies. It does not construct an inertia tensor, infer geometry, identify a robot axis, calculate motion dynamics, establish payload/reach/duty limits, validate collision, select hardware, establish safety, or approve a robot cell."], errors: [], method: "Iaxis = Icg + mr² · Itotal = IEOAT,axis + Ipayload,axis" };
-};
 
 const calculateCycleBuilder = (input: Record<string, string>): CalculationState => {
   const steps = [1, 2, 3, 4, 5, 6].map((index) => ({ label: input[`step${index}Label`]?.trim() || `Step ${index}`, duration: finite(input[`step${index}Duration`], `Step ${index} duration`, false) }));
@@ -2883,14 +2556,6 @@ const calculateMinorLosses = (input: Record<string, string>): CalculationState =
   return { values: [quantity("dynamicPressure", "Declared-section dynamic pressure", dynamicPressure, dynamicPressure, "Pa"), quantity("pressureLoss", "Declared-coefficient minor pressure loss", pressureLoss, pressureLoss, "Pa"), quantity("headLoss", "Equivalent liquid head loss", headLoss, headLoss, "m")], warnings: ["This is a user-entered aggregate-coefficient minor-loss arithmetic screen only. It does not choose or derive fitting coefficients, calculate friction or major loss, size pipe, model networks, elevation, compressibility, cavitation, transient effects, viscosity/temperature variation, pressure rating, equipment selection, safety, or approval."], errors: [], method: "Δpminor = ΣK·ρv²/2 · hminor = Δp/(ρg)" };
 };
 
-const calculatePipeSizing = (input: Record<string, string>): CalculationState => {
-  const flow = finite(input.flow, "Declared volumetric flow");
-  const targetVelocity = finite(input.targetVelocity, "Declared target velocity");
-  const flowM3s = flow / 60000;
-  const area = flowM3s / targetVelocity;
-  const diameter = Math.sqrt(4 * area / Math.PI);
-  return { values: [quantity("flow", "Declared volumetric flow", flowM3s, flowM3s, "m³/s"), quantity("requiredArea", "Required internal flow area at target velocity", area, area, "m²"), quantity("diameter", "Calculated circular inside diameter", diameter * 1000, diameter * 1000, "mm")], warnings: ["This is target-velocity circular-passage arithmetic only. It does not select a nominal pipe, tube, hose, schedule, material, wall thickness, pressure rating, fitting, pump, velocity target, pressure loss, structural support, corrosion allowance, fluid compatibility, safety, or approval."], errors: [], method: "D = √(4Q/(πvtarget)) · A = Q/vtarget" };
-};
 
 const calculateBuoyancyForce = (input: Record<string, string>): CalculationState => {
   const fluidDensity = finite(input.fluidDensity, "Declared fluid density");
@@ -2918,13 +2583,6 @@ const calculateSubmergedPlane = (input: Record<string, string>): CalculationStat
   return { values: [quantity("area", "Rectangle area", area, area, "m²"), quantity("resultantForce", "Hydrostatic resultant force", resultantForce, resultantForce / 1000, "kN"), quantity("centroidalInertia", "Rectangle centroidal second moment", centroidalInertia, centroidalInertia, "m⁴"), quantity("centerOffset", "Center-of-pressure offset below centroid", centerOffset, centerOffset, "m"), quantity("centerDepth", "Center-of-pressure depth below free surface", centerDepth, centerDepth, "m")], warnings: ["This is a fully submerged vertical rectangular-plane, constant-density hydrostatic arithmetic screen only. It does not analyze inclined or curved surfaces, variable density, free-surface motion, vessel or support structure, plate stress, fasteners, pressure rating, installation, safety, or approval."], errors: [], method: "F = ρgycA · Ix = bh³/12 · yCP = yc + Ix/(Ayc)" };
 };
 
-const calculateConvectionHeat = (input: Record<string, string>): CalculationState => {
-  const coefficient = finite(input.coefficient, "Declared convection coefficient");
-  const area = finite(input.area, "Declared heat-transfer area");
-  const deltaT = finite(input.deltaT, "Declared temperature difference", false);
-  const heatRate = coefficient * area * deltaT;
-  return { values: [quantity("heatRate", "Declared convection heat rate", heatRate, heatRate, "W"), quantity("heatRateKw", "Declared convection heat rate", heatRate, heatRate / 1000, "kW"), quantity("conductance", "Declared convection conductance hA", coefficient * area, coefficient * area, "W/K")], warnings: ["This is user-entered convection coefficient arithmetic only. It does not derive a heat-transfer coefficient or correlation, determine flow regime, calculate a temperature field, model radiation, conduction, phase change, fins, contact resistance, material selection, service-temperature rating, equipment suitability, safety, or approval."], errors: [], method: "Q̇ = hAΔT" };
-};
 
 const calculateThermalResistance = (input: Record<string, string>): CalculationState => {
   const hotCoefficient = finite(input.hotCoefficient, "Declared hot-side convection coefficient");
@@ -2945,18 +2603,6 @@ const calculateThermalResistance = (input: Record<string, string>): CalculationS
   return { values: [quantity("hotConvectionResistance", "Declared hot-side convection resistance", hotConvectionResistance, hotConvectionResistance, "K/W"), quantity("wallResistance", "Declared wall conduction resistance", wallResistance, wallResistance, "K/W"), quantity("coldConvectionResistance", "Declared cold-side convection resistance", coldConvectionResistance, coldConvectionResistance, "K/W"), quantity("totalResistance", "Declared series thermal resistance", totalResistance, totalResistance, "K/W"), quantity("totalTemperatureDifference", "Temperature difference at declared heat rate", totalTemperatureDifference, totalTemperatureDifference, "K")], warnings: ["This is a declared, one-dimensional series-resistance arithmetic screen. It does not derive convection coefficients, infer contact conditions, model radiation, phase change, parallel heat paths, thermal bridges, temperature-dependent properties, material selection, service-temperature rating, equipment suitability, safety, or approval."], errors: [], method: "Rtotal = 1/(hhAh) + L/(kAw) + Rc + 1/(hcAc) · ΔT = Q̇Rtotal" };
 };
 
-const calculateIdealGas = (input: Record<string, string>): CalculationState => {
-  const pressure = finite(input.pressure, "Declared absolute pressure") * 1000;
-  const temperature = finite(input.temperature, "Declared absolute temperature");
-  const molarMass = finite(input.molarMass, "Declared molar mass") / 1000;
-  const volume = finite(input.volume, "Declared volume");
-  const universalGasConstant = 8.314462618;
-  const moles = pressure * volume / (universalGasConstant * temperature);
-  const mass = moles * molarMass;
-  const density = mass / volume;
-  const specificGasConstant = universalGasConstant / molarMass;
-  return { values: [quantity("density", "Ideal-gas density", density, density, "kg/m³"), quantity("specificVolume", "Ideal-gas specific volume", 1 / density, 1 / density, "m³/kg"), quantity("amount", "Ideal-gas amount in declared volume", moles, moles, "mol"), quantity("mass", "Ideal-gas mass in declared volume", mass, mass, "kg"), quantity("specificGasConstant", "Specific gas constant from declared molar mass", specificGasConstant, specificGasConstant, "J/(kg·K)")], warnings: ["This is a user-entered ideal-gas equation-of-state arithmetic screen only. It does not convert gauge pressure, identify a gas, infer composition, model real-gas effects, phase change, mixtures, humidity, heat transfer, equipment selection, safety, operability, or approval."], errors: [], method: "pV = nRuT · ρ = pM/(RuT) = p/(RspecT)" };
-};
 
 const calculateIsentropicMachine = (input: Record<string, string>): CalculationState => {
   const inletTemperature = finite(input.inletTemperature, "Declared inlet temperature");
@@ -3128,19 +2774,6 @@ const calculateHydraulicLine = (input: Record<string, string>): CalculationState
   return { values: [quantity("area", "Internal flow area", area, area * 1e6, "mm²"), quantity("velocity", "Mean line velocity", velocity, velocity, "m/s"), quantity("majorLoss", "Declared-fluid Darcy major loss", majorLossPa, majorLossPa / 1000, "kPa"), quantity("referenceRatio", "Mean velocity / declared reference", referenceRatio, referenceRatio * 100, "%")], warnings: ["This calculates mean velocity and a user-factor Darcy major loss in one constant-ID, straight, steady hydraulic line. It does not select hose, tube, or pipe size; prescribe an acceptable velocity or friction factor; calculate Reynolds number, fittings/minor losses, bends, networks, elevation, surge, cavitation, viscosity/temperature variation, pressure rating, routing, hydraulic-system safety, or approval."], errors: [], method: "A = πDi²/4 · vmean = Q/A · Δpmajor = f(L/Di)(ρv²/2) · comparison = vmean/vref" };
 };
 
-const calculateShaftCombined = (input: Record<string, string>): CalculationState => {
-  const bendingMoment = finite(input.bendingMoment, "Bending moment", false) * 1000;
-  const torque = finite(input.torque, "Applied torque", false) * 1000;
-  const diameter = finite(input.diameter, "Solid shaft diameter");
-  const bendingStress = 32 * bendingMoment / (Math.PI * diameter ** 3);
-  const torsionalShear = 16 * torque / (Math.PI * diameter ** 3);
-  const center = bendingStress / 2;
-  const radius = Math.hypot(center, torsionalShear);
-  const principalOne = center + radius;
-  const principalTwo = center - radius;
-  const vonMises = Math.sqrt(bendingStress ** 2 + 3 * torsionalShear ** 2);
-  return { values: [quantity("bendingStress", "Outer-fiber bending stress", bendingStress, bendingStress, "MPa"), quantity("torsionalShear", "Outer-fiber torsional shear", torsionalShear, torsionalShear, "MPa"), quantity("principalOne", "Maximum principal stress", principalOne, principalOne, "MPa"), quantity("principalTwo", "Minimum principal stress", principalTwo, principalTwo, "MPa"), quantity("vonMises", "Plane-stress von Mises equivalent", vonMises, vonMises, "MPa")], warnings: ["This is an elastic outer-fiber point-stress screen for one solid circular shaft section. It excludes axial load, stress concentrations, keyways, fillets, fluctuating loading, fatigue, material allowables, deflection, bearing reaction, torsional vibration, buckling, and design approval."], errors: [], method: "σb = 32M/(πd³) · τt = 16T/(πd³) · σvm = √(σb² + 3τt²)" };
-};
 
 const calculateMohrCircle = (input: Record<string, string>): CalculationState => {
   const sigmaX = finite(input.sigmaX, "x normal stress", false);
@@ -3174,19 +2807,6 @@ const calculatePressFit = (input: Record<string, string>): CalculationState => {
   return { values: [quantity("interference", "Diametral interference", interference, interference, "mm"), quantity("geometryFactor", "Reference hub geometry factor", geometryFactor, geometryFactor, "—"), quantity("contactPressure", "Reference contact pressure", contactPressure, contactPressure, "MPa"), quantity("frictionForce", "Friction holding / assembly-force estimate", frictionForce, frictionForce / 1000, "kN"), quantity("holdingTorque", "Friction holding-torque estimate", holdingTorque, holdingTorque, "N·m")], warnings: ["This follows a simplified single-modulus, Lame-style hub geometry-factor relation with uniform interface pressure and user-entered friction. It does not split shaft and hub compliance, select a tolerance, assess yield or fit class, model temperature/assembly method/surface texture, include centrifugal unloading or dynamic/fatigue behavior, rate equipment, or approve a joint."], errors: [], method: "δ = Ds−Di · p = (δ/Di)E[(Do²−Di²)/(Do²+Di²)] · Fμ = πDiLpμ · Tμ = FμDi/2" };
 };
 
-const calculateJointSeparation = (input: Record<string, string>): CalculationState => {
-  const preload = finite(input.preload, "Declared preload");
-  const boltStiffness = finite(input.boltStiffness, "Bolt axial stiffness");
-  const memberStiffness = finite(input.memberStiffness, "Member axial stiffness");
-  const externalLoad = finite(input.externalLoad, "External axial separating load", false);
-  const loadFraction = boltStiffness / (boltStiffness + memberStiffness);
-  const boltLoadIncrease = loadFraction * externalLoad;
-  const clampLoss = (1 - loadFraction) * externalLoad;
-  const residualClamp = preload - clampLoss;
-  const separationLoad = preload / (1 - loadFraction);
-  const separationReserve = separationLoad - externalLoad;
-  return { values: [quantity("loadFraction", "Bolt load fraction C", loadFraction, loadFraction * 100, "%"), quantity("boltLoadIncrease", "External-load share carried by bolt", boltLoadIncrease, boltLoadIncrease, "kN"), quantity("residualClamp", "Residual clamp force", residualClamp, residualClamp, "kN"), quantity("separationLoad", "Ideal separation-load threshold", separationLoad, separationLoad, "kN"), quantity("separationReserve", "Threshold minus stated external load", separationReserve, separationReserve, "kN")], warnings: ["This is a one-bolt, axial, linear parallel-spring screen with user-entered equivalent stiffnesses. It does not infer stiffness from geometry, distribute a system load among bolts, account for preload variation or relaxation, nonlinear contact, shear, bending, thermal effects, fatigue, gasket behavior, joint slip, safety factors, or prove that a joint will not separate."], errors: [], method: "C = kb/(kb+km) · ΔFb = CP · Fm = Fp−(1−C)P · Psep = Fp/(1−C)" };
-};
 
 const calculateDimensionCheck = (input: Record<string, string>): CalculationState => {
   const dimensions = [
@@ -3266,13 +2886,6 @@ const calculateArithmeticScratchpad = (input: Record<string, string>): Calculati
   return { values: [quantity("result", name, result, result, unit, 8)], warnings: [`Declared input label: ${inputUnit}. This evaluates only the displayed scalar arithmetic grammar. Formula names and unit labels are retained user context, not parsed or validated. It does not support variables, functions, unit conversion, dimension checking, symbolic algebra, code execution, or engineering-model validation.`], errors: [], method: "Fixed grammar: number · ( ) · + · − · * · / · ^" };
 };
 
-const calculateCantileverFrame = (input: Record<string, string>): CalculationState => {
-  const lateralLoad = finite(input.lateralLoad, "Declared lateral top load");
-  const columnHeight = finite(input.columnHeight, "Column height") / 1000;
-  const baseShear = lateralLoad;
-  const baseMoment = lateralLoad * columnHeight;
-  return { values: [quantity("baseShear", "Base shear magnitude", baseShear, baseShear, "N"), quantity("baseMoment", "Base couple-moment magnitude", baseMoment, baseMoment, "N·m")], warnings: ["This is one vertical cantilever-frame free-body equilibrium only: a single stated lateral top-load magnitude, base shear, and fixed-base couple moment. It excludes portal-frame redistribution, axial load, member stiffness, deflection, stress, connection behavior, second-order effects, stability, code requirements, safety factors, and approval."], errors: [], method: "Vbase = H · Mbase = Hh" };
-};
 
 const calculatePlateBuckling = (input: Record<string, string>): CalculationState => {
   const modulus = finite(input.modulus, "Declared elastic modulus") * 1e9;
@@ -3286,17 +2899,6 @@ const calculatePlateBuckling = (input: Record<string, string>): CalculationState
   return { values: [quantity("criticalStress", "Elastic critical buckling stress", criticalStress / 1e6, criticalStress / 1e6, "MPa"), quantity("slendernessRatio", "Declared thickness / reference-width ratio", thickness / referenceWidth, thickness / referenceWidth, "—"), quantity("elasticPlateStiffnessTerm", "Elastic plate stiffness term", elasticPlateStiffnessTerm / 1e6, elasticPlateStiffnessTerm / 1e6, "MPa")], warnings: ["This calculates only the declared simply supported isotropic elastic plate-buckling relation using a user-entered coefficient. It does not select boundary conditions, load case, reference width, or buckling coefficient; and excludes plasticity, residual stress, geometric imperfections, post-buckling, stiffeners, connections, code requirements, safety factors, adequacy, and approval."], errors: [], method: "σcr = kπ²E/[12(1−ν²)](t/b)²" };
 };
 
-const calculateScrewCriticalSpeed = (input: Record<string, string>): CalculationState => {
-  const rootDiameter = finite(input.rootDiameter, "Declared screw root diameter");
-  const unsupportedLength = finite(input.unsupportedLength, "Declared unsupported length");
-  const endFixityFactor = finite(input.endFixityFactor, "Declared end-fixity factor");
-  const operatingSpeed = finite(input.operatingSpeed, "Declared operating speed");
-  const rootDiameterInches = rootDiameter / 25.4;
-  const unsupportedLengthInches = unsupportedLength / 25.4;
-  const criticalSpeed = endFixityFactor * 4.76e6 * rootDiameterInches / unsupportedLengthInches ** 2;
-  const operatingRatio = operatingSpeed / criticalSpeed;
-  return { values: [quantity("criticalSpeed", "Calculated critical speed", criticalSpeed, criticalSpeed, "rpm"), quantity("operatingRatio", "Declared operating / critical-speed ratio", operatingRatio, operatingRatio, "—"), quantity("rootToLengthRatio", "Declared root-diameter / unsupported-length ratio", rootDiameter / unsupportedLength, rootDiameter / unsupportedLength, "—")], warnings: ["This applies the cited manufacturer critical-speed relation with user-entered root diameter, unsupported length, and end-fixity factor. It does not select a screw, bearing support, or fixity factor; predict actual shaft whirl/resonance; model straightness, preload, bearing stiffness, buckling, acceleration, drive control, load, fatigue, life, safety factor, suitability, or approval."], errors: [], method: "ncrit = Cs·4.76×10⁶·dr(in)/L(in)² · r = ndeclared/ncrit" };
-};
 
 const calculateLinearGuideLife = (input: Record<string, string>): CalculationState => {
   if (input.rollingType !== "ball" && input.rollingType !== "roller") throw new Error("Select a supported rolling-element type.");
@@ -3363,19 +2965,6 @@ const calculateDriveTrain = (input: Record<string, string>): CalculationState =>
   return { values: [quantity("totalRatio", "Declared total reduction ratio", totalRatio, totalRatio, "—"), quantity("totalEfficiency", "Declared total efficiency", totalEfficiency, totalEfficiency * 100, "%"), quantity("outputSpeed", "Literal output speed", outputSpeed, outputSpeed, "rpm"), quantity("outputTorque", "Literal output torque", outputTorque, outputTorque, "N·m"), quantity("inputPower", "Literal input power", inputPower / 1000, inputPower / 1000, "kW"), quantity("outputPower", "Literal output power", outputPower / 1000, outputPower / 1000, "kW"), quantity("arithmeticLoss", "Declared-efficiency arithmetic loss", arithmeticLoss / 1000, arithmeticLoss / 1000, "kW")], warnings: ["This multiplies user-entered series ratios and efficiencies, then applies ideal speed/torque/power relationships. It does not select a gearbox or stage configuration; predict individual loss, efficiency, backlash, stiffness, lubrication, temperature, inertia, dynamics, rating, reliability, safety, suitability, or approval."], errors: [], method: "rtotal = r1r2r3 · ηtotal = η1η2η3 · n2 = n1/rtotal · T2 = T1rtotalηtotal" };
 };
 
-const calculateRmsDutyTorque = (input: Record<string, string>): CalculationState => {
-  const torque1 = finite(input.torque1, "Declared segment 1 torque", false);
-  const duration1 = finite(input.duration1, "Declared segment 1 duration");
-  const torque2 = finite(input.torque2, "Declared segment 2 torque", false);
-  const duration2 = finite(input.duration2, "Declared segment 2 duration");
-  const torque3 = finite(input.torque3, "Declared segment 3 torque", false);
-  const duration3 = finite(input.duration3, "Declared segment 3 duration");
-  const cycleTime = duration1 + duration2 + duration3;
-  const rmsTorque = Math.sqrt((torque1 ** 2 * duration1 + torque2 ** 2 * duration2 + torque3 ** 2 * duration3) / cycleTime);
-  const absolutePeakTorque = Math.max(Math.abs(torque1), Math.abs(torque2), Math.abs(torque3));
-  const signedMeanTorque = (torque1 * duration1 + torque2 * duration2 + torque3 * duration3) / cycleTime;
-  return { values: [quantity("cycleTime", "Declared duty-cycle time", cycleTime, cycleTime, "s"), quantity("rmsTorque", "Declared RMS torque", rmsTorque, rmsTorque, "N·m"), quantity("absolutePeakTorque", "Declared absolute peak torque", absolutePeakTorque, absolutePeakTorque, "N·m"), quantity("signedMeanTorque", "Declared signed mean torque", signedMeanTorque, signedMeanTorque, "N·m")], warnings: ["This applies a three-segment root-mean-square torque relation to user-entered constant torque/time values. It does not derive an axis motion profile or load, determine motor/drive thermal capacity, compare torque-speed curves, infer a duty cycle, select a motor/drive, establish safety, suitability, or approval."], errors: [], method: "Trms = √[(T1²t1 + T2²t2 + T3²t3)/(t1 + t2 + t3)]" };
-};
 
 const calculateMotorOperatingPoint = (input: Record<string, string>): CalculationState => {
   if (input.motorClass !== "servo" && input.motorClass !== "stepper" && input.motorClass !== "ac") throw new Error("Select a supported declared motor class.");
@@ -3418,34 +3007,8 @@ const calculateConveyorLine = (input: Record<string, string>): CalculationState 
   return { values: [quantity("lineSpeed", "Literal line speed", lineSpeed, lineSpeed, "m/min"), quantity("itemRate", "Declared requested item rate", requestedRate, requestedRate, "items/min"), quantity("pitchDensity", "Declared items per metre at pitch", pitchDensity, pitchDensity, "items/m")], warnings: ["This converts a declared requested item rate and uniform pitch into a literal conveyor line speed. It does not select or size a conveyor, validate accumulation, transfers, product stability, dwell/process requirements, equipment capacity, safety, suitability, or approval."], errors: [], method: "v = q·p/1000" };
 };
 
-const calculateRobotReach = (input: Record<string, string>): CalculationState => {
-  const targetX = finite(input.targetX, "Declared target X offset", false);
-  const targetY = finite(input.targetY, "Declared target Y offset", false);
-  const targetZ = finite(input.targetZ, "Declared target Z offset", false);
-  const referenceReach = finite(input.referenceReach, "Declared radial reference reach");
-  const radialDistance = Math.sqrt(targetX ** 2 + targetY ** 2 + targetZ ** 2);
-  const referenceRatio = radialDistance / referenceReach;
-  return { values: [quantity("radialDistance", "Literal target radial distance", radialDistance, radialDistance, "mm"), quantity("referenceReach", "Declared radial reference reach", referenceReach, referenceReach, "mm"), quantity("referenceRatio", "Literal distance / reference-reach ratio", referenceRatio, referenceRatio, "—")], warnings: ["This calculates only a target radial distance and literal comparison to a user-entered reference reach. It is not a six-axis robot workspace, pose, orientation, collision, joint-limit, singularity, path, payload, reachability, safety, suitability, or approval result."], errors: [], method: "r = √(x² + y² + z²) · rratio = r/Rref" };
-};
 
-const calculateRobotPayloadMoment = (input: Record<string, string>): CalculationState => {
-  const payloadMass = finite(input.payloadMass, "Declared payload mass");
-  const cogOffset = finite(input.cogOffset, "Declared flange-to-CoG offset");
-  const gravityForce = payloadMass * 9.80665;
-  const staticMoment = gravityForce * (cogOffset / 1000);
-  return { values: [quantity("gravityForce", "Literal payload gravity force", gravityForce, gravityForce, "N"), quantity("staticMoment", "Literal static weight moment", staticMoment, staticMoment, "N·m"), quantity("cogOffset", "Declared flange-to-CoG offset", cogOffset, cogOffset, "mm")], warnings: ["This applies static gravity force and a declared flange-to-CoG lever arm. It does not compare a result to any robot payload/moment curve or capacity; calculate acceleration, inertia, motion, mounting, stability, safety, suitability, or approval."], errors: [], method: "Fg = m·g · Mstatic = Fg·e" };
-};
 
-const calculateRotaryIndexing = (input: Record<string, string>): CalculationState => {
-  const indexAngle = finite(input.indexAngle, "Declared index angle");
-  const moveTime = finite(input.moveTime, "Declared move time");
-  const systemInertia = finite(input.systemInertia, "Declared table-plus-load inertia");
-  const indexAngleRad = indexAngle * Math.PI / 180;
-  const averageAngularSpeed = indexAngleRad / moveTime;
-  const indexesPerMinute = 60 / moveTime;
-  const kineticEnergy = 0.5 * systemInertia * averageAngularSpeed ** 2;
-  return { values: [quantity("indexAngleRad", "Declared index angle in radians", indexAngleRad, indexAngleRad, "rad"), quantity("averageAngularSpeed", "Ideal average angular speed", averageAngularSpeed, averageAngularSpeed, "rad/s"), quantity("indexesPerMinute", "Literal move-only index rate", indexesPerMinute, indexesPerMinute, "indexes/min"), quantity("kineticEnergy", "Rotational kinetic energy at average speed", kineticEnergy, kineticEnergy, "J")], warnings: ["This applies only declared index-angle, move-time, and table-plus-load-inertia arithmetic. It excludes acceleration profile, peak/RMS torque, friction, gearing, motor/table selection, capacity, position accuracy, dwell/process timing, safety, suitability, and approval."], errors: [], method: "θ = α·π/180 · ωavg = θ/tmove · rate(move-only) = 60/tmove · KE = ½Iωavg²" };
-};
 
 const calculatePneumaticDemandBudget = (input: Record<string, string>): CalculationState => {
   const normalizedAirPerCycle = finite(input.normalizedAirPerCycle, "Declared normalized air demand per cycle");
@@ -3500,15 +3063,6 @@ const calculateHydraulicAccumulatorState = (input: Record<string, string>): Calc
   return { values: [quantity("gasVolumeAtMaximum", "Literal gas volume at declared maximum pressure", gasVolumeAtMaximum, gasVolumeAtMaximum, "L"), quantity("gasVolumeAtMinimum", "Literal gas volume at declared minimum pressure", gasVolumeAtMinimum, gasVolumeAtMinimum, "L"), quantity("usableFluidVolume", "Literal usable fluid-volume difference", usableFluidVolume, usableFluidVolume, "L"), quantity("polytropicExponent", "Declared polytropic exponent", polytropicExponent, polytropicExponent, "—")], warnings: ["This applies a user-declared ideal polytropic gas-state relation to declared absolute pressures and precharge gas volume. It does not select an accumulator, precharge, gas, vessel technology, safety device, or operating pressure; infer temperature, derive a transient duty cycle, model flow/response, heat transfer, seal condition, capacity, safety, suitability, code compliance, or approval."], errors: [], method: "P₀·V₀ⁿ = P·Vⁿ · V(P) = V₀·(P₀/P)^(1/n) · ΔVfluid = V(Pmin) − V(Pmax)" };
 };
 
-const calculateHydraulicReservoirDwell = (input: Record<string, string>): CalculationState => {
-  const workingVolume = finite(input.workingVolume, "Declared working reservoir volume");
-  const returnFlow = finite(input.returnFlow, "Declared return or pump flow");
-  const referenceDwellTime = finite(input.referenceDwellTime, "Declared dwell-time reference");
-  const dwellTime = workingVolume / returnFlow;
-  const referenceVolume = returnFlow * referenceDwellTime;
-  const dwellReferenceRatio = dwellTime / referenceDwellTime;
-  return { values: [quantity("dwellTime", "Literal reservoir dwell time", dwellTime, dwellTime, "min"), quantity("referenceVolume", "Literal volume at declared dwell-time reference", referenceVolume, referenceVolume, "L"), quantity("dwellReferenceRatio", "Literal dwell-time / reference ratio", dwellReferenceRatio, dwellReferenceRatio, "—"), quantity("returnFlow", "Declared return or pump flow", returnFlow, returnFlow, "L/min")], warnings: ["This divides only a declared working reservoir volume by a declared steady flow, then compares that result to a user-entered reference time. It does not select a reservoir, apply a rule-of-thumb, estimate cooling, aeration, contamination, geometry, fluid level, heat rejection, flow distribution, capacity, safety, suitability, or approval."], errors: [], method: "tdwell = Vworking/Qreturn · Vref = Qreturn·tref · ratio = tdwell/tref" };
-};
 
 const calculateDarcyFrictionFactor = (input: Record<string, string>): CalculationState => {
   const mode = input.mode;
@@ -3536,16 +3090,6 @@ const calculatePumpSystemHeadPoint = (input: Record<string, string>): Calculatio
   return { values: [quantity("systemHead", "Literal declared system head at flow point", systemHead, systemHead, "m"), quantity("staticHead", "Declared static-head offset", staticHead, staticHead, "m"), quantity("quadraticLossHead", "Literal declared quadratic loss head", quadraticLossHead, quadraticLossHead, "m"), quantity("flowPoint", "Declared flow point", flowPoint, flowPoint, "L/s")], warnings: ["This adds only a declared static-head offset to a declared quadratic-loss coefficient at one declared flow point. It does not derive the coefficient; model pipe, fitting, or valve losses; generate a full curve; find an operating point; compare a pump curve; select a pump; determine NPSH, capacity, efficiency, safety, suitability, or approval."], errors: [], method: "Hsystem(Q) = Hstatic + K·Q²" };
 };
 
-const calculateNpshAvailableBudget = (input: Record<string, string>): CalculationState => {
-  const surfacePressureHead = finite(input.surfacePressureHead, "Declared absolute surface-pressure head");
-  const staticSuctionHead = finite(input.staticSuctionHead, "Declared signed static suction head", false);
-  const suctionLossHead = finite(input.suctionLossHead, "Declared suction loss head");
-  const vaporPressureHead = finite(input.vaporPressureHead, "Declared vapor-pressure head");
-  const npshRequiredReference = finite(input.npshRequiredReference, "Declared NPSH-required reference");
-  const npshAvailable = surfacePressureHead + staticSuctionHead - suctionLossHead - vaporPressureHead;
-  const statedHeadDifference = npshAvailable - npshRequiredReference;
-  return { values: [quantity("npshAvailable", "Literal NPSH available", npshAvailable, npshAvailable, "m"), quantity("npshRequiredReference", "Declared NPSH-required reference", npshRequiredReference, npshRequiredReference, "m"), quantity("statedHeadDifference", "Literal NPSHa − declared NPSHr difference", statedHeadDifference, statedHeadDifference, "m"), quantity("staticSuctionHead", "Declared signed static suction head", staticSuctionHead, staticSuctionHead, "m")], warnings: ["This sums only user-declared surface-pressure, signed static-suction, suction-loss, and vapor-pressure heads, then subtracts a user-declared NPSH-required reference. It does not calculate properties, determine vapor pressure, derive losses, select a pump, determine cavitation risk, establish NPSH margin adequacy, capacity, safety, suitability, or approval."], errors: [], method: "NPSHa = Hsurface + Hsuction − Hloss − Hvapor · stated difference = NPSHa − NPSHr" };
-};
 
 const calculateThermalRcStep = (input: Record<string, string>): CalculationState => {
   const constantPower = finite(input.constantPower, "Declared constant power step");
@@ -3561,15 +3105,6 @@ const calculateThermalRcStep = (input: Record<string, string>): CalculationState
   return { values: [quantity("timeConstant", "Literal thermal time constant", timeConstant, timeConstant, "s"), quantity("temperatureRise", "Literal ideal temperature rise at elapsed time", temperatureRise, temperatureRise, "K"), quantity("nodeTemperature", "Literal ideal node temperature", nodeTemperature, nodeTemperature, "°C"), quantity("steadyStateRise", "Literal ideal steady-state temperature rise", steadyStateRise, steadyStateRise, "K")], warnings: ["This applies a user-declared constant power step to one ideal thermal RC node. It does not derive resistance or capacitance; determine thermal paths; select a heat sink, TIM, fan, or cooler; model multi-node conduction, convection, radiation, variable power, spatial temperature, material properties, junction limits, capacity, safety, suitability, or approval."], errors: [], method: "τ = R·C · ΔT(t) = P·R·(1 − e^(−t/τ)) · Tnode = Tamb + ΔT(t)" };
 };
 
-const calculateManningUniformFlow = (input: Record<string, string>): CalculationState => {
-  const manningRoughness = finite(input.manningRoughness, "Declared Manning roughness coefficient");
-  const hydraulicRadius = finite(input.hydraulicRadius, "Declared hydraulic radius");
-  const energySlope = finite(input.energySlope, "Declared energy slope");
-  const flowArea = finite(input.flowArea, "Declared flow area");
-  const meanVelocity = (1 / manningRoughness) * hydraulicRadius ** (2 / 3) * Math.sqrt(energySlope);
-  const discharge = flowArea * meanVelocity;
-  return { values: [quantity("meanVelocity", "Literal metric Manning mean velocity", meanVelocity, meanVelocity, "m/s"), quantity("discharge", "Literal metric Manning discharge", discharge, discharge, "m³/s"), quantity("hydraulicRadius", "Declared hydraulic radius", hydraulicRadius, hydraulicRadius, "m"), quantity("flowArea", "Declared flow area", flowArea, flowArea, "m²")], warnings: ["This applies only the metric Manning uniform-flow relation to user-declared roughness, hydraulic radius, energy slope, and area. It does not infer cross-section geometry, select roughness, calculate normal depth or a water-surface profile, model nonuniform flow, design a channel, determine flood flow or capacity, safety, suitability, or approval."], errors: [], method: "v = (1/n)·R^(2/3)·S^(1/2) · Q = A·v (metric uniform-flow form)" };
-};
 
 const calculateCompressibleMassFlow = (input: Record<string, string>): CalculationState => {
   const flowArea = finite(input.flowArea, "Declared flow area");
@@ -3617,18 +3152,6 @@ const calculateSheetBendAllowance = (input: Record<string, string>): Calculation
   return { values: [quantity("bendAllowance", "Literal single-bend allowance", bendAllowance, bendAllowance, "mm"), quantity("bendDeduction", "Literal single-bend deduction", bendDeduction, bendDeduction, "mm"), quantity("neutralAxisRadius", "Literal neutral-axis radius", insideRadius + kFactor * thickness, insideRadius + kFactor * thickness, "mm"), quantity("bendAngle", "Declared bend angle", bendAngle, bendAngle, "°")], warnings: ["This applies only the stated single-bend allowance and deduction relations to user-declared angle, inside radius, thickness, and K factor. It does not select material, K factor, tooling, bend radius, bend method, process sequence, multi-bend flat pattern, tolerance, manufacturability, cost, capacity, safety, suitability, or approval."], errors: [], method: "BA = θ·(π/180)·(R + K·T) · BD = 2·(R + T)·tan(θ/2) − BA" };
 };
 
-const calculateIdealGasEntropyChange = (input: Record<string, string>): CalculationState => {
-  const initialTemperature = finite(input.initialTemperature, "Declared initial temperature");
-  const finalTemperature = finite(input.finalTemperature, "Declared final temperature");
-  const initialPressure = finite(input.initialPressure, "Declared initial pressure");
-  const finalPressure = finite(input.finalPressure, "Declared final pressure");
-  const specificHeat = finite(input.specificHeat, "Declared constant specific heat");
-  const gasConstant = finite(input.gasConstant, "Declared specific gas constant");
-  const temperatureTerm = specificHeat * Math.log(finalTemperature / initialTemperature);
-  const pressureTerm = gasConstant * Math.log(finalPressure / initialPressure);
-  const entropyChange = temperatureTerm - pressureTerm;
-  return { values: [quantity("entropyChange", "Literal ideal-gas specific entropy change", entropyChange, entropyChange, "J/(kg·K)"), quantity("temperatureTerm", "Literal temperature contribution", temperatureTerm, temperatureTerm, "J/(kg·K)"), quantity("pressureTerm", "Literal pressure contribution", pressureTerm, pressureTerm, "J/(kg·K)"), quantity("temperatureRatio", "Declared temperature ratio", finalTemperature / initialTemperature, finalTemperature / initialTemperature, "—")], warnings: ["This applies NASA’s constant-specific-heat ideal-gas pressure-temperature entropy relation only to user-declared state values. It does not determine gas properties, phase, process path, reversibility, heat or work transfer, state validity, isentropic efficiency, refrigeration, equipment, capacity, safety, suitability, or approval."], errors: [], method: "Δs = cp·ln(T₂/T₁) − R·ln(p₂/p₁)" };
-};
 
 export type ConversionGroup = UnitFamilyId;
 export const conversionUnits = (category: ConversionGroup) => unitsForFamily(category).map((unit) => unit.value);
@@ -3650,98 +3173,58 @@ const calculateConverter = (input: Record<string, string>): CalculationState => 
 
 export const calculateTool = (toolId: ToolId, input: Record<string, string>): CalculationState => {
   try {
-    if (toolId === "axial") return calculateAxial(input);
+    if (toolId in libraryDocuments) return runLibraryDocument(toolId, input);
     if (toolId === "beam") return calculateBeam(input);
     if (toolId === "beamDiagram") return calculateBeamDiagram(input);
-    if (toolId === "triangleTruss") return calculateTriangleTruss(input);
     if (toolId === "hertzContact") return calculateHertzContact(input);
-    if (toolId === "fractureIntensity") return calculateFractureIntensity(input);
     if (toolId === "deflectionCheck") return calculateDeflectionCheck(input);
-    if (toolId === "cantileverFrame") return calculateCantileverFrame(input);
     if (toolId === "plateBuckling") return calculatePlateBuckling(input);
-    if (toolId === "screwCriticalSpeed") return calculateScrewCriticalSpeed(input);
     if (toolId === "linearGuideLife") return calculateLinearGuideLife(input);
     if (toolId === "brakingDuty") return calculateBrakingDuty(input);
     if (toolId === "ballScrewLife") return calculateBallScrewLife(input);
     if (toolId === "driveTrain") return calculateDriveTrain(input);
-    if (toolId === "rmsDutyTorque") return calculateRmsDutyTorque(input);
     if (toolId === "motorOperatingPoint") return calculateMotorOperatingPoint(input);
     if (toolId === "gripperHold") return calculateGripperHold(input);
     if (toolId === "conveyorLine") return calculateConveyorLine(input);
-    if (toolId === "robotReach") return calculateRobotReach(input);
-    if (toolId === "robotPayloadMoment") return calculateRobotPayloadMoment(input);
-    if (toolId === "rotaryIndexing") return calculateRotaryIndexing(input);
     if (toolId === "pneumaticDemandBudget") return calculatePneumaticDemandBudget(input);
     if (toolId === "hydraulicLossBudget") return calculateHydraulicLossBudget(input);
     if (toolId === "vacuumLeakageBudget") return calculateVacuumLeakageBudget(input);
     if (toolId === "hydraulicAccumulatorState") return calculateHydraulicAccumulatorState(input);
-    if (toolId === "hydraulicReservoirDwell") return calculateHydraulicReservoirDwell(input);
     if (toolId === "darcyFrictionFactor") return calculateDarcyFrictionFactor(input);
     if (toolId === "pumpSystemHeadPoint") return calculatePumpSystemHeadPoint(input);
-    if (toolId === "npshAvailableBudget") return calculateNpshAvailableBudget(input);
     if (toolId === "thermalRcStep") return calculateThermalRcStep(input);
-    if (toolId === "manningUniformFlow") return calculateManningUniformFlow(input);
     if (toolId === "compressibleMassFlow") return calculateCompressibleMassFlow(input);
     if (toolId === "machiningTimeBudget") return calculateMachiningTimeBudget(input);
     if (toolId === "threePhasePower") return calculateThreePhasePower(input);
     if (toolId === "sheetBendAllowance") return calculateSheetBendAllowance(input);
-    if (toolId === "idealGasEntropyChange") return calculateIdealGasEntropyChange(input);
-    if (toolId === "bearingAdjustedLife") return calculateBearingAdjustedLife(input);
     if (toolId === "flywheelEnergy") return calculateFlywheelEnergy(input);
     if (toolId === "frictionClutch") return calculateFrictionClutch(input);
     if (toolId === "splineLoad") return calculateSplineLoad(input);
     if (toolId === "gearMeshForce") return calculateGearMeshForce(input);
     if (toolId === "beltTension") return calculateBeltTension(input);
-    if (toolId === "vesselGeometry") return calculateVesselGeometry(input);
     if (toolId === "threadTensileArea") return calculateThreadTensileArea(input);
-    if (toolId === "couplingTorsion") return calculateCouplingTorsion(input);
-    if (toolId === "stability") return calculateStability(input);
     if (toolId === "section") return calculateSection(input);
     if (toolId === "triangle") return calculateTriangle(input);
-    if (toolId === "coordinate") return calculateCoordinate(input);
-    if (toolId === "cylinder") return calculateCylinder(input);
-    if (toolId === "density") return calculateDensity(input);
-    if (toolId === "newton") return calculateNewton(input);
-    if (toolId === "kinetic") return calculateKinetic(input);
-    if (toolId === "hydrostatic") return calculateHydrostatic(input);
-    if (toolId === "continuity") return calculateContinuity(input);
-    if (toolId === "sensibleHeat") return calculateSensibleHeat(input);
-    if (toolId === "ohm") return calculateOhm(input);
     if (toolId === "fits") return calculateFits(input);
     if (toolId === "toleranceStack") return calculateToleranceStack(input);
     if (toolId === "toleranceSampling") return calculateToleranceSampling(input);
     if (toolId === "taylorToolLife") return calculateTaylorToolLife(input);
-    if (toolId === "cuttingForce") return calculateCuttingForce(input);
     if (toolId === "weldGroup") return calculateWeldGroup(input);
-    if (toolId === "position") return calculatePosition(input);
     if (toolId === "mmc") return calculateMmc(input);
     if (toolId === "motionProfile") return calculateMotionProfile(input);
-    if (toolId === "reflectedInertia") return calculateReflectedInertia(input);
     if (toolId === "pneumatic") return calculatePneumatic(input);
     if (toolId === "clampForce") return calculateClampForce(input);
-    if (toolId === "torsion") return calculateTorsion(input);
     if (toolId === "bearingLife") return calculateBearingLife(input);
     if (toolId === "boltPreload") return calculateBoltPreload(input);
-    if (toolId === "millingMrr") return calculateMillingMrr(input);
     if (toolId === "lmtd") return calculateLmtd(input);
-    if (toolId === "darcy") return calculateDarcy(input);
-    if (toolId === "thermalExpansion") return calculateThermalExpansion(input);
-    if (toolId === "thermalStress") return calculateThermalStress(input);
-    if (toolId === "planeConduction") return calculatePlaneConduction(input);
-    if (toolId === "bernoulli") return calculateBernoulli(input);
-    if (toolId === "combinedStress") return calculateCombinedStress(input);
     if (toolId === "thinVessel") return calculateThinVessel(input);
     if (toolId === "leadScrew") return calculateLeadScrew(input);
     if (toolId === "airConsumption") return calculateAirConsumption(input);
     if (toolId === "gearRatio") return calculateGearRatio(input);
-    if (toolId === "boltLoad") return calculateBoltLoad(input);
-    if (toolId === "safetyMargin") return calculateSafetyMargin(input);
     if (toolId === "circularArc") return calculateCircularArc(input);
     if (toolId === "compressionSpring") return calculateCompressionSpring(input);
     if (toolId === "drillingTime") return calculateDrillingTime(input);
-    if (toolId === "turningMrr") return calculateTurningMrr(input);
     if (toolId === "processCapability") return calculateProcessCapability(input);
-    if (toolId === "extensionSpring") return calculateExtensionSpring(input);
     if (toolId === "torsionSpring") return calculateTorsionSpring(input);
     if (toolId === "keyway") return calculateKeyway(input);
     if (toolId === "cuttingParameters") return calculateCuttingParameters(input);
@@ -3756,17 +3239,14 @@ export const calculateTool = (toolId: ToolId, input: Record<string, string>): Ca
     if (toolId === "bearingLoad") return calculateBearingLoad(input);
     if (toolId === "formControl") return calculateFormControl(input);
     if (toolId === "driveRatio") return calculateDriveRatio(input);
-    if (toolId === "motionDuty") return calculateMotionDuty(input);
     if (toolId === "filletWeld") return calculateFilletWeld(input);
     if (toolId === "threadDesign") return calculateThreadDesign(input);
     if (toolId === "orificeFlow") return calculateOrificeFlow(input);
     if (toolId === "dimensionCheck") return calculateDimensionCheck(input);
     if (toolId === "cuttingPower") return calculateCuttingPower(input);
     if (toolId === "drillPointDepth") return calculateDrillPointDepth(input);
-    if (toolId === "toolDeflection") return calculateToolDeflection(input);
     if (toolId === "fatigueConcentration") return calculateFatigueConcentration(input);
     if (toolId === "goodmanFatigue") return calculateGoodmanFatigue(input);
-    if (toolId === "minerDamage") return calculateMinerDamage(input);
     if (toolId === "planetaryGear") return calculatePlanetaryGear(input);
     if (toolId === "wormDrive") return calculateWormDrive(input);
     if (toolId === "sCurveProfile") return calculateSCurveProfile(input);
@@ -3775,7 +3255,6 @@ export const calculateTool = (toolId: ToolId, input: Record<string, string>): Ca
     if (toolId === "pickPlaceCycle") return calculatePickPlaceCycle(input);
     if (toolId === "payloadInertia") return calculatePayloadInertia(input);
     if (toolId === "pneumaticCycleTime") return calculatePneumaticCycleTime(input);
-    if (toolId === "valveCv") return calculateValveCv(input);
     if (toolId === "vacuumHolding") return calculateVacuumHolding(input);
     if (toolId === "additiveBuild") return calculateAdditiveBuild(input);
     if (toolId === "gravityMoment") return calculateGravityMoment(input);
@@ -3786,19 +3265,15 @@ export const calculateTool = (toolId: ToolId, input: Record<string, string>): Ca
     if (toolId === "gearToothStress") return calculateGearToothStress(input);
     if (toolId === "vacuumEvacuation") return calculateVacuumEvacuation(input);
     if (toolId === "toggleForce") return calculateToggleForce(input);
-    if (toolId === "wristInertia") return calculateWristInertia(input);
     if (toolId === "cycleBuilder") return calculateCycleBuilder(input);
     if (toolId === "pneumaticLineLoss") return calculatePneumaticLineLoss(input);
     if (toolId === "tappingTorque") return calculateTappingTorque(input);
     if (toolId === "threadMachiningTime") return calculateThreadMachiningTime(input);
     if (toolId === "reynoldsNumber") return calculateReynoldsNumber(input);
     if (toolId === "minorLosses") return calculateMinorLosses(input);
-    if (toolId === "pipeSizing") return calculatePipeSizing(input);
     if (toolId === "buoyancyForce") return calculateBuoyancyForce(input);
     if (toolId === "submergedPlane") return calculateSubmergedPlane(input);
-    if (toolId === "convectionHeat") return calculateConvectionHeat(input);
     if (toolId === "thermalResistance") return calculateThermalResistance(input);
-    if (toolId === "idealGas") return calculateIdealGas(input);
     if (toolId === "isentropicMachine") return calculateIsentropicMachine(input);
     if (toolId === "ballScrewSizing") return calculateBallScrewSizing(input);
     if (toolId === "rackPinion") return calculateRackPinion(input);
@@ -3810,10 +3285,8 @@ export const calculateTool = (toolId: ToolId, input: Record<string, string>): Ca
     if (toolId === "hydraulicPump") return calculateHydraulicPump(input);
     if (toolId === "hydraulicMotor") return calculateHydraulicMotor(input);
     if (toolId === "hydraulicLine") return calculateHydraulicLine(input);
-    if (toolId === "shaftCombined") return calculateShaftCombined(input);
     if (toolId === "mohrCircle") return calculateMohrCircle(input);
     if (toolId === "pressFit") return calculatePressFit(input);
-    if (toolId === "jointSeparation") return calculateJointSeparation(input);
     if (toolId === "arithmeticScratchpad") return calculateArithmeticScratchpad(input);
     if (toolId === "converter") return calculateConverter(input);
     return { values: [], warnings: [], errors: [`No released method is registered for “${toolId}”.`], method: "Unregistered model" };

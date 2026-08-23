@@ -1,19 +1,28 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, CircleAlert, Copy, Link2, RotateCcw, Save, Star } from "lucide-react";
+import { CircleAlert, Copy, Link2, PenLine, RotateCcw, Save, Star } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
+import { InstrumentSheet, QuantityName } from "@/components/instrument-sheet";
+import { GoverningRelation } from "@/components/governing-relation";
+import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, UnitBadge, UnitSelect, controlClass } from "@/components/ui/field";
+import { MeasurementField } from "@/components/ui/measurement-field";
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
-import { convertShop, formatShop, parseShop, shopLabel, unitSwitchFor } from "@/lib/fieldUnits";
+import { convertShop, formatShop, hydrateDisplayInputs, parseShop, shopLabel, unitSwitchFor, unitSwitchForResult } from "@/lib/fieldUnits";
 import { coerceSearchValue, sharePath, stringifySearchPlain } from "@/lib/search-params";
 import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
+import { libraryDocuments, isStudioDocument } from "@/lib/document";
+import { resolveSketchId } from "@/lib/diagrams";
+import { quantitySymbol } from "@/lib/quantity-symbols";
+import { inlineRelations } from "@/lib/formula-display";
 import { useDeskStore } from "@/lib/workspace-store";
+import { useWorkshop } from "@/gauge/lib/workshop-store";
 import { cn } from "@/lib/utils";
 
 export function CalculatorWorkspace({ toolId, search }: { toolId: string; search: Record<string, string> }) {
@@ -23,17 +32,25 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     if (!tool) return {};
     return { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
   });
-  const [resultUnit, setResultUnit] = useState<Record<string, string>>({});
+  const [resultUnit, setResultUnit] = useState<Record<string, string>>(() => loadStoredUnits(toolId)?.result ?? {});
   const [displayInput, setDisplayInput] = useState<Record<string, string>>(() => {
     if (!tool) return {};
-    return { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
+    const stored = loadStoredUnits(tool.id)?.display;
+    const canonical = { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
+    return hydrateDisplayInputs(toolFields[tool.id], canonical, stored);
   });
   const [displayUnit, setDisplayUnit] = useState<Record<string, string>>(() => {
     if (!tool) return {};
+    const stored = loadStoredUnits(tool.id)?.display;
     return Object.fromEntries(
-      toolFields[tool.id].map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""]),
+      toolFields[tool.id].map((field) => [
+        field.key,
+        stored?.[field.key] ?? unitSwitchFor(field.unit)?.engine ?? field.unit ?? "",
+      ]),
     );
   });
+  const displayUnitRef = useRef(displayUnit);
+  displayUnitRef.current = displayUnit;
   const lastWrittenSearch = useRef(stringifySearchPlain(pickKnown(search, tool?.id ?? "axial")));
   const favorites = useDeskStore((state) => state.favorites);
   const toggleFavorite = useDeskStore((state) => state.toggleFavorite);
@@ -43,15 +60,24 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   const setActiveProject = useDeskStore((state) => state.setActiveProject);
   const createProject = useDeskStore((state) => state.createProject);
   const saveCalculation = useDeskStore((state) => state.saveCalculation);
+  const createFrom = useWorkshop((state) => state.createFrom);
+  const libraryDocument = tool ? libraryDocuments[tool.id] : undefined;
 
   useEffect(() => {
     if (!tool) return;
     const fromUrl = pickKnown(search, tool.id);
+    const stored = loadStoredUnits(tool.id);
     const next = { ...initialInputs[tool.id], ...fromUrl };
     setInput(next);
-    setResultUnit({});
-    setDisplayUnit(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""])));
-    setDisplayInput(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, next[field.key] ?? ""])));
+    setResultUnit(stored?.result ?? {});
+    const nextDisplay = Object.fromEntries(
+      toolFields[tool.id].map((field) => [
+        field.key,
+        stored?.display?.[field.key] ?? unitSwitchFor(field.unit)?.engine ?? field.unit ?? "",
+      ]),
+    );
+    setDisplayUnit(nextDisplay);
+    setDisplayInput(hydrateDisplayInputs(toolFields[tool.id], next, nextDisplay));
     lastWrittenSearch.current = stringifySearchPlain(fromUrl);
     touchRecent(tool.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset inputs only when the model changes
@@ -64,7 +90,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     if (incoming === lastWrittenSearch.current) return;
     const next = { ...initialInputs[tool.id], ...fromUrl };
     setInput(next);
-    setDisplayInput(Object.fromEntries(toolFields[tool.id].map((field) => [field.key, next[field.key] ?? ""])));
+    setDisplayInput(hydrateDisplayInputs(toolFields[tool.id], next, displayUnitRef.current));
     lastWrittenSearch.current = incoming;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- apply URL changes; tool object identity is not the trigger
   }, [tool?.id, search]);
@@ -74,13 +100,13 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   const displayGroups = useMemo(() => {
     if (!result || result.errors.length) return [];
     return groupResultValues(result.values).map((group) => {
-      const spec = unitSwitchFor(group.primary.unit);
+      const spec = unitSwitchForResult(group.primary.key, group.primary.unit);
       const stored = resultUnit[group.label] ?? (spec ? spec.engine : group.primary.unit);
-      const numeric = parseShop(group.primary.display);
+      const fromDisplay = parseShop(group.primary.display);
       let shown = tidyDisplay(group.primary.display);
-      if (spec && Number.isFinite(numeric) && stored !== spec.engine && stored !== group.primary.unit) {
+      if (spec && Number.isFinite(fromDisplay) && stored !== spec.engine && stored !== group.primary.unit) {
         try {
-          shown = formatShop(convertShop(spec.family, numeric, group.primary.unit, stored));
+          shown = formatShop(convertShop(spec.family, fromDisplay, spec.engine, stored));
         } catch {
           shown = tidyDisplay(group.primary.display);
         }
@@ -110,7 +136,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       <div className="page-wrap">
         <p className="eyebrow">Unknown model</p>
         <h1 className="display-title mt-3">This route is not a released calculator.</h1>
-        <Link to="/library" className="mt-6 inline-flex text-sm text-accent">
+        <Link to="/" className="mt-6 inline-flex text-sm text-accent">
           Back to library
         </Link>
       </div>
@@ -132,6 +158,13 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     if (tool.id === "converter" && key === "category") {
       const units = conversionUnits(value as ConversionGroup);
       setInput((current) => ({ ...current, category: value, from: units[0], to: units[1] ?? units[0] }));
+      setResultUnit((current) => {
+        const next = { ...current };
+        delete next["Converted value"];
+        delete next["Canonical SI value"];
+        persistStoredUnits(tool.id, displayUnit, next);
+        return next;
+      });
       return;
     }
     setInput((current) => ({ ...current, [key]: value }));
@@ -158,7 +191,11 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   const onUnitChange = (key: string, nextUnit: string, engineUnit?: string) => {
     const spec = unitSwitchFor(engineUnit);
     const engineValue = parseShop(input[key] ?? "");
-    setDisplayUnit((current) => ({ ...current, [key]: nextUnit }));
+    setDisplayUnit((current) => {
+      const next = { ...current, [key]: nextUnit };
+      if (tool) persistStoredUnits(tool.id, next, resultUnit);
+      return next;
+    });
     if (!spec || !Number.isFinite(engineValue)) return;
     try {
       setDisplayInput((current) => ({ ...current, [key]: formatShop(convertShop(spec.family, engineValue, spec.engine, nextUnit)) }));
@@ -184,7 +221,10 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
 
   const copySummary = async () => {
     if (result.errors.length) return;
-    const summary = `${tool.title}\n${result.values.map((item) => `${item.label}: ${item.display} ${item.unit}`).join("\n")}\nMethod: ${result.method}\nBoundary: ${tool.assumptions.join("; ")}`;
+    const lines = displayGroups.length
+      ? displayGroups.map((item) => `${item.group.label}: ${item.shown} ${item.unitLabel}`)
+      : result.values.map((item) => `${item.label}: ${item.display} ${item.unit}`);
+    const summary = `${tool.title}\n${lines.join("\n")}\nMethod: ${inlineRelations(result.method)}\nBoundary: ${tool.assumptions.join("; ")}`;
     try {
       await navigator.clipboard.writeText(summary);
       toast.success("Result copied with method context.");
@@ -200,7 +240,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     }
     let projectId = activeProjectId ?? projects[0]?.id;
     if (!projectId) {
-      projectId = createProject("Desk project").id;
+      projectId = createProject("Saved").id;
     } else {
       setActiveProject(projectId);
     }
@@ -214,57 +254,94 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       method: result.method,
       resultJson: JSON.stringify({ values: result.values, warnings: result.warnings }),
     });
-    toast.success("Saved to this browser. Reopen it from the desk.");
+    toast.success("Saved on this device. Reopen it from Project.");
   };
 
   const related = relatedTools(tool.id);
+  const sketchId = resolveSketchId(tool.id);
 
   return (
-    <div className="page-wrap">
-      <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/library" className="inline-flex items-center gap-2 text-sm text-muted hover:text-fg">
-          <ArrowLeft size={15} />
-          All models
-        </Link>
-        <Button variant={pinned ? "mark" : "outline"} onClick={() => toggleFavorite(tool.id)}>
-          <Star size={14} fill={pinned ? "currentColor" : "none"} />
-          {pinned ? "Pinned" : "Pin"}
-        </Button>
-      </div>
-
-      <p className="eyebrow">{tool.kicker}</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">{tool.title}</h1>
-      {displayGroups[0] ? (
-        <p className="mt-2 font-mono text-2xl font-medium tabular-nums tracking-tight lg:hidden">
-          {displayGroups[0].shown} {displayGroups[0].unitLabel}
-          {displayGroups.length > 1 ? (
-            <span className="mt-1 block text-sm font-normal text-muted">
-              {displayGroups
-                .slice(1)
-                .map((item) => `${item.shown} ${item.unitLabel}`)
-                .join(" · ")}
-            </span>
+    <InstrumentPage
+      kicker={tool.kicker}
+      title={tool.title}
+      actions={
+        <>
+          {libraryDocument && isStudioDocument(libraryDocument) ? (
+            <Button
+              variant="outline"
+              onClick={() => {
+                const item = createFrom(libraryDocument);
+                void navigate({ to: "/studio/$id", params: { id: item.id } });
+              }}
+            >
+              <PenLine size={14} />
+              Fork in studio
+            </Button>
           ) : null}
-        </p>
-      ) : null}
-
-      <section className="mt-5 grid gap-px overflow-hidden rounded-md border border-border bg-border lg:grid-cols-[minmax(240px,320px)_minmax(0,1fr)]">
-        <aside id="inputs" className="bg-surface p-4 sm:p-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold">Inputs</h2>
-            <Button variant="ghost" size="sm" onClick={() => {
+          <Button variant={pinned ? "mark" : "outline"} onClick={() => toggleFavorite(tool.id)}>
+            <Star size={14} fill={pinned ? "currentColor" : "none"} />
+            {pinned ? "Pinned" : "Pin"}
+          </Button>
+        </>
+      }
+      nearby={
+        related.length > 0 ? (
+          <InstrumentNearby>
+            {related.map((item, index) => (
+              <span key={item.id}>
+                {index > 0 ? " · " : null}
+                <Link to="/tool/$toolId" params={{ toolId: item.id }} className="text-fg hover:text-accent">
+                  {item.title}
+                </Link>
+              </span>
+            ))}
+          </InstrumentNearby>
+        ) : null
+      }
+      method={
+        !result.errors.length ? (
+          <InstrumentMethod
+            description={tool.description}
+            formula={result.method}
+            when={tool.assumptions}
+            dont={result.warnings[0] ?? "This is a first-pass number, not a code check or approval."}
+            sourceLabel={tool.sourceLabel}
+            sourceUrl={tool.sourceUrl}
+          />
+        ) : undefined
+      }
+    >
+        <InstrumentSheet
+          diagram={
+            sketchId ? (
+              <MechanicalDiagram
+                toolId={tool.id}
+                variant={tool.id === "beam" ? input.case : tool.id === "section" ? input.shape : undefined}
+              />
+            ) : undefined
+          }
+          resultTitle={result.errors.length ? "Resolve the input state" : "Results"}
+          example={
+            <Button
+              variant="ghost"
+              className="h-10 min-h-10"
+              onClick={() => {
                 const next = { ...initialInputs[tool.id] };
+                const nextDisplay = Object.fromEntries(fields.map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""]));
                 setInput(next);
-                setDisplayUnit(Object.fromEntries(fields.map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""])));
-                setDisplayInput(Object.fromEntries(fields.map((field) => [field.key, next[field.key] ?? ""])));
+                setDisplayUnit(nextDisplay);
+                setDisplayInput(hydrateDisplayInputs(fields, next, nextDisplay));
+                setResultUnit({});
+                persistStoredUnits(tool.id, nextDisplay, {});
                 toast.success("Example restored.");
               }}
             >
               <RotateCcw size={13} />
               Example
             </Button>
-          </div>
-          <div className="mt-4 grid gap-4">
+          }
+          inputs={
+            <div id="inputs" className="grid gap-4">
             {fields.map((field) => {
               if (isFieldHidden(tool.id, field.key, input)) return null;
               const converterUnit = tool.id === "converter" && (field.key === "from" || field.key === "to");
@@ -279,7 +356,8 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               const fieldError = result.errors.find((error) => error.toLowerCase().includes(field.label.toLowerCase()));
               const spec = unitSwitchFor(field.unit);
               return (
-                <Field key={field.key} htmlFor={fieldId} label={field.label} symbol={field.symbol} error={fieldError}>
+                <div key={field.key} className="grid gap-2">
+                <Field htmlFor={fieldId} label={field.label} symbol={field.symbol} error={fieldError}>
                   {field.kind === "select" || converterUnit ? (
                     <Select
                       id={fieldId}
@@ -316,7 +394,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                       />
                     )
                   ) : (
-                    <span className="flex gap-2">
+                    <MeasurementField invalid={Boolean(fieldError)}>
                       <Input
                         id={fieldId}
                         inputMode="decimal"
@@ -339,38 +417,50 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                       ) : field.unit ? (
                         <UnitBadge>{field.unit}</UnitBadge>
                       ) : null}
-                    </span>
+                    </MeasurementField>
                   )}
                 </Field>
+                {!fieldError && field.helper ? (
+                  <span className="text-sm text-muted">{field.helper}</span>
+                ) : null}
+                </div>
               );
             })}
-          </div>
-        </aside>
-
-        <div id="results" className="bg-bg">
-          <div className="diagram-surface">
-            <MechanicalDiagram toolId={tool.id} variant={tool.id === "beam" ? input.case : tool.id === "section" ? input.shape : undefined} />
-          </div>
-          <section className="p-4 sm:p-5" aria-live="polite">
-            <h2 className="text-base font-semibold">{result.errors.length ? "Resolve the input state" : "Results"}</h2>
+            </div>
+          }
+          results={
+            <div id="results" aria-live="polite" className="grid gap-4">
             {result.errors.length ? (
-              <div className="mt-4 flex items-start gap-2 rounded-md border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
+              <div className="flex items-start gap-2 rounded-md border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
                 <CircleAlert size={16} />
                 <p>{result.errors[0]}</p>
               </div>
             ) : (
               <>
-                <div className="mt-4 grid gap-4">
+                <div className="grid gap-4">
                   {displayGroups.map(({ group, spec, stored, shown, options, canSwitch, unitLabel }) => (
                       <div key={group.label} className="grid gap-1.5">
-                        <span className="text-sm">{group.label}</span>
+                        <QuantityName
+                          label={group.label}
+                          symbol={quantitySymbol(group.primary.key, group.primary.symbol)}
+                        />
                         <span className="flex items-center gap-2">
                           <p className="min-w-0 flex-1 font-mono text-3xl font-medium tabular-nums tracking-tight">{shown}</p>
                           {canSwitch && spec ? (
                             <UnitSelect
                               aria-label={`${group.label} unit`}
                               value={stored}
-                              onChange={(event) => setResultUnit((current) => ({ ...current, [group.label]: event.target.value }))}
+                              onChange={(event) => {
+                                const nextUnit = event.target.value;
+                                setResultUnit((current) => {
+                                  const next = { ...current, [group.label]: nextUnit };
+                                  persistStoredUnits(tool.id, displayUnit, next);
+                                  return next;
+                                });
+                                if (tool.id === "converter" && group.primary.key === "converted") {
+                                  update("to", nextUnit);
+                                }
+                              }}
                             >
                               {options.map((option) => (
                                 <option key={option} value={option}>
@@ -385,8 +475,8 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                       </div>
                     ))}
                 </div>
-                <p className="mt-5 font-mono text-sm text-accent">{result.method}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
+                <GoverningRelation formula={result.method} className="text-sm" />
+                <div className="flex flex-wrap gap-2">
                     <Button variant="accent" onClick={saveLocal}>
                       <Save size={13} />
                       Save this check
@@ -402,61 +492,13 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                   </div>
               </>
             )}
-          </section>
-        </div>
-      </section>
-
-      {related.length > 0 && (
-        <p className="no-print mt-6 text-sm text-muted">
-          Nearby:{" "}
-          {related.map((item, index) => (
-            <span key={item.id}>
-              {index > 0 ? " · " : null}
-              <Link to="/tool/$toolId" params={{ toolId: item.id }} className="text-fg hover:text-accent">
-                {item.title}
-              </Link>
-            </span>
-          ))}
-        </p>
-      )}
-
-      {!result.errors.length && (
-        <section className="no-print mt-8 border-t border-border pt-6" aria-labelledby="method-title">
-          <p className="eyebrow">Method</p>
-          <h2 id="method-title" className="mt-1 text-lg font-semibold tracking-[-0.03em]">
-            Equation, when, and don’t
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">{tool.description}</p>
-          <p className="mt-4 font-mono text-sm text-accent">{result.method}</p>
-          <div className="mt-5 grid max-w-2xl gap-5 sm:grid-cols-2">
-            <div>
-              <p className="text-sm font-medium">When</p>
-              <ul className="mt-2 grid gap-1.5 text-sm leading-6 text-muted">
-                {tool.assumptions.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
             </div>
-            <div>
-              <p className="text-sm font-medium">Don’t</p>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                {result.warnings[0] ?? "This is a first-pass number, not a code check or approval."}
-              </p>
-            </div>
-          </div>
-          {tool.sourceUrl ? (
-            <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="mt-5 inline-flex text-sm text-accent hover:underline">
-              {tool.sourceLabel}
-            </a>
-          ) : (
-            <p className="mt-5 text-sm text-muted">{tool.sourceLabel}</p>
-          )}
-        </section>
-      )}
+          }
+        />
 
       {printScope && (
         <section className="print-sheet mt-8 hidden print:block">
-          <p className="eyebrow">Caliper · calculation snapshot</p>
+          <p className="eyebrow">Calculation snapshot</p>
           <h1>{printScope.title}</h1>
           <p>Formula version {printScope.formulaVersion}</p>
           <h2>Conditions</h2>
@@ -498,7 +540,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           <p>{printScope.boundary}</p>
         </section>
       )}
-    </div>
+    </InstrumentPage>
   );
 }
 
@@ -515,4 +557,34 @@ function pickKnown(search: Record<string, string>, toolId: ToolId) {
     if (allowed.has(key) && text !== undefined && text !== "") next[key] = text;
   }
   return next;
+}
+
+type StoredUnits = { display: Record<string, string>; result: Record<string, string> };
+
+function unitStorageKey(toolId: string) {
+  return `instrument-caliper-units:${toolId}`;
+}
+
+function loadStoredUnits(toolId?: string): StoredUnits | null {
+  if (!toolId || typeof sessionStorage === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(unitStorageKey(toolId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredUnits;
+    if (!parsed || typeof parsed !== "object") return null;
+    return {
+      display: parsed.display && typeof parsed.display === "object" ? parsed.display : {},
+      result: parsed.result && typeof parsed.result === "object" ? parsed.result : {},
+    };
+  } catch {
+    return null;
+  }
+}
+
+function persistStoredUnits(toolId: string, display: Record<string, string>, result: Record<string, string>) {
+  try {
+    sessionStorage.setItem(unitStorageKey(toolId), JSON.stringify({ display, result }));
+  } catch {
+    /* private mode */
+  }
 }

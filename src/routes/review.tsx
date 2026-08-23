@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Check, Download, Minus, Plus, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -185,7 +185,7 @@ function ReviewPage() {
       </div>
 
       <section className="mt-12 grid gap-8 lg:grid-cols-2">
-        <div className={cn(panelClass, "p-5")}>
+        <div className={cn(panelClass, "min-w-0 overflow-hidden p-5")}>
           <p className="eyebrow">Trade study</p>
           <h2 className="mt-1 text-xl font-semibold">Weighted comparison</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -200,15 +200,20 @@ function ReviewPage() {
           </div>
           <div className="mt-4 grid gap-3">
             {criteria.map((criterion, index) => (
-              <div key={index} className="grid gap-2 rounded-md border border-border p-3 sm:grid-cols-[1fr_70px_70px_70px_auto]">
-                <Input value={criterion.label} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, label: event.target.value } : item)))} />
-                <Input value={criterion.weight} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, weight: event.target.value } : item)))} className="font-mono" aria-label="Weight" />
-                <Input value={criterion.optionA} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionA: event.target.value } : item)))} className="font-mono" aria-label="A score" />
-                <Input value={criterion.optionB} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionB: event.target.value } : item)))} className="font-mono" aria-label="B score" />
-                <Button variant="ghost" size="icon" onClick={() => setCriteria((current) => (current.length === 1 ? current : current.filter((_, i) => i !== index)))} aria-label="Remove">
+              <fieldset key={index} className="grid min-w-0 gap-2 rounded-md border border-border p-3 sm:grid-cols-[1fr_70px_70px_70px_auto]">
+                <legend className="sr-only">Criterion {index + 1}</legend>
+                <Input
+                  value={criterion.label}
+                  onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, label: event.target.value } : item)))}
+                  aria-label={`Criterion ${index + 1} name`}
+                />
+                <Input value={criterion.weight} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, weight: event.target.value } : item)))} className="font-mono" aria-label={`Criterion ${index + 1} weight`} />
+                <Input value={criterion.optionA} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionA: event.target.value } : item)))} className="font-mono" aria-label={`Criterion ${index + 1} ${optionAName} score`} />
+                <Input value={criterion.optionB} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionB: event.target.value } : item)))} className="font-mono" aria-label={`Criterion ${index + 1} ${optionBName} score`} />
+                <Button variant="ghost" size="icon" onClick={() => setCriteria((current) => (current.length === 1 ? current : current.filter((_, i) => i !== index)))} aria-label={`Remove criterion ${index + 1}`}>
                   <Minus size={14} />
                 </Button>
-              </div>
+              </fieldset>
             ))}
           </div>
           <Button variant="ghost" className="mt-3 text-accent" onClick={() => setCriteria((current) => [...current, { label: "New criterion", weight: "1", optionA: "5", optionB: "5" }])}>
@@ -220,7 +225,7 @@ function ReviewPage() {
             </p>
           )}
         </div>
-        <div className={cn(panelClass, "p-5")}>
+        <div className={cn(panelClass, "min-w-0 overflow-hidden p-5")}>
           <p className="eyebrow">FMEA arithmetic</p>
           <h2 className="mt-1 text-xl font-semibold">Severity × occurrence × detection</h2>
           <div className="mt-4 grid grid-cols-3 gap-3">
@@ -238,9 +243,9 @@ function ReviewPage() {
             ))}
           </div>
           {fmea.error ? <p className="mt-4 text-sm text-danger">{fmea.error}</p> : fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>}
-          <label className="mt-6 grid gap-2 text-xs text-muted">
+          <label className="mt-6 grid min-w-0 gap-2 text-xs text-muted">
             Selection workflow
-            <Select value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)}>
+            <Select className="w-full min-w-0 max-w-full" value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)}>
               {selectionWorkflows.map((item) => (
                 <option key={item.id} value={item.id}>{item.title}</option>
               ))}
@@ -264,18 +269,27 @@ function ReviewPage() {
         </div>
       </section>
 
-      <section className={cn(panelClass, "mt-10 p-5")}>
+      <section className={cn(panelClass, "mt-10 min-w-0 overflow-hidden p-5")}>
         <p className="eyebrow">Record</p>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Snapshot title" />
-          <Select value={templateKind} onChange={(event) => setTemplateKind(event.target.value as DocumentTemplateKind)}>
-            <option value="report">Report template</option>
-            <option value="checklist">Checklist template</option>
-            <option value="designBasis">Design-basis record</option>
-            <option value="changeSummary">Change-summary record</option>
-          </Select>
+        <div className="mt-3 grid min-w-0 gap-3 md:grid-cols-2">
+          <label className="grid min-w-0 gap-1 text-xs text-muted">
+            Snapshot title
+            <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Evidence review" />
+          </label>
+          <label className="grid min-w-0 gap-1 text-xs text-muted">
+            Export template
+            <Select className="w-full min-w-0 max-w-full" value={templateKind} onChange={(event) => setTemplateKind(event.target.value as DocumentTemplateKind)}>
+              <option value="report">Report template</option>
+              <option value="checklist">Checklist template</option>
+              <option value="designBasis">Design-basis record</option>
+              <option value="changeSummary">Change-summary record</option>
+            </Select>
+          </label>
         </div>
-        <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className={cn(controlClass, "mt-3 h-auto w-full py-2")} placeholder="Notes (optional)" />
+        <label className="mt-3 grid gap-1 text-xs text-muted">
+          Notes
+          <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className={cn(controlClass, "mt-0 h-auto w-full min-w-0 py-2")} placeholder="Optional context for this snapshot" />
+        </label>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="accent" onClick={persist}>
             <Save size={15} /> Save locally
@@ -284,7 +298,15 @@ function ReviewPage() {
             <Download size={15} /> Download markdown
           </Button>
         </div>
-        {reviews.length > 0 && <p className="mt-4 text-sm text-muted">{reviews.length} snapshot{reviews.length === 1 ? "" : "s"} stored in this browser. Open one from Projects to continue.</p>}
+        {reviews.length > 0 && (
+          <p className="mt-4 text-sm text-muted">
+            {reviews.length} snapshot{reviews.length === 1 ? "" : "s"} stored in this browser. Open one from{" "}
+            <Link to="/workshop" className="text-accent hover:text-fg">
+              Project
+            </Link>{" "}
+            to continue.
+          </p>
+        )}
       </section>
     </div>
   );

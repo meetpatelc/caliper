@@ -25,7 +25,7 @@ import {
 import type { WorkspaceContract } from "@/lib/platform";
 
 type BaseToolId = "axial" | "beam" | "stability" | "section" | "converter" | "triangle" | "coordinate" | "cylinder" | "density" | "newton" | "kinetic" | "hydrostatic" | "continuity" | "sensibleHeat" | "ohm" | "fits" | "toleranceStack" | "position" | "mmc" | "motionProfile" | "reflectedInertia" | "pneumatic" | "clampForce" | "torsion" | "bearingLife" | "boltPreload" | "millingMrr" | "lmtd" | "darcy" | "thermalExpansion" | "thermalStress" | "planeConduction" | "bernoulli" | "combinedStress" | "thinVessel" | "leadScrew" | "airConsumption" | "gearRatio" | "boltLoad" | "safetyMargin" | "circularArc" | "compressionSpring" | "drillingTime" | "turningMrr" | "processCapability" | "extensionSpring" | "torsionSpring" | "keyway" | "cuttingParameters" | "sheetMetalBend" | "productionMetrics" | "gageRr" | "measurementUncertainty" | "thermalRadiation" | "shaftDesign" | "bearingLoad" | "formControl" | "driveRatio" | "motionDuty" | "filletWeld" | "threadDesign" | "orificeFlow" | "dimensionCheck" | "arithmeticScratchpad" | "shaftCombined" | "mohrCircle" | "pressFit" | "jointSeparation" | "hydraulicCylinder" | "hydraulicPump" | "hydraulicMotor" | "hydraulicLine" | "orientationControl" | "profileRunout" | "processPerformance" | "ballScrewSizing" | "rackPinion" | "beltAxis" | "cuttingPower" | "drillPointDepth" | "toolDeflection" | "fatigueConcentration" | "goodmanFatigue" | "minerDamage" | "planetaryGear" | "wormDrive" | "sCurveProfile" | "torqueSpeedDuty" | "fixtureClamping" | "pickPlaceCycle" | "payloadInertia" | "pneumaticCycleTime" | "valveCv" | "vacuumHolding" | "additiveBuild" | "gravityMoment" | "pitchCircle" | "regularPolygon" | "eccentricBoltGroup" | "pinStress" | "gearToothStress" | "vacuumEvacuation" | "toggleForce" | "wristInertia" | "cycleBuilder" | "pneumaticLineLoss" | "tappingTorque" | "threadMachiningTime" | "reynoldsNumber" | "minorLosses" | "pipeSizing" | "buoyancyForce" | "submergedPlane" | "convectionHeat" | "thermalResistance" | "idealGas" | "isentropicMachine" | "gaugeBiasStudy" | "controlChart" | "toleranceSampling" | "taylorToolLife" | "cuttingForce" | "weldGroup" | "beamDiagram" | "triangleTruss" | "hertzContact" | "fractureIntensity" | "deflectionCheck" | "bearingAdjustedLife" | "flywheelEnergy" | "frictionClutch" | "splineLoad" | "gearMeshForce" | "beltTension" | "vesselGeometry" | "threadTensileArea" | "couplingTorsion" | "cantileverFrame" | "plateBuckling" | "screwCriticalSpeed" | "linearGuideLife" | "brakingDuty" | "ballScrewLife" | "driveTrain" | "rmsDutyTorque" | "motorOperatingPoint" | "gripperHold" | "conveyorLine" | "robotReach" | "robotPayloadMoment" | "rotaryIndexing" | "pneumaticDemandBudget" | "hydraulicLossBudget" | "vacuumLeakageBudget" | "hydraulicAccumulatorState" | "hydraulicReservoirDwell" | "darcyFrictionFactor" | "pumpSystemHeadPoint" | "npshAvailableBudget" | "thermalRcStep" | "manningUniformFlow" | "compressibleMassFlow" | "machiningTimeBudget" | "threePhasePower";
-type ExpansionToolId = "sheetBendAllowance" | "idealGasEntropyChange";
+type ExpansionToolId = "sheetBendAllowance" | "idealGasEntropyChange" | "gravitationalPe" | "pipeVelocity" | "dynamicPressure";
 export type ToolId = BaseToolId | ExpansionToolId;
 
 export type ToolDefinition = {
@@ -217,6 +217,21 @@ export const tools: ToolDefinition[] = [
     contract: { formulaVersion: "1.0.0", domain: "dynamics", safetyTier: "A", validation: "verified", prerequisites: ["mass", "speed", "classical-motion context"], sourceIds: ["openstax-energy", "nist-derived"] },
   },
   {
+    id: "gravitationalPe",
+    title: "Gravitational potential energy",
+    kicker: "Near-field m g h",
+    description: "Calculate the change in gravitational potential energy near Earth's surface from a stated mass, height, and gravity.",
+    category: "Dynamics & motion",
+    icon: Zap,
+    accent: "amber",
+    assumptions: ["Constant g", "Height measured along the gravity vector", "No stored elastic energy"],
+    outputLabel: "Potential energy",
+    status: "ready",
+    sourceLabel: "Standard particle mechanics",
+    sourceUrl: "https://en.wikipedia.org/wiki/Gravitational_energy",
+    contract: { formulaVersion: "1.0.0", domain: "dynamics", safetyTier: "A", validation: "verified", prerequisites: ["mass", "height", "gravity"], sourceIds: ["particle-mechanics"] },
+  },
+  {
     id: "hydrostatic",
     title: "Hydrostatic pressure",
     kicker: "Static liquid column",
@@ -245,6 +260,21 @@ export const tools: ToolDefinition[] = [
     sourceLabel: "Engineering ToolBox fluid-mechanics index",
     sourceUrl: "https://www.engineeringtoolbox.com/fluid-mechanics-t_21.html",
     contract: { formulaVersion: "1.0.0", domain: "fluids", safetyTier: "A", validation: "verified", prerequisites: ["first area", "first velocity", "second area"], sourceIds: ["etb-fluid", "nist-derived"] },
+  },
+  {
+    id: "pipeVelocity",
+    title: "Pipe mean velocity",
+    kicker: "Continuity in a full pipe",
+    description: "Calculate mean velocity in a circular full-flowing pipe from volumetric flow and inside diameter.",
+    category: "Fluids",
+    icon: ArrowLeftRight,
+    accent: "cyan",
+    assumptions: ["Incompressible", "Pipe running full", "Uniform density"],
+    outputLabel: "Mean velocity",
+    status: "ready",
+    sourceLabel: "Continuity",
+    sourceUrl: "https://en.wikipedia.org/wiki/Continuity_equation",
+    contract: { formulaVersion: "1.0.0", domain: "fluids", safetyTier: "A", validation: "verified", prerequisites: ["volumetric flow", "inside diameter"], sourceIds: ["continuity-mean-velocity"] },
   },
   {
     id: "sensibleHeat",
@@ -490,11 +520,11 @@ export const tools: ToolDefinition[] = [
     id: "thermalExpansion",
     title: "Free thermal expansion",
     kicker: "User-entered CTE",
-    description: "Calculate ideal free linear length change from a stated coefficient of thermal expansion, initial length, and temperature interval.",
+    description: "Calculate ideal free linear length change from a signed coefficient of thermal expansion, initial length, and temperature interval.",
     category: "Materials & thermal",
     icon: Thermometer,
     accent: "cyan",
-    assumptions: ["Free expansion", "Uniform temperature", "User-entered coefficient", "Near-constant CTE"],
+    assumptions: ["Free expansion", "Uniform temperature", "Signed user-entered CTE", "Near-constant CTE"],
     outputLabel: "Length change · final length",
     status: "ready",
     sourceLabel: "OpenStax thermal-expansion reference",
@@ -545,6 +575,21 @@ export const tools: ToolDefinition[] = [
     sourceLabel: "OpenStax Bernoulli reference",
     sourceUrl: "https://openstax.org/books/university-physics-volume-1/pages/14-6-bernoullis-equation",
     contract: { formulaVersion: "1.0.0", domain: "fluids", safetyTier: "B", validation: "source-reviewed", prerequisites: ["density", "velocity at each station", "elevation at each station", "ideal-flow context"], sourceIds: ["openstax-bernoulli"] },
+  },
+  {
+    id: "dynamicPressure",
+    title: "Dynamic pressure",
+    kicker: "Bernoulli kinetic term",
+    description: "Calculate Bernoulli dynamic pressure from density and speed as a wind or duct screen.",
+    category: "Applied fluids",
+    icon: Waves,
+    accent: "cyan",
+    assumptions: ["Incompressible", "Uniform density", "Speed is the free-stream or mean duct speed"],
+    outputLabel: "Dynamic pressure",
+    status: "ready",
+    sourceLabel: "Bernoulli",
+    sourceUrl: "https://en.wikipedia.org/wiki/Dynamic_pressure",
+    contract: { formulaVersion: "1.0.0", domain: "fluids", safetyTier: "A", validation: "verified", prerequisites: ["density", "speed"], sourceIds: ["bernoulli-dynamic-pressure"] },
   },
   {
     id: "combinedStress",
@@ -689,7 +734,7 @@ export const tools: ToolDefinition[] = [
     category: "Manufacturing planning",
     icon: Gauge,
     accent: "amber",
-    assumptions: ["Constant spindle speed", "Constant feed per revolution", "Cutting length equals entered depth", "Reference arithmetic only"],
+    assumptions: ["Constant spindle speed", "Constant feed per revolution", "Cutting length equals entered depth", "Integer hole count", "Reference arithmetic only"],
     outputLabel: "Cutting speed · feed rate · time",
     status: "ready",
     sourceLabel: "KEYENCE drilling-formula reference",
@@ -1864,6 +1909,9 @@ export const toolAliases: Record<ToolId, string[]> = {
   threePhasePower: ["three phase power", "three phase kVA", "three phase kW", "line voltage current", "apparent power", "power factor"],
   sheetBendAllowance: ["bend allowance", "bend deduction", "sheet metal bend", "K factor", "flat pattern bend", "neutral axis"],
   idealGasEntropyChange: ["ideal gas entropy", "entropy change", "specific entropy", "constant cp entropy", "temperature pressure entropy", "NASA entropy"],
+  gravitationalPe: ["potential energy", "gravitational energy", "mgh", "elevation energy", "datum energy"],
+  pipeVelocity: ["pipe velocity", "mean velocity", "continuity velocity", "pipe flow speed", "inside diameter velocity"],
+  dynamicPressure: ["dynamic pressure", "stagnation", "q pressure", "wind pressure", "½ρv²", "half rho v squared"],
 };
 
 export const searchableToolText = (tool: ToolDefinition) => [tool.id, tool.title, tool.description, tool.category, tool.contract.domain, ...toolAliases[tool.id]].join(" ").toLowerCase();

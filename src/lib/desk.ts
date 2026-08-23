@@ -1,13 +1,13 @@
 import { tools, type ToolId } from "@/lib/catalog";
 import { domains } from "@/lib/platform";
 
-export const APP_NAME = "Caliper";
+export const APP_NAME = "Library";
 export const APP_TAGLINE = "Set the numbers. Keep the model in frame.";
-export const APP_JOB = "The ready desk — open a model and get a number.";
+export const APP_JOB = "Open a finished model and get a number.";
 export const SIBLING = {
-  name: "Gauge",
+  name: "Studio",
   job: "Write and publish a model",
-  url: "https://meadow-prairie-bamboo-civic.grok.me",
+  path: "/studio",
   repo: "https://github.com/meetpatelc/gauge",
 } as const;
 export const MODEL_COUNT = tools.length;
@@ -40,6 +40,7 @@ export function openDeskSearch() {
 }
 
 export function isFieldHidden(toolId: ToolId, key: string, input: Record<string, string>) {
+  if (toolId === "converter" && key === "to") return true;
   if (toolId === "section" && ((key === "height" && input.shape !== "rectangle") || (key === "innerDiameter" && input.shape !== "annulus"))) {
     return true;
   }

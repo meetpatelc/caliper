@@ -3,3 +3,86 @@
 @source "../node_modules/@instrument/ui/src";
 @import "./styles/desk.css";
 @import "./diagrams.css";
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  .field-control:focus-visible {
+    outline: var(--focus-ring) !important;
+    outline-offset: var(--focus-offset) !important;
+  }
+
+  select {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  .measurement-field {
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+  }
+  .measurement-field:hover {
+    border-color: color-mix(in srgb, var(--color-fg) 25%, var(--color-border));
+  }
+  .measurement-field:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .measurement-field-invalid {
+    border-color: var(--color-danger);
+  }
+  .measurement-field input,
+  .measurement-field select,
+  .measurement-field > * {
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent;
+  }
+  .measurement-field input {
+    flex: 1;
+    min-width: 0;
+  }
+  .measurement-field select,
+  .measurement-field > :not(input) {
+    width: var(--spacing-unit);
+    flex: 0 0 var(--spacing-unit);
+    border-left: 1px solid var(--color-border) !important;
+  }
+
+  .field-control.tabular-nums {
+    font-family: var(--font-mono);
+  }
+
+  footer a {
+    min-height: 1.5rem;
+    padding-block: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  header nav a,
+  header nav button {
+    min-height: 2.5rem;
+  }
+}
+
+/* Kit accent hover:bg-mark is the same red; darken it outside layers so utilities cannot hide it. */
+button.bg-accent:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-accent) 78%, #111) !important;
+}

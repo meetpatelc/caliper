@@ -1,4 +1,4 @@
-import { convertQuantity, isUnitFamilyId, unitId, unitSymbol, type UnitFamilyId } from "./units";
+import { convertQuantity, isUnitFamilyId, unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 
 export type UnitSwitch = { family: UnitFamilyId; engine: string; options: string[] };
 
@@ -19,6 +19,7 @@ const SHORT: Partial<Record<UnitFamilyId, string[]>> = {
   energy: ["energy.J", "energy.kJ", "energy.kWh"],
   power: ["power.W", "power.kW", "power.hp"],
   temperature: ["temperature.degC", "temperature.K", "temperature.degF"],
+  temperatureDelta: ["temperatureDelta.degC", "temperatureDelta.K", "temperatureDelta.degF"],
   density: ["density.kg_m3", "density.lbm_ft3"],
   volumetricFlow: ["volumetricFlow.L_min", "volumetricFlow.L_s", "volumetricFlow.us_gpm", "volumetricFlow.cfm"],
   frequency: ["frequency.rpm", "frequency.Hz"],
@@ -32,25 +33,49 @@ const SHORT: Partial<Record<UnitFamilyId, string[]>> = {
 const skip = new Set(["—", "%", "unit", "units", "declared", "teeth", "cycles", "holes", "samples", "people", "observations", "coils", "turns", "starts", "TPI", ":1"]);
 
 const ALIAS_FAMILY: Record<string, UnitFamilyId> = {
-  "K or °C": "temperature",
+  "K or °C": "temperatureDelta",
   "mbar abs": "pressure",
   "°": "angle",
   deg: "angle",
 };
 
-export function unitSwitchFor(unit?: string): UnitSwitch | null {
+const DELTA_OUTPUT_KEYS = new Set(["lmtd", "delta1", "delta2", "totalTemperatureDifference"]);
+
+export function unitSwitchFor(unit?: string, familyHint?: UnitFamilyId): UnitSwitch | null {
   if (!unit || skip.has(unit)) return null;
-  const familyId = ALIAS_FAMILY[unit] ?? inferFamily(unit);
+  const familyId = familyHint ?? ALIAS_FAMILY[unit] ?? inferFamily(unit);
   if (!familyId || !isUnitFamilyId(familyId)) return null;
   let engine: string;
   try {
-    engine = unitId(familyId, unit === "K or °C" ? "°C" : unit === "mbar abs" ? "mbar" : unit === "°" || unit === "deg" ? "deg" : unit);
+    const token = unit === "K or °C" ? "°C" : unit === "mbar abs" ? "mbar" : unit === "°" || unit === "deg" ? "deg" : unit;
+    engine = unitId(familyId, token);
   } catch {
     return null;
   }
   const preferred = SHORT[familyId] ?? [];
   const options = [engine, ...preferred.filter((item) => item !== engine)];
   return { family: familyId, engine, options };
+}
+
+const STRESS_OUTPUT_KEYS = new Set([
+  "stress",
+  "axialStress",
+  "bendingStress",
+  "shearStress",
+  "thermalStress",
+  "stressMagnitude",
+  "vonMises",
+  "principalStress",
+]);
+
+export function unitSwitchForResult(key: string, unit?: string): UnitSwitch | null {
+  if (DELTA_OUTPUT_KEYS.has(key) || unit === "K or °C") {
+    return unitSwitchFor(unit === "K" ? "K" : unit, "temperatureDelta");
+  }
+  if (STRESS_OUTPUT_KEYS.has(key) || /stress/i.test(key)) {
+    return unitSwitchFor(unit, "stress");
+  }
+  return unitSwitchFor(unit);
 }
 
 function inferFamily(token: string): UnitFamilyId | undefined {
@@ -70,6 +95,7 @@ function inferFamily(token: string): UnitFamilyId | undefined {
     "energy",
     "power",
     "temperature",
+    "temperatureDelta",
     "density",
     "dynamicViscosity",
     "kinematicViscosity",
@@ -114,3 +140,27 @@ export function parseShop(value: string) {
 export function shopLabel(family: UnitFamilyId, token: string) {
   return unitSymbol(family, token);
 }
+
+/** Rewrite canonical engine values into the user's last display units (session only). */
+export function hydrateDisplayInputs(
+  fields: Array<{ key: string; unit?: string }>,
+  canonical: Record<string, string>,
+  displayUnits?: Record<string, string>,
+): Record<string, string> {
+  return Object.fromEntries(
+    fields.map((field) => {
+      const spec = unitSwitchFor(field.unit);
+      const shownUnit = displayUnits?.[field.key] ?? spec?.engine ?? field.unit ?? "";
+      const raw = canonical[field.key] ?? "";
+      if (!spec || !shownUnit || shownUnit === spec.engine) return [field.key, raw];
+      const numeric = parseShop(raw);
+      if (!Number.isFinite(numeric)) return [field.key, raw];
+      try {
+        return [field.key, formatShop(convertShop(spec.family, numeric, spec.engine, shownUnit))];
+      } catch {
+        return [field.key, raw];
+      }
+    }),
+  );
+}
+

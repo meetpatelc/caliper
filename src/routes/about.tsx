@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 import { tools } from "@/lib/catalog";
-import { SIBLING } from "@/lib/desk";
+import { PARENT_NAME } from "@/lib/instrument";
 
 export const Route = createFileRoute("/about")({ component: AboutPage });
 
@@ -9,6 +9,7 @@ const suitable = [
   "Engineering explanation and independent study.",
   "Preliminary, transparent checks inside the stated model boundary.",
   "Comparing compatible quantities while keeping units explicit.",
+  "Authoring a unit-aware calculator with method and assumptions attached.",
   "Building intuition before using a project-specific approved process.",
 ];
 
@@ -22,17 +23,29 @@ const unsuitable = [
 function AboutPage() {
   return (
     <div className="page-wrap max-w-3xl">
-      <p className="eyebrow">About Caliper</p>
-      <h1 className="display-title mt-4">The ready desk.</h1>
+      <p className="eyebrow">About {PARENT_NAME}</p>
+      <h1 className="display-title mt-4">One product. Four rooms.</h1>
       <p className="mt-5 text-base leading-7 text-muted">
-        Caliper is a local-first workspace of {tools.length} finished calculators. Open a model, set the numbers, keep the result. Saving a snapshot does not require an account.
+        {PARENT_NAME} is a calculator you can trust because the model is in the frame.{" "}
+        <Link to="/" className="text-accent">
+          Library
+        </Link>{" "}
+        is {tools.length} finished models — open one and get a number.{" "}
+        <Link to="/studio" className="text-accent">
+          Studio
+        </Link>{" "}
+        is where you write a model.{" "}
+        <Link to="/review" className="text-accent">
+          Review
+        </Link>{" "}
+        is evidence checklists, a trade study, and FMEA you control.{" "}
+        <Link to="/workshop" className="text-accent">
+          Project
+        </Link>{" "}
+        is drafts, saved checks, and review snapshots on this device. Method, assumptions, and limits also sit on each model.
       </p>
       <p className="mt-4 text-base leading-7 text-muted">
-        {SIBLING.name} is the sibling: atlas and studio — {SIBLING.job.toLowerCase()}.{" "}
-        <a href={SIBLING.url} className="text-accent">
-          Open {SIBLING.name}
-        </a>
-        .
+        Saving a snapshot or a Studio draft does not require an account.
       </p>
       <p className="eyebrow mt-6">Preliminary only · project context required · independent review</p>
       <div className="mt-10 grid gap-5 md:grid-cols-2">
@@ -60,7 +73,11 @@ function AboutPage() {
         </div>
       </div>
       <p className="mt-10 text-sm text-muted">
-        Found a model issue? <Link to="/feedback" className="text-accent">Send feedback</Link>.
+        Found a model issue?{" "}
+        <Link to="/feedback" className="text-accent">
+          Send feedback
+        </Link>
+        .
       </p>
     </div>
   );

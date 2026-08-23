@@ -2,9 +2,14 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const src = join(dirname(fileURLToPath(import.meta.url)), "../src");
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const src = join(root, "src");
+const formula = join(root, "packages/formula/src/index.ts");
 
 export async function resolve(specifier, context, nextResolve) {
+  if (specifier === "@instrument/formula") {
+    return { url: pathToFileURL(formula).href, shortCircuit: true };
+  }
   if (!specifier.startsWith("@/")) return nextResolve(specifier, context);
   const without = specifier.slice(2);
   for (const file of [join(src, without), join(src, `${without}.ts`), join(src, `${without}.tsx`)]) {

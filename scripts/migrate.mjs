@@ -2,14 +2,21 @@
 /**
  * Deploy-time database migrator (node-postgres, `pg`).
  *
- * Run with `npm run db:migrate` at deploy time — not as a side effect of
- * `npm run build`. No DATABASE_URL (local / preview) -> skip; the PGLite
- * fallback applies the same files at startup instead (see src/lib/db.ts).
+ * Runs during `npm run build` — on every Vercel deploy — applying pending files
+ * in ../migrations to DATABASE_URL. Each file is applied in one transaction and
+ * recorded in a `_migrations` table, so it runs once and is safe to re-run.
+ *
+ * The read is non-recursive, so the opt-in auth schema under migrations/auth/
+ * is not applied to an app that never asked for sign-in.
+ *
+ * No DATABASE_URL (local / preview builds) -> skip; the PGLite fallback applies
+ * the same files at startup instead (see src/lib/db.ts).
  */
 import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import pg from "pg";
+import { pendingMigrations } from "./migration-plan.mjs";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -22,27 +29,31 @@ if (!databaseUrl) {
 const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "migrations");
 
 async function main() {
+  let entries;
+  try {
+    entries = await readdir(migrationsDir);
+  } catch {
+    console.log("[migrate] no migrations/ directory — nothing to do.");
+    return;
+  }
+  // An app with no schema of its own must not pay for a database connection.
+  if (pendingMigrations(entries, []).length === 0) {
+    console.log("[migrate] no migrations — nothing to do.");
+    return;
+  }
+
   const pool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
   const client = await pool.connect();
   try {
     await client.query(
       "CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())",
     );
-    const applied = new Set(
-      (await client.query("SELECT name FROM _migrations")).rows.map((r) => r.name),
+    const applied = (await client.query("SELECT name FROM _migrations")).rows.map(
+      (r) => r.name,
     );
 
-    let files;
-    try {
-      files = (await readdir(migrationsDir)).filter((f) => f.endsWith(".sql")).sort();
-    } catch {
-      console.log("[migrate] no migrations/ directory — nothing to do.");
-      return;
-    }
-
     let count = 0;
-    for (const name of files) {
-      if (applied.has(name)) continue;
+    for (const { name } of pendingMigrations(entries, applied)) {
       const text = await readFile(join(migrationsDir, name), "utf8");
       try {
         await client.query("BEGIN");

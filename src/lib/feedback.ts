@@ -1,16 +1,16 @@
-import { createServerFn } from "@tanstack/react-start";
-import { getSql } from "@/lib/db";
+const KEY = "instrument-feedback";
 
-export const submitFeedback = createServerFn({ method: "POST" })
-  .validator((data: { kind: "bug" | "message"; message: string; pagePath: string }) => {
-    const message = data.message.trim();
-    if (!message) throw new Error("Add a message before submitting.");
-    if (message.length > 20000) throw new Error("Message is limited to 20,000 characters.");
-    if (data.kind !== "bug" && data.kind !== "message") throw new Error("Choose a message type.");
-    return { kind: data.kind, message, pagePath: data.pagePath.slice(0, 300) };
-  })
-  .handler(async ({ data }) => {
-    const sql = await getSql();
-    await sql`insert into feedback (kind, message, page_path) values (${data.kind}, ${data.message}, ${data.pagePath})`;
-    return { ok: true as const };
-  });
+export async function submitFeedback(input: { data: { kind: "bug" | "message"; message: string; pagePath: string } }) {
+  const message = input.data.message.trim();
+  if (!message) throw new Error("Add a message before submitting.");
+  if (message.length > 20000) throw new Error("Message is limited to 20,000 characters.");
+  const record = {
+    kind: input.data.kind,
+    message,
+    pagePath: input.data.pagePath.slice(0, 300),
+    savedAt: new Date().toISOString(),
+  };
+  const existing = JSON.parse(localStorage.getItem(KEY) ?? "[]") as unknown[];
+  localStorage.setItem(KEY, JSON.stringify([record, ...existing].slice(0, 40)));
+  return { ok: true as const };
+}

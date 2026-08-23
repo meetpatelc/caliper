@@ -25,7 +25,7 @@ function FeedbackPage() {
     try {
       await submitFeedback({ data: { kind, message, pagePath: window.location.pathname } });
       setMessage("");
-      toast.success("Feedback submitted. Thank you.");
+      toast.success("Feedback saved on this device. Thank you.");
     } catch {
       toast.error("Could not submit. Try again.");
     } finally {
