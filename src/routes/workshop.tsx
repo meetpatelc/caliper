@@ -37,7 +37,7 @@ function ProjectPage() {
           <p className="eyebrow">Project</p>
           <h1 className="display-title mt-3">On this device.</h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-muted">
-            Drafts, saved checks, and reviews stay here. No account. Write in{" "}
+            Drafts, saved checks, and reviews stay here. Sign in with email to keep an account; the work itself is still on this computer. Write in{" "}
             <Link to="/studio" className="text-accent hover:text-fg">
               Studio
             </Link>{" "}

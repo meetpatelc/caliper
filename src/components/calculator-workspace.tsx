@@ -144,7 +144,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   }
 
   const fields = toolFields[tool.id];
-  const pinned = favorites.includes(tool.id);
+  const favourited = favorites.includes(tool.id);
   const printScope = !result.errors.length
     ? buildCalculationPrintScope(
         tool,
@@ -278,9 +278,9 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               Fork in studio
             </Button>
           ) : null}
-          <Button variant={pinned ? "mark" : "outline"} onClick={() => toggleFavorite(tool.id)}>
-            <Star size={14} fill={pinned ? "currentColor" : "none"} />
-            {pinned ? "Pinned" : "Pin"}
+          <Button variant={favourited ? "mark" : "outline"} onClick={() => toggleFavorite(tool.id)}>
+            <Star size={14} fill={favourited ? "currentColor" : "none"} />
+            {favourited ? "Favourited" : "Favourite"}
           </Button>
         </>
       }

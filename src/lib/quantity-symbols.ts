@@ -27,6 +27,8 @@ const BY_ID: Record<string, string> = {
   pressureLoss: "Δp",
   headLoss: "hL",
   dynamicPressure: "q",
+  cmax: "cmax",
+  imax: "imax",
   q: "q",
   rate: "MRR",
   hourly: "MRR",

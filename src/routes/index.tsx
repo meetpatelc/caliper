@@ -25,6 +25,7 @@ function Home() {
   const navigate = Route.useNavigate();
   const domain = (search.domain as EngineeringDomain | undefined) ?? "all";
   const favorites = useDeskStore((state) => state.favorites);
+  const toggleFavorite = useDeskStore((state) => state.toggleFavorite);
   const recents = useDeskStore((state) => state.recents);
   const calculations = useDeskStore((state) => state.calculations);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -124,7 +125,8 @@ function Home() {
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 {shown.map((tool) => {
-                  const formula = libraryDocuments[tool.id]?.formula;
+                  const formula =
+                    libraryDocuments[tool.id]?.formula ?? (tool.id === "fits" ? "cmax = ES − ei; imax = es − EI" : undefined);
                   return (
                     <Link
                       key={tool.id}
@@ -132,14 +134,34 @@ function Home() {
                       params={{ toolId: tool.id }}
                       className={cn(
                         panelHoverClass,
-                        "grid h-full content-start gap-2 bg-surface p-4 hover:border-accent",
+                        "group grid h-full content-start gap-2 bg-surface p-4 hover:border-accent",
                       )}
                     >
                       <span className="flex items-start justify-between gap-2">
                         <strong className="text-base font-semibold tracking-[-0.02em]">{tool.title}</strong>
-                        {favorites.includes(tool.id as ToolId) ? (
-                          <Star size={12} className="mt-1 shrink-0 text-mark" fill="currentColor" />
-                        ) : null}
+                        <button
+                          type="button"
+                          aria-label={
+                            favorites.includes(tool.id as ToolId) ? "Remove from favourites" : "Add to favourites"
+                          }
+                          aria-pressed={favorites.includes(tool.id as ToolId)}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            toggleFavorite(tool.id as ToolId);
+                          }}
+                          className={cn(
+                            "mt-0.5 shrink-0 rounded p-0.5 text-mark hover:text-mark",
+                            favorites.includes(tool.id as ToolId)
+                              ? "opacity-100"
+                              : "text-muted opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100",
+                          )}
+                        >
+                          <Star
+                            size={14}
+                            fill={favorites.includes(tool.id as ToolId) ? "currentColor" : "none"}
+                          />
+                        </button>
                       </span>
                       <span className="line-clamp-2 text-sm leading-5 text-muted">{tool.description}</span>
                       {formula ? <GoverningRelation formula={formula} className="text-xs leading-5" /> : null}

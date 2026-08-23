@@ -1,7 +1,5 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { CalculatorFrame } from "@/gauge/components/calculator-frame";
-import { Iso286Instrument } from "@/gauge/components/iso-286";
-import { type OfficialCalculator } from "@/gauge/lib/calculator-types";
 import { findCalculator } from "@/gauge/lib/resolve";
 import { useWorkshop } from "@/gauge/lib/workshop-store";
 import { buttonVariants } from "@instrument/ui";
@@ -22,6 +20,7 @@ export const Route = createFileRoute("/c/$slug")({
       "gravitational-pe": "gravitationalPe",
       "pipe-velocity": "pipeVelocity",
       "dynamic-pressure": "dynamicPressure",
+      "iso-286-fits": "fits",
       "hoop-stress": "thinVessel",
       "helical-spring": "compressionSpring",
     } as const;
@@ -46,16 +45,6 @@ function CalculatorPage() {
         <Link to="/" className={buttonVariants({ variant: "ghost" })}>
           Back to library
         </Link>
-      </div>
-    );
-  }
-
-  const isIso = calculator.origin === "official" && (calculator as OfficialCalculator).engine === "iso286";
-
-  if (isIso) {
-    return (
-      <div className="page-wrap">
-        <Iso286Instrument calculator={calculator as OfficialCalculator} />
       </div>
     );
   }

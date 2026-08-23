@@ -78,7 +78,7 @@ export function CommandPalette({
             </Command.Group>
           )}
           {favorites.filter((id) => !recentIds.has(id)).length > 0 && (
-            <Command.Group heading="Pinned" className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
+            <Command.Group heading="Favourite" className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
               {favorites
                 .filter((id) => !recentIds.has(id))
                 .map((id) => tools.find((tool) => tool.id === id))
@@ -86,7 +86,7 @@ export function CommandPalette({
                 .map((tool) => (
                   <Command.Item
                     key={`fav-${tool!.id}`}
-                    value={`pinned ${tool!.id} ${searchableToolText(tool!)}`}
+                    value={`favourite ${tool!.id} ${searchableToolText(tool!)}`}
                     onSelect={() => go(`/tool/${tool!.id}`)}
                     className="flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm data-[selected=true]:bg-elevated"
                   >
@@ -143,7 +143,9 @@ export function CommandPalette({
             );
           })}
           <Command.Group className="px-1 py-1 text-[11px] uppercase tracking-[0.12em] text-muted">
-            {officialCalculators.map((item) => (
+            {officialCalculators
+              .filter((item) => item.slug !== "iso-286-fits")
+              .map((item) => (
               <Command.Item
                 key={`official-${item.slug}`}
                 value={`${item.title} ${item.slug} ${item.domain} ${item.description} ${item.formula}`}

@@ -1,38 +1,107 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { GROK_PROVIDERS, authEnabled, signIn } from "@/lib/auth/client";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
+import { authClient, authEnabled } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { Field, Input } from "@/components/ui/field";
 
 export const Route = createFileRoute("/login")({ component: Login });
 
 function Login() {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<"in" | "up">("in");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setBusy(true);
+    try {
+      const result =
+        mode === "up"
+          ? await authClient.signUp.email({ name: name.trim() || email.split("@")[0], email, password })
+          : await authClient.signIn.email({ email, password });
+      if (result.error) {
+        setError(result.error.message || "Could not sign in.");
+        return;
+      }
+      await navigate({ to: "/" });
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not sign in.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <main className="grid min-h-dvh place-items-center bg-bg px-6 text-fg">
       <div className="w-full max-w-sm">
         <Link to="/" className="wordmark">
-          CALIPER
+          Instrument
         </Link>
-        <h1 className="mt-6 text-2xl font-semibold tracking-[-0.03em]">Sign in</h1>
+        <h1 className="mt-6 text-2xl font-semibold tracking-[-0.03em]">{mode === "up" ? "Create an account" : "Sign in"}</h1>
         <p className="mt-2 text-sm leading-6 text-muted">
-          Optional. Calculators and local project snapshots work without an account.
+          Email and a password. No Google or X. Favourites and Project still save on this device.
         </p>
-        <div className="mt-6 grid gap-2">
-          {authEnabled ? (
-            GROK_PROVIDERS.map((provider) => (
-              <Button
-                key={provider.providerId}
-                className="w-full"
-                onClick={() => signIn(provider.providerId, { callbackURL: "/" })}
-              >
-                Continue with {provider.label}
-              </Button>
-            ))
-          ) : (
-            <p className="text-sm text-muted">Sign-in is disabled.</p>
-          )}
+        {authEnabled ? (
+          <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
+            {mode === "up" ? (
+              <Field htmlFor="account-name" label="Name">
+                <Input
+                  id="account-name"
+                  autoComplete="name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </Field>
+            ) : null}
+            <Field htmlFor="account-email" label="Email">
+              <Input
+                id="account-email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </Field>
+            <Field htmlFor="account-password" label="Password">
+              <Input
+                id="account-password"
+                type="password"
+                autoComplete={mode === "up" ? "new-password" : "current-password"}
+                required
+                minLength={8}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </Field>
+            {error ? <p className="text-sm text-danger">{error}</p> : null}
+            <Button type="submit" disabled={busy} className="w-full">
+              {busy ? "Working…" : mode === "up" ? "Create account" : "Sign in"}
+            </Button>
+          </form>
+        ) : (
+          <p className="mt-6 text-sm text-muted">Sign-in is disabled.</p>
+        )}
+        <button
+          type="button"
+          className="mt-4 text-sm text-accent hover:text-fg"
+          onClick={() => {
+            setError(null);
+            setMode((current) => (current === "up" ? "in" : "up"));
+          }}
+        >
+          {mode === "up" ? "Already have an account? Sign in" : "Need an account? Create one"}
+        </button>
+        <div>
+          <Link to="/" className="mt-6 inline-block text-sm text-muted hover:text-fg">
+            Back to the library
+          </Link>
         </div>
-        <Link to="/" className="mt-6 inline-block text-sm text-accent">
-          Back to the desk
-        </Link>
       </div>
     </main>
   );
