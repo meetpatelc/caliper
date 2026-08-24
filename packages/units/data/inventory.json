@@ -1,0 +1,1697 @@
+{
+  "version": "0.1.0-inventory",
+  "kinds": [
+    "linear",
+    "affine"
+  ],
+  "referenceDependent": false,
+  "notes": [
+    "Identity is unit id (pressure.bar), not the display symbol.",
+    "bar(g) is compatibility-only: same factor as bar; no +101325 Pa.",
+    "temperature is affine absolute; temperatureDelta is linear interval.",
+    "gal/min and US gpm are one unit (volumetricFlow.us_gpm).",
+    "deg and \u00b0 are one unit (angle.degree).",
+    "This inventory is the contract. convertQuantity() reads only this file."
+  ],
+  "families": [
+    {
+      "id": "dimensionless",
+      "label": "Dimensionless",
+      "canonicalUnit": "1",
+      "sources": [
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "dimensionless.one",
+          "symbol": "1",
+          "label": "ratio",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "ratio"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "dimensionless.percent",
+          "symbol": "%",
+          "label": "percent",
+          "kind": "linear",
+          "factor": 0.01,
+          "aliases": [
+            "percent"
+          ],
+          "status": "canonical"
+        }
+      ],
+      "note": "Gauge studio counts, ratios, and percent. Caliper shop skips % on some declared fields \u2014 that skip stays in the Caliper adapter."
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "canonicalUnit": "m",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "length.m",
+          "symbol": "m",
+          "label": "metre",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "metre",
+            "meter"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "length.mm",
+          "symbol": "mm",
+          "label": "millimetre",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [
+            "millimeter"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "length.cm",
+          "symbol": "cm",
+          "label": "centimetre",
+          "kind": "linear",
+          "factor": 0.01,
+          "aliases": [
+            "centimeter"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "length.km",
+          "symbol": "km",
+          "label": "kilometre",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [
+            "kilometer"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "length.um",
+          "symbol": "\u00b5m",
+          "label": "micrometre",
+          "kind": "linear",
+          "factor": 1e-06,
+          "aliases": [
+            "um",
+            "micrometre",
+            "micrometer"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "length.in",
+          "symbol": "in",
+          "label": "inch",
+          "kind": "linear",
+          "factor": 0.0254,
+          "aliases": [
+            "inch"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "length.ft",
+          "symbol": "ft",
+          "label": "foot",
+          "kind": "linear",
+          "factor": 0.3048,
+          "aliases": [
+            "foot",
+            "feet"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "length.yd",
+          "symbol": "yd",
+          "label": "yard",
+          "kind": "linear",
+          "factor": 0.9144,
+          "aliases": [
+            "yard"
+          ],
+          "status": "canonical"
+        }
+      ],
+      "note": "yd is Caliper-only today; additive for Gauge."
+    },
+    {
+      "id": "area",
+      "label": "Area",
+      "canonicalUnit": "m\u00b2",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "area.m2",
+          "symbol": "m\u00b2",
+          "label": "square metre",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "m2"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "area.mm2",
+          "symbol": "mm\u00b2",
+          "label": "square millimetre",
+          "kind": "linear",
+          "factor": 1e-06,
+          "aliases": [
+            "mm2"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "area.cm2",
+          "symbol": "cm\u00b2",
+          "label": "square centimetre",
+          "kind": "linear",
+          "factor": 0.0001,
+          "aliases": [
+            "cm2"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "area.in2",
+          "symbol": "in\u00b2",
+          "label": "square inch",
+          "kind": "linear",
+          "factor": 0.00064516,
+          "aliases": [
+            "in2"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "area.ft2",
+          "symbol": "ft\u00b2",
+          "label": "square foot",
+          "kind": "linear",
+          "factor": 0.09290304,
+          "aliases": [
+            "ft2"
+          ],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "volume",
+      "label": "Volume",
+      "canonicalUnit": "m\u00b3",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "volume.m3",
+          "symbol": "m\u00b3",
+          "label": "cubic metre",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "m3"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "volume.L",
+          "symbol": "L",
+          "label": "litre",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [
+            "l",
+            "liter",
+            "litre"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "volume.mL",
+          "symbol": "mL",
+          "label": "millilitre",
+          "kind": "linear",
+          "factor": 1e-06,
+          "aliases": [
+            "ml"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "volume.ft3",
+          "symbol": "ft\u00b3",
+          "label": "cubic foot",
+          "kind": "linear",
+          "factor": 0.028316846592,
+          "aliases": [
+            "ft3"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "volume.gal_us",
+          "symbol": "gal (US)",
+          "label": "US gallon",
+          "kind": "linear",
+          "factor": 0.003785411784,
+          "aliases": [
+            "gal",
+            "US gal"
+          ],
+          "status": "canonical"
+        }
+      ],
+      "note": "mL is Caliper-only today."
+    },
+    {
+      "id": "mass",
+      "label": "Mass",
+      "canonicalUnit": "kg",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "mass.kg",
+          "symbol": "kg",
+          "label": "kilogram",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "mass.g",
+          "symbol": "g",
+          "label": "gram",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "mass.tonne",
+          "symbol": "t",
+          "label": "metric tonne",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [
+            "tonne",
+            "t"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "mass.lbm",
+          "symbol": "lbm",
+          "label": "pound mass",
+          "kind": "linear",
+          "factor": 0.45359237,
+          "aliases": [
+            "lb"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "mass.oz",
+          "symbol": "oz",
+          "label": "ounce",
+          "kind": "linear",
+          "factor": 0.028349523125,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "note": "oz is Caliper-only today."
+    },
+    {
+      "id": "time",
+      "label": "Time",
+      "canonicalUnit": "s",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "time.s",
+          "symbol": "s",
+          "label": "second",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "sec"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "time.min",
+          "symbol": "min",
+          "label": "minute",
+          "kind": "linear",
+          "factor": 60,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "time.h",
+          "symbol": "h",
+          "label": "hour",
+          "kind": "linear",
+          "factor": 3600,
+          "aliases": [
+            "hr"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "time.day",
+          "symbol": "day",
+          "label": "day",
+          "kind": "linear",
+          "factor": 86400,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "note": "day is Caliper-only today."
+    },
+    {
+      "id": "angle",
+      "label": "Angle",
+      "canonicalUnit": "rad",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "angle.rad",
+          "symbol": "rad",
+          "label": "radian",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "radian"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "angle.degree",
+          "symbol": "\u00b0",
+          "label": "degree",
+          "kind": "linear",
+          "factor": 0.017453292519943295,
+          "aliases": [
+            "deg",
+            "degree"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "angle.rev",
+          "symbol": "rev",
+          "label": "revolution",
+          "kind": "linear",
+          "factor": 6.283185307179586,
+          "aliases": [
+            "turn"
+          ],
+          "status": "canonical"
+        }
+      ],
+      "note": "Stable id is angle.degree. Symbol \u00b0; alias deg (Caliper engine key). Caliper-only family today."
+    },
+    {
+      "id": "force",
+      "label": "Force",
+      "canonicalUnit": "N",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "force.N",
+          "symbol": "N",
+          "label": "newton",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "force.kN",
+          "symbol": "kN",
+          "label": "kilonewton",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "force.MN",
+          "symbol": "MN",
+          "label": "meganewton",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "force.lbf",
+          "symbol": "lbf",
+          "label": "pound-force",
+          "kind": "linear",
+          "factor": 4.4482216152605,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "pressure",
+      "label": "Pressure",
+      "canonicalUnit": "Pa",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "pressure.Pa",
+          "symbol": "Pa",
+          "label": "pascal",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "pressure.kPa",
+          "symbol": "kPa",
+          "label": "kilopascal",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "pressure.MPa",
+          "symbol": "MPa",
+          "label": "megapascal",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "pressure.bar",
+          "symbol": "bar",
+          "label": "bar",
+          "kind": "linear",
+          "factor": 100000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "pressure.bar_gauge",
+          "symbol": "bar(g)",
+          "label": "bar gauge",
+          "kind": "linear",
+          "factor": 100000.0,
+          "aliases": [
+            "barg"
+          ],
+          "status": "compatibility",
+          "note": "No atmospheric-reference conversion. Same canonical factor as bar. True gauge physics is out of scope."
+        },
+        {
+          "id": "pressure.bar_abs",
+          "symbol": "bar(abs)",
+          "label": "bar absolute",
+          "kind": "linear",
+          "factor": 100000.0,
+          "aliases": [
+            "bara"
+          ],
+          "status": "compatibility",
+          "note": "Same factor as bar. Label only; not a second physics."
+        },
+        {
+          "id": "pressure.kPa_abs",
+          "symbol": "kPa(abs)",
+          "label": "kilopascal absolute",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "compatibility"
+        },
+        {
+          "id": "pressure.mbar",
+          "symbol": "mbar",
+          "label": "millibar",
+          "kind": "linear",
+          "factor": 100,
+          "aliases": [
+            "mbar abs"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "pressure.psi",
+          "symbol": "psi",
+          "label": "pounds per square inch",
+          "kind": "linear",
+          "factor": 6894.757293168,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "pressure.atm",
+          "symbol": "atm",
+          "label": "standard atmosphere",
+          "kind": "linear",
+          "factor": 101325,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "note": "bar(g) / bar(abs) / kPa(abs) are compatibility labels. They do not add or subtract 101325 Pa."
+    },
+    {
+      "id": "stress",
+      "label": "Stress",
+      "canonicalUnit": "Pa",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "stress.Pa",
+          "symbol": "Pa",
+          "label": "pascal",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "stress.kPa",
+          "symbol": "kPa",
+          "label": "kilopascal",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "stress.MPa",
+          "symbol": "MPa",
+          "label": "megapascal",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "stress.GPa",
+          "symbol": "GPa",
+          "label": "gigapascal",
+          "kind": "linear",
+          "factor": 1000000000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "stress.N_per_mm2",
+          "symbol": "N/mm\u00b2",
+          "label": "newton per square millimetre",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [
+            "N/mm2"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "stress.psi",
+          "symbol": "psi",
+          "label": "pounds per square inch",
+          "kind": "linear",
+          "factor": 6894.757293168,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "stress.ksi",
+          "symbol": "ksi",
+          "label": "thousand pounds per square inch",
+          "kind": "linear",
+          "factor": 6894757.293168,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "note": "Pa/psi also exist on pressure. Identity is the unit id (stress.Pa), not the symbol."
+    },
+    {
+      "id": "torque",
+      "label": "Torque",
+      "canonicalUnit": "N\u00b7m",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "torque.N_m",
+          "symbol": "N\u00b7m",
+          "label": "newton metre",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "N.m",
+            "Nm"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "torque.kN_m",
+          "symbol": "kN\u00b7m",
+          "label": "kilonewton metre",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "torque.lbf_ft",
+          "symbol": "lbf\u00b7ft",
+          "label": "pound-force foot",
+          "kind": "linear",
+          "factor": 1.3558179483314,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "torque.lbf_in",
+          "symbol": "lbf\u00b7in",
+          "label": "pound-force inch",
+          "kind": "linear",
+          "factor": 0.1129848290276167,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "acceleration",
+      "label": "Acceleration",
+      "canonicalUnit": "m/s\u00b2",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "acceleration.m_s2",
+          "symbol": "m/s\u00b2",
+          "label": "metres per second squared",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "m/s2"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "acceleration.g",
+          "symbol": "g",
+          "label": "standard gravity",
+          "kind": "linear",
+          "factor": 9.80665,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "acceleration.ft_s2",
+          "symbol": "ft/s\u00b2",
+          "label": "feet per second squared",
+          "kind": "linear",
+          "factor": 0.3048,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "speed",
+      "label": "Speed",
+      "canonicalUnit": "m/s",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "speed.m_s",
+          "symbol": "m/s",
+          "label": "metres per second",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "speed.mm_s",
+          "symbol": "mm/s",
+          "label": "millimetres per second",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "speed.m_min",
+          "symbol": "m/min",
+          "label": "metres per minute",
+          "kind": "linear",
+          "factor": 0.016666666666666666,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "speed.mm_min",
+          "symbol": "mm/min",
+          "label": "millimetres per minute",
+          "kind": "linear",
+          "factor": 1.6666666666666667e-05,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "speed.km_h",
+          "symbol": "km/h",
+          "label": "kilometres per hour",
+          "kind": "linear",
+          "factor": 0.2777777777777778,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "speed.mph",
+          "symbol": "mph",
+          "label": "miles per hour",
+          "kind": "linear",
+          "factor": 0.44704,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "speed.ft_s",
+          "symbol": "ft/s",
+          "label": "feet per second",
+          "kind": "linear",
+          "factor": 0.3048,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "energy",
+      "label": "Energy / work",
+      "canonicalUnit": "J",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "energy.J",
+          "symbol": "J",
+          "label": "joule",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "energy.kJ",
+          "symbol": "kJ",
+          "label": "kilojoule",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "energy.MJ",
+          "symbol": "MJ",
+          "label": "megajoule",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "energy.Wh",
+          "symbol": "Wh",
+          "label": "watt-hour",
+          "kind": "linear",
+          "factor": 3600,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "energy.kWh",
+          "symbol": "kWh",
+          "label": "kilowatt-hour",
+          "kind": "linear",
+          "factor": 3600000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "energy.Btu",
+          "symbol": "Btu",
+          "label": "British thermal unit",
+          "kind": "linear",
+          "factor": 1055.05585262,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "power",
+      "label": "Power / heat flow",
+      "canonicalUnit": "W",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "power.W",
+          "symbol": "W",
+          "label": "watt",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "power.kW",
+          "symbol": "kW",
+          "label": "kilowatt",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "power.MW",
+          "symbol": "MW",
+          "label": "megawatt",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "power.hp",
+          "symbol": "hp",
+          "label": "mechanical horsepower",
+          "kind": "linear",
+          "factor": 745.6998715822702,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "power.Btu_h",
+          "symbol": "Btu/h",
+          "label": "British thermal units per hour",
+          "kind": "linear",
+          "factor": 0.293071070172,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "temperature",
+      "label": "Temperature (absolute)",
+      "canonicalUnit": "K",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "temperature.K",
+          "symbol": "K",
+          "label": "kelvin",
+          "kind": "affine",
+          "scale": 1,
+          "offset": 0,
+          "aliases": [
+            "kelvin"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "temperature.degC",
+          "symbol": "\u00b0C",
+          "label": "degree Celsius",
+          "kind": "affine",
+          "scale": 1,
+          "offset": 273.15,
+          "aliases": [
+            "C",
+            "celsius"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "temperature.degF",
+          "symbol": "\u00b0F",
+          "label": "degree Fahrenheit",
+          "kind": "affine",
+          "scale": 0.5555555555555556,
+          "offset": 255.3722222222222,
+          "aliases": [
+            "F",
+            "fahrenheit"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "temperature.degR",
+          "symbol": "\u00b0R",
+          "label": "degree Rankine",
+          "kind": "affine",
+          "scale": 0.5555555555555556,
+          "offset": 0,
+          "aliases": [
+            "R",
+            "rankine"
+          ],
+          "status": "canonical"
+        }
+      ],
+      "note": "Affine: canonical K = scale \u00d7 value + offset. Do not use this family for intervals (LMTD, \u0394T). Use temperatureDelta."
+    },
+    {
+      "id": "temperatureDelta",
+      "label": "Temperature difference",
+      "canonicalUnit": "K",
+      "sources": [
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "temperatureDelta.K",
+          "symbol": "K",
+          "label": "kelvin interval",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "temperatureDelta.degC",
+          "symbol": "\u00b0C",
+          "label": "celsius interval",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "C"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "temperatureDelta.degF",
+          "symbol": "\u00b0F",
+          "label": "fahrenheit interval",
+          "kind": "linear",
+          "factor": 0.5555555555555556,
+          "aliases": [
+            "F"
+          ],
+          "status": "canonical"
+        }
+      ],
+      "note": "Linear intervals. 1 \u00b0C \u0394 = 1 K; 1 \u00b0F \u0394 = 5/9 K. Gauge-only family today."
+    },
+    {
+      "id": "density",
+      "label": "Density",
+      "canonicalUnit": "kg/m\u00b3",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "density.kg_m3",
+          "symbol": "kg/m\u00b3",
+          "label": "kilograms per cubic metre",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "density.g_cm3",
+          "symbol": "g/cm\u00b3",
+          "label": "grams per cubic centimetre",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "density.lbm_ft3",
+          "symbol": "lbm/ft\u00b3",
+          "label": "pounds mass per cubic foot",
+          "kind": "linear",
+          "factor": 16.01846337396,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "density.lbm_in3",
+          "symbol": "lbm/in\u00b3",
+          "label": "pounds mass per cubic inch",
+          "kind": "linear",
+          "factor": 27679.904710191,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "dynamicViscosity",
+      "label": "Dynamic viscosity",
+      "canonicalUnit": "Pa\u00b7s",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "dynamicViscosity.Pa_s",
+          "symbol": "Pa\u00b7s",
+          "label": "pascal second",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "dynamicViscosity.cP",
+          "symbol": "cP",
+          "label": "centipoise",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "dynamicViscosity.P",
+          "symbol": "P",
+          "label": "poise",
+          "kind": "linear",
+          "factor": 0.1,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "kinematicViscosity",
+      "label": "Kinematic viscosity",
+      "canonicalUnit": "m\u00b2/s",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "kinematicViscosity.m2_s",
+          "symbol": "m\u00b2/s",
+          "label": "square metre per second",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "kinematicViscosity.cSt",
+          "symbol": "cSt",
+          "label": "centistokes",
+          "kind": "linear",
+          "factor": 1e-06,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "kinematicViscosity.ft2_s",
+          "symbol": "ft\u00b2/s",
+          "label": "square foot per second",
+          "kind": "linear",
+          "factor": 0.09290304,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "volumetricFlow",
+      "label": "Volumetric flow",
+      "canonicalUnit": "m\u00b3/s",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "volumetricFlow.m3_s",
+          "symbol": "m\u00b3/s",
+          "label": "cubic metres per second",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "volumetricFlow.L_s",
+          "symbol": "L/s",
+          "label": "litres per second",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "volumetricFlow.L_min",
+          "symbol": "L/min",
+          "label": "litres per minute",
+          "kind": "linear",
+          "factor": 1.6666666666666667e-05,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "volumetricFlow.us_gpm",
+          "symbol": "gal/min",
+          "label": "US gallons per minute",
+          "kind": "linear",
+          "factor": 6.30901964e-05,
+          "aliases": [
+            "US gpm",
+            "gpm"
+          ],
+          "status": "canonical",
+          "note": "Caliper listed gal/min and US gpm as duplicate symbols with the same factor. One id; both aliases."
+        },
+        {
+          "id": "volumetricFlow.cfm",
+          "symbol": "cfm",
+          "label": "cubic feet per minute",
+          "kind": "linear",
+          "factor": 0.0004719474432,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "frequency",
+      "label": "Frequency",
+      "canonicalUnit": "Hz",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "frequency.Hz",
+          "symbol": "Hz",
+          "label": "hertz",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "frequency.kHz",
+          "symbol": "kHz",
+          "label": "kilohertz",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "frequency.MHz",
+          "symbol": "MHz",
+          "label": "megahertz",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "frequency.rpm",
+          "symbol": "rpm",
+          "label": "revolutions per minute",
+          "kind": "linear",
+          "factor": 0.016666666666666666,
+          "aliases": [],
+          "status": "canonical",
+          "note": "Categorized as frequency (rev/s), not rad/s. Matches both apps today."
+        }
+      ],
+      "note": "rpm stays under frequency. Caliper-only family today."
+    },
+    {
+      "id": "voltage",
+      "label": "Voltage",
+      "canonicalUnit": "V",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "voltage.V",
+          "symbol": "V",
+          "label": "volt",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "voltage.mV",
+          "symbol": "mV",
+          "label": "millivolt",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "voltage.kV",
+          "symbol": "kV",
+          "label": "kilovolt",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "current",
+      "label": "Current",
+      "canonicalUnit": "A",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "current.A",
+          "symbol": "A",
+          "label": "ampere",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "current.mA",
+          "symbol": "mA",
+          "label": "milliampere",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "current.kA",
+          "symbol": "kA",
+          "label": "kiloampere",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "resistance",
+      "label": "Resistance",
+      "canonicalUnit": "\u03a9",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "resistance.ohm",
+          "symbol": "\u03a9",
+          "label": "ohm",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [
+            "ohm"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "resistance.kohm",
+          "symbol": "k\u03a9",
+          "label": "kilo-ohm",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "resistance.Mohm",
+          "symbol": "M\u03a9",
+          "label": "mega-ohm",
+          "kind": "linear",
+          "factor": 1000000.0,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "capacitance",
+      "label": "Capacitance",
+      "canonicalUnit": "F",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "capacitance.F",
+          "symbol": "F",
+          "label": "farad",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "capacitance.mF",
+          "symbol": "mF",
+          "label": "millifarad",
+          "kind": "linear",
+          "factor": 0.001,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "capacitance.uF",
+          "symbol": "\u00b5F",
+          "label": "microfarad",
+          "kind": "linear",
+          "factor": 1e-06,
+          "aliases": [
+            "uF"
+          ],
+          "status": "canonical"
+        },
+        {
+          "id": "capacitance.nF",
+          "symbol": "nF",
+          "label": "nanofarad",
+          "kind": "linear",
+          "factor": 1e-09,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "charge",
+      "label": "Electric charge",
+      "canonicalUnit": "C",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "charge.C",
+          "symbol": "C",
+          "label": "coulomb",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "charge.Ah",
+          "symbol": "Ah",
+          "label": "ampere-hour",
+          "kind": "linear",
+          "factor": 3600,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "charge.mAh",
+          "symbol": "mAh",
+          "label": "milliampere-hour",
+          "kind": "linear",
+          "factor": 3.6,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "strain",
+      "label": "Strain",
+      "canonicalUnit": "1",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "strain.one",
+          "symbol": "1",
+          "label": "strain",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "strain.micro",
+          "symbol": "\u00b5\u03b5",
+          "label": "microstrain",
+          "kind": "linear",
+          "factor": 1e-06,
+          "aliases": [
+            "ue"
+          ],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "secondMoment",
+      "label": "Second moment of area",
+      "canonicalUnit": "m\u2074",
+      "sources": [
+        "caliper",
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "secondMoment.m4",
+          "symbol": "m\u2074",
+          "label": "metre to the fourth",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "secondMoment.cm4",
+          "symbol": "cm\u2074",
+          "label": "centimetre to the fourth",
+          "kind": "linear",
+          "factor": 1e-08,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "secondMoment.mm4",
+          "symbol": "mm\u2074",
+          "label": "millimetre to the fourth",
+          "kind": "linear",
+          "factor": 1e-12,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "secondMoment.in4",
+          "symbol": "in\u2074",
+          "label": "inch to the fourth",
+          "kind": "linear",
+          "factor": 4.162314255999999e-07,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "stiffness",
+      "label": "Stiffness",
+      "canonicalUnit": "N/m",
+      "sources": [
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "stiffness.N_m",
+          "symbol": "N/m",
+          "label": "newton per metre",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "stiffness.N_mm",
+          "symbol": "N/mm",
+          "label": "newton per millimetre",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "stiffness.lbf_in",
+          "symbol": "lbf/in",
+          "label": "pound-force per inch",
+          "kind": "linear",
+          "factor": 175.12683524647636,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "note": "lbf/in factor is lbf/in = 4.4482216152605 / 0.0254 (derived, not a third constant)."
+    },
+    {
+      "id": "massFlow",
+      "label": "Mass flow",
+      "canonicalUnit": "kg/s",
+      "sources": [
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "massFlow.kg_s",
+          "symbol": "kg/s",
+          "label": "kilograms per second",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "massFlow.kg_h",
+          "symbol": "kg/h",
+          "label": "kilograms per hour",
+          "kind": "linear",
+          "factor": 0.0002777777777777778,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ]
+    },
+    {
+      "id": "specificHeat",
+      "label": "Specific heat",
+      "canonicalUnit": "J/(kg\u00b7K)",
+      "sources": [
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "specificHeat.J_kg_K",
+          "symbol": "J/(kg\u00b7K)",
+          "label": "joule per kilogram kelvin",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "specificHeat.kJ_kg_K",
+          "symbol": "kJ/(kg\u00b7K)",
+          "label": "kilojoule per kilogram kelvin",
+          "kind": "linear",
+          "factor": 1000.0,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "note": "Included: Gauge studio publishes this family."
+    },
+    {
+      "id": "thermalConductivity",
+      "label": "Thermal conductivity",
+      "canonicalUnit": "W/(m\u00b7K)",
+      "sources": [
+        "gauge"
+      ],
+      "units": [
+        {
+          "id": "thermalConductivity.W_m_K",
+          "symbol": "W/(m\u00b7K)",
+          "label": "watt per metre kelvin",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "note": "Included: Gauge studio publishes this family."
+    }
+  ]
+}

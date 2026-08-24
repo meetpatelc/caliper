@@ -22,7 +22,7 @@
     "@electric-sql/pglite": "^0.5.4",
     "@hookform/resolvers": "^5.7.0",
     "@instrument/ui": "file:packages/ui",
-    "@instrument/units": "github:meetpatelc/instrument-units#v0.1.2",
+    "@instrument/units": "file:packages/units",
     "@instrument/formula": "file:packages/formula",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",

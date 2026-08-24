@@ -86,7 +86,14 @@ function ProjectPage() {
       </div>
 
       {loadingDesk ? null : empty ? (
-        <EmptyState className={cn(panelClass, "mt-10 p-6")}>
+        <EmptyState
+          className={cn(panelClass, "mt-10 p-6")}
+          action={
+            <Link to="/" className="text-accent">
+              Open library
+            </Link>
+          }
+        >
           Nothing here yet. Open a model and save a check, write one in Studio, or start a review.
         </EmptyState>
       ) : null}

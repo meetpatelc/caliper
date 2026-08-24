@@ -1,0 +1,326 @@
+{
+  "version": "0.1.0-inventory",
+  "cases": [
+    {
+      "id": "length.in_m",
+      "family": "length",
+      "from": "length.in",
+      "to": "length.m",
+      "input": 1,
+      "expected": 0.0254
+    },
+    {
+      "id": "length.mm_m",
+      "family": "length",
+      "from": "length.mm",
+      "to": "length.m",
+      "input": 1000,
+      "expected": 1
+    },
+    {
+      "id": "area.mm2_m2",
+      "family": "area",
+      "from": "area.mm2",
+      "to": "area.m2",
+      "input": 1000000.0,
+      "expected": 1
+    },
+    {
+      "id": "volume.L_m3",
+      "family": "volume",
+      "from": "volume.L",
+      "to": "volume.m3",
+      "input": 1000,
+      "expected": 1
+    },
+    {
+      "id": "mass.lbm_kg",
+      "family": "mass",
+      "from": "mass.lbm",
+      "to": "mass.kg",
+      "input": 1,
+      "expected": 0.45359237
+    },
+    {
+      "id": "time.min_s",
+      "family": "time",
+      "from": "time.min",
+      "to": "time.s",
+      "input": 1,
+      "expected": 60
+    },
+    {
+      "id": "angle.deg_rad",
+      "family": "angle",
+      "from": "angle.degree",
+      "to": "angle.rad",
+      "input": 180,
+      "expected": 3.141592653589793
+    },
+    {
+      "id": "force.lbf_N",
+      "family": "force",
+      "from": "force.lbf",
+      "to": "force.N",
+      "input": 1,
+      "expected": 4.4482216152605
+    },
+    {
+      "id": "pressure.bar_Pa",
+      "family": "pressure",
+      "from": "pressure.bar",
+      "to": "pressure.Pa",
+      "input": 1,
+      "expected": 100000.0
+    },
+    {
+      "id": "pressure.barg_bar",
+      "family": "pressure",
+      "from": "pressure.bar_gauge",
+      "to": "pressure.bar",
+      "input": 1,
+      "expected": 1,
+      "note": "compatibility: same factor, no atmosphere"
+    },
+    {
+      "id": "pressure.psi_Pa",
+      "family": "pressure",
+      "from": "pressure.psi",
+      "to": "pressure.Pa",
+      "input": 1,
+      "expected": 6894.757293168
+    },
+    {
+      "id": "stress.Nmm2_MPa",
+      "family": "stress",
+      "from": "stress.N_per_mm2",
+      "to": "stress.MPa",
+      "input": 1,
+      "expected": 1
+    },
+    {
+      "id": "stress.ksi_Pa",
+      "family": "stress",
+      "from": "stress.ksi",
+      "to": "stress.Pa",
+      "input": 1,
+      "expected": 6894757.293168
+    },
+    {
+      "id": "torque.lbfft_Nm",
+      "family": "torque",
+      "from": "torque.lbf_ft",
+      "to": "torque.N_m",
+      "input": 1,
+      "expected": 1.3558179483314
+    },
+    {
+      "id": "acceleration.g",
+      "family": "acceleration",
+      "from": "acceleration.g",
+      "to": "acceleration.m_s2",
+      "input": 1,
+      "expected": 9.80665
+    },
+    {
+      "id": "speed.kmh_ms",
+      "family": "speed",
+      "from": "speed.km_h",
+      "to": "speed.m_s",
+      "input": 3.6,
+      "expected": 1
+    },
+    {
+      "id": "energy.kWh_J",
+      "family": "energy",
+      "from": "energy.kWh",
+      "to": "energy.J",
+      "input": 1,
+      "expected": 3600000.0
+    },
+    {
+      "id": "power.hp_W",
+      "family": "power",
+      "from": "power.hp",
+      "to": "power.W",
+      "input": 1,
+      "expected": 745.6998715822702
+    },
+    {
+      "id": "temperature.C_K",
+      "family": "temperature",
+      "from": "temperature.degC",
+      "to": "temperature.K",
+      "input": 0,
+      "expected": 273.15
+    },
+    {
+      "id": "temperature.F_K",
+      "family": "temperature",
+      "from": "temperature.degF",
+      "to": "temperature.K",
+      "input": 32,
+      "expected": 273.15
+    },
+    {
+      "id": "temperature.F_C",
+      "family": "temperature",
+      "from": "temperature.degF",
+      "to": "temperature.degC",
+      "input": 32,
+      "expected": 0
+    },
+    {
+      "id": "temperatureDelta.F",
+      "family": "temperatureDelta",
+      "from": "temperatureDelta.degF",
+      "to": "temperatureDelta.K",
+      "input": 1,
+      "expected": 0.5555555555555556
+    },
+    {
+      "id": "temperatureDelta.C",
+      "family": "temperatureDelta",
+      "from": "temperatureDelta.degC",
+      "to": "temperatureDelta.K",
+      "input": 1,
+      "expected": 1
+    },
+    {
+      "id": "density.gcm3",
+      "family": "density",
+      "from": "density.g_cm3",
+      "to": "density.kg_m3",
+      "input": 1,
+      "expected": 1000
+    },
+    {
+      "id": "dynamicViscosity.cP",
+      "family": "dynamicViscosity",
+      "from": "dynamicViscosity.cP",
+      "to": "dynamicViscosity.Pa_s",
+      "input": 1,
+      "expected": 0.001
+    },
+    {
+      "id": "kinematicViscosity.cSt",
+      "family": "kinematicViscosity",
+      "from": "kinematicViscosity.cSt",
+      "to": "kinematicViscosity.m2_s",
+      "input": 1,
+      "expected": 1e-06
+    },
+    {
+      "id": "volumetricFlow.gpm",
+      "family": "volumetricFlow",
+      "from": "volumetricFlow.us_gpm",
+      "to": "volumetricFlow.m3_s",
+      "input": 1,
+      "expected": 6.30901964e-05
+    },
+    {
+      "id": "frequency.rpm",
+      "family": "frequency",
+      "from": "frequency.rpm",
+      "to": "frequency.Hz",
+      "input": 60,
+      "expected": 1
+    },
+    {
+      "id": "voltage.kV",
+      "family": "voltage",
+      "from": "voltage.kV",
+      "to": "voltage.V",
+      "input": 1,
+      "expected": 1000
+    },
+    {
+      "id": "current.mA",
+      "family": "current",
+      "from": "current.mA",
+      "to": "current.A",
+      "input": 1000,
+      "expected": 1
+    },
+    {
+      "id": "resistance.kohm",
+      "family": "resistance",
+      "from": "resistance.kohm",
+      "to": "resistance.ohm",
+      "input": 1,
+      "expected": 1000
+    },
+    {
+      "id": "capacitance.uF",
+      "family": "capacitance",
+      "from": "capacitance.uF",
+      "to": "capacitance.F",
+      "input": 1,
+      "expected": 1e-06
+    },
+    {
+      "id": "charge.Ah",
+      "family": "charge",
+      "from": "charge.Ah",
+      "to": "charge.C",
+      "input": 1,
+      "expected": 3600
+    },
+    {
+      "id": "strain.ue",
+      "family": "strain",
+      "from": "strain.micro",
+      "to": "strain.one",
+      "input": 1,
+      "expected": 1e-06
+    },
+    {
+      "id": "secondMoment.in4",
+      "family": "secondMoment",
+      "from": "secondMoment.in4",
+      "to": "secondMoment.m4",
+      "input": 1,
+      "expected": 4.162314255999999e-07
+    },
+    {
+      "id": "stiffness.lbf_in",
+      "family": "stiffness",
+      "from": "stiffness.lbf_in",
+      "to": "stiffness.N_m",
+      "input": 1,
+      "expected": 175.12683524647636
+    },
+    {
+      "id": "massFlow.kgh",
+      "family": "massFlow",
+      "from": "massFlow.kg_h",
+      "to": "massFlow.kg_s",
+      "input": 3600,
+      "expected": 1
+    },
+    {
+      "id": "specificHeat.kJ",
+      "family": "specificHeat",
+      "from": "specificHeat.kJ_kg_K",
+      "to": "specificHeat.J_kg_K",
+      "input": 1,
+      "expected": 1000
+    },
+    {
+      "id": "thermalConductivity.id",
+      "family": "thermalConductivity",
+      "from": "thermalConductivity.W_m_K",
+      "to": "thermalConductivity.W_m_K",
+      "input": 12,
+      "expected": 12
+    },
+    {
+      "id": "dimensionless.pct",
+      "family": "dimensionless",
+      "from": "dimensionless.percent",
+      "to": "dimensionless.one",
+      "input": 100,
+      "expected": 1
+    }
+  ]
+}

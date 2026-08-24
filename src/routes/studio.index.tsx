@@ -3,8 +3,9 @@ import { Copy, FilePlus, PenLine } from "lucide-react";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { studioDocuments } from "@/lib/document";
-import { Button, buttonVariants, panelClass, panelHoverClass } from "@instrument/ui";
+import { Button, buttonVariants, panelClass } from "@instrument/ui";
 import { LoadingState } from "@/components/ui/status";
+import { SelectableCard } from "@/components/ui/selection";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/studio/")({ component: StudioHome });
@@ -67,14 +68,16 @@ function StudioHome() {
           <ul className="mt-4 grid gap-2">
             {items.map((item) => (
               <li key={item.id}>
-                <Link
-                  to="/studio/$id"
-                  params={{ id: item.id }}
-                  className={cn(panelHoverClass, "flex min-h-10 items-center justify-between px-3 py-3")}
-                >
+                <SelectableCard asChild key={item.id}>
+                  <Link
+                    to="/studio/$id"
+                    params={{ id: item.id }}
+                    className="flex min-h-10 items-center justify-between px-3 py-3"
+                  >
                   <span>{item.title}</span>
-                  <span className="font-mono text-xs text-muted">{item.published ? "published" : "draft"}</span>
-                </Link>
+                    <span className="font-mono text-xs text-muted">{item.published ? "published" : "draft"}</span>
+                  </Link>
+                </SelectableCard>
               </li>
             ))}
           </ul>
@@ -87,18 +90,20 @@ function StudioHome() {
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {studioDocuments().map((item) => (
             <li key={item.slug}>
-              <Button
-                type="button"
-                variant="outline"
-                className={cn(panelHoverClass, "h-auto min-h-10 w-full justify-between gap-3 px-3 py-3 text-left")}
-                onClick={() => open(createFrom(item))}
-              >
+              <SelectableCard asChild key={item.slug}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto min-h-10 w-full justify-between gap-3 px-3 py-3 text-left"
+                  onClick={() => open(createFrom(item))}
+                >
                 <span>
                   <span className="block text-sm font-medium">{item.title}</span>
                   <span className="font-mono text-xs text-muted">{item.formula}</span>
                 </span>
-                <Copy size={14} className="shrink-0 text-accent" />
-              </Button>
+                  <Copy size={14} className="shrink-0 text-accent" />
+                </Button>
+              </SelectableCard>
             </li>
           ))}
         </ul>

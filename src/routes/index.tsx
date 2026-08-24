@@ -7,8 +7,7 @@ import { MODEL_COUNT, releasedDomains, savedHeadline } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { panelHoverClass } from "@/components/ui/panel";
-import { FilterChip } from "@/components/ui/selection";
+import { FilterChip, SelectableCard } from "@/components/ui/selection";
 import { EmptyState } from "@/components/ui/status";
 import { GoverningRelation } from "@/components/governing-relation";
 import type { EngineeringDomain } from "@/lib/platform";
@@ -128,14 +127,14 @@ function Home() {
                   const formula =
                     libraryDocuments[tool.id]?.formula ?? (tool.id === "fits" ? "cmax = ES − ei; imax = es − EI" : undefined);
                   return (
-                    <Link
+                    <SelectableCard
                       key={tool.id}
+                      asChild
+                      className="group grid h-full content-start gap-2 bg-surface p-4 hover:border-accent"
+                    >
+                    <Link
                       to="/tool/$toolId"
                       params={{ toolId: tool.id }}
-                      className={cn(
-                        panelHoverClass,
-                        "group grid h-full content-start gap-2 bg-surface p-4 hover:border-accent",
-                      )}
                     >
                       <span className="flex items-start justify-between gap-2">
                         <strong className="text-base font-semibold tracking-[-0.02em]">{tool.title}</strong>
@@ -168,6 +167,7 @@ function Home() {
                       <span className="line-clamp-2 text-sm leading-5 text-muted">{tool.description}</span>
                       {formula ? <GoverningRelation formula={formula} className="text-xs leading-5" /> : null}
                     </Link>
+                    </SelectableCard>
                   );
                 })}
               </div>

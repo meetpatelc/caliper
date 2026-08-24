@@ -15,7 +15,8 @@ import {
 import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemplates";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
-import { panelClass, panelHoverClass } from "@/components/ui/panel";
+import { panelClass } from "@/components/ui/panel";
+import { SelectableCard } from "@/components/ui/selection";
 import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
 import { useDeskStatus } from "@/lib/desk-mode";
@@ -173,7 +174,12 @@ function ReviewPage() {
           {activeRules.map((rule) => {
             const on = complete.includes(rule.id);
             return (
-              <Button key={rule.id} type="button" variant="outline" onClick={() => setComplete((current) => (on ? current.filter((id) => id !== rule.id) : [...current, rule.id]))} className={cn(panelHoverClass, "h-auto w-full justify-start gap-3 p-4 text-left")}>
+              <SelectableCard
+                key={rule.id}
+                selected={on}
+                onClick={() => setComplete((current) => (on ? current.filter((id) => id !== rule.id) : [...current, rule.id]))}
+                className="flex h-auto w-full justify-start gap-3 p-4 text-left"
+              >
                 <span className={`mt-0.5 grid size-5 place-items-center rounded-sm border ${on ? "border-ok bg-ok text-bg" : "border-border"}`}>
                   {on && <Check size={12} />}
                 </span>
@@ -182,7 +188,7 @@ function ReviewPage() {
                   <small className="text-muted">{rule.prompt}</small>
                   <em className="mt-1 block text-xs not-italic text-muted">Evidence: {rule.evidence}</em>
                 </span>
-              </Button>
+              </SelectableCard>
             );
           })}
         </div>
@@ -275,10 +281,14 @@ function ReviewPage() {
               const on = workflowChecks.includes(id);
               return (
                 <li key={id}>
-                  <Button type="button" variant="ghost" onClick={() => setWorkflowChecks((current) => (on ? current.filter((entry) => entry !== id) : [...current, id]))} className="h-auto w-full justify-start gap-2 text-left">
+                  <SelectableCard
+                    selected={on}
+                    onClick={() => setWorkflowChecks((current) => (on ? current.filter((entry) => entry !== id) : [...current, id]))}
+                    className="flex h-auto w-full justify-start gap-2 p-3 text-left"
+                  >
                     <span className={`mt-0.5 size-4 rounded-sm border ${on ? "border-ok bg-ok" : "border-border"}`} />
                     {item}
-                  </Button>
+                  </SelectableCard>
                 </li>
               );
             })}

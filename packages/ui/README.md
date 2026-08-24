@@ -2,7 +2,7 @@
 
 Shared **Metrology** tokens and primitives for Instrument.
 
-This is not a second product. It is the wardrobe for the one desk.
+This is not a second product. It lives in the Instrument repo (`packages/ui`).
 
 ## Primitives
 

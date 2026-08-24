@@ -1,6 +1,6 @@
 /**
- * Caliper adapter: the kit is the conversion truth.
- * This file is only the Caliper-approved family/unit menu (original Caliper table).
+ * Desk unit menu: the kit is the conversion truth.
+ * This file is only the Instrument-approved family/unit tray (original short lists).
  */
 import {
   convertQuantity as convert,
