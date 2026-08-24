@@ -8,7 +8,7 @@ import { FamilySwitch } from "@/components/family-switch";
 import { FavouriteRail } from "@/components/favourite-rail";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/status";
 import { PARENT_NAME, THEME_KEY } from "@/lib/instrument";
 import { cn } from "@/lib/utils";
@@ -121,15 +121,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 const Icon = item.icon;
                 const active = item.match(pathname);
                 return (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(buttonVariants({ variant: "ghost" }), active && "bg-elevated text-fg")}
-                  >
-                    <Icon size={15} />
-                    {item.label}
-                  </Link>
+                  <Button key={item.href} asChild variant="ghost">
+                    <Link
+                      to={item.href}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(active && "bg-elevated text-fg")}
+                    >
+                      <Icon size={15} />
+                      {item.label}
+                    </Link>
+                  </Button>
                 );
               })}
             </nav>
@@ -143,7 +144,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Search size={15} className="shrink-0" />
               <span className="flex-1 truncate text-left">Search…</span>
-              <kbd className="rounded-md border border-border px-1.5 py-0.5 font-mono text-xs">{shortcut}</kbd>
+              <kbd className="kbd">{shortcut}</kbd>
             </Button>
             <Button
               variant="outline"
@@ -177,24 +178,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             const Icon = item.icon;
             const active = item.match(pathname);
             return (
-              <Link
-                key={item.href}
-                to={item.href}
-                onClick={() => setMenuOpen(false)}
-                aria-current={active ? "page" : undefined}
-                className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start", active && "bg-elevated text-fg")}
-              >
-                <Icon size={16} />
-                {item.label}
-              </Link>
+              <Button key={item.href} asChild variant="ghost">
+                <Link
+                  to={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  aria-current={active ? "page" : undefined}
+                  className={cn("w-full justify-start", active && "bg-elevated text-fg")}
+                >
+                  <Icon size={16} />
+                  {item.label}
+                </Link>
+              </Button>
             );
           })}
-          <Link to="/about" onClick={() => setMenuOpen(false)} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start text-muted")}>
-            About & limits
-          </Link>
-          <Link to="/feedback" onClick={() => setMenuOpen(false)} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start text-muted")}>
-            Feedback
-          </Link>
+          <Button asChild variant="ghost">
+            <Link to="/about" onClick={() => setMenuOpen(false)} className="w-full justify-start text-muted">
+              About & limits
+            </Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link to="/feedback" onClick={() => setMenuOpen(false)} className="w-full justify-start text-muted">
+              Feedback
+            </Link>
+          </Button>
           <DrawerAccount onClose={() => setMenuOpen(false)} />
         </nav>
         <div className="mt-auto grid gap-3 border-t border-border pt-4">
@@ -209,26 +215,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <DeskSync />
       <main id="main-content">{children}</main>
       <FavouriteRail />
-      <footer className="no-print border-t border-border px-5 py-6 text-sm text-muted">
-        <div className="mx-auto flex w-[min(1180px,100%)] flex-wrap items-center justify-between gap-3">
+      <footer className="no-print border-t border-border py-6 text-sm text-muted">
+        <div className="page-frame flex flex-wrap items-center justify-between gap-3">
           <p>{PARENT_NAME} · not a design stamp</p>
           <div className="flex flex-wrap gap-4">
-            <Link to="/" className="hover:text-fg">
+            <Link to="/" className="link-quiet">
               Library
             </Link>
-            <Link to="/studio" className="hover:text-fg">
+            <Link to="/studio" className="link-quiet">
               Studio
             </Link>
-            <Link to="/review" className="hover:text-fg">
+            <Link to="/review" className="link-quiet">
               Review
             </Link>
-            <Link to="/workshop" className="hover:text-fg">
+            <Link to="/workshop" className="link-quiet">
               Project
             </Link>
-            <Link to="/about" className="hover:text-fg">
+            <Link to="/about" className="link-quiet">
               About & limits
             </Link>
-            <Link to="/feedback" className="hover:text-fg">
+            <Link to="/feedback" className="link-quiet">
               Feedback
             </Link>
           </div>
@@ -243,19 +249,25 @@ function DrawerAccount({ onClose }: { onClose: () => void }) {
   if (isPending) return <LoadingState variant="bar" className="h-11 w-auto" />;
   if (!user) {
     return (
-      <Link to="/login" onClick={onClose} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}>
-        Sign in
-      </Link>
+      <Button asChild variant="ghost">
+        <Link to="/login" onClick={onClose} className="w-full justify-start">
+          Sign in
+        </Link>
+      </Button>
     );
   }
   return (
     <>
-      <Link to="/profile" onClick={onClose} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}>
-        Profile
-      </Link>
-      <Link to="/settings" onClick={onClose} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}>
-        Account settings
-      </Link>
+      <Button asChild variant="ghost">
+        <Link to="/profile" onClick={onClose} className="w-full justify-start">
+          Profile
+        </Link>
+      </Button>
+      <Button asChild variant="ghost">
+        <Link to="/settings" onClick={onClose} className="w-full justify-start">
+          Account settings
+        </Link>
+      </Button>
     </>
   );
 }

@@ -27,26 +27,26 @@ function AboutPage() {
     <div className="page-wrap max-w-3xl">
       <p className="eyebrow">About {PARENT_NAME}</p>
       <h1 className="display-title mt-4">One product. Four rooms.</h1>
-      <p className="mt-5 text-base leading-7 text-muted">
+      <p className="lede max-w-none">
         {PARENT_NAME} is a calculator you can trust because the model is in the frame.{" "}
-        <Link to="/" className="text-accent">
+        <Link to="/" className="link-accent">
           Library
         </Link>{" "}
         is {tools.length} finished models — open one and get a number.{" "}
-        <Link to="/studio" className="text-accent">
+        <Link to="/studio" className="link-accent">
           Studio
         </Link>{" "}
         is where you write a model.{" "}
-        <Link to="/review" className="text-accent">
+        <Link to="/review" className="link-accent">
           Review
         </Link>{" "}
         is evidence checklists, a trade study, and FMEA you control.{" "}
-        <Link to="/workshop" className="text-accent">
+        <Link to="/workshop" className="link-accent">
           Project
         </Link>{" "}
         is drafts, saved checks, and review snapshots — on this device until you sign in, then on your account. Method, assumptions, and limits also sit on each model.
       </p>
-      <p className="mt-4 text-base leading-7 text-muted">
+      <p className="lede max-w-none">
         Saving a snapshot or a Studio draft does not require an account. Sign in and that work can follow you.
       </p>
       <p className="eyebrow mt-6">Preliminary only · project context required · independent review</p>
@@ -76,7 +76,7 @@ function AboutPage() {
       </div>
       <p className="mt-10 text-sm text-muted">
         Found a model issue?{" "}
-        <Link to="/feedback" className="text-accent">
+        <Link to="/feedback" className="link-accent">
           Send feedback
         </Link>
         .

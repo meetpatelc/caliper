@@ -70,8 +70,22 @@ export function ErrorState({
   children,
   action,
   className,
+  variant = "text",
   ...props
-}: HTMLAttributes<HTMLElement> & StatusSlots) {
+}: HTMLAttributes<HTMLElement> & StatusSlots & { variant?: "text" | "banner" }) {
+  if (variant === "banner") {
+    return (
+      <div
+        className={cn("rounded-md border border-danger/40 bg-danger/10 p-3 text-sm text-danger", className)}
+        role="alert"
+        {...props}
+      >
+        {title ? <p className="font-medium">{title}</p> : null}
+        {children}
+        {action ? <div className="mt-3">{action}</div> : null}
+      </div>
+    );
+  }
   if (!title && !action) {
     return (
       <p className={cn("text-sm text-danger", className)} role="alert" {...props}>

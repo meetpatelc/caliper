@@ -13,10 +13,11 @@ import {
   type ReviewArea,
 } from "@/lib/reviewRules";
 import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemplates";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { panelClass } from "@/components/ui/panel";
 import { SelectableCard } from "@/components/ui/selection";
+import { ErrorState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
 import { useDeskStatus } from "@/lib/desk-mode";
@@ -158,14 +159,14 @@ function ReviewPage() {
     <div className="page-wrap">
       <p className="eyebrow">Evidence, not a verdict</p>
       <h1 className="display-title mt-3">Engineering review</h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+      <p className="lede max-w-2xl">
         Checklists, a scored trade study, and FMEA arithmetic you control. Nothing here infers a recommendation or signs a design.
       </p>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
         <aside className={cn(panelClass, "grid h-fit gap-1 p-2")}>
           {reviewAreas.map((item) => (
-            <Button key={item.id} type="button" variant="ghost" onClick={() => setArea(item.id)} className={cn("w-full justify-start", area === item.id && "bg-elevated text-fg")}>
+            <Button key={item.id} type="button" variant="ghost" aria-pressed={area === item.id} onClick={() => setArea(item.id)} className={cn("w-full justify-start", area === item.id && "bg-elevated text-fg")}>
               {item.label}
             </Button>
           ))}
@@ -197,7 +198,7 @@ function ReviewPage() {
       <section className="mt-12 grid gap-8 lg:grid-cols-2">
         <div className={cn(panelClass, "min-w-0 overflow-hidden p-5")}>
           <p className="eyebrow">Trade study</p>
-          <h2 className="mt-1 text-xl font-semibold">Weighted comparison</h2>
+          <h2 className="section-title mt-1">Weighted comparison</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field htmlFor="option-a" label="Option A">
               <Input id="option-a" value={optionAName} onChange={(event) => setOptionAName(event.target.value)} />
@@ -227,7 +228,7 @@ function ReviewPage() {
           <Button variant="ghost" className="mt-3 text-accent" onClick={() => setCriteria((current) => [...current, { label: "New criterion", weight: "1", optionA: "5", optionB: "5" }])}>
             <Plus size={14} /> Add criterion
           </Button>
-          {trade.error ? <p className="mt-4 text-sm text-danger">{trade.error}</p> : trade.result && (
+          {trade.error ? <ErrorState className="mt-4">{trade.error}</ErrorState> : trade.result && (
             <p className="mt-4 font-mono text-sm">
               {optionAName}: {trade.result.normalizedA.toFixed(2)} · {optionBName}: {trade.result.normalizedB.toFixed(2)}
             </p>
@@ -235,7 +236,7 @@ function ReviewPage() {
         </div>
         <div className={cn(panelClass, "min-w-0 overflow-hidden p-5")}>
           <p className="eyebrow">FMEA arithmetic</p>
-          <h2 className="mt-1 text-xl font-semibold">Severity × occurrence × detection</h2>
+          <h2 className="section-title mt-1">Severity × occurrence × detection</h2>
           <div className="mt-4 grid grid-cols-3 gap-3">
             {(
               [
@@ -261,9 +262,9 @@ function ReviewPage() {
             })}
           </div>
           {fmea.error ? (
-            <p id={FMEA_ERROR_ID} role="alert" className="mt-4 text-sm text-danger">
+            <ErrorState id={FMEA_ERROR_ID} className="mt-4">
               {fmea.error}
-            </p>
+            </ErrorState>
           ) : (
             fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>
           )}
@@ -325,7 +326,7 @@ function ReviewPage() {
         {reviews.length > 0 && (
           <p className="mt-4 text-sm text-muted">
             {reviews.length} snapshot{reviews.length === 1 ? "" : "s"} saved. Open one from{" "}
-            <Link to="/workshop" className="text-accent hover:text-fg">
+            <Link to="/workshop" className="link-accent">
               Project
             </Link>{" "}
             to continue.

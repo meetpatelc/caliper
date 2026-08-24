@@ -51,9 +51,9 @@ function Home() {
       <section>
         <p className="eyebrow">Library</p>
         <h1 className="display-title mt-3">Every released model.</h1>
-        <p className="mt-4 max-w-xl text-base leading-7 text-muted">
+        <p className="lede">
           {MODEL_COUNT} finished calculators. Filter, search, open. To write your own, open{" "}
-          <Link to="/studio" className="text-accent hover:text-fg">
+          <Link to="/studio" className="link-accent">
             Studio
           </Link>
           .
@@ -118,7 +118,7 @@ function Home() {
               <div className="mb-3 flex items-end justify-between">
                 <div>
                   <p className="eyebrow">{groupDomain.label}</p>
-                  <h2 className="text-lg font-semibold">{groupDomain.note}</h2>
+                  <h2 className="section-title-sm">{groupDomain.note}</h2>
                 </div>
                 <span className="font-mono text-xs text-muted">{groupTools.length}</span>
               </div>

@@ -38,6 +38,7 @@ export function Field({
   htmlFor,
   error,
   errorId: errorIdProp,
+  hint,
   children,
 }: {
   label: string;
@@ -45,6 +46,7 @@ export function Field({
   htmlFor?: string;
   error?: string;
   errorId?: string;
+  hint?: ReactNode;
   children: ReactNode;
 }) {
   const generatedId = useId();
@@ -61,6 +63,8 @@ export function Field({
           <small id={errorId} role="alert" className="text-xs leading-4 text-danger">
             {error}
           </small>
+        ) : hint ? (
+          <span className="text-sm text-muted">{hint}</span>
         ) : null}
       </label>
     </FieldContext.Provider>

@@ -17,8 +17,10 @@ import { rewriteIdentifier, toIdentifier } from "@/studio/lib/identifiers";
 import { retargetAuthoredField } from "@/studio/lib/evaluate";
 import { unitFamilyOptions, unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { uniqueSlug, useWorkshop } from "@/studio/lib/workshop-store";
-import { Button, buttonVariants, panelClass } from "@instrument/ui";
+import { Button } from "@/components/ui/button";
+import { panelClass } from "@/components/ui/panel";
 import { Field as FormField, Input, Select, Textarea } from "@/components/ui/field";
+import { ErrorState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -403,9 +405,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       placeholder="x * y / z"
                     />
                     {formulaErrors[index] ? (
-                      <p id={`studio-expression-error-${index}`} className="text-sm text-danger">
-                        {formulaErrors[index]}
-                      </p>
+                      <ErrorState id={`studio-expression-error-${index}`}>{formulaErrors[index]}</ErrorState>
                     ) : null}
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_7rem]">
                       <Select
@@ -588,9 +588,11 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
               compact
             />
           </div>
-          <Link to="/c/$slug" params={{ slug: draft.slug }} className={cn(buttonVariants({ variant: "ghost" }), "mt-4 text-accent")}>
-            Open full page →
-          </Link>
+          <Button asChild variant="ghost" className="mt-4 text-accent">
+            <Link to="/c/$slug" params={{ slug: draft.slug }}>
+              Open full page →
+            </Link>
+          </Button>
         </aside>
       </div>
     </div>

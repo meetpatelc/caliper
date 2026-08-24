@@ -36,7 +36,7 @@ function FeedbackPage() {
     <div className="page-wrap max-w-3xl">
       <p className="eyebrow">Product desk</p>
       <h1 className="display-title mt-3">Send a bug report or a message.</h1>
-      <p className="mt-4 text-base leading-7 text-muted">Paste the full context. No account required.</p>
+      <p className="lede max-w-none">Paste the full context. No account required.</p>
       <form className="mt-8" onSubmit={onSubmit}>
         <fieldset>
           <legend className="eyebrow">Message type</legend>

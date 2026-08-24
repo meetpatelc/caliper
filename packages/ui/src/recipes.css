@@ -19,11 +19,79 @@
   padding-block: 1.75rem 3.5rem;
 }
 
+.page-frame {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.lede {
+  margin-top: 1rem;
+  max-width: 36rem;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--color-muted);
+}
+
+.link-quiet {
+  color: var(--color-muted);
+}
+.link-quiet:hover {
+  color: var(--color-fg);
+}
+
+.link-accent {
+  color: var(--color-accent);
+}
+.link-accent:hover {
+  color: var(--color-fg);
+}
+
+.link-row {
+  font-weight: 500;
+}
+.link-row:hover {
+  color: var(--color-accent);
+}
+
+.kbd {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: 0.125rem 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.sheet-heading {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 .display-title {
   font-size: clamp(2rem, 4.4vw, 3.35rem);
   font-weight: 600;
   letter-spacing: -0.045em;
   line-height: 1.05;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.section-title-sm {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
 }
 
 .wordmark {
@@ -32,22 +100,14 @@
   letter-spacing: 0.22em;
 }
 
-/* Compatibility: same control as Field, until leftover pages move to primitives. */
-.field-control {
-  height: 2.5rem;
-  width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
+[cmdk-group-heading] {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
   padding-inline: 0.75rem;
-  font-size: 0.875rem;
-}
-.field-control:hover {
-  border-color: color-mix(in srgb, var(--color-fg) 25%, var(--color-border));
-}
-.field-control:focus {
-  outline: var(--focus-ring);
-  outline-offset: var(--focus-offset);
+  padding-block: 0.35rem;
 }
 
 .measurement-field {

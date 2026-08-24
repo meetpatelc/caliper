@@ -8,7 +8,7 @@ export function AppErrorComponent({ error }: ErrorComponentProps) {
       <div>
         <TriangleAlert className="mx-auto size-10 text-danger" strokeWidth={2} />
         <h1 className="page-title mt-4">Something went wrong</h1>
-        <ErrorState className="mt-2 max-w-md break-words text-muted">
+        <ErrorState className="mt-2 max-w-md break-words">
           {error.message || "An unexpected error occurred. Try reloading the page."}
         </ErrorState>
       </div>

@@ -38,7 +38,7 @@ export function FavouriteRail() {
                 <Link
                   to="/tool/$toolId"
                   params={{ toolId: tool!.id }}
-                  className="block py-1.5 text-sm hover:text-accent"
+                  className="link-accent block py-1.5 text-sm"
                 >
                   {tool!.title}
                 </Link>

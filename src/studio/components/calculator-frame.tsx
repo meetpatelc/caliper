@@ -19,6 +19,7 @@ import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components
 import { MeasurementField } from "@/components/ui/measurement-field";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, UnitBadge, UnitSelect } from "@/components/ui/field";
+import { ErrorState } from "@/components/ui/status";
 
 function sketchForCalculator(calculator: AnyCalculator) {
   const direct = resolveSketchId(calculator.slug, calculator.sketch);
@@ -133,6 +134,7 @@ export function CalculatorFrame({
                     label={field.label}
                     symbol={field.symbol}
                     error={fieldError}
+                    hint={!compact ? field.help : undefined}
                   >
                     {choice ? (
                       <Select
@@ -174,9 +176,6 @@ export function CalculatorFrame({
                       </MeasurementField>
                     )}
                   </Field>
-                    {!fieldError && !compact && field.help ? (
-                      <span className="text-sm text-muted">{field.help}</span>
-                    ) : null}
                   </div>
                 );
               })}
@@ -220,9 +219,9 @@ export function CalculatorFrame({
                 })}
               </ul>
             ) : (
-              <p className="text-sm text-danger" aria-hidden={compact || undefined}>
+              <ErrorState aria-hidden={compact || undefined}>
                 {compact ? "Preview cannot run until the expression is valid." : result.error}
-              </p>
+              </ErrorState>
             )}
             <GoverningRelation formula={calculator.formula} className="text-sm" />
           </>
@@ -269,7 +268,7 @@ export function CalculatorFrame({
             {related.map((item, index) => (
               <span key={item.slug}>
                 {index > 0 ? " · " : null}
-                <Link to="/c/$slug" params={{ slug: item.slug }} className="text-fg hover:text-accent">
+                <Link to="/c/$slug" params={{ slug: item.slug }} className="link-row">
                   {item.title}
                 </Link>
               </span>

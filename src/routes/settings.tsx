@@ -91,7 +91,7 @@ function SettingsBody({ email }: { email: string }) {
       <h1 className="page-title mt-1">Settings</h1>
       <p className="mt-3 max-w-lg text-sm leading-6 text-muted">
         Password, appearance, and the account itself. Name and email live on{" "}
-        <Link to="/profile" className="text-accent hover:text-fg">
+        <Link to="/profile" className="link-accent">
           Profile
         </Link>
         .
@@ -137,7 +137,7 @@ function SettingsBody({ email }: { email: string }) {
             />
           </Field>
           {passwordMessage ? <p className="text-sm text-muted">{passwordMessage}</p> : null}
-          <Button type="submit" disabled={savingPassword || currentPassword.length < 1 || newPassword.length < 8}>
+          <Button type="submit" variant="accent" disabled={savingPassword || currentPassword.length < 1 || newPassword.length < 8}>
             {savingPassword ? "Updating…" : "Update password"}
           </Button>
         </form>
@@ -165,7 +165,7 @@ function SettingsBody({ email }: { email: string }) {
           Removes the email account and the Favourites, Project, and Studio drafts on it. Work that never left this browser stays.
         </p>
         <form className="mt-4 grid gap-4" onSubmit={removeAccount}>
-          <Field htmlFor="settings-delete" label="Password to confirm">
+          <Field htmlFor="settings-delete" label="Password to confirm" error={deleteMessage || undefined}>
             <Input
               id="settings-delete"
               type="password"
@@ -174,7 +174,6 @@ function SettingsBody({ email }: { email: string }) {
               onChange={(event) => setDeletePassword(event.target.value)}
             />
           </Field>
-          {deleteMessage ? <p className="text-sm text-danger">{deleteMessage}</p> : null}
           <Button type="submit" variant="mark" disabled={deleting || deletePassword.length < 1}>
             {deleting ? "Deleting…" : "Delete account"}
           </Button>

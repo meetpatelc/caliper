@@ -14,8 +14,7 @@
   select:focus-visible,
   textarea:focus-visible,
   button:focus-visible,
-  [role="button"]:focus-visible,
-  .field-control:focus-visible {
+  [role="button"]:focus-visible {
     outline: var(--focus-ring) !important;
     outline-offset: var(--focus-offset) !important;
   }
@@ -27,10 +26,6 @@
 }
 
 @layer components {
-  .field-control.tabular-nums {
-    font-family: var(--font-mono);
-  }
-
   footer a {
     min-height: 1.5rem;
     padding-block: 0.35rem;
@@ -42,23 +37,6 @@
   header nav button {
     min-height: 2.5rem;
   }
-}
-
-.page-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-}
-
-[cmdk-group-heading] {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  padding-inline: 0.75rem;
-  padding-block: 0.35rem;
 }
 
 /* Kit accent hover:bg-mark is the same red; darken it outside layers so utilities cannot hide it. */

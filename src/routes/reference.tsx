@@ -13,7 +13,7 @@ function ReferencePage() {
     <div className="page-wrap">
       <p className="eyebrow">Method library</p>
       <h1 className="display-title mt-3">The number is only as good as the model.</h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+      <p className="lede max-w-2xl">
         Sources explain the concept. Each workspace still declares its own narrow boundary. Read both before treating a result as evidence.
       </p>
 
@@ -25,7 +25,7 @@ function ReferencePage() {
         ].map(([n, title, copy]) => (
           <li key={n} className={cn(panelClass, "p-4")}>
             <p className="font-mono text-xs text-accent">{n}</p>
-            <h2 className="mt-2 font-semibold">{title}</h2>
+            <h2 className="section-title-sm mt-2">{title}</h2>
             <p className="mt-2 text-sm leading-6 text-muted">{copy}</p>
           </li>
         ))}
@@ -40,7 +40,7 @@ function ReferencePage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="eyebrow">{dataset.id.replace(/-/g, " ")}</p>
-                  <h3 className="mt-1 text-lg font-semibold">{dataset.title}</h3>
+                  <h3 className="section-title-sm mt-1">{dataset.title}</h3>
                 </div>
                 <a href={dataset.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Open ${dataset.sourceLabel}`}>
                   <ArrowUpRight size={16} />
@@ -96,7 +96,7 @@ function ReferencePage() {
                 <div className={cn(panelClass)}>
                   {domainTools.map((tool) => (
                     <div key={tool.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 last:border-b-0">
-                      <Link to="/tool/$toolId" params={{ toolId: tool.id }} className="font-medium hover:text-accent">
+                      <Link to="/tool/$toolId" params={{ toolId: tool.id }} className="link-row">
                         {tool.title}
                       </Link>
                       <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-mono text-[11px] text-muted hover:text-fg">

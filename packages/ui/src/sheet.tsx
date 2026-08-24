@@ -24,14 +24,14 @@ export function InstrumentSheet({
       <div className={cn("grid gap-px", compact ? "grid-cols-1" : "lg:grid-cols-2")}>
         <div className="bg-surface p-4 sm:p-5">
           <div className="flex h-10 items-center justify-between gap-2">
-            <h2 className="text-base font-semibold">Inputs</h2>
+            <h2 className="sheet-heading">Inputs</h2>
             {example ?? <span className="size-10 shrink-0" aria-hidden="true" />}
           </div>
           <div className="mt-4 grid gap-4">{inputs}</div>
         </div>
         <div className="bg-bg p-4 sm:p-5">
           <div className="flex h-10 items-center">
-            <h2 className="text-base font-semibold">{resultTitle}</h2>
+            <h2 className="sheet-heading">{resultTitle}</h2>
           </div>
           <div className="mt-4 grid gap-4">{results}</div>
         </div>

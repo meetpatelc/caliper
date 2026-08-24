@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { StudioEditor } from "@/studio/components/studio-editor";
 import { useWorkshop } from "@/studio/lib/workshop-store";
-import { buttonVariants } from "@instrument/ui";
+import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/status";
 
 export const Route = createFileRoute("/studio/$id")({ component: StudioEdit });
@@ -25,9 +25,9 @@ function StudioEdit() {
       <div className="page-wrap max-w-xl">
         <p className="eyebrow">Studio</p>
         <h1 className="display-title mt-3">That draft is not here.</h1>
-        <Link to="/workshop" className={buttonVariants({ variant: "ghost" })}>
-          Back to Project
-        </Link>
+        <Button asChild variant="ghost" className="mt-4">
+          <Link to="/workshop">Back to Project</Link>
+        </Button>
       </div>
     );
   }

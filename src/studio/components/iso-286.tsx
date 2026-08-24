@@ -15,11 +15,12 @@ import { tools } from "@/lib/catalog";
 import { relatedTools } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
-import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
+import { InstrumentSheet, QuantityName, ResultQuantity } from "@/components/instrument-sheet";
 import { GoverningRelation } from "@/components/governing-relation";
 import { MeasurementField } from "@/components/ui/measurement-field";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, UnitBadge } from "@/components/ui/field";
+import { ErrorState } from "@/components/ui/status";
 import { Link } from "@tanstack/react-router";
 
 const calculator = officialBySlug.get("iso-286-fits")!;
@@ -111,7 +112,7 @@ export function Iso286Instrument() {
             {nearby.map((item, index) => (
               <span key={item.id}>
                 {index > 0 ? " · " : null}
-                <Link to="/tool/$toolId" params={{ toolId: item.id }} className="text-fg hover:text-accent">
+                <Link to="/tool/$toolId" params={{ toolId: item.id }} className="link-row">
                   {item.title}
                 </Link>
               </span>
@@ -158,13 +159,7 @@ export function Iso286Instrument() {
               </MeasurementField>
             </Field>
             <div className="grid gap-2">
-              <span className="flex items-baseline gap-2 text-sm">
-                Hole class
-                <em className="font-mono text-xs not-italic text-accent">
-                  {holeLetter}
-                  {holeGrade}
-                </em>
-              </span>
+              <QuantityName label="Hole class" symbol={`${holeLetter}${holeGrade}`} />
               <div className="grid grid-cols-2 gap-2">
                 <Select aria-label="Hole letter" value={holeLetter} onChange={(event) => setHoleLetter(event.target.value as HoleLetter)}>
                   {HOLE_LETTERS.map((letter) => (
@@ -193,13 +188,7 @@ export function Iso286Instrument() {
               ) : null}
             </div>
             <div className="grid gap-2">
-              <span className="flex items-baseline gap-2 text-sm">
-                Shaft class
-                <em className="font-mono text-xs not-italic text-accent">
-                  {shaftLetter}
-                  {shaftGrade}
-                </em>
-              </span>
+              <QuantityName label="Shaft class" symbol={`${shaftLetter}${shaftGrade}`} />
               <div className="grid grid-cols-2 gap-2">
                 <Select aria-label="Shaft letter" value={shaftLetter} onChange={(event) => setShaftLetter(event.target.value as ShaftLetter)}>
                   {SHAFT_LETTERS.map((letter) => (
@@ -262,7 +251,7 @@ export function Iso286Instrument() {
               <GoverningRelation formula={calculator.formula} className="text-sm" />
             </>
           ) : (
-            <p className="text-sm text-danger">{result.error}</p>
+            <ErrorState>{result.error}</ErrorState>
           )
         }
       />

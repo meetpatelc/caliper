@@ -81,7 +81,7 @@ function Login() {
               />
             </Field>
             {error ? <ErrorState>{error}</ErrorState> : null}
-            <Button type="submit" disabled={busy} className="w-full">
+            <Button type="submit" variant="accent" disabled={busy} className="w-full">
               {busy ? "Working…" : mode === "up" ? "Create account" : "Sign in"}
             </Button>
           </form>
@@ -91,7 +91,7 @@ function Login() {
         <Button
           type="button"
           variant="ghost"
-          className="mt-4 px-0 text-accent hover:text-fg"
+          className="link-accent mt-4 px-0"
           onClick={() => {
             setError(null);
             setMode((current) => (current === "up" ? "in" : "up"));
@@ -100,7 +100,7 @@ function Login() {
           {mode === "up" ? "Already have an account? Sign in" : "Need an account? Create one"}
         </Button>
         <div>
-          <Link to="/" className="mt-6 inline-block text-sm text-muted hover:text-fg">
+          <Link to="/" className="link-quiet mt-6 inline-block text-sm">
             Back to the library
           </Link>
         </div>

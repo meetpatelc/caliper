@@ -3,6 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import { ClipboardList, PenLine, Star } from "lucide-react";
 import type { RefObject } from "react";
 import { OverlayDialog } from "@/components/overlay-dialog";
+import { EmptyState } from "@/components/ui/status";
 import { getTool, tools, searchableToolText } from "@/lib/catalog";
 import { releasedDomains, savedHeadline } from "@/lib/desk";
 import { officialCalculators } from "@/studio/lib/catalog";
@@ -65,8 +66,8 @@ export function CommandPalette({
           className="w-full border-b border-border bg-transparent px-4 py-3 text-base outline-none placeholder:text-muted"
         />
         <Command.List className="max-h-[min(420px,60vh)] overflow-auto p-2">
-          <Command.Empty className="px-3 py-6 text-sm text-muted">
-            No match. Try a favourite, a saved check, or a model name.
+          <Command.Empty className="px-3 py-6">
+            <EmptyState>No match. Try a favourite, a saved check, or a model name.</EmptyState>
           </Command.Empty>
           {recents.length > 0 && (
             <Command.Group heading="Recent" className="px-1 py-1">

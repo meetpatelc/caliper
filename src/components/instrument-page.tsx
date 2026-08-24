@@ -28,7 +28,7 @@ export function InstrumentPage({
   return (
     <div className="page-wrap">
       <div className="no-print mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted hover:text-fg">
+        <Link to="/" className="link-quiet inline-flex items-center gap-2 text-sm">
           <ArrowLeft size={15} />
           {backLabel}
         </Link>
@@ -61,7 +61,7 @@ export function InstrumentMethod({
   return (
     <section className="no-print mt-8 border-t border-border pt-6" aria-labelledby="method-title">
       <p className="eyebrow">Method</p>
-      <h2 id="method-title" className="mt-1 text-lg font-semibold tracking-[-0.03em]">
+      <h2 id="method-title" className="section-title-sm mt-1">
         Equation, when, and don’t
       </h2>
       {description ? <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">{description}</p> : null}
@@ -81,7 +81,7 @@ export function InstrumentMethod({
         </div>
       </div>
       {sourceUrl ? (
-        <a href={sourceUrl} target="_blank" rel="noreferrer" className="mt-5 inline-flex text-sm text-accent hover:underline">
+        <a href={sourceUrl} target="_blank" rel="noreferrer" className="link-accent mt-5 inline-flex text-sm hover:underline">
           {sourceLabel}
         </a>
       ) : (

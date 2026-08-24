@@ -2,7 +2,7 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { CalculatorFrame } from "@/studio/components/calculator-frame";
 import { findCalculator } from "@/studio/lib/resolve";
 import { useWorkshop } from "@/studio/lib/workshop-store";
-import { buttonVariants } from "@instrument/ui";
+import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/status";
 
 export const Route = createFileRoute("/c/$slug")({
@@ -53,9 +53,9 @@ function CalculatorPage() {
       <div className="page-wrap max-w-xl">
         <p className="eyebrow">Missing instrument</p>
         <h1 className="display-title mt-3">That instrument is not here.</h1>
-        <Link to="/" className={buttonVariants({ variant: "ghost" })}>
-          Back to library
-        </Link>
+        <Button asChild variant="ghost" className="mt-4">
+          <Link to="/">Back to library</Link>
+        </Button>
       </div>
     );
   }

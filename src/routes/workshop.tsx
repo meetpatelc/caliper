@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ClipboardList, FolderPlus, PenLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkshop } from "@/studio/lib/workshop-store";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { panelClass } from "@/components/ui/panel";
 import { EmptyState, LoadingState } from "@/components/ui/status";
@@ -50,17 +50,17 @@ function ProjectPage() {
           {loadingDesk ? (
             <LoadingState className="mt-4">{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
           ) : (
-          <p className="mt-4 max-w-xl text-base leading-7 text-muted">
+          <p className="lede">
             {onAccount
               ? "Drafts, saved checks, and reviews follow this account. Write in "
               : fallback
                 ? "The account desk could not be loaded. Write in "
                 : "Drafts, saved checks, and reviews stay on this device until you sign in. Write in "}
-            <Link to="/studio" className="text-accent hover:text-fg">
+            <Link to="/studio" className="link-accent">
               Studio
             </Link>{" "}
             or open{" "}
-            <Link to="/review" className="text-accent hover:text-fg">
+            <Link to="/review" className="link-accent">
               Review
             </Link>
             .
@@ -68,10 +68,12 @@ function ProjectPage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link to="/review" className={buttonVariants({ variant: "outline" })}>
-            <ClipboardList size={16} />
-            Start a review
-          </Link>
+          <Button asChild variant="outline">
+            <Link to="/review">
+              <ClipboardList size={16} />
+              Start a review
+            </Link>
+          </Button>
           <Button
             variant="accent"
             onClick={() => {
@@ -89,7 +91,7 @@ function ProjectPage() {
         <EmptyState
           className={cn(panelClass, "mt-10 p-6")}
           action={
-            <Link to="/" className="text-accent">
+            <Link to="/" className="link-accent">
               Open library
             </Link>
           }
@@ -99,7 +101,7 @@ function ProjectPage() {
       ) : null}
 
       <section className="mt-10">
-        <h2 className="text-xl font-semibold">Your models</h2>
+        <h2 className="section-title">Your models</h2>
         {loadingDesk ? null : items.length === 0 ? (
           <EmptyState className="mt-3">{onAccount ? "No drafts on this account." : "No drafts on this device."}</EmptyState>
         ) : (
@@ -109,16 +111,20 @@ function ProjectPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="eyebrow">{item.published ? "Published" : "Draft"}</p>
-                    <h3 className="mt-1 text-lg font-semibold">{item.title}</h3>
+                    <h3 className="section-title-sm mt-1">{item.title}</h3>
                     <p className="mt-1 font-mono text-xs text-muted">{item.slug}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Link to="/c/$slug" params={{ slug: item.slug }} className={buttonVariants()}>
-                      Open
-                    </Link>
-                    <Link to="/studio/$id" params={{ id: item.id }} className={buttonVariants({ variant: "accent" })}>
-                      Edit
-                    </Link>
+                    <Button asChild>
+                      <Link to="/c/$slug" params={{ slug: item.slug }}>
+                        Open
+                      </Link>
+                    </Button>
+                    <Button asChild variant="accent">
+                      <Link to="/studio/$id" params={{ id: item.id }}>
+                        Edit
+                      </Link>
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -140,7 +146,7 @@ function ProjectPage() {
       </section>
 
       <section className="mt-12" id="checks">
-        <h2 className="text-xl font-semibold">Saved checks</h2>
+        <h2 className="section-title">Saved checks</h2>
         <p className="mt-2 text-sm text-muted">Optional folders. The red one is the folder in use, not a trial of the product.</p>
         <form
           className="mt-4 flex flex-wrap items-end gap-2"
@@ -210,7 +216,7 @@ function ProjectPage() {
                       to="/tool/$toolId"
                       params={{ toolId: record.toolId }}
                       search={{ ...record.input, restore: "1" }}
-                      className="font-medium hover:text-accent"
+                      className="link-row"
                     >
                       {record.title}
                     </Link>
@@ -237,12 +243,12 @@ function ProjectPage() {
 
       {reviews.length > 0 && (
         <section className="mt-12">
-          <h2 className="text-xl font-semibold">Review snapshots</h2>
+          <h2 className="section-title">Review snapshots</h2>
           <ul className="mt-4 grid gap-2">
             {reviews.map((record) => (
               <li key={record.id} className={cn(panelClass, "flex items-center justify-between px-4 py-3")}>
                 <div>
-                  <Link to="/review" search={{ id: record.id }} className="font-medium hover:text-accent">
+                  <Link to="/review" search={{ id: record.id }} className="link-row">
                     {record.title}
                   </Link>
                   <p className="font-mono text-[11px] text-muted">

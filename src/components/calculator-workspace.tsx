@@ -9,6 +9,7 @@ import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea, UnitBadge, UnitSelect } from "@/components/ui/field";
 import { MeasurementField } from "@/components/ui/measurement-field";
+import { ErrorState } from "@/components/ui/status";
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
@@ -137,9 +138,9 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       <div className="page-wrap">
         <p className="eyebrow">Unknown model</p>
         <h1 className="display-title mt-3">This route is not a released calculator.</h1>
-        <Link to="/" className="mt-6 inline-flex text-sm text-accent">
-          Back to library
-        </Link>
+        <Button asChild variant="ghost" className="mt-6">
+          <Link to="/">Back to library</Link>
+        </Button>
       </div>
     );
   }
@@ -291,7 +292,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
             {related.map((item, index) => (
               <span key={item.id}>
                 {index > 0 ? " · " : null}
-                <Link to="/tool/$toolId" params={{ toolId: item.id }} className="text-fg hover:text-accent">
+                <Link to="/tool/$toolId" params={{ toolId: item.id }} className="link-row">
                   {item.title}
                 </Link>
               </span>
@@ -358,7 +359,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               const spec = unitSwitchFor(field.unit);
               return (
                 <div key={field.key} className="grid gap-2">
-                <Field htmlFor={fieldId} label={field.label} symbol={field.symbol} error={fieldError}>
+                <Field htmlFor={fieldId} label={field.label} symbol={field.symbol} error={fieldError} hint={field.helper}>
                   {field.kind === "select" || converterUnit ? (
                     <Select
                       id={fieldId}
@@ -421,9 +422,6 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     </MeasurementField>
                   )}
                 </Field>
-                {!fieldError && field.helper ? (
-                  <span className="text-sm text-muted">{field.helper}</span>
-                ) : null}
                 </div>
               );
             })}
@@ -432,10 +430,10 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           results={
             <div id="results" aria-live="polite" className="grid gap-4">
             {result.errors.length ? (
-              <div className="flex items-start gap-2 rounded-md border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
+              <ErrorState variant="banner" className="flex items-start gap-2">
                 <CircleAlert size={16} />
                 <p>{result.errors[0]}</p>
-              </div>
+              </ErrorState>
             ) : (
               <>
                 <div className="grid gap-4">

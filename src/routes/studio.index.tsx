@@ -3,10 +3,9 @@ import { Copy, FilePlus, PenLine } from "lucide-react";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { studioDocuments } from "@/lib/document";
-import { Button, buttonVariants, panelClass } from "@instrument/ui";
+import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/status";
 import { SelectableCard } from "@/components/ui/selection";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/studio/")({ component: StudioHome });
 
@@ -26,7 +25,7 @@ function StudioHome() {
     <div className="page-wrap">
       <p className="eyebrow">Studio</p>
       <h1 className="display-title mt-3">Name the quantities. Write the relation. Watch it compute.</h1>
-      <p className="mt-5 max-w-xl text-base leading-7 text-muted">
+      <p className="lede">
         Start blank, start from a working example, or fork a formula instrument. Method is for publishing — not for the
         first number.
       </p>
@@ -46,7 +45,7 @@ function StudioHome() {
         <Button
           type="button"
           variant="outline"
-          className={cn(panelClass, "h-auto min-h-28 flex-col items-start justify-between px-5 py-4 text-left")}
+          className="h-auto min-h-28 flex-col items-start justify-between px-5 py-4 text-left"
           onClick={() => open(createStarter())}
         >
           <PenLine size={18} />
@@ -56,9 +55,9 @@ function StudioHome() {
           </span>
         </Button>
       </div>
-      <Link to="/workshop" className={cn(buttonVariants({ variant: "ghost" }), "mt-4")}>
-        Project →
-      </Link>
+      <Button asChild variant="ghost" className="mt-4">
+        <Link to="/workshop">Project →</Link>
+      </Button>
 
       {hydrating ? (
         <LoadingState className="mt-12">Loading the account desk.</LoadingState>
@@ -86,7 +85,7 @@ function StudioHome() {
 
       <section className="mt-12">
         <p className="eyebrow">Start from a published model</p>
-        <h2 className="mt-1 text-xl font-semibold tracking-[-0.03em]">Start from something you already trust.</h2>
+        <h2 className="section-title mt-1">Start from something you already trust.</h2>
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {studioDocuments().map((item) => (
             <li key={item.slug}>

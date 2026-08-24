@@ -89,7 +89,7 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
             <Input id="profile-email" value={email} readOnly />
           </Field>
           {nameMessage ? <p className="text-sm text-muted">{nameMessage}</p> : null}
-          <Button type="submit" disabled={savingName || !displayName.trim()}>
+          <Button type="submit" variant="accent" disabled={savingName || !displayName.trim()}>
             {savingName ? "Saving…" : "Save name"}
           </Button>
         </form>
@@ -122,7 +122,7 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
               <ul className="mt-4 grid gap-1">
                 {favouriteTools.map((tool) => (
                   <li key={tool!.id}>
-                    <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="block py-1.5 text-sm hover:text-accent">
+                    <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="link-row block py-1.5 text-sm">
                       {tool!.title}
                     </Link>
                   </li>
@@ -133,14 +133,14 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
             )}
           </>
         )}
-        <Link to="/workshop" className="mt-3 inline-block text-sm text-accent hover:text-fg">
+        <Link to="/workshop" className="link-accent mt-3 inline-block text-sm">
           Open Project
         </Link>
       </section>
 
       <p className="mt-6 text-sm text-muted">
         Password and sign out are in{" "}
-        <Link to="/settings" className="text-accent hover:text-fg">
+        <Link to="/settings" className="link-accent">
           Account settings
         </Link>
         .

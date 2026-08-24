@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { signOut } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { panelClass } from "@/components/ui/panel";
 import { LoadingState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
@@ -39,9 +39,9 @@ export function AccountMenu() {
   }
   if (!user) {
     return (
-      <Link to="/login" className={cn(buttonVariants({ variant: "outline" }))}>
-        Sign in
-      </Link>
+      <Button asChild variant="outline">
+        <Link to="/login">Sign in</Link>
+      </Button>
     );
   }
 
@@ -69,22 +69,16 @@ export function AccountMenu() {
         <div role="menu" className={cn(panelClass, "absolute right-0 top-full z-40 mt-1 w-56 p-2")}>
           <p className="truncate px-2 pt-1 text-sm font-medium">{user.displayName || "Account"}</p>
           {user.primaryEmail ? <p className="truncate px-2 pb-2 text-xs text-muted">{user.primaryEmail}</p> : null}
-          <Link
-            to="/profile"
-            role="menuitem"
-            className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}
-            onClick={() => setOpen(false)}
-          >
-            Profile
-          </Link>
-          <Link
-            to="/settings"
-            role="menuitem"
-            className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}
-            onClick={() => setOpen(false)}
-          >
-            Account settings
-          </Link>
+          <Button asChild variant="ghost">
+            <Link to="/profile" role="menuitem" className="w-full justify-start" onClick={() => setOpen(false)}>
+              Profile
+            </Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link to="/settings" role="menuitem" className="w-full justify-start" onClick={() => setOpen(false)}>
+              Account settings
+            </Link>
+          </Button>
           <Button
             variant="ghost"
             className="w-full justify-start"
