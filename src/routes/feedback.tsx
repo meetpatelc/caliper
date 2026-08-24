@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Bug, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
-import { submitFeedback } from "@/lib/feedback";
+import { listFeedback, submitFeedback, type FeedbackRow } from "@/lib/feedback";
+import { SignedIn } from "@/lib/auth/gates";
 import { Button } from "@/components/ui/button";
 import { Field, Textarea } from "@/components/ui/field";
 import { PageHeader } from "@/components/ui/page";
+import { panelClass } from "@/components/ui/panel";
 import { SelectableCard } from "@/components/ui/selection";
+import { EmptyState, LoadingState } from "@/components/ui/status";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/feedback")({ component: FeedbackPage });
 
@@ -14,6 +18,7 @@ function FeedbackPage() {
   const [kind, setKind] = useState<"bug" | "message">("bug");
   const [message, setMessage] = useState("");
   const [pending, setPending] = useState(false);
+  const [inboxTick, setInboxTick] = useState(0);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -25,7 +30,8 @@ function FeedbackPage() {
     try {
       await submitFeedback({ data: { kind, message, pagePath: window.location.pathname } });
       setMessage("");
-      toast.success("Feedback saved on this device. Thank you.");
+      setInboxTick((value) => value + 1);
+      toast.success("Feedback sent. Thank you.");
     } catch {
       toast.error("Could not submit. Try again.");
     } finally {
@@ -39,7 +45,7 @@ function FeedbackPage() {
         kicker="Product desk"
         title="Send a bug report or a message."
         ledeClassName="max-w-none"
-        lede="Paste the full context. No account required."
+        lede="Paste the full context. No account required. It reaches the product desk, not only this browser."
       />
       <form className="mt-8" onSubmit={onSubmit}>
         <fieldset>
@@ -75,6 +81,52 @@ function FeedbackPage() {
           {pending ? "Submitting" : "Submit"}
         </Button>
       </form>
+      <SignedIn>
+        <FeedbackInbox tick={inboxTick} />
+      </SignedIn>
     </div>
+  );
+}
+
+function FeedbackInbox({ tick }: { tick: number }) {
+  const [rows, setRows] = useState<FeedbackRow[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setRows(null);
+    listFeedback()
+      .then((next) => {
+        if (!cancelled) setRows(next);
+      })
+      .catch(() => {
+        if (!cancelled) setRows([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [tick]);
+
+  return (
+    <section className="mt-12">
+      <p className="eyebrow">Received</p>
+      <h2 className="section-title mt-1">On this desk.</h2>
+      {rows === null ? (
+        <LoadingState className="mt-4">Loading messages.</LoadingState>
+      ) : rows.length === 0 ? (
+        <EmptyState className="mt-4">Nothing received yet.</EmptyState>
+      ) : (
+        <ul className="mt-4 grid gap-3">
+          {rows.map((row) => (
+            <li key={row.id} className={cn(panelClass, "p-4")}>
+              <p className="eyebrow">
+                {row.kind === "bug" ? "Bug" : "Message"} · {row.createdAt.slice(0, 16).replace("T", " ")} UTC
+              </p>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{row.message}</p>
+              {row.pagePath ? <p className="meta mt-2">{row.pagePath}</p> : null}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
