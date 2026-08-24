@@ -67,7 +67,7 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
     <div className="page-wrap max-w-xl">
       <p className="eyebrow">Account</p>
       <h1 className="page-title mt-1">Profile</h1>
-      <p className="mt-3 max-w-lg text-sm leading-6 text-muted">
+      <p className="lede">
         This is your Instrument account. Favourites, drafts, and Project live here.
       </p>
 
@@ -88,7 +88,11 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
           <Field htmlFor="profile-email" label="Email">
             <Input id="profile-email" value={email} readOnly />
           </Field>
-          {nameMessage ? <p className="text-sm text-muted">{nameMessage}</p> : null}
+          {nameMessage === "Saved." ? (
+            <p className="text-sm text-ok">{nameMessage}</p>
+          ) : nameMessage ? (
+            <ErrorState>{nameMessage}</ErrorState>
+          ) : null}
           <Button type="submit" variant="accent" disabled={savingName || !displayName.trim()}>
             {savingName ? "Saving…" : "Save name"}
           </Button>

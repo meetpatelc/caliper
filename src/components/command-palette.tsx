@@ -82,7 +82,7 @@ export function CommandPalette({
                     className={itemClass}
                   >
                     <span>{tool!.title}</span>
-                    <span className="font-mono text-[11px] text-muted">{tool!.outputLabel}</span>
+                    <span className="meta">{tool!.outputLabel}</span>
                   </Command.Item>
                 ))}
             </Command.Group>
@@ -123,7 +123,7 @@ export function CommandPalette({
                     className={itemClass}
                   >
                     <span>{record.title}</span>
-                    <span className="hidden font-mono text-[11px] text-muted sm:inline">
+                    <span className="hidden meta sm:inline">
                       {headline || tool?.title || "saved check"}
                     </span>
                   </Command.Item>
@@ -144,7 +144,7 @@ export function CommandPalette({
                   className={itemClass}
                 >
                   <span>{record.title}</span>
-                  <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted">
+                  <span className="inline-flex items-center gap-1 meta">
                     <ClipboardList size={11} className="hidden sm:inline" />
                     {record.area}
                   </span>
@@ -165,7 +165,7 @@ export function CommandPalette({
                   className={itemClass}
                 >
                   <span>{item.title}</span>
-                  <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted">
+                  <span className="inline-flex items-center gap-1 meta">
                     <PenLine size={11} className="hidden sm:inline" />
                     {item.published ? "published" : "draft"}
                   </span>
@@ -193,7 +193,7 @@ export function CommandPalette({
                     className={itemClass}
                   >
                     <span>{tool.title}</span>
-                    <span className="hidden font-mono text-[11px] text-muted sm:inline">{tool.outputLabel}</span>
+                    <span className="hidden meta sm:inline">{tool.outputLabel}</span>
                   </Command.Item>
                 ))}
               </Command.Group>
@@ -210,7 +210,7 @@ export function CommandPalette({
                   className={itemClass}
                 >
                   <span>{item.title}</span>
-                  <span className="hidden font-mono text-[11px] text-muted sm:inline">{item.formula}</span>
+                  <span className="hidden meta sm:inline">{item.formula}</span>
                 </Command.Item>
               ))}
           </Command.Group>

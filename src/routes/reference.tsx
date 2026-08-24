@@ -33,7 +33,7 @@ function ReferencePage() {
 
       <section className="mt-14">
         <p className="eyebrow">Governed reference data</p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">Version, range, and source before a value.</h2>
+        <h2 className="section-title mt-1">Version, range, and source before a value.</h2>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {governedReferenceData.map((dataset) => (
             <article key={dataset.id} className={`${panelClass} p-5`}>
@@ -82,7 +82,7 @@ function ReferencePage() {
 
       <section className="mt-14">
         <p className="eyebrow">Workspace provenance</p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">Every released method, one step away</h2>
+        <h2 className="section-title mt-1">Every released method, one step away</h2>
         <div className="mt-6 grid gap-8">
           {releasedDomains.map((domain) => {
             const domainTools = tools.filter((tool) => tool.contract.domain === domain.id);
@@ -99,7 +99,7 @@ function ReferencePage() {
                       <Link to="/tool/$toolId" params={{ toolId: tool.id }} className="link-row">
                         {tool.title}
                       </Link>
-                      <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-mono text-[11px] text-muted hover:text-fg">
+                      <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="meta link-quiet inline-flex items-center gap-1">
                         {tool.sourceLabel} <ArrowUpRight size={12} />
                       </a>
                     </div>

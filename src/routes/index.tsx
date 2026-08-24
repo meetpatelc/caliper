@@ -137,7 +137,7 @@ function Home() {
                       params={{ toolId: tool.id }}
                     >
                       <span className="flex items-start justify-between gap-2">
-                        <strong className="text-base font-semibold tracking-[-0.02em]">{tool.title}</strong>
+                        <strong className="section-title-sm">{tool.title}</strong>
                         <Button
                           type="button"
                           variant="ghost"

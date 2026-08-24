@@ -44,7 +44,7 @@ function Login() {
           Instrument
         </Link>
         <h1 className="page-title mt-6">{mode === "up" ? "Create an account" : "Sign in"}</h1>
-        <p className="mt-2 text-sm leading-6 text-muted">
+        <p className="lede">
           Email and a password. No Google or X. Sign in and Favourites, Project, and Studio drafts follow the account. Without an account they stay on this device.
         </p>
         {authEnabled ? (

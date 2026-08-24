@@ -32,6 +32,12 @@
   color: var(--color-muted);
 }
 
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-muted);
+}
+
 .link-quiet {
   color: var(--color-muted);
 }

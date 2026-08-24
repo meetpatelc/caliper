@@ -220,7 +220,7 @@ function ProjectPage() {
                     >
                       {record.title}
                     </Link>
-                    <p className="font-mono text-[11px] text-muted">
+                    <p className="meta">
                       {tool?.title}
                       {headline ? ` · ${headline}` : ""} · {new Date(record.savedAt).toLocaleString()}
                     </p>
@@ -251,7 +251,7 @@ function ProjectPage() {
                   <Link to="/review" search={{ id: record.id }} className="link-row">
                     {record.title}
                   </Link>
-                  <p className="font-mono text-[11px] text-muted">
+                  <p className="meta">
                     {record.area} · {new Date(record.savedAt).toLocaleString()}
                   </p>
                 </div>

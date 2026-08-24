@@ -160,7 +160,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
         <div>
           <p className="eyebrow">Studio</p>
           <h1 className="page-title mt-2">{draft.title}</h1>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
+          <p className="lede">
             Drafts autosave. Signed in, they live on your account. Method is only required to publish.
           </p>
         </div>

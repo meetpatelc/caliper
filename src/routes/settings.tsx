@@ -6,7 +6,7 @@ import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { wipeDesk } from "@/lib/desk-account";
 import { THEME_KEY } from "@/lib/instrument";
 import { Button } from "@/components/ui/button";
-import { LoadingState } from "@/components/ui/status";
+import { ErrorState, LoadingState } from "@/components/ui/status";
 import { Field, Input } from "@/components/ui/field";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
@@ -89,7 +89,7 @@ function SettingsBody({ email }: { email: string }) {
     <div className="page-wrap max-w-xl">
       <p className="eyebrow">Account</p>
       <h1 className="page-title mt-1">Settings</h1>
-      <p className="mt-3 max-w-lg text-sm leading-6 text-muted">
+      <p className="lede">
         Password, appearance, and the account itself. Name and email live on{" "}
         <Link to="/profile" className="link-accent">
           Profile
@@ -136,7 +136,11 @@ function SettingsBody({ email }: { email: string }) {
               onChange={(event) => setNewPassword(event.target.value)}
             />
           </Field>
-          {passwordMessage ? <p className="text-sm text-muted">{passwordMessage}</p> : null}
+          {passwordMessage === "Password updated." ? (
+            <p className="text-sm text-ok">{passwordMessage}</p>
+          ) : passwordMessage ? (
+            <ErrorState>{passwordMessage}</ErrorState>
+          ) : null}
           <Button type="submit" variant="accent" disabled={savingPassword || currentPassword.length < 1 || newPassword.length < 8}>
             {savingPassword ? "Updating…" : "Update password"}
           </Button>
