@@ -4,10 +4,12 @@ import { RedirectToSignIn } from "@/lib/auth/gates";
 import { authClient, signOut } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { wipeDesk } from "@/lib/desk-account";
-import { THEME_KEY } from "@/lib/instrument";
+import { SignOutButton } from "@/components/sign-out-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { ErrorState, LoadingState } from "@/components/ui/status";
+import { ErrorState, LoadingState, SuccessState } from "@/components/ui/status";
 import { Field, Input } from "@/components/ui/field";
+import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
@@ -27,9 +29,6 @@ function SettingsPage() {
 }
 
 function SettingsBody({ email }: { email: string }) {
-  const [theme, setTheme] = useState<"dark" | "light">(() =>
-    typeof document !== "undefined" && document.documentElement.classList.contains("dark") ? "dark" : "light",
-  );
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
@@ -37,14 +36,6 @@ function SettingsBody({ email }: { email: string }) {
   const [deletePassword, setDeletePassword] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState<string | null>(null);
-  const [signingOut, setSigningOut] = useState(false);
-
-  function applyTheme(next: "dark" | "light") {
-    setTheme(next);
-    localStorage.setItem(THEME_KEY, next);
-    document.documentElement.classList.toggle("dark", next === "dark");
-    document.documentElement.classList.toggle("light", next !== "dark");
-  }
 
   async function savePassword(event: FormEvent) {
     event.preventDefault();
@@ -87,15 +78,20 @@ function SettingsBody({ email }: { email: string }) {
 
   return (
     <div className="page-wrap max-w-xl">
-      <p className="eyebrow">Account</p>
-      <h1 className="page-title mt-1">Settings</h1>
-      <p className="lede">
-        Password, appearance, and the account itself. Name and email live on{" "}
-        <Link to="/profile" className="link-accent">
-          Profile
-        </Link>
-        .
-      </p>
+      <PageHeader
+        size="page"
+        kicker="Account"
+        title="Settings"
+        lede={
+          <>
+            Password, appearance, and the account itself. Name and email live on{" "}
+            <Link to="/profile" className="link-accent">
+              Profile
+            </Link>
+            .
+          </>
+        }
+      />
 
       <section className={cn(panelClass, "mt-8 p-5")}>
         <p className="eyebrow">Signed in as</p>
@@ -104,13 +100,8 @@ function SettingsBody({ email }: { email: string }) {
 
       <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">Appearance</p>
-        <div className="mt-4 flex gap-2">
-          <Button type="button" variant={theme === "light" ? "accent" : "outline"} onClick={() => applyTheme("light")}>
-            Light
-          </Button>
-          <Button type="button" variant={theme === "dark" ? "accent" : "outline"} onClick={() => applyTheme("dark")}>
-            Dark
-          </Button>
+        <div className="mt-4">
+          <ThemeToggle appearance="segmented" />
         </div>
       </section>
 
@@ -137,7 +128,7 @@ function SettingsBody({ email }: { email: string }) {
             />
           </Field>
           {passwordMessage === "Password updated." ? (
-            <p className="text-sm text-ok">{passwordMessage}</p>
+            <SuccessState>{passwordMessage}</SuccessState>
           ) : passwordMessage ? (
             <ErrorState>{passwordMessage}</ErrorState>
           ) : null}
@@ -150,17 +141,7 @@ function SettingsBody({ email }: { email: string }) {
       <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">Session</p>
         <p className="mt-2 text-sm leading-6 text-muted">Sign out on this browser. Favourites and Project stay on the account.</p>
-        <Button
-          className="mt-4"
-          variant="outline"
-          disabled={signingOut}
-          onClick={() => {
-            setSigningOut(true);
-            void signOut("/").catch(() => setSigningOut(false));
-          }}
-        >
-          {signingOut ? "Signing out…" : "Sign out"}
-        </Button>
+        <SignOutButton variant="outline" className="mt-4" />
       </section>
 
       <section className={cn(panelClass, "mt-4 p-5")}>

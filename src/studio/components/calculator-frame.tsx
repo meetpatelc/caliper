@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { PenLine, RotateCcw } from "lucide-react";
+import { PenLine } from "lucide-react";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import type { AnyCalculator, WorkshopCalculator } from "@/studio/lib/calculator-types";
 import { isPackedCalculator } from "@/studio/lib/calculator-types";
 import { relatedCalculators } from "@/studio/lib/catalog";
@@ -16,6 +15,7 @@ import MechanicalDiagram from "@/components/MechanicalDiagram";
 import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
 import { GoverningRelation } from "@/components/governing-relation";
 import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
+import { ExampleButton } from "@/components/example-button";
 import { MeasurementField } from "@/components/ui/measurement-field";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, UnitBadge, UnitSelect } from "@/components/ui/field";
@@ -105,20 +105,14 @@ export function CalculatorFrame({
           !compact && sketchId ? <MechanicalDiagram toolId={sketchId as ToolId} /> : undefined
         }
         example={
-          <Button
-            variant="ghost"
-            className="h-10 min-h-10"
-            onClick={() => {
+          <ExampleButton
+            onRestore={() => {
               setFields(defaultFieldState(calculator));
               setOutputUnits(
                 Object.fromEntries(calculator.outputs.map((output) => [output.id, output.defaultUnit])),
               );
-              toast.success("Example restored.");
             }}
-          >
-            <RotateCcw size={13} />
-            Example
-          </Button>
+          />
         }
         resultTitle={result.ok ? "Results" : compact ? "Results" : "Resolve the input state"}
         inputs={

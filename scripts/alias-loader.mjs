@@ -14,6 +14,9 @@ export async function resolve(specifier, context, nextResolve) {
   if (specifier === "@instrument/ui") {
     return { url: pathToFileURL(ui).href, shortCircuit: true };
   }
+  if (specifier === "@instrument/ui/cn") {
+    return { url: pathToFileURL(join(root, "packages/ui/src/cn.ts")).href, shortCircuit: true };
+  }
   if (!specifier.startsWith("@/")) return nextResolve(specifier, context);
   const without = specifier.slice(2);
   for (const file of [join(src, without), join(src, `${without}.ts`), join(src, `${without}.tsx`)]) {

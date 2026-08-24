@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { tools } from "@/lib/catalog";
 import { releasedDomains } from "@/lib/desk";
 import { panelClass } from "@/components/ui/panel";
+import { PageHeader } from "@/components/ui/page";
 import { governedReferenceData } from "@/lib/referenceData";
 import { cn } from "@/lib/utils";
 
@@ -11,11 +12,12 @@ export const Route = createFileRoute("/reference")({ component: ReferencePage })
 function ReferencePage() {
   return (
     <div className="page-wrap">
-      <p className="eyebrow">Method library</p>
-      <h1 className="display-title mt-3">The number is only as good as the model.</h1>
-      <p className="lede max-w-2xl">
-        Sources explain the concept. Each workspace still declares its own narrow boundary. Read both before treating a result as evidence.
-      </p>
+      <PageHeader
+        kicker="Method library"
+        title="The number is only as good as the model."
+        ledeClassName="max-w-2xl"
+        lede="Sources explain the concept. Each workspace still declares its own narrow boundary. Read both before treating a result as evidence."
+      />
 
       <ol className="mt-10 grid gap-3 md:grid-cols-3">
         {[

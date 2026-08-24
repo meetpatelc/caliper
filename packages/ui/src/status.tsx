@@ -15,9 +15,9 @@ function StatusFrame({
   className,
   role,
   tone,
-}: StatusSlots & { role?: "status" | "alert"; tone: "muted" | "danger" }) {
-  const titleClass = tone === "danger" ? "font-medium text-danger" : "font-medium text-fg";
-  const bodyClass = tone === "danger" ? "text-sm text-danger" : "text-sm text-muted";
+}: StatusSlots & { role?: "status" | "alert"; tone: "muted" | "danger" | "ok" }) {
+  const titleClass = tone === "danger" ? "font-medium text-danger" : tone === "ok" ? "font-medium text-ok" : "font-medium text-fg";
+  const bodyClass = tone === "danger" ? "text-sm text-danger" : tone === "ok" ? "text-sm text-ok" : "text-sm text-muted";
   if (!title && !action) {
     return (
       <p className={cn(bodyClass, className)} role={role}>
@@ -60,6 +60,14 @@ export function LoadingState({
 export function EmptyState({ title, children, action, className }: StatusSlots) {
   return (
     <StatusFrame title={title} action={action} className={className} role="status" tone="muted">
+      {children}
+    </StatusFrame>
+  );
+}
+
+export function SuccessState({ title, children, action, className }: StatusSlots) {
+  return (
+    <StatusFrame title={title} action={action} className={className} role="status" tone="ok">
       {children}
     </StatusFrame>
   );

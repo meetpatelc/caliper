@@ -8,8 +8,9 @@ import { useDeskStatus } from "@/lib/desk-mode";
 import { useDeskStore } from "@/lib/workspace-store";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { Button } from "@/components/ui/button";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/status";
+import { EmptyState, ErrorState, LoadingState, SuccessState } from "@/components/ui/status";
 import { Field, Input } from "@/components/ui/field";
+import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
@@ -65,11 +66,12 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
 
   return (
     <div className="page-wrap max-w-xl">
-      <p className="eyebrow">Account</p>
-      <h1 className="page-title mt-1">Profile</h1>
-      <p className="lede">
-        This is your Instrument account. Favourites, drafts, and Project live here.
-      </p>
+      <PageHeader
+        size="page"
+        kicker="Account"
+        title="Profile"
+        lede="This is your Instrument account. Favourites, drafts, and Project live here."
+      />
 
       <section className={cn(panelClass, "mt-8 p-5")}>
         <div className="flex items-center gap-3">
@@ -89,7 +91,7 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
             <Input id="profile-email" value={email} readOnly />
           </Field>
           {nameMessage === "Saved." ? (
-            <p className="text-sm text-ok">{nameMessage}</p>
+            <SuccessState>{nameMessage}</SuccessState>
           ) : nameMessage ? (
             <ErrorState>{nameMessage}</ErrorState>
           ) : null}

@@ -3,6 +3,7 @@ import { CheckCircle2, CircleAlert } from "lucide-react";
 import { tools } from "@/lib/catalog";
 import { PARENT_NAME } from "@/lib/instrument";
 import { panelClass } from "@/components/ui/panel";
+import { PageHeader } from "@/components/ui/page";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/about")({ component: AboutPage });
@@ -25,30 +26,37 @@ const unsuitable = [
 function AboutPage() {
   return (
     <div className="page-wrap max-w-3xl">
-      <p className="eyebrow">About {PARENT_NAME}</p>
-      <h1 className="display-title mt-4">One product. Four rooms.</h1>
-      <p className="lede max-w-none">
-        {PARENT_NAME} is a calculator you can trust because the model is in the frame.{" "}
-        <Link to="/" className="link-accent">
-          Library
-        </Link>{" "}
-        is {tools.length} finished models — open one and get a number.{" "}
-        <Link to="/studio" className="link-accent">
-          Studio
-        </Link>{" "}
-        is where you write a model.{" "}
-        <Link to="/review" className="link-accent">
-          Review
-        </Link>{" "}
-        is evidence checklists, a trade study, and FMEA you control.{" "}
-        <Link to="/workshop" className="link-accent">
-          Project
-        </Link>{" "}
-        is drafts, saved checks, and review snapshots — on this device until you sign in, then on your account. Method, assumptions, and limits also sit on each model.
-      </p>
-      <p className="lede max-w-none">
-        Saving a snapshot or a Studio draft does not require an account. Sign in and that work can follow you.
-      </p>
+      <PageHeader
+        kicker={`About ${PARENT_NAME}`}
+        title="One product. Four rooms."
+        ledeClassName="max-w-none"
+        lede={
+          <>
+            <p>
+              {PARENT_NAME} is a calculator you can trust because the model is in the frame.{" "}
+              <Link to="/" className="link-accent">
+                Library
+              </Link>{" "}
+              is {tools.length} finished models — open one and get a number.{" "}
+              <Link to="/studio" className="link-accent">
+                Studio
+              </Link>{" "}
+              is where you write a model.{" "}
+              <Link to="/review" className="link-accent">
+                Review
+              </Link>{" "}
+              is evidence checklists, a trade study, and FMEA you control.{" "}
+              <Link to="/workshop" className="link-accent">
+                Project
+              </Link>{" "}
+              is drafts, saved checks, and review snapshots — on this device until you sign in, then on your account. Method, assumptions, and limits also sit on each model.
+            </p>
+            <p className="mt-4">
+              Saving a snapshot or a Studio draft does not require an account. Sign in and that work can follow you.
+            </p>
+          </>
+        }
+      />
       <p className="eyebrow mt-6">Preliminary only · project context required · independent review</p>
       <div className="mt-10 grid gap-5 md:grid-cols-2">
         <div className={cn(panelClass, "border-ok/30 p-5")}>

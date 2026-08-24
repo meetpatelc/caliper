@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+import { PageHeader } from "@/components/ui/page";
 import { GoverningRelation } from "@/components/governing-relation";
 
 /**
@@ -34,8 +35,7 @@ export function InstrumentPage({
         </Link>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : <span />}
       </div>
-      <p className="eyebrow">{kicker}</p>
-      <h1 className="page-title mt-1">{title}</h1>
+      <PageHeader size="page" kicker={kicker} title={title} />
       <div className="mt-5">{children}</div>
       {nearby}
       {method}

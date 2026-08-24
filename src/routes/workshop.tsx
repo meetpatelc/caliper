@@ -4,8 +4,11 @@ import { ClipboardList, FolderPlus, PenLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm";
 import { Field, Input } from "@/components/ui/field";
+import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
+import { DataRow } from "@/components/ui/row";
 import { EmptyState, LoadingState } from "@/components/ui/status";
 import { getTool } from "@/lib/catalog";
 import { savedHeadline } from "@/lib/desk";
@@ -15,6 +18,8 @@ import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/workshop")({ component: ProjectPage });
+
+type PendingDelete = { kind: "model" | "check" | "review" | "folder"; id: string; title: string };
 
 function ProjectPage() {
   const navigate = useNavigate();
@@ -31,6 +36,7 @@ function ProjectPage() {
   const deleteReview = useDeskStore((state) => state.deleteReview);
   const activeProjectId = useDeskStore((state) => state.activeProjectId);
   const [name, setName] = useState("");
+  const [pending, setPending] = useState<PendingDelete | null>(null);
   const { isPending } = useCurrentUserState();
   const { accountMode, hydrating, fallback } = useDeskStatus();
   const onAccount = accountMode;
@@ -39,53 +45,71 @@ function ProjectPage() {
   const visible = calculations.filter((item) => (projectId ? item.projectId === projectId : true));
   const empty = items.length === 0 && calculations.length === 0 && reviews.length === 0;
 
+  const confirmPending = () => {
+    if (!pending) return;
+    if (pending.kind === "model") {
+      removeModel(pending.id);
+      toast.success("Model removed.");
+    } else if (pending.kind === "check") {
+      deleteCalculation(pending.id);
+      toast.success("Check removed.");
+    } else if (pending.kind === "review") {
+      deleteReview(pending.id);
+      toast.success("Review snapshot removed.");
+    } else {
+      deleteProject(pending.id);
+      toast.success(`${pending.title} removed.`);
+    }
+    setPending(null);
+  };
+
   return (
     <div className="page-wrap">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow">Project</p>
-          <h1 className="display-title mt-3">
-            {onAccount ? "On this account." : fallback || (!isPending && !hydrating) ? "On this device." : "Loading."}
-          </h1>
-          {loadingDesk ? (
-            <LoadingState className="mt-4">{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
+      <PageHeader
+        kicker="Project"
+        title={onAccount ? "On this account." : fallback || (!isPending && !hydrating) ? "On this device." : "Loading."}
+        lede={
+          loadingDesk ? (
+            <LoadingState>{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
           ) : (
-          <p className="lede">
-            {onAccount
-              ? "Drafts, saved checks, and reviews follow this account. Write in "
-              : fallback
-                ? "The account desk could not be loaded. Write in "
-                : "Drafts, saved checks, and reviews stay on this device until you sign in. Write in "}
-            <Link to="/studio" className="link-accent">
-              Studio
-            </Link>{" "}
-            or open{" "}
-            <Link to="/review" className="link-accent">
-              Review
-            </Link>
-            .
-          </p>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline">
-            <Link to="/review">
-              <ClipboardList size={16} />
-              Start a review
-            </Link>
-          </Button>
-          <Button
-            variant="accent"
-            onClick={() => {
-              const item = createBlank();
-              navigate({ to: "/studio/$id", params: { id: item.id } });
-            }}
-          >
-            <PenLine size={16} />
-            Create from scratch
-          </Button>
-        </div>
-      </div>
+            <>
+              {onAccount
+                ? "Drafts, saved checks, and reviews follow this account. Write in "
+                : fallback
+                  ? "The account desk could not be loaded. Write in "
+                  : "Drafts, saved checks, and reviews stay on this device until you sign in. Write in "}
+              <Link to="/studio" className="link-accent">
+                Studio
+              </Link>{" "}
+              or open{" "}
+              <Link to="/review" className="link-accent">
+                Review
+              </Link>
+              .
+            </>
+          )
+        }
+        actions={
+          <>
+            <Button asChild variant="outline">
+              <Link to="/review">
+                <ClipboardList size={16} />
+                Start a review
+              </Link>
+            </Button>
+            <Button
+              variant="accent"
+              onClick={() => {
+                const item = createBlank();
+                navigate({ to: "/studio/$id", params: { id: item.id } });
+              }}
+            >
+              <PenLine size={16} />
+              Create from scratch
+            </Button>
+          </>
+        }
+      />
 
       {loadingDesk ? null : empty ? (
         <EmptyState
@@ -107,38 +131,36 @@ function ProjectPage() {
         ) : (
           <ul className="mt-4 grid gap-3">
             {items.map((item) => (
-              <li key={item.id} className={cn(panelClass, "p-4")}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="eyebrow">{item.published ? "Published" : "Draft"}</p>
-                    <h3 className="section-title-sm mt-1">{item.title}</h3>
-                    <p className="mt-1 font-mono text-xs text-muted">{item.slug}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button asChild>
-                      <Link to="/c/$slug" params={{ slug: item.slug }}>
-                        Open
-                      </Link>
-                    </Button>
-                    <Button asChild variant="accent">
-                      <Link to="/studio/$id" params={{ id: item.id }}>
-                        Edit
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-10 text-muted hover:text-danger"
-                      aria-label={`Delete ${item.title}`}
-                      onClick={() => {
-                        removeModel(item.id);
-                        toast.success("Model removed.");
-                      }}
-                    >
-                      <Trash2 size={15} />
-                    </Button>
-                  </div>
-                </div>
+              <li key={item.id}>
+                <DataRow
+                  align="start"
+                  eyebrow={item.published ? "Published" : "Draft"}
+                  title={<h3 className="section-title-sm">{item.title}</h3>}
+                  meta={<p className="font-mono text-xs text-muted">{item.slug}</p>}
+                  actions={
+                    <>
+                      <Button asChild>
+                        <Link to="/c/$slug" params={{ slug: item.slug }}>
+                          Open
+                        </Link>
+                      </Button>
+                      <Button asChild variant="accent">
+                        <Link to="/studio/$id" params={{ id: item.id }}>
+                          Edit
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-10 text-muted hover:text-danger"
+                        aria-label={`Delete ${item.title}`}
+                        onClick={() => setPending({ kind: "model", id: item.id, title: item.title })}
+                      >
+                        <Trash2 size={15} />
+                      </Button>
+                    </>
+                  }
+                />
               </li>
             ))}
           </ul>
@@ -191,10 +213,7 @@ function ProjectPage() {
                   variant={project.id === projectId ? "accent" : "outline"}
                   className="rounded-l-none border-l-0 px-2"
                   aria-label={`Delete ${project.name}`}
-                  onClick={() => {
-                    deleteProject(project.id);
-                    toast.success(`${project.name} removed.`);
-                  }}
+                  onClick={() => setPending({ kind: "folder", id: project.id, title: project.name })}
                 >
                   <Trash2 size={13} />
                 </Button>
@@ -210,30 +229,36 @@ function ProjectPage() {
               const tool = getTool(record.toolId);
               const headline = savedHeadline(record.resultJson);
               return (
-                <li key={record.id} className={cn(panelClass, "flex flex-wrap items-center justify-between gap-3 px-4 py-3")}>
-                  <div>
-                    <Link
-                      to="/tool/$toolId"
-                      params={{ toolId: record.toolId }}
-                      search={{ ...record.input, restore: "1" }}
-                      className="link-row"
-                    >
-                      {record.title}
-                    </Link>
-                    <p className="meta">
-                      {tool?.title}
-                      {headline ? ` · ${headline}` : ""} · {new Date(record.savedAt).toLocaleString()}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-10 text-muted hover:text-danger"
-                    aria-label="Delete snapshot"
-                    onClick={() => deleteCalculation(record.id)}
-                  >
-                    <Trash2 size={15} />
-                  </Button>
+                <li key={record.id}>
+                  <DataRow
+                    title={
+                      <Link
+                        to="/tool/$toolId"
+                        params={{ toolId: record.toolId }}
+                        search={{ ...record.input, restore: "1" }}
+                        className="link-row"
+                      >
+                        {record.title}
+                      </Link>
+                    }
+                    meta={
+                      <p className="meta">
+                        {tool?.title}
+                        {headline ? ` · ${headline}` : ""} · {new Date(record.savedAt).toLocaleString()}
+                      </p>
+                    }
+                    actions={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-10 text-muted hover:text-danger"
+                        aria-label="Delete snapshot"
+                        onClick={() => setPending({ kind: "check", id: record.id, title: record.title })}
+                      >
+                        <Trash2 size={15} />
+                      </Button>
+                    }
+                  />
                 </li>
               );
             })}
@@ -246,29 +271,57 @@ function ProjectPage() {
           <h2 className="section-title">Review snapshots</h2>
           <ul className="mt-4 grid gap-2">
             {reviews.map((record) => (
-              <li key={record.id} className={cn(panelClass, "flex items-center justify-between px-4 py-3")}>
-                <div>
-                  <Link to="/review" search={{ id: record.id }} className="link-row">
-                    {record.title}
-                  </Link>
-                  <p className="meta">
-                    {record.area} · {new Date(record.savedAt).toLocaleString()}
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-10 text-muted hover:text-danger"
-                  aria-label="Delete review"
-                  onClick={() => deleteReview(record.id)}
-                >
-                  <Trash2 size={15} />
-                </Button>
+              <li key={record.id}>
+                <DataRow
+                  title={
+                    <Link to="/review" search={{ id: record.id }} className="link-row">
+                      {record.title}
+                    </Link>
+                  }
+                  meta={
+                    <p className="meta">
+                      {record.area} · {new Date(record.savedAt).toLocaleString()}
+                    </p>
+                  }
+                  actions={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-10 text-muted hover:text-danger"
+                      aria-label="Delete review"
+                      onClick={() => setPending({ kind: "review", id: record.id, title: record.title })}
+                    >
+                      <Trash2 size={15} />
+                    </Button>
+                  }
+                />
               </li>
             ))}
           </ul>
         </section>
       )}
+
+      <ConfirmDialog
+        open={Boolean(pending)}
+        onClose={() => setPending(null)}
+        title={
+          pending?.kind === "folder"
+            ? "Delete folder"
+            : pending?.kind === "model"
+              ? "Delete draft"
+              : pending?.kind === "review"
+                ? "Delete review snapshot"
+                : "Delete saved check"
+        }
+        confirmLabel="Delete"
+        onConfirm={confirmPending}
+      >
+        {pending?.kind === "folder"
+          ? `Remove ${pending.title}? Checks inside stay.`
+          : pending
+            ? `Remove ${pending.title}? This cannot be undone.`
+            : null}
+      </ConfirmDialog>
     </div>
   );
 }

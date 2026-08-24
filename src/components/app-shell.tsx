@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ClipboardList, Folder, LayoutGrid, Menu, Moon, PenLine, Search, Sun, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AccountMenu } from "@/components/account-menu";
 import { CommandPalette } from "@/components/command-palette";
@@ -7,41 +7,22 @@ import { DeskSync } from "@/components/desk-sync";
 import { FamilySwitch } from "@/components/family-switch";
 import { FavouriteRail } from "@/components/favourite-rail";
 import { OverlayDialog } from "@/components/overlay-dialog";
+import { SignOutButton } from "@/components/sign-out-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button } from "@/components/ui/button";
+import { SearchTrigger } from "@/components/ui/search";
 import { LoadingState } from "@/components/ui/status";
-import { PARENT_NAME, THEME_KEY } from "@/lib/instrument";
+import { PARENT_NAME, SEARCH_EVENT } from "@/lib/instrument";
+import { ACCOUNT_NAV, PAGE_NAV, PRIMARY_NAV, SECONDARY_NAV } from "@/lib/nav";
 import { cn } from "@/lib/utils";
-
-const primaryNav = [
-  {
-    href: "/",
-    label: "Library",
-    icon: LayoutGrid,
-    match: (path: string) => path === "/" || path.startsWith("/library") || path.startsWith("/tool/"),
-  },
-  { href: "/studio", label: "Studio", icon: PenLine, match: (path: string) => path.startsWith("/studio") },
-  { href: "/review", label: "Review", icon: ClipboardList, match: (path: string) => path.startsWith("/review") },
-  {
-    href: "/workshop",
-    label: "Project",
-    icon: Folder,
-    match: (path: string) => path.startsWith("/workshop") || path.startsWith("/projects"),
-  },
-] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("light");
   const searchTriggerRef = useRef<HTMLButtonElement>(null);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
-    setTheme(stored);
-  }, []);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -52,24 +33,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     };
     const onOpen = () => setPaletteOpen(true);
     window.addEventListener("keydown", onKey);
-    window.addEventListener("instrument:open-search", onOpen);
-    window.addEventListener("caliper:open-search", onOpen);
-    window.addEventListener("gauge:open-search", onOpen);
+    window.addEventListener(SEARCH_EVENT, onOpen);
     return () => {
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener("instrument:open-search", onOpen);
-      window.removeEventListener("caliper:open-search", onOpen);
-      window.removeEventListener("gauge:open-search", onOpen);
+      window.removeEventListener(SEARCH_EVENT, onOpen);
     };
   }, []);
-
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem(THEME_KEY, next);
-    document.documentElement.classList.toggle("dark", next === "dark");
-    document.documentElement.classList.toggle("light", next !== "dark");
-  };
 
   const shortcut = typeof navigator !== "undefined" && /Mac|iPhone|iPad/i.test(navigator.platform) ? "⌘K" : "Ctrl K";
 
@@ -88,17 +57,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="no-print sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-xl">
         <div className="flex h-14 items-center gap-2 px-3 md:hidden">
           <FamilySwitch />
-          <Button
+          <SearchTrigger
             ref={searchTriggerRef}
-            type="button"
-            variant="outline"
             onClick={() => setPaletteOpen(true)}
             aria-label="Search"
-            className="min-h-10 min-w-0 flex-1 justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg"
+            className="min-w-0 flex-1"
           >
             <Search size={15} className="shrink-0" />
             <span className="truncate">Search</span>
-          </Button>
+          </SearchTrigger>
           <Button
             ref={menuTriggerRef}
             type="button"
@@ -117,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center justify-center gap-2">
             <nav className="flex items-center gap-1" aria-label="Primary">
-              {primaryNav.map((item) => {
+              {PRIMARY_NAV.map((item) => {
                 const Icon = item.icon;
                 const active = item.match(pathname);
                 return (
@@ -134,26 +101,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 );
               })}
             </nav>
-            <Button
+            <SearchTrigger
               ref={searchTriggerRef}
-              type="button"
-              variant="outline"
               onClick={() => setPaletteOpen(true)}
               aria-label="Search"
-              className="min-h-10 w-[min(28rem,32vw)] justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg"
+              shortcut={shortcut}
+              className="w-[min(28rem,32vw)]"
             >
               <Search size={15} className="shrink-0" />
               <span className="flex-1 truncate text-left">Search…</span>
-              <kbd className="kbd">{shortcut}</kbd>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-            </Button>
+            </SearchTrigger>
+            <ThemeToggle />
             <AccountMenu />
           </div>
           <div />
@@ -174,7 +132,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Button>
         </div>
         <nav className="grid gap-1">
-          {primaryNav.map((item) => {
+          {PRIMARY_NAV.map((item) => {
             const Icon = item.icon;
             const active = item.match(pathname);
             return (
@@ -191,23 +149,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Button>
             );
           })}
-          <Button asChild variant="ghost">
-            <Link to="/about" onClick={() => setMenuOpen(false)} className="w-full justify-start text-muted">
-              About & limits
-            </Link>
-          </Button>
-          <Button asChild variant="ghost">
-            <Link to="/feedback" onClick={() => setMenuOpen(false)} className="w-full justify-start text-muted">
-              Feedback
-            </Link>
-          </Button>
+          {SECONDARY_NAV.map((item) => (
+            <Button key={item.href} asChild variant="ghost">
+              <Link to={item.href} onClick={() => setMenuOpen(false)} className="w-full justify-start text-muted">
+                {item.label}
+              </Link>
+            </Button>
+          ))}
           <DrawerAccount onClose={() => setMenuOpen(false)} />
         </nav>
         <div className="mt-auto grid gap-3 border-t border-border pt-4">
-          <Button variant="outline" onClick={toggleTheme}>
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-            {theme === "dark" ? "Light theme" : "Dark theme"}
-          </Button>
+          <ThemeToggle appearance="labeled" />
         </div>
       </OverlayDialog>
 
@@ -219,24 +171,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="page-frame flex flex-wrap items-center justify-between gap-3">
           <p>{PARENT_NAME} · not a design stamp</p>
           <div className="flex flex-wrap gap-4">
-            <Link to="/" className="link-quiet">
-              Library
-            </Link>
-            <Link to="/studio" className="link-quiet">
-              Studio
-            </Link>
-            <Link to="/review" className="link-quiet">
-              Review
-            </Link>
-            <Link to="/workshop" className="link-quiet">
-              Project
-            </Link>
-            <Link to="/about" className="link-quiet">
-              About & limits
-            </Link>
-            <Link to="/feedback" className="link-quiet">
-              Feedback
-            </Link>
+            {PAGE_NAV.map((item) => (
+              <Link key={item.href} to={item.href} className="link-quiet">
+                {item.label}
+              </Link>
+            ))}
           </div>
         </div>
       </footer>
@@ -258,16 +197,14 @@ function DrawerAccount({ onClose }: { onClose: () => void }) {
   }
   return (
     <>
-      <Button asChild variant="ghost">
-        <Link to="/profile" onClick={onClose} className="w-full justify-start">
-          Profile
-        </Link>
-      </Button>
-      <Button asChild variant="ghost">
-        <Link to="/settings" onClick={onClose} className="w-full justify-start">
-          Account settings
-        </Link>
-      </Button>
+      {ACCOUNT_NAV.map((item) => (
+        <Button key={item.href} asChild variant="ghost">
+          <Link to={item.href} onClick={onClose} className="w-full justify-start">
+            {item.label}
+          </Link>
+        </Button>
+      ))}
+      <SignOutButton className="w-full justify-start" onClick={onClose} />
     </>
   );
 }

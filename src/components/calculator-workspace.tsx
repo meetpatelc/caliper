@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { CircleAlert, Copy, Link2, PenLine, RotateCcw, Save, Star } from "lucide-react";
+import { CircleAlert, Copy, Link2, PenLine, Save } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
 import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
 import { GoverningRelation } from "@/components/governing-relation";
 import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
+import { ExampleButton } from "@/components/example-button";
+import { FavouriteButton } from "@/components/favourite-button";
+import { MissingPage } from "@/components/missing-page";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea, UnitBadge, UnitSelect } from "@/components/ui/field";
 import { MeasurementField } from "@/components/ui/measurement-field";
@@ -135,13 +138,12 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
 
   if (!tool || !result) {
     return (
-      <div className="page-wrap">
-        <p className="eyebrow">Unknown model</p>
-        <h1 className="display-title mt-3">This route is not a released calculator.</h1>
-        <Button asChild variant="ghost" className="mt-6">
-          <Link to="/">Back to library</Link>
-        </Button>
-      </div>
+      <MissingPage
+        kicker="Unknown model"
+        title="This route is not a released calculator."
+        to="/"
+        backLabel="Back to library"
+      />
     );
   }
 
@@ -280,10 +282,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               Fork in studio
             </Button>
           ) : null}
-          <Button variant={favourited ? "mark" : "outline"} onClick={() => toggleFavorite(tool.id)}>
-            <Star size={14} fill={favourited ? "currentColor" : "none"} />
-            {favourited ? "Favourited" : "Favourite"}
-          </Button>
+          <FavouriteButton favourited={favourited} onToggle={() => toggleFavorite(tool.id)} />
         </>
       }
       nearby={
@@ -324,10 +323,8 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           }
           resultTitle={result.errors.length ? "Resolve the input state" : "Results"}
           example={
-            <Button
-              variant="ghost"
-              className="h-10 min-h-10"
-              onClick={() => {
+            <ExampleButton
+              onRestore={() => {
                 const next = { ...initialInputs[tool.id] };
                 const nextDisplay = Object.fromEntries(fields.map((field) => [field.key, unitSwitchFor(field.unit)?.engine ?? field.unit ?? ""]));
                 setInput(next);
@@ -335,12 +332,8 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                 setDisplayInput(hydrateDisplayInputs(fields, next, nextDisplay));
                 setResultUnit({});
                 persistStoredUnits(tool.id, nextDisplay, {});
-                toast.success("Example restored.");
               }}
-            >
-              <RotateCcw size={13} />
-              Example
-            </Button>
+            />
           }
           inputs={
             <div id="inputs" className="grid gap-4">

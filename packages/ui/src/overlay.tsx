@@ -11,6 +11,7 @@ export function OverlayDialog({
   title,
   restoreFocusTo,
   variant = "modal",
+  titleMode = "sr-only",
   children,
 }: {
   open: boolean;
@@ -18,6 +19,7 @@ export function OverlayDialog({
   title: string;
   restoreFocusTo?: RefObject<HTMLElement | null>;
   variant?: "modal" | "drawer";
+  titleMode?: "sr-only" | "visible";
   children: ReactNode;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -68,7 +70,8 @@ export function OverlayDialog({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
       inertTargets.forEach((element) => element.removeAttribute("inert"));
-      const restore = restoreFocusTo?.current ?? lastActive.current;
+      const remembered = lastActive.current;
+      const restore = remembered && document.contains(remembered) ? remembered : restoreFocusTo?.current;
       restore?.focus?.();
     };
   }, [open, restoreFocusTo]);
@@ -89,7 +92,7 @@ export function OverlayDialog({
             : cn(panelClass, "relative mx-auto mt-[12vh] w-[min(640px,calc(100%-1.5rem))] shadow-menu"),
         )}
       >
-        <h2 id={titleId} className="sr-only">
+        <h2 id={titleId} className={titleMode === "visible" ? "section-title-sm px-5 pt-5" : "sr-only"}>
           {title}
         </h2>
         {children}

@@ -1,4 +1,5 @@
 import { tools, type ToolId } from "@/lib/catalog";
+import { SEARCH_EVENT } from "@/lib/instrument";
 import { domains } from "@/lib/platform";
 
 export const APP_NAME = "Library";
@@ -30,7 +31,7 @@ export function savedHeadline(resultJson: string): string {
 
 export function openDeskSearch() {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new Event("instrument:open-search"));
+  window.dispatchEvent(new Event(SEARCH_EVENT));
 }
 
 export function isFieldHidden(toolId: ToolId, key: string, input: Record<string, string>) {

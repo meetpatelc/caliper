@@ -14,7 +14,9 @@ import {
 } from "@/lib/reviewRules";
 import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemplates";
 import { Button } from "@/components/ui/button";
+import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
+import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { SelectableCard } from "@/components/ui/selection";
 import { ErrorState } from "@/components/ui/status";
@@ -157,19 +159,27 @@ function ReviewPage() {
 
   return (
     <div className="page-wrap">
-      <p className="eyebrow">Evidence, not a verdict</p>
-      <h1 className="display-title mt-3">Engineering review</h1>
-      <p className="lede max-w-2xl">
-        Checklists, a scored trade study, and FMEA arithmetic you control. Nothing here infers a recommendation or signs a design.
-      </p>
+      <PageHeader
+        kicker="Evidence, not a verdict"
+        title="Engineering review"
+        ledeClassName="max-w-2xl"
+        lede="Checklists, a scored trade study, and FMEA arithmetic you control. Nothing here infers a recommendation or signs a design."
+      />
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]">
-        <aside className={cn(panelClass, "grid h-fit gap-1 p-2")}>
-          {reviewAreas.map((item) => (
-            <Button key={item.id} type="button" variant="ghost" aria-pressed={area === item.id} onClick={() => setArea(item.id)} className={cn("w-full justify-start", area === item.id && "bg-elevated text-fg")}>
-              {item.label}
-            </Button>
-          ))}
+        <aside className={cn(panelClass, "h-fit p-2")}>
+          <SegmentedControl aria-label="Review area" orientation="vertical" appearance="plain">
+            {reviewAreas.map((item) => (
+              <SegmentedItem
+                key={item.id}
+                selected={area === item.id}
+                onClick={() => setArea(item.id)}
+                className="w-full justify-start"
+              >
+                {item.label}
+              </SegmentedItem>
+            ))}
+          </SegmentedControl>
         </aside>
         <div className="grid gap-4">
           {activeRules.map((rule) => {

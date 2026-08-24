@@ -18,9 +18,12 @@ import { retargetAuthoredField } from "@/studio/lib/evaluate";
 import { unitFamilyOptions, unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { uniqueSlug, useWorkshop } from "@/studio/lib/workshop-store";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm";
+import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
+import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { Field as FormField, Input, Select, Textarea } from "@/components/ui/field";
-import { ErrorState } from "@/components/ui/status";
+import { ErrorState, SuccessState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -156,16 +159,13 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
 
   return (
     <div className="page-wrap">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow">Studio</p>
-          <h1 className="page-title mt-2">{draft.title}</h1>
-          <p className="lede">
-            Drafts autosave. Signed in, they live on your account. Method is only required to publish.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {draft.published ? (
+      <PageHeader
+        size="page"
+        kicker="Studio"
+        title={draft.title}
+        lede="Drafts autosave. Signed in, they live on your account. Method is only required to publish."
+        actions={
+          draft.published ? (
             <Button disabled={busy} onClick={retract}>
               Unpublish
             </Button>
@@ -173,23 +173,23 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
             <Button variant="accent" disabled={busy} onClick={publish}>
               Publish
             </Button>
-          )}
-        </div>
-      </div>
+          )
+        }
+      />
 
-      <nav className="mt-8 flex gap-1 overflow-x-auto" aria-label="Studio steps">
+      <SegmentedControl aria-label="Studio steps" className="mt-8 overflow-x-auto">
         {STEPS.map((entry) => (
-          <Button
+          <SegmentedItem
             key={entry.id}
-            variant="ghost"
+            selected={step === entry.id}
+            current={step === entry.id ? "step" : undefined}
             onClick={() => setStep(entry.id)}
-            aria-current={step === entry.id ? "step" : undefined}
-            className={cn("shrink-0", step === entry.id && "bg-elevated text-fg")}
+            className="shrink-0"
           >
             {entry.label}
-          </Button>
+          </SegmentedItem>
         ))}
-      </nav>
+      </SegmentedControl>
 
       <div className="mt-6 grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div>
@@ -472,7 +472,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                     </Button>
                   ))}
                 </div>
-                {formulaError ? null : <p className="text-sm text-ok">Formula evaluates.</p>}
+                {formulaError ? null : <SuccessState>Formula evaluates.</SuccessState>}
                 <FormField htmlFor="studio-formula" label="How it should read on the page">
                   <Input
                     id="studio-formula"
@@ -554,28 +554,21 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
             </fieldset>
           )}
 
-          {confirmDelete ? (
-            <div className="mt-6 flex flex-wrap items-center gap-3 text-sm">
-              <span>Delete this draft?</span>
-              <Button
-                variant="ghost"
-                className="text-danger"
-                onClick={() => {
-                  remove(draft.id);
-                  navigate({ to: "/workshop" });
-                }}
-              >
-                Delete
-              </Button>
-              <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <Button variant="ghost" className="mt-6 text-danger" onClick={() => setConfirmDelete(true)}>
-              Delete draft
-            </Button>
-          )}
+          <ConfirmDialog
+            open={confirmDelete}
+            onClose={() => setConfirmDelete(false)}
+            title="Delete this draft?"
+            confirmLabel="Delete"
+            onConfirm={() => {
+              remove(draft.id);
+              navigate({ to: "/workshop" });
+            }}
+          >
+            {draft.title} will be removed from Project. This cannot be undone.
+          </ConfirmDialog>
+          <Button variant="ghost" className="mt-6 text-danger" onClick={() => setConfirmDelete(true)}>
+            Delete draft
+          </Button>
         </div>
 
         <aside className={cn(panelClass, "p-4 lg:sticky lg:top-20 lg:self-start")}>

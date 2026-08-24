@@ -1,8 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { StudioEditor } from "@/studio/components/studio-editor";
 import { useWorkshop } from "@/studio/lib/workshop-store";
-import { Button } from "@/components/ui/button";
-import { LoadingState } from "@/components/ui/status";
+import { MissingPage, PageLoading } from "@/components/missing-page";
 
 export const Route = createFileRoute("/studio/$id")({ component: StudioEdit });
 
@@ -12,23 +11,12 @@ function StudioEdit() {
   const item = useWorkshop((state) => state.get(id));
 
   if (!hasHydrated && !item) {
-    return (
-      <div className="page-wrap">
-        <p className="eyebrow">Studio</p>
-        <LoadingState variant="block" className="mt-6" />
-      </div>
-    );
+    return <PageLoading kicker="Studio" />;
   }
 
   if (!item) {
     return (
-      <div className="page-wrap max-w-xl">
-        <p className="eyebrow">Studio</p>
-        <h1 className="display-title mt-3">That draft is not here.</h1>
-        <Button asChild variant="ghost" className="mt-4">
-          <Link to="/workshop">Back to Project</Link>
-        </Button>
-      </div>
+      <MissingPage kicker="Studio" title="That draft is not here." to="/workshop" backLabel="Back to Project" />
     );
   }
 

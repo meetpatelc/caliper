@@ -2,8 +2,8 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AppShell } from "@/components/app-shell";
-import { Toaster } from "sonner";
-import { APP_DESCRIPTION, PARENT_NAME, THEME_KEY } from "@/lib/instrument";
+import { AppToaster } from "@/components/app-toaster";
+import { APP_DESCRIPTION, PARENT_NAME, THEME_COLOR, THEME_KEY } from "@/lib/instrument";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -13,7 +13,7 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: PARENT_NAME },
       { name: "description", content: APP_DESCRIPTION },
-      { name: "theme-color", content: "#e8eaed" },
+      { name: "theme-color", content: THEME_COLOR.light },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -38,14 +38,14 @@ function RootDocument() {
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('${THEME_KEY}');var r=document.documentElement;if(t==='dark'){r.classList.add('dark');r.classList.remove('light')}else{r.classList.add('light');r.classList.remove('dark')}}catch(e){}`,
+            __html: `try{var t=localStorage.getItem('${THEME_KEY}');var r=document.documentElement;var d=t==='dark';if(d){r.classList.add('dark');r.classList.remove('light')}else{r.classList.add('light');r.classList.remove('dark')}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'${THEME_COLOR.dark}':'${THEME_COLOR.light}')}catch(e){}`,
           }}
         />
       </head>
       <body>
         <PreviewHostBridge />
         <AuthProvider>
-          <Toaster theme="system" position="bottom-right" toastOptions={{ className: "font-sans" }} />
+          <AppToaster />
           <AppShell>
             <Outlet />
           </AppShell>

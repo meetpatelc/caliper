@@ -1,14 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Star } from "lucide-react";
 import { tools, type ToolId } from "@/lib/catalog";
 import { libraryDocuments } from "@/lib/document";
 import { MODEL_COUNT, releasedDomains, savedHeadline } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FilterChip, SelectableCard } from "@/components/ui/selection";
+import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
+import { PageHeader } from "@/components/ui/page";
+import { SelectableCard } from "@/components/ui/selection";
 import { EmptyState } from "@/components/ui/status";
+import { FavouriteButton } from "@/components/favourite-button";
 import { GoverningRelation } from "@/components/governing-relation";
 import type { EngineeringDomain } from "@/lib/platform";
 
@@ -48,17 +49,19 @@ function Home() {
 
   return (
     <div className="page-wrap">
-      <section>
-        <p className="eyebrow">Library</p>
-        <h1 className="display-title mt-3">Every released model.</h1>
-        <p className="lede">
-          {MODEL_COUNT} finished calculators. Filter, search, open. To write your own, open{" "}
-          <Link to="/studio" className="link-accent">
-            Studio
-          </Link>
-          .
-        </p>
-      </section>
+      <PageHeader
+        kicker="Library"
+        title="Every released model."
+        lede={
+          <>
+            {MODEL_COUNT} finished calculators. Filter, search, open. To write your own, open{" "}
+            <Link to="/studio" className="link-accent">
+              Studio
+            </Link>
+            .
+          </>
+        }
+      />
 
       {(saved.length > 0 || recentTools.length > 0) && (
         <section className="mt-8">
@@ -92,20 +95,23 @@ function Home() {
         </section>
       )}
 
-      <div className="mt-8 flex flex-wrap gap-2" role="toolbar" aria-label="Domain filter">
-        <FilterChip active={domain === "all"} onClick={() => void navigate({ search: (prev) => ({ ...prev, domain: undefined }) })}>
+      <SegmentedControl aria-label="Domain filter" appearance="chip" className="mt-8">
+        <SegmentedItem
+          selected={domain === "all"}
+          onClick={() => void navigate({ search: (prev) => ({ ...prev, domain: undefined }) })}
+        >
           All · {tools.length}
-        </FilterChip>
+        </SegmentedItem>
         {releasedDomains.map((item) => (
-          <FilterChip
+          <SegmentedItem
             key={item.id}
-            active={domain === item.id}
+            selected={domain === item.id}
             onClick={() => void navigate({ search: (prev) => ({ ...prev, domain: item.id }) })}
           >
             {item.label} · {item.count}
-          </FilterChip>
+          </SegmentedItem>
         ))}
-      </div>
+      </SegmentedControl>
 
       <p className="mt-6 text-sm text-muted">{visible.length} shown</p>
 
@@ -130,43 +136,21 @@ function Home() {
                     <SelectableCard
                       key={tool.id}
                       asChild
-                      className="group grid h-full content-start gap-2 bg-surface p-4 hover:border-accent"
+                      className="group relative grid h-full content-start bg-surface p-0 hover:border-accent"
                     >
-                    <Link
-                      to="/tool/$toolId"
-                      params={{ toolId: tool.id }}
-                    >
-                      <span className="flex items-start justify-between gap-2">
-                        <strong className="section-title-sm">{tool.title}</strong>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          aria-label={
-                            favorites.includes(tool.id as ToolId) ? "Remove from favourites" : "Add to favourites"
-                          }
-                          aria-pressed={favorites.includes(tool.id as ToolId)}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            toggleFavorite(tool.id as ToolId);
-                          }}
-                          className={cn(
-                            "size-8 shrink-0 text-mark hover:text-mark",
-                            favorites.includes(tool.id as ToolId)
-                              ? "opacity-100"
-                              : "text-muted opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100",
-                          )}
-                        >
-                          <Star
-                            size={14}
-                            fill={favorites.includes(tool.id as ToolId) ? "currentColor" : "none"}
-                          />
-                        </Button>
-                      </span>
-                      <span className="line-clamp-2 text-sm leading-5 text-muted">{tool.description}</span>
-                      {formula ? <GoverningRelation formula={formula} className="text-xs leading-5" /> : null}
-                    </Link>
+                      <div>
+                        <Link to="/tool/$toolId" params={{ toolId: tool.id }} className="grid h-full content-start gap-2 p-4 pr-12">
+                          <strong className="section-title-sm">{tool.title}</strong>
+                          <span className="line-clamp-2 text-sm leading-5 text-muted">{tool.description}</span>
+                          {formula ? <GoverningRelation formula={formula} className="text-xs leading-5" /> : null}
+                        </Link>
+                        <FavouriteButton
+                          compact
+                          favourited={favorites.includes(tool.id as ToolId)}
+                          onToggle={() => toggleFavorite(tool.id as ToolId)}
+                          className="absolute right-3 top-3"
+                        />
+                      </div>
                     </SelectableCard>
                   );
                 })}

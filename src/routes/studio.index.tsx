@@ -4,6 +4,7 @@ import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { studioDocuments } from "@/lib/document";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page";
 import { LoadingState } from "@/components/ui/status";
 import { SelectableCard } from "@/components/ui/selection";
 
@@ -23,12 +24,11 @@ function StudioHome() {
 
   return (
     <div className="page-wrap">
-      <p className="eyebrow">Studio</p>
-      <h1 className="display-title mt-3">Name the quantities. Write the relation. Watch it compute.</h1>
-      <p className="lede">
-        Start blank, start from a working example, or fork a formula instrument. Method is for publishing — not for the
-        first number.
-      </p>
+      <PageHeader
+        kicker="Studio"
+        title="Name the quantities. Write the relation. Watch it compute."
+        lede="Start blank, start from a working example, or fork a formula instrument. Method is for publishing — not for the first number."
+      />
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         <Button
           type="button"

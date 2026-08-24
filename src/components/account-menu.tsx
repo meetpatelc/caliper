@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { signOut } from "@/lib/auth/client";
+import { SignOutButton } from "@/components/sign-out-button";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { ACCOUNT_NAV } from "@/lib/nav";
 import { Button } from "@/components/ui/button";
-import { panelClass } from "@/components/ui/panel";
+import { Menu, MenuItem } from "@/components/ui/menu";
 import { LoadingState } from "@/components/ui/status";
-import { cn } from "@/lib/utils";
 
 function initialFor(name: string | null, email: string | null) {
   const source = name?.trim() || email?.trim() || "?";
@@ -15,24 +15,7 @@ function initialFor(name: string | null, email: string | null) {
 export function AccountMenu() {
   const { user, isPending } = useCurrentUserState();
   const [open, setOpen] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("pointerdown", onPointer);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("pointerdown", onPointer);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   if (isPending) {
     return <LoadingState variant="avatar" />;
@@ -48,8 +31,9 @@ export function AccountMenu() {
   const initial = initialFor(user.displayName, user.primaryEmail);
 
   return (
-    <div ref={rootRef} className="relative">
+    <div className="relative">
       <Button
+        ref={triggerRef}
         type="button"
         variant="outline"
         size="icon"
@@ -65,33 +49,18 @@ export function AccountMenu() {
           <span className="text-sm font-medium">{initial}</span>
         )}
       </Button>
-      {open ? (
-        <div role="menu" className={cn(panelClass, "absolute right-0 top-full z-40 mt-1 w-56 p-2")}>
-          <p className="truncate px-2 pt-1 text-sm font-medium">{user.displayName || "Account"}</p>
-          {user.primaryEmail ? <p className="truncate px-2 pb-2 text-xs text-muted">{user.primaryEmail}</p> : null}
-          <Button asChild variant="ghost">
-            <Link to="/profile" role="menuitem" className="w-full justify-start" onClick={() => setOpen(false)}>
-              Profile
+      <Menu open={open} onClose={() => setOpen(false)} label="Account" restoreFocusTo={triggerRef}>
+        <p className="truncate px-2 pt-1 text-sm font-medium">{user.displayName || "Account"}</p>
+        {user.primaryEmail ? <p className="truncate px-2 pb-2 text-xs text-muted">{user.primaryEmail}</p> : null}
+        {ACCOUNT_NAV.map((item) => (
+          <MenuItem key={item.href} asChild>
+            <Link to={item.href} onClick={() => setOpen(false)}>
+              {item.label}
             </Link>
-          </Button>
-          <Button asChild variant="ghost">
-            <Link to="/settings" role="menuitem" className="w-full justify-start" onClick={() => setOpen(false)}>
-              Account settings
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            disabled={signingOut}
-            onClick={() => {
-              setSigningOut(true);
-              void signOut("/").catch(() => setSigningOut(false));
-            }}
-          >
-            {signingOut ? "Signing out…" : "Sign out"}
-          </Button>
-        </div>
-      ) : null}
+          </MenuItem>
+        ))}
+        <SignOutButton asMenuItem onClick={() => setOpen(false)} />
+      </Menu>
     </div>
   );
 }

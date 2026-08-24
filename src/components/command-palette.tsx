@@ -6,19 +6,10 @@ import { OverlayDialog } from "@/components/overlay-dialog";
 import { EmptyState } from "@/components/ui/status";
 import { getTool, tools, searchableToolText } from "@/lib/catalog";
 import { releasedDomains, savedHeadline } from "@/lib/desk";
+import { PAGE_NAV } from "@/lib/nav";
 import { officialCalculators } from "@/studio/lib/catalog";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStore } from "@/lib/workspace-store";
-
-const pages = [
-  { href: "/", label: "Library" },
-  { href: "/studio", label: "Studio" },
-  { href: "/workshop", label: "Project" },
-  { href: "/review", label: "Review" },
-  { href: "/about", label: "Limits & about" },
-  { href: "/feedback", label: "Feedback" },
-  { href: "/reference", label: "Method library" },
-] as const;
 
 const itemClass =
   "flex cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-sm data-[selected=true]:bg-elevated";
@@ -174,7 +165,7 @@ export function CommandPalette({
             </Command.Group>
           )}
           <Command.Group heading="Pages" className="px-1 py-1">
-            {pages.map((page) => (
+            {PAGE_NAV.map((page) => (
               <Command.Item key={page.href} value={page.label} onSelect={() => go(page.href)} className={itemClass}>
                 {page.label}
               </Command.Item>

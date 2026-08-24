@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { submitFeedback } from "@/lib/feedback";
 import { Button } from "@/components/ui/button";
 import { Field, Textarea } from "@/components/ui/field";
+import { PageHeader } from "@/components/ui/page";
 import { SelectableCard } from "@/components/ui/selection";
 
 export const Route = createFileRoute("/feedback")({ component: FeedbackPage });
@@ -34,9 +35,12 @@ function FeedbackPage() {
 
   return (
     <div className="page-wrap max-w-3xl">
-      <p className="eyebrow">Product desk</p>
-      <h1 className="display-title mt-3">Send a bug report or a message.</h1>
-      <p className="lede max-w-none">Paste the full context. No account required.</p>
+      <PageHeader
+        kicker="Product desk"
+        title="Send a bug report or a message."
+        ledeClassName="max-w-none"
+        lede="Paste the full context. No account required."
+      />
       <form className="mt-8" onSubmit={onSubmit}>
         <fieldset>
           <legend className="eyebrow">Message type</legend>

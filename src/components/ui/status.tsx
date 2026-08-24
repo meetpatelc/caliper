@@ -1,1 +1,1 @@
-export { EmptyState, LoadingState, ErrorState } from "@instrument/ui";
+export { EmptyState, LoadingState, ErrorState, SuccessState } from "@instrument/ui";

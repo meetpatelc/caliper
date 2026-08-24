@@ -1,9 +1,8 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { CalculatorFrame } from "@/studio/components/calculator-frame";
 import { findCalculator } from "@/studio/lib/resolve";
 import { useWorkshop } from "@/studio/lib/workshop-store";
-import { Button } from "@/components/ui/button";
-import { LoadingState } from "@/components/ui/status";
+import { MissingPage, PageLoading } from "@/components/missing-page";
 
 export const Route = createFileRoute("/c/$slug")({
   beforeLoad: ({ params }) => {
@@ -40,23 +39,17 @@ function CalculatorPage() {
   const calculator = findCalculator(slug, workshop);
 
   if (!hasHydrated && !calculator) {
-    return (
-      <div className="page-wrap">
-        <p className="eyebrow">Instrument</p>
-        <LoadingState variant="block" className="mt-6" />
-      </div>
-    );
+    return <PageLoading kicker="Instrument" />;
   }
 
   if (!calculator) {
     return (
-      <div className="page-wrap max-w-xl">
-        <p className="eyebrow">Missing instrument</p>
-        <h1 className="display-title mt-3">That instrument is not here.</h1>
-        <Button asChild variant="ghost" className="mt-4">
-          <Link to="/">Back to library</Link>
-        </Button>
-      </div>
+      <MissingPage
+        kicker="Missing instrument"
+        title="That instrument is not here."
+        to="/"
+        backLabel="Back to library"
+      />
     );
   }
 

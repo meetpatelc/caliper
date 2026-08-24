@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { RotateCcw, Star } from "lucide-react";
 import { officialBySlug } from "@/studio/lib/catalog";
 import { formatDeviationMm, formatLimitMm } from "@/studio/lib/format-limit";
 import {
@@ -17,8 +16,9 @@ import { useDeskStore } from "@/lib/workspace-store";
 import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
 import { InstrumentSheet, QuantityName, ResultQuantity } from "@/components/instrument-sheet";
 import { GoverningRelation } from "@/components/governing-relation";
+import { ExampleButton } from "@/components/example-button";
+import { FavouriteButton } from "@/components/favourite-button";
 import { MeasurementField } from "@/components/ui/measurement-field";
-import { Button } from "@/components/ui/button";
 import { Field, Input, Select, UnitBadge } from "@/components/ui/field";
 import { ErrorState } from "@/components/ui/status";
 import { Link } from "@tanstack/react-router";
@@ -101,10 +101,7 @@ export function Iso286Instrument() {
       kicker={tool.kicker}
       title={tool.title}
       actions={
-        <Button variant={favourited ? "mark" : "outline"} onClick={() => toggleFavorite("fits")}>
-          <Star size={14} fill={favourited ? "currentColor" : "none"} />
-          {favourited ? "Favourited" : "Favourite"}
-        </Button>
+        <FavouriteButton favourited={favourited} onToggle={() => toggleFavorite("fits")} />
       }
       nearby={
         nearby.length > 0 ? (
@@ -135,20 +132,15 @@ export function Iso286Instrument() {
         diagram={result.ok ? <FitDiagram ES={result.fit.ES} EI={result.fit.EI} es={result.fit.es} ei={result.fit.ei} /> : undefined}
         resultTitle={result.ok ? "Results" : "Resolve the input state"}
         example={
-          <Button
-            variant="ghost"
-            className="h-10 min-h-10"
-            onClick={() => {
+          <ExampleButton
+            onRestore={() => {
               setD("100");
               setHoleLetter("H");
               setHoleGrade(9);
               setShaftLetter("n");
               setShaftGrade(8);
             }}
-          >
-            <RotateCcw size={13} />
-            Example
-          </Button>
+          />
         }
         inputs={
           <>
