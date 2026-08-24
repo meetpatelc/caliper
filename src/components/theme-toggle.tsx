@@ -20,7 +20,7 @@ export function ThemeToggle({ appearance = "icon" }: { appearance?: "icon" | "la
   if (appearance === "labeled") {
     return (
       <Button type="button" variant="outline" aria-pressed={theme === "dark"} onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}>
-        {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+        {theme === "dark" ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
         {theme === "dark" ? "Light theme" : "Dark theme"}
       </Button>
     );
@@ -34,7 +34,7 @@ export function ThemeToggle({ appearance = "icon" }: { appearance?: "icon" | "la
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
       onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}
     >
-      {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+      {theme === "dark" ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
     </Button>
   );
 }

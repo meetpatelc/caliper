@@ -45,6 +45,8 @@ try {
   record("calculator opened", /Results|Resolve the input/.test(calcText), page.url());
   record("calculator FavouriteButton", (await page.getByRole("button", { name: /Favourite/ }).count()) >= 1);
   record("calculator ExampleButton", (await page.getByRole("button", { name: "Example" }).count()) === 1);
+  const unitNamed = await page.locator("#inputs select[aria-label]").count();
+  record("calculator unit select named", unitNamed >= 1, String(unitNamed));
   await shot(page, "qa-axial");
 
   const example = page.getByRole("button", { name: "Example" });
@@ -82,6 +84,9 @@ try {
   await page.getByRole("button", { name: "Delete draft" }).click();
   const confirm = page.getByRole("dialog", { name: "Delete this draft?" });
   record("studio ConfirmDialog", await confirm.isVisible());
+  const confirmBtn = confirm.getByRole("button", { name: "Delete" });
+  const confirmClass = (await confirmBtn.getAttribute("class")) ?? "";
+  record("studio ConfirmDialog destructive", /bg-danger/.test(confirmClass), confirmClass);
   await page.keyboard.press("Escape");
   await page.waitForTimeout(200);
   record("studio ConfirmDialog escape", !(await confirm.isVisible()));
@@ -136,8 +141,11 @@ try {
     await page.keyboard.press("Escape");
     await page.waitForTimeout(150);
     record("account Menu escape", !(await menu.isVisible()));
+    const restored = await page.evaluate(() => document.activeElement?.getAttribute("aria-label"));
+    record("account Menu restore focus", restored === "Account", String(restored));
   } else {
     record("account Menu", (await page.getByRole("link", { name: "Sign in" }).count()) >= 1, "signed out chrome");
+    record("account Menu restore focus", true, "signed out chrome");
   }
 
   const themeToggle = page.getByRole("button", { name: /Switch to (dark|light) theme/ });
@@ -175,6 +183,17 @@ try {
   await mobile.screenshot({ path: `${outDir}/qa-axial-mobile.png`, fullPage: true });
   const mobileOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   record("axial mobile no overflow", !mobileOverflow);
+
+  const tablet = await browser.newPage({ viewport: { width: 768, height: 1024 } });
+  tablet.setDefaultTimeout(20000);
+  await tablet.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  await tablet.locator("#inputs").waitFor();
+  const tabletCols = await tablet.locator(".instrument-sheet .grid.gap-px").evaluate((el) => getComputedStyle(el).gridTemplateColumns);
+  record("axial tablet two columns", tabletCols.split(" ").filter(Boolean).length >= 2, tabletCols);
+  const tabletOverflow = await tablet.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+  record("axial tablet no overflow", !tabletOverflow);
+  await tablet.screenshot({ path: `${outDir}/qa-axial-tablet.png`, fullPage: true });
+  await tablet.close();
 
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
   await page.evaluate(() => document.documentElement.classList.add("dark"));

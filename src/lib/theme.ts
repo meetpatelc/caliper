@@ -15,12 +15,16 @@ function syncThemeColor(theme: Theme) {
   if (meta) meta.setAttribute("content", THEME_COLOR[theme]);
 }
 
-export function applyTheme(theme: Theme) {
-  localStorage.setItem(THEME_KEY, theme);
+function paintTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
   document.documentElement.classList.toggle("light", theme !== "dark");
   syncThemeColor(theme);
   window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: theme }));
+}
+
+export function applyTheme(theme: Theme) {
+  localStorage.setItem(THEME_KEY, theme);
+  paintTheme(theme);
 }
 
 export function useTheme(): [Theme, (theme: Theme) => void] {
@@ -29,7 +33,16 @@ export function useTheme(): [Theme, (theme: Theme) => void] {
     setTheme(readTheme());
     const sync = () => setTheme(readTheme());
     window.addEventListener(THEME_EVENT, sync);
-    return () => window.removeEventListener(THEME_EVENT, sync);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const onScheme = () => {
+      if (localStorage.getItem(THEME_KEY)) return;
+      paintTheme(media.matches ? "dark" : "light");
+    };
+    media.addEventListener("change", onScheme);
+    return () => {
+      window.removeEventListener(THEME_EVENT, sync);
+      media.removeEventListener("change", onScheme);
+    };
   }, []);
   return [theme, applyTheme];
 }

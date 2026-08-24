@@ -59,7 +59,7 @@ function Login() {
                 />
               </Field>
             ) : null}
-            <Field htmlFor="account-email" label="Email">
+            <Field htmlFor="account-email" label="Email" required>
               <Input
                 id="account-email"
                 type="email"
@@ -69,7 +69,7 @@ function Login() {
                 onChange={(event) => setEmail(event.target.value)}
               />
             </Field>
-            <Field htmlFor="account-password" label="Password">
+            <Field htmlFor="account-password" label="Password" required>
               <Input
                 id="account-password"
                 type="password"

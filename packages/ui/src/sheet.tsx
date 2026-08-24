@@ -10,6 +10,7 @@ export function InstrumentSheet({
   inputs,
   results,
   compact = false,
+  columns = "md",
 }: {
   diagram?: ReactNode;
   example?: ReactNode;
@@ -17,11 +18,17 @@ export function InstrumentSheet({
   inputs: ReactNode;
   results: ReactNode;
   compact?: boolean;
+  columns?: "md" | "lg";
 }) {
   return (
     <div className={instrumentClass}>
       {diagram ? <div className="diagram-surface">{diagram}</div> : null}
-      <div className={cn("grid gap-px", compact ? "grid-cols-1" : "lg:grid-cols-2")}>
+      <div
+        className={cn(
+          "grid gap-px",
+          compact ? "grid-cols-1" : columns === "lg" ? "lg:grid-cols-2" : "md:grid-cols-2",
+        )}
+      >
         <div className="bg-surface p-4 sm:p-5">
           <div className="flex h-10 items-center justify-between gap-2">
             <h2 className="sheet-heading">Inputs</h2>
@@ -64,7 +71,7 @@ export function ResultQuantity({
   caption?: ReactNode;
 }) {
   return (
-    <div className="grid gap-1.5">
+    <div className="grid min-w-0 gap-1.5">
       <QuantityName label={label} symbol={symbol} />
       <span className="flex items-center gap-2">
         <p className="min-w-0 flex-1 font-mono text-3xl font-medium tabular-nums tracking-tight">{value}</p>

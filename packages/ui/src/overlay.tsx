@@ -88,7 +88,7 @@ export function OverlayDialog({
         aria-labelledby={titleId}
         className={cn(
           variant === "drawer"
-            ? "absolute inset-y-0 right-0 flex w-72 flex-col border-l border-border bg-bg p-5"
+            ? "overlay-drawer absolute inset-y-0 right-0 flex w-72 flex-col border-l border-border bg-bg p-5"
             : cn(panelClass, "relative mx-auto mt-[12vh] w-[min(640px,calc(100%-1.5rem))] shadow-menu"),
         )}
       >

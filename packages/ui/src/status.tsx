@@ -15,18 +15,20 @@ function StatusFrame({
   className,
   role,
   tone,
-}: StatusSlots & { role?: "status" | "alert"; tone: "muted" | "danger" | "ok" }) {
+  busy,
+}: StatusSlots & { role?: "status" | "alert"; tone: "muted" | "danger" | "ok"; busy?: boolean }) {
   const titleClass = tone === "danger" ? "font-medium text-danger" : tone === "ok" ? "font-medium text-ok" : "font-medium text-fg";
   const bodyClass = tone === "danger" ? "text-sm text-danger" : tone === "ok" ? "text-sm text-ok" : "text-sm text-muted";
+  const live = role === "alert" ? "assertive" : role === "status" ? "polite" : undefined;
   if (!title && !action) {
     return (
-      <p className={cn(bodyClass, className)} role={role}>
+      <p className={cn(bodyClass, className)} role={role} aria-live={live} aria-busy={busy || undefined}>
         {children}
       </p>
     );
   }
   return (
-    <div className={cn(bodyClass, className)} role={role}>
+    <div className={cn(bodyClass, className)} role={role} aria-live={live} aria-busy={busy || undefined}>
       {title ? <p className={titleClass}>{title}</p> : null}
       {children ? <div className={title ? "mt-1" : undefined}>{children}</div> : null}
       {action ? <div className="mt-3">{action}</div> : null}
@@ -51,7 +53,7 @@ export function LoadingState({
     return <div className={cn("size-10 shrink-0 animate-pulse rounded-md bg-elevated", className)} aria-hidden="true" />;
   }
   return (
-    <StatusFrame title={title} action={action} className={className} role="status" tone="muted">
+    <StatusFrame title={title} action={action} className={className} role="status" tone="muted" busy>
       {children}
     </StatusFrame>
   );

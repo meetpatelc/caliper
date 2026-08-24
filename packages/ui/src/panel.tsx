@@ -5,6 +5,10 @@ export const panelClass = "overflow-hidden rounded-lg border border-border bg-su
 export const panelHoverClass = "rounded-lg border border-border transition-colors hover:bg-elevated";
 export const instrumentClass = "instrument-sheet";
 
-export function Panel({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn(panelClass, className)} {...props} />;
+export function Panel({
+  className,
+  variant = "card",
+  ...props
+}: HTMLAttributes<HTMLDivElement> & { variant?: "card" | "hover" }) {
+  return <div className={cn(variant === "hover" ? panelHoverClass : panelClass, className)} {...props} />;
 }

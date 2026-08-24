@@ -43,3 +43,6 @@
 button.bg-accent:hover:not(:disabled) {
   background-color: color-mix(in srgb, var(--color-accent) 78%, #111) !important;
 }
+button.bg-danger:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-danger) 78%, #111) !important;
+}

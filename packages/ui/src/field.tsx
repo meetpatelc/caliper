@@ -13,13 +13,15 @@ import { fieldErrorId } from "./field-id";
 
 export { fieldErrorId };
 
-type FieldA11y = { error?: string; errorId?: string };
+type FieldA11y = { error?: string; errorId?: string; required?: boolean };
 const FieldContext = createContext<FieldA11y>({});
 
 export function useFieldA11y(props: {
   "aria-invalid"?: InputHTMLAttributes<HTMLInputElement>["aria-invalid"];
   "aria-describedby"?: string;
   "aria-errormessage"?: string;
+  "aria-required"?: InputHTMLAttributes<HTMLInputElement>["aria-required"];
+  required?: boolean;
 }) {
   const ctx = useContext(FieldContext);
   const described = [...new Set([props["aria-describedby"], ctx.error ? ctx.errorId : undefined].filter(Boolean))].join(
@@ -29,6 +31,7 @@ export function useFieldA11y(props: {
     "aria-invalid": props["aria-invalid"] ?? (ctx.error ? true : undefined),
     "aria-describedby": described || undefined,
     "aria-errormessage": props["aria-errormessage"] ?? (ctx.error ? ctx.errorId : undefined),
+    "aria-required": props["aria-required"] ?? (props.required || ctx.required ? true : undefined),
   };
 }
 
@@ -39,6 +42,7 @@ export function Field({
   error,
   errorId: errorIdProp,
   hint,
+  required,
   children,
 }: {
   label: string;
@@ -47,15 +51,21 @@ export function Field({
   error?: string;
   errorId?: string;
   hint?: ReactNode;
+  required?: boolean;
   children: ReactNode;
 }) {
   const generatedId = useId();
   const errorId = error ? (errorIdProp ?? (htmlFor ? fieldErrorId(htmlFor) : `${generatedId}-error`)) : undefined;
   return (
-    <FieldContext.Provider value={{ error, errorId }}>
+    <FieldContext.Provider value={{ error, errorId, required }}>
       <label htmlFor={htmlFor} className="grid gap-1.5">
         <span className="flex items-baseline gap-2 text-sm">
           {label}
+          {required ? (
+            <span className="text-danger" aria-hidden="true">
+              *
+            </span>
+          ) : null}
           {symbol ? <em className="font-mono text-xs not-italic text-accent">{symbol}</em> : null}
         </span>
         {children}
@@ -125,7 +135,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
 
 export function UnitSelect({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select className={cn(controlClass, "w-unit shrink-0 px-1 font-mono text-xs", className)} {...props}>
+    <select aria-label="Unit" className={cn(controlClass, "w-unit shrink-0 px-1 font-mono text-xs", className)} {...props}>
       {children}
     </select>
   );

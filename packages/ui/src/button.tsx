@@ -12,6 +12,7 @@ export const buttonVariants = cva(
         outline: "border border-border bg-transparent hover:bg-elevated",
         ghost: "text-muted hover:bg-elevated hover:text-fg",
         mark: "border border-mark text-mark hover:bg-elevated",
+        destructive: "bg-danger text-accent-fg hover:bg-danger/90",
       },
       size: {
         md: "h-10 px-3",

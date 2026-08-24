@@ -63,7 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             aria-label="Search"
             className="min-w-0 flex-1"
           >
-            <Search size={15} className="shrink-0" />
+            <Search size={15} className="shrink-0" aria-hidden="true" />
             <span className="truncate">Search</span>
           </SearchTrigger>
           <Button
@@ -75,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             aria-label="Open menu"
             onClick={() => setMenuOpen(true)}
           >
-            <Menu size={18} />
+            <Menu size={18} aria-hidden="true" />
           </Button>
         </div>
         <div className="relative hidden h-14 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:px-5">
@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <FamilySwitch />
           </div>
           <div className="flex items-center justify-center gap-2">
-            <nav className="flex items-center gap-1" aria-label="Primary">
+            <nav className="flex flex-wrap items-center gap-0.5 md:gap-1" aria-label="Primary">
               {PRIMARY_NAV.map((item) => {
                 const Icon = item.icon;
                 const active = item.match(pathname);
@@ -108,7 +108,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               shortcut={shortcut}
               className="w-[min(28rem,32vw)]"
             >
-              <Search size={15} className="shrink-0" />
+              <Search size={15} className="shrink-0" aria-hidden="true" />
               <span className="flex-1 truncate text-left">Search…</span>
             </SearchTrigger>
             <ThemeToggle />
