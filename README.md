@@ -6,7 +6,7 @@ Open a finished model, or write your own. Units stay on the quantity. Method, as
 
 This is **not** two products. Caliper and Gauge are retired names for the same desk.
 
-Shared look: [`@instrument/ui`](https://github.com/meetpatelc/instrument-ui). Units: [`@instrument/units`](https://github.com/meetpatelc/instrument-units).
+Shared look: [`packages/ui`](packages/ui) (`@instrument/ui`). Units: [`packages/units`](packages/units) (`@instrument/units`). Formula: [`packages/formula`](packages/formula).
 
 Instrument is a **preliminary screening desk**, not a design approval, sealed calculation, or code-compliance tool. Verify every output against the geometry, loading, material, and specifications that apply to the actual project.
 
@@ -59,6 +59,7 @@ src/lib/             Catalog, documents, units, desk
 src/studio/          Studio evaluator, ISO 286, authoring
 src/components/      Shell, calculator workspace, diagrams
 packages/ui          Shared Instrument UI kit
+packages/units       Canonical SI inventory
 packages/formula     Expression evaluator
 migrations/          Auth + desk schema
 ```
