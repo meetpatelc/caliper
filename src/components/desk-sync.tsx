@@ -2,7 +2,7 @@ import { useLayoutEffect } from "react";
 import { toast } from "sonner";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { claimDesk, getDesk, type DeskSnapshot } from "@/lib/desk-account";
-import { WORKSHOP_KEY } from "@/gauge/lib/brand";
+import { WORKSHOP_KEY } from "@/studio/lib/brand";
 import {
   consumeClaimedUnsignedDesk,
   flushAccountWrites,
@@ -12,7 +12,7 @@ import {
   setDeskFallback,
   setDeskHydrating,
 } from "@/lib/desk-mode";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStore } from "@/lib/workspace-store";
 
 let syncGeneration = 0;

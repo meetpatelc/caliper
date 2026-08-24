@@ -1,19 +1,22 @@
-# Caliper
+# Instrument
 
-The **ready desk**: **166** unit-aware calculators. Open a model, set the numbers, keep the result.
+One engineering desk: **Library**, **Studio**, **Review**, and **Project**.
 
-Sibling to [Gauge](https://github.com/meetpatelc/gauge) — Gauge is the atlas and studio (write and publish a model). Caliper is the finished library.
+Open a finished model, or write your own. Units stay on the quantity. Method, assumptions, and limits sit in the same frame.
 
-Shared look: [@instrument/ui](https://github.com/meetpatelc/instrument-ui) (tokens + Button / Field / Panel).
+This is **not** two products. Caliper and Gauge are retired names for the same desk.
 
-Caliper is a **preliminary screening desk**, not a design approval, sealed calculation, or code-compliance tool. Verify every output against the geometry, loading, material, and specifications that apply to the actual project.
+Shared look: [`@instrument/ui`](https://github.com/meetpatelc/instrument-ui). Units: [`@instrument/units`](https://github.com/meetpatelc/instrument-units).
+
+Instrument is a **preliminary screening desk**, not a design approval, sealed calculation, or code-compliance tool. Verify every output against the geometry, loading, material, and specifications that apply to the actual project.
 
 ## Features
 
-- 166 released models across fundamentals, mechanics, fluids, thermal, electrical, quality, automation, manufacturing, and applied systems
+- Finished library models across fundamentals, mechanics, fluids, thermal, electrical, quality, automation, manufacturing, and applied systems
+- Studio to author a unit-aware calculator with method attached
 - SI-canonical arithmetic with declared display units
-- Command palette (`⌘K` / `Ctrl+K`) with substring search
-- Local project snapshots and review records (no account required)
+- Command palette (`⌘K` / `Ctrl+K`)
+- Project snapshots and review records (no account required)
 - Engineering review: checklists, weighted trade study, FMEA arithmetic
 - Optional Google / X sign-in
 - Dark and light themes
@@ -26,8 +29,8 @@ Caliper is a **preliminary screening desk**, not a design approval, sealed calcu
 ## Quick start
 
 ```bash
-git clone https://github.com/meetpatelc/caliper.git
-cd caliper
+git clone https://github.com/meetpatelc/instrument.git
+cd instrument
 npm install
 npm run dev
 ```
@@ -46,17 +49,18 @@ Calculators and local saves work without signing in. Copy `.env.example` to `.en
 | `npm run typecheck` | TypeScript (`tsc --noEmit`) |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
-| `npm test` | Node test runner for `scripts/**/*.test.mjs` |
+| `npm test` | Node test runner |
 
-## Project layout
+## Layout
 
 ```
-src/routes/          Pages (desk, library, tool, review, projects, methods)
-src/lib/catalog.ts   Tool metadata, aliases, sources
-src/lib/engineering.ts  Field definitions and calculateTool
-src/lib/units.ts     Unit families and SI conversion
-src/components/      Shell, calculator workspace, diagrams, command palette
-migrations/          Auth + feedback schema
+src/routes/          Pages (library, studio, review, project, account)
+src/lib/             Catalog, documents, units, desk
+src/studio/          Studio evaluator, ISO 286, authoring
+src/components/      Shell, calculator workspace, diagrams
+packages/ui          Shared Instrument UI kit
+packages/formula     Expression evaluator
+migrations/          Auth + desk schema
 ```
 
 ## Engineering posture
@@ -66,15 +70,7 @@ migrations/          Auth + feedback schema
 - Sources and method notes remain one step away.
 - A screening result is never a certification.
 
-See **About & limits** in the app for what Caliper is and is not designed to support.
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
-
-## Security
-
-See [SECURITY.md](SECURITY.md) to report a vulnerability. Do not open a public issue for secrets or exploitable bugs.
+See **About & limits** in the app for what Instrument is and is not designed to support.
 
 ## License
 

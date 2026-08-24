@@ -1,0 +1,50 @@
+{
+  "gravitationalPe": {
+    "values": [
+      {
+        "key": "energy",
+        "label": "Potential energy",
+        "raw": 1569.0639999999999,
+        "display": "1,569.1",
+        "unit": "J"
+      }
+    ],
+    "warnings": [
+      "This is near-field gravitational PE on a constant-g Earth. It is not orbital mechanics, not elastic energy, and not a drop-height safety result."
+    ],
+    "errors": [],
+    "method": "PE = m g h"
+  },
+  "pipeVelocity": {
+    "values": [
+      {
+        "key": "speed",
+        "label": "Mean velocity",
+        "raw": 1.5915494309189535,
+        "display": "1.5915",
+        "unit": "m/s"
+      }
+    ],
+    "warnings": [
+      "This is mean velocity from continuity in a circular full pipe. It does not size the pipe, calculate pressure drop, or classify the flow regime."
+    ],
+    "errors": [],
+    "method": "V = 4 Q / (π D²)"
+  },
+  "dynamicPressure": {
+    "values": [
+      {
+        "key": "q",
+        "label": "Dynamic pressure",
+        "raw": 245.00000000000003,
+        "display": "245",
+        "unit": "Pa"
+      }
+    ],
+    "warnings": [
+      "This is the kinetic term ½ρV². It is not a stagnation temperature, not a drag load, and not a code wind pressure."
+    ],
+    "errors": [],
+    "method": "q = ½ ρ V²"
+  }
+}

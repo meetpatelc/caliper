@@ -4,6 +4,7 @@ import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { useDeskStore } from "@/lib/workspace-store";
 import { panelClass } from "@/components/ui/panel";
+import { EmptyState, LoadingState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
 /** Sits in the viewport gutter, outside the 1180px page wrap. Hidden when the gutter is too narrow. */
@@ -29,9 +30,7 @@ export function FavouriteRail() {
       <div className={cn(panelClass, "pointer-events-auto max-h-full overflow-auto p-4")}>
         <p className="eyebrow">Favourite</p>
         {loading ? (
-          <p className="mt-3 text-sm text-muted" role="status">
-            {hydrating ? "Loading the account desk." : "Loading."}
-          </p>
+          <LoadingState className="mt-3">{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
         ) : favouriteTools.length ? (
           <ul className="mt-3 grid gap-1">
             {favouriteTools.map((tool) => (
@@ -47,7 +46,7 @@ export function FavouriteRail() {
             ))}
           </ul>
         ) : (
-          <p className="mt-3 text-sm leading-6 text-muted">Favourite a model. It stays here.</p>
+          <EmptyState className="mt-3 leading-6">Favourite a model. It stays here.</EmptyState>
         )}
       </div>
     </aside>

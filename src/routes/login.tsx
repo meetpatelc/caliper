@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { authClient, authEnabled } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
+import { ErrorState } from "@/components/ui/status";
 
 export const Route = createFileRoute("/login")({ component: Login });
 
@@ -79,7 +80,7 @@ function Login() {
                 onChange={(event) => setPassword(event.target.value)}
               />
             </Field>
-            {error ? <p className="text-sm text-danger">{error}</p> : null}
+            {error ? <ErrorState>{error}</ErrorState> : null}
             <Button type="submit" disabled={busy} className="w-full">
               {busy ? "Working…" : mode === "up" ? "Create account" : "Sign in"}
             </Button>

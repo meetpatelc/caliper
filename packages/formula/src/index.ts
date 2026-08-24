@@ -16,6 +16,11 @@ const FUNCTIONS: Record<string, (...args: number[]) => number> = {
   min: (...xs) => Math.min(...xs),
   max: (...xs) => Math.max(...xs),
   pow: (a, b) => a ** b,
+  hypot: (...xs) => Math.hypot(...xs),
+  atan: (x) => Math.atan(x),
+  atan2: (y, x) => Math.atan2(y, x),
+  logmean: (a, b) => (Math.abs(a - b) < 1e-10 ? a : (a - b) / Math.log(a / b)),
+  eq: (a, b) => (Math.abs(a - b) < 1e-12 ? 1 : 0),
 };
 
 export class FormulaError extends Error {

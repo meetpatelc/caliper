@@ -1,8 +1,9 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { CalculatorFrame } from "@/gauge/components/calculator-frame";
-import { findCalculator } from "@/gauge/lib/resolve";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { CalculatorFrame } from "@/studio/components/calculator-frame";
+import { findCalculator } from "@/studio/lib/resolve";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { buttonVariants } from "@instrument/ui";
+import { LoadingState } from "@/components/ui/status";
 
 export const Route = createFileRoute("/c/$slug")({
   beforeLoad: ({ params }) => {
@@ -42,7 +43,7 @@ function CalculatorPage() {
     return (
       <div className="page-wrap">
         <p className="eyebrow">Instrument</p>
-        <div className="mt-6 h-40 animate-pulse rounded-md bg-surface" />
+        <LoadingState variant="block" className="mt-6" />
       </div>
     );
   }

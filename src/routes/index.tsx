@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { Star } from "lucide-react";
 import { tools, type ToolId } from "@/lib/catalog";
 import { libraryDocuments } from "@/lib/document";
@@ -8,6 +8,8 @@ import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { panelHoverClass } from "@/components/ui/panel";
+import { FilterChip } from "@/components/ui/selection";
+import { EmptyState } from "@/components/ui/status";
 import { GoverningRelation } from "@/components/governing-relation";
 import type { EngineeringDomain } from "@/lib/platform";
 
@@ -184,15 +186,7 @@ function Home() {
         })}
       </div>
 
-      {!visible.length && <p className="mt-10 text-sm text-muted">Nothing in that domain.</p>}
+      {!visible.length && <EmptyState className="mt-10">Nothing in that domain.</EmptyState>}
     </div>
-  );
-}
-
-function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
-  return (
-    <Button type="button" aria-pressed={active} variant={active ? "accent" : "outline"} size="sm" onClick={onClick} className="whitespace-nowrap">
-      {children}
-    </Button>
   );
 }

@@ -71,7 +71,7 @@
       {
         "key": "shearStress",
         "label": "Nominal key shear stress",
-        "raw": 16666666.666666666,
+        "raw": 16666666.666666668,
         "display": "16.667",
         "unit": "MPa"
       },
@@ -311,7 +311,7 @@
       {
         "key": "frictionCapacity",
         "label": "Friction capacity at required normal force",
-        "raw": 3599.9999999999995,
+        "raw": 3600,
         "display": "3,600",
         "unit": "N"
       }

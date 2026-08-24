@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { authMiddleware } from "@/lib/auth/middleware";
-import type { WorkshopCalculator } from "@/gauge/lib/calculator-types";
+import type { WorkshopCalculator } from "@/studio/lib/calculator-types";
 import type { DeskProject, ReviewSnapshot, SavedCalculation } from "@/lib/workspace-store";
 
 export type DeskSnapshot = {

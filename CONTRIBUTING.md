@@ -1,4 +1,4 @@
-# Contributing to Caliper
+# Contributing to Instrument
 
 Thanks for helping keep this engineering desk honest and usable.
 

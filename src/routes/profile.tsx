@@ -6,8 +6,9 @@ import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { tools } from "@/lib/catalog";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { useDeskStore } from "@/lib/workspace-store";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { Button } from "@/components/ui/button";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/status";
 import { Field, Input } from "@/components/ui/field";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
@@ -19,7 +20,7 @@ function ProfilePage() {
   if (isPending) {
     return (
       <div className="page-wrap max-w-xl">
-        <div className="h-8 w-40 animate-pulse rounded-md bg-elevated" />
+        <LoadingState variant="bar" className="w-40" />
       </div>
     );
   }
@@ -97,12 +98,10 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
       <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">{accountMode ? "On this account" : "On this device"}</p>
         {fallback ? (
-          <p className="mt-2 text-sm text-muted">Could not load the account desk. Counts below are this device.</p>
+          <ErrorState className="mt-2 text-muted">Could not load the account desk. Counts below are this device.</ErrorState>
         ) : null}
         {hydrating ? (
-          <p className="mt-3 text-sm text-muted" role="status">
-            Loading the account desk.
-          </p>
+          <LoadingState className="mt-3">Loading the account desk.</LoadingState>
         ) : (
           <>
             <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
@@ -130,7 +129,7 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
                 ))}
               </ul>
             ) : (
-              <p className="mt-4 text-sm text-muted">No favourites yet. Star a model in the library.</p>
+              <EmptyState className="mt-4">No favourites yet. Star a model in the library.</EmptyState>
             )}
           </>
         )}

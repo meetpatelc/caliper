@@ -3,10 +3,9 @@ import { FormEvent, useState } from "react";
 import { Bug, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
 import { submitFeedback } from "@/lib/feedback";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Field, controlClass } from "@/components/ui/field";
-import { panelHoverClass } from "@/components/ui/panel";
+import { Field, Textarea } from "@/components/ui/field";
+import { SelectableCard } from "@/components/ui/selection";
 
 export const Route = createFileRoute("/feedback")({ component: FeedbackPage });
 
@@ -42,26 +41,30 @@ function FeedbackPage() {
         <fieldset>
           <legend className="eyebrow">Message type</legend>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <label className={cn(panelHoverClass, "flex cursor-pointer gap-3 p-4", kind === "bug" && "border-accent")}>
+            <SelectableCard asChild selected={kind === "bug"} className="flex cursor-pointer gap-3 p-4">
+              <label>
               <input type="radio" name="kind" className="sr-only" checked={kind === "bug"} onChange={() => setKind("bug")} />
               <Bug size={18} className="text-accent" />
               <span>
                 <strong className="block">Report a bug</strong>
                 <small className="text-muted">What happened, where, and what you expected.</small>
               </span>
-            </label>
-            <label className={cn(panelHoverClass, "flex cursor-pointer gap-3 p-4", kind === "message" && "border-accent")}>
+              </label>
+            </SelectableCard>
+            <SelectableCard asChild selected={kind === "message"} className="flex cursor-pointer gap-3 p-4">
+              <label>
               <input type="radio" name="kind" className="sr-only" checked={kind === "message"} onChange={() => setKind("message")} />
               <MessageSquareText size={18} className="text-accent" />
               <span>
                 <strong className="block">Send a message</strong>
                 <small className="text-muted">Request, idea, or other context.</small>
               </span>
-            </label>
+              </label>
+            </SelectableCard>
           </div>
         </fieldset>
         <Field htmlFor="feedback-message" label="Full message">
-          <textarea id="feedback-message" value={message} onChange={(event) => setMessage(event.target.value)} rows={12} className={cn(controlClass, "h-auto py-2")} placeholder="Paste steps, values, and URLs." />
+          <Textarea id="feedback-message" value={message} onChange={(event) => setMessage(event.target.value)} rows={12} placeholder="Paste steps, values, and URLs." />
         </Field>
         <Button type="submit" variant="accent" disabled={pending} className="mt-4">
           <Send size={16} />

@@ -1,0 +1,157 @@
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  useId,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from "react";
+import { cn } from "./cn";
+import { fieldErrorId } from "./field-id";
+
+export { fieldErrorId };
+
+type FieldA11y = { error?: string; errorId?: string };
+const FieldContext = createContext<FieldA11y>({});
+
+export function useFieldA11y(props: {
+  "aria-invalid"?: InputHTMLAttributes<HTMLInputElement>["aria-invalid"];
+  "aria-describedby"?: string;
+  "aria-errormessage"?: string;
+}) {
+  const ctx = useContext(FieldContext);
+  const described = [...new Set([props["aria-describedby"], ctx.error ? ctx.errorId : undefined].filter(Boolean))].join(
+    " ",
+  );
+  return {
+    "aria-invalid": props["aria-invalid"] ?? (ctx.error ? true : undefined),
+    "aria-describedby": described || undefined,
+    "aria-errormessage": props["aria-errormessage"] ?? (ctx.error ? ctx.errorId : undefined),
+  };
+}
+
+export function Field({
+  label,
+  symbol,
+  htmlFor,
+  error,
+  errorId: errorIdProp,
+  children,
+}: {
+  label: string;
+  symbol?: string;
+  htmlFor?: string;
+  error?: string;
+  errorId?: string;
+  children: ReactNode;
+}) {
+  const generatedId = useId();
+  const errorId = error ? (errorIdProp ?? (htmlFor ? fieldErrorId(htmlFor) : `${generatedId}-error`)) : undefined;
+  return (
+    <FieldContext.Provider value={{ error, errorId }}>
+      <label htmlFor={htmlFor} className="grid gap-1.5">
+        <span className="flex items-baseline gap-2 text-sm">
+          {label}
+          {symbol ? <em className="font-mono text-xs not-italic text-accent">{symbol}</em> : null}
+        </span>
+        {children}
+        {error ? (
+          <small id={errorId} role="alert" className="text-xs leading-4 text-danger">
+            {error}
+          </small>
+        ) : null}
+      </label>
+    </FieldContext.Provider>
+  );
+}
+
+export const controlClass =
+  "h-10 rounded-md border border-border bg-bg px-3 text-sm outline-none transition-colors hover:border-fg/25 disabled:opacity-40";
+const invalid = "border-danger";
+
+export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input(
+  { className, ...props },
+  ref,
+) {
+  const a11y = useFieldA11y(props);
+  return (
+    <input
+      ref={ref}
+      className={cn(
+        controlClass,
+        "min-w-0 flex-1",
+        props.inputMode === "decimal" && "font-mono tabular-nums",
+        a11y["aria-invalid"] && invalid,
+        className,
+      )}
+      {...props}
+      {...a11y}
+    />
+  );
+});
+
+export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(function Select(
+  { className, children, ...props },
+  ref,
+) {
+  const a11y = useFieldA11y(props);
+  return (
+    <select ref={ref} className={cn(controlClass, a11y["aria-invalid"] && invalid, className)} {...props} {...a11y}>
+      {children}
+    </select>
+  );
+});
+
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea(
+  { className, ...props },
+  ref,
+) {
+  const a11y = useFieldA11y(props);
+  return (
+    <textarea
+      ref={ref}
+      className={cn(controlClass, "h-auto min-w-0 py-2", a11y["aria-invalid"] && invalid, className)}
+      {...props}
+      {...a11y}
+    />
+  );
+});
+
+export function UnitSelect({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select className={cn(controlClass, "w-unit shrink-0 px-1 font-mono text-xs", className)} {...props}>
+      {children}
+    </select>
+  );
+}
+
+export function UnitBadge({ children }: { children: ReactNode }) {
+  return (
+    <span className="grid h-10 w-unit shrink-0 place-items-center rounded-md border border-border bg-bg font-mono text-xs text-muted">
+      {children}
+    </span>
+  );
+}
+
+export function MeasurementField({
+  children,
+  invalid: invalidProp,
+  className,
+}: {
+  children: ReactNode;
+  invalid?: boolean;
+  className?: string;
+}) {
+  const ctx = useContext(FieldContext);
+  const isInvalid = invalidProp ?? Boolean(ctx.error);
+  return (
+    <span
+      className={cn("measurement-field", isInvalid && "measurement-field-invalid", className)}
+      data-invalid={isInvalid ? "true" : undefined}
+    >
+      {children}
+    </span>
+  );
+}

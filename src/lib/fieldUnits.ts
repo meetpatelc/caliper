@@ -2,7 +2,7 @@ import { convertQuantity, isUnitFamilyId, unitId, unitSymbol, type UnitFamilyId 
 
 export type UnitSwitch = { family: UnitFamilyId; engine: string; options: string[] };
 
-/** Desk trays — original Caliper short lists, as stable ids. */
+/** Desk trays — original short lists, as stable ids. */
 const SHORT: Partial<Record<UnitFamilyId, string[]>> = {
   length: ["length.mm", "length.m", "length.in", "length.ft"],
   area: ["area.mm2", "area.m2", "area.in2"],

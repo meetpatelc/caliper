@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { StudioEditor } from "@/gauge/components/studio-editor";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { StudioEditor } from "@/studio/components/studio-editor";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { buttonVariants } from "@instrument/ui";
+import { LoadingState } from "@/components/ui/status";
 
 export const Route = createFileRoute("/studio/$id")({ component: StudioEdit });
 
@@ -14,7 +15,7 @@ function StudioEdit() {
     return (
       <div className="page-wrap">
         <p className="eyebrow">Studio</p>
-        <div className="mt-6 h-40 animate-pulse rounded-md bg-surface" />
+        <LoadingState variant="block" className="mt-6" />
       </div>
     );
   }

@@ -1,0 +1,105 @@
+.more-menu > summary {
+  list-style: none;
+}
+.more-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.page-wrap {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 1.75rem 3.5rem;
+}
+
+.display-title {
+  font-size: clamp(2rem, 4.4vw, 3.35rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.wordmark {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+
+/* Compatibility: same control as Field, until leftover pages move to primitives. */
+.field-control {
+  height: 2.5rem;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  padding-inline: 0.75rem;
+  font-size: 0.875rem;
+}
+.field-control:hover {
+  border-color: color-mix(in srgb, var(--color-fg) 25%, var(--color-border));
+}
+.field-control:focus {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.measurement-field {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+.measurement-field:hover {
+  border-color: color-mix(in srgb, var(--color-fg) 25%, var(--color-border));
+}
+.measurement-field:focus-within {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+.measurement-field-invalid {
+  border-color: var(--color-danger);
+}
+.measurement-field input,
+.measurement-field select,
+.measurement-field > * {
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+.measurement-field input {
+  flex: 1;
+  min-width: 0;
+}
+.measurement-field select,
+.measurement-field > :not(input) {
+  width: var(--spacing-unit);
+  flex: 0 0 var(--spacing-unit);
+  border-left: 1px solid var(--color-border) !important;
+}
+
+.instrument-sheet {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-border);
+}
+
+.diagram-surface {
+  display: grid;
+  min-height: 148px;
+  place-items: center;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0.75rem 1rem;
+}

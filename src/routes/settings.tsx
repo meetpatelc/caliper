@@ -6,6 +6,7 @@ import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { wipeDesk } from "@/lib/desk-account";
 import { THEME_KEY } from "@/lib/instrument";
 import { Button } from "@/components/ui/button";
+import { LoadingState } from "@/components/ui/status";
 import { Field, Input } from "@/components/ui/field";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
@@ -17,7 +18,7 @@ function SettingsPage() {
   if (isPending) {
     return (
       <div className="page-wrap max-w-xl">
-        <div className="h-8 w-48 animate-pulse rounded-md bg-elevated" />
+        <LoadingState variant="bar" />
       </div>
     );
   }

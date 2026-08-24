@@ -9,6 +9,7 @@ import { FavouriteRail } from "@/components/favourite-rail";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { LoadingState } from "@/components/ui/status";
 import { PARENT_NAME, THEME_KEY } from "@/lib/instrument";
 import { cn } from "@/lib/utils";
 
@@ -51,10 +52,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     };
     const onOpen = () => setPaletteOpen(true);
     window.addEventListener("keydown", onKey);
+    window.addEventListener("instrument:open-search", onOpen);
     window.addEventListener("caliper:open-search", onOpen);
     window.addEventListener("gauge:open-search", onOpen);
     return () => {
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("instrument:open-search", onOpen);
       window.removeEventListener("caliper:open-search", onOpen);
       window.removeEventListener("gauge:open-search", onOpen);
     };
@@ -237,7 +240,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function DrawerAccount({ onClose }: { onClose: () => void }) {
   const { user, isPending } = useCurrentUserState();
-  if (isPending) return <div className="h-11 animate-pulse rounded-md bg-elevated" />;
+  if (isPending) return <LoadingState variant="bar" className="h-11 w-auto" />;
   if (!user) {
     return (
       <Link to="/login" onClick={onClose} className={cn(buttonVariants({ variant: "ghost" }), "w-full justify-start")}>

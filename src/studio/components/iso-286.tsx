@@ -1,0 +1,271 @@
+import { useMemo, useState } from "react";
+import { RotateCcw, Star } from "lucide-react";
+import { officialBySlug } from "@/studio/lib/catalog";
+import { formatDeviationMm, formatLimitMm } from "@/studio/lib/format-limit";
+import {
+  computeFit,
+  fitLabel,
+  HOLE_LETTERS,
+  IT_GRADES,
+  SHAFT_LETTERS,
+  type HoleLetter,
+  type ShaftLetter,
+} from "@/studio/lib/iso286";
+import { tools } from "@/lib/catalog";
+import { relatedTools } from "@/lib/desk";
+import { useDeskStore } from "@/lib/workspace-store";
+import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
+import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
+import { GoverningRelation } from "@/components/governing-relation";
+import { MeasurementField } from "@/components/ui/measurement-field";
+import { Button } from "@/components/ui/button";
+import { Field, Input, Select, UnitBadge } from "@/components/ui/field";
+import { Link } from "@tanstack/react-router";
+
+const calculator = officialBySlug.get("iso-286-fits")!;
+const tool = tools.find((item) => item.id === "fits")!;
+
+function mm(value: number, kind: "limit" | "deviation" = "deviation") {
+  return kind === "limit" ? formatLimitMm(value) : formatDeviationMm(value);
+}
+
+function FitDiagram({
+  ES,
+  EI,
+  es,
+  ei,
+}: {
+  ES: number;
+  EI: number;
+  es: number;
+  ei: number;
+}) {
+  const values = [ES, EI, es, ei, 0];
+  const max = Math.max(...values.map((v) => Math.abs(v)), 1e-6);
+  const y = (v: number) => 16 + ((max - v) / (2 * max)) * 140;
+  const zero = y(0);
+  const holeTop = y(Math.max(ES, EI));
+  const holeBot = y(Math.min(ES, EI));
+  const shaftTop = y(Math.max(es, ei));
+  const shaftBot = y(Math.min(es, ei));
+
+  return (
+    <svg viewBox="0 0 220 180" className="mx-auto max-h-48 w-full max-w-md" aria-hidden="true">
+      <line x1="24" y1={zero} x2="210" y2={zero} stroke="var(--color-border)" strokeWidth="1" />
+      <text x="8" y={zero + 4} className="fill-muted" fontSize="9" fontFamily="IBM Plex Mono, monospace">
+        0
+      </text>
+      <rect x="48" y={holeTop} width="44" height={Math.max(holeBot - holeTop, 2)} fill="var(--color-surface)" stroke="var(--color-fg)" strokeWidth="2" />
+      <rect
+        x="128"
+        y={shaftTop}
+        width="44"
+        height={Math.max(shaftBot - shaftTop, 2)}
+        fill="color-mix(in srgb, var(--color-mark) 35%, transparent)"
+        stroke="var(--color-mark)"
+        strokeWidth="2"
+      />
+      <text x="70" y="12" textAnchor="middle" className="fill-muted" fontSize="9" fontFamily="IBM Plex Sans, sans-serif">
+        Hole
+      </text>
+      <text x="150" y="12" textAnchor="middle" className="fill-muted" fontSize="9" fontFamily="IBM Plex Sans, sans-serif">
+        Shaft
+      </text>
+    </svg>
+  );
+}
+
+export function Iso286Instrument() {
+  const [D, setD] = useState("100");
+  const [holeLetter, setHoleLetter] = useState<HoleLetter>("H");
+  const [holeGrade, setHoleGrade] = useState(9);
+  const [shaftLetter, setShaftLetter] = useState<ShaftLetter>("n");
+  const [shaftGrade, setShaftGrade] = useState(8);
+  const favorites = useDeskStore((state) => state.favorites);
+  const toggleFavorite = useDeskStore((state) => state.toggleFavorite);
+  const favourited = favorites.includes("fits");
+  const nearby = relatedTools("fits");
+
+  const result = useMemo(() => {
+    const diameter = Number(D);
+    try {
+      return { ok: true as const, fit: computeFit(diameter, holeLetter, holeGrade, shaftLetter, shaftGrade) };
+    } catch (error) {
+      return { ok: false as const, error: error instanceof Error ? error.message : "Could not evaluate." };
+    }
+  }, [D, holeLetter, holeGrade, shaftLetter, shaftGrade]);
+
+  return (
+    <InstrumentPage
+      kicker={tool.kicker}
+      title={tool.title}
+      actions={
+        <Button variant={favourited ? "mark" : "outline"} onClick={() => toggleFavorite("fits")}>
+          <Star size={14} fill={favourited ? "currentColor" : "none"} />
+          {favourited ? "Favourited" : "Favourite"}
+        </Button>
+      }
+      nearby={
+        nearby.length > 0 ? (
+          <InstrumentNearby>
+            {nearby.map((item, index) => (
+              <span key={item.id}>
+                {index > 0 ? " · " : null}
+                <Link to="/tool/$toolId" params={{ toolId: item.id }} className="text-fg hover:text-accent">
+                  {item.title}
+                </Link>
+              </span>
+            ))}
+          </InstrumentNearby>
+        ) : null
+      }
+      method={
+        <InstrumentMethod
+          description={calculator.description}
+          formula={calculator.formula}
+          when={calculator.assumptions}
+          dont={calculator.boundary}
+          sourceLabel={calculator.sourceLabel}
+          sourceUrl={calculator.sourceUrl}
+        />
+      }
+    >
+      <InstrumentSheet
+        diagram={result.ok ? <FitDiagram ES={result.fit.ES} EI={result.fit.EI} es={result.fit.es} ei={result.fit.ei} /> : undefined}
+        resultTitle={result.ok ? "Results" : "Resolve the input state"}
+        example={
+          <Button
+            variant="ghost"
+            className="h-10 min-h-10"
+            onClick={() => {
+              setD("100");
+              setHoleLetter("H");
+              setHoleGrade(9);
+              setShaftLetter("n");
+              setShaftGrade(8);
+            }}
+          >
+            <RotateCcw size={13} />
+            Example
+          </Button>
+        }
+        inputs={
+          <>
+            <Field htmlFor="iso-D" label="Nominal size" symbol="D">
+              <MeasurementField>
+                <Input id="iso-D" inputMode="decimal" value={D} onChange={(event) => setD(event.target.value)} />
+                <UnitBadge>mm</UnitBadge>
+              </MeasurementField>
+            </Field>
+            <div className="grid gap-2">
+              <span className="flex items-baseline gap-2 text-sm">
+                Hole class
+                <em className="font-mono text-xs not-italic text-accent">
+                  {holeLetter}
+                  {holeGrade}
+                </em>
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                <Select aria-label="Hole letter" value={holeLetter} onChange={(event) => setHoleLetter(event.target.value as HoleLetter)}>
+                  {HOLE_LETTERS.map((letter) => (
+                    <option key={letter} value={letter}>
+                      {letter}
+                    </option>
+                  ))}
+                </Select>
+                <Select aria-label="Hole IT grade" value={String(holeGrade)} onChange={(event) => setHoleGrade(Number(event.target.value))}>
+                  {IT_GRADES.map((grade) => (
+                    <option key={grade} value={grade}>
+                      {grade}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              {result.ok ? (
+                <dl className="grid grid-cols-[3rem_1fr_auto] gap-x-3 gap-y-1 font-mono text-sm text-muted">
+                  <dt>ES</dt>
+                  <dd className="tabular-nums text-fg">{mm(result.fit.ES)}</dd>
+                  <dd>mm</dd>
+                  <dt>EI</dt>
+                  <dd className="tabular-nums text-fg">{mm(result.fit.EI)}</dd>
+                  <dd>mm</dd>
+                </dl>
+              ) : null}
+            </div>
+            <div className="grid gap-2">
+              <span className="flex items-baseline gap-2 text-sm">
+                Shaft class
+                <em className="font-mono text-xs not-italic text-accent">
+                  {shaftLetter}
+                  {shaftGrade}
+                </em>
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                <Select aria-label="Shaft letter" value={shaftLetter} onChange={(event) => setShaftLetter(event.target.value as ShaftLetter)}>
+                  {SHAFT_LETTERS.map((letter) => (
+                    <option key={letter} value={letter}>
+                      {letter}
+                    </option>
+                  ))}
+                </Select>
+                <Select aria-label="Shaft IT grade" value={String(shaftGrade)} onChange={(event) => setShaftGrade(Number(event.target.value))}>
+                  {IT_GRADES.map((grade) => (
+                    <option key={grade} value={grade}>
+                      {grade}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              {result.ok ? (
+                <dl className="grid grid-cols-[3rem_1fr_auto] gap-x-3 gap-y-1 font-mono text-sm text-muted">
+                  <dt>es</dt>
+                  <dd className="tabular-nums text-fg">{mm(result.fit.es)}</dd>
+                  <dd>mm</dd>
+                  <dt>ei</dt>
+                  <dd className="tabular-nums text-fg">{mm(result.fit.ei)}</dd>
+                  <dd>mm</dd>
+                </dl>
+              ) : null}
+            </div>
+          </>
+        }
+        results={
+          result.ok ? (
+            <>
+              <ResultQuantity
+                label="Fit"
+                value={fitLabel(result.fit.kind)}
+                caption={
+                  <p className="font-mono text-xs text-muted">
+                    {result.fit.holeClass}/{result.fit.shaftClass}
+                  </p>
+                }
+              />
+              <ResultQuantity
+                label="Maximum clearance"
+                symbol="cmax"
+                value={mm(result.fit.cmax)}
+                unit={<UnitBadge>mm</UnitBadge>}
+              />
+              <ResultQuantity
+                label="Maximum interference"
+                symbol="imax"
+                value={mm(result.fit.imax)}
+                unit={<UnitBadge>mm</UnitBadge>}
+              />
+              <dl className="grid grid-cols-2 gap-2 font-mono text-xs text-muted">
+                <div>Hole max {mm(result.fit.holeMax, "limit")} mm</div>
+                <div>Shaft max {mm(result.fit.shaftMax, "limit")} mm</div>
+                <div>Hole min {mm(result.fit.holeMin, "limit")} mm</div>
+                <div>Shaft min {mm(result.fit.shaftMin, "limit")} mm</div>
+              </dl>
+              <GoverningRelation formula={calculator.formula} className="text-sm" />
+            </>
+          ) : (
+            <p className="text-sm text-danger">{result.error}</p>
+          )
+        }
+      />
+    </InstrumentPage>
+  );
+}

@@ -28,6 +28,9 @@
       ],
       "@instrument/formula": [
         "./packages/formula/src/index.ts"
+      ],
+      "@instrument/ui": [
+        "./packages/ui/src/index.ts"
       ]
     },
     "allowImportingTsExtensions": true
@@ -35,6 +38,7 @@
   "include": [
     "src",
     "server",
-    "packages/formula/src"
+    "packages/formula/src",
+    "packages/ui/src"
   ]
 }

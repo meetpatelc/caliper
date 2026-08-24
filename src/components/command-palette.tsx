@@ -5,8 +5,8 @@ import type { RefObject } from "react";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { getTool, tools, searchableToolText } from "@/lib/catalog";
 import { releasedDomains, savedHeadline } from "@/lib/desk";
-import { officialCalculators } from "@/gauge/lib/catalog";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { officialCalculators } from "@/studio/lib/catalog";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStore } from "@/lib/workspace-store";
 
 const pages = [

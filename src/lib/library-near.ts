@@ -1,6 +1,6 @@
 import type { InstrumentDocument } from "@/lib/document";
 
-/** Near-10 closed-form remainder. formControl and driveRatio stay TypeScript (choice fields). */
+/** Near-10 closed-form remainder. formControl and driveRatio later moved with remaining-43. */
 export const nearDocuments: Record<string, InstrumentDocument> = {
   sheetMetalBend: {
     slug: "sheetMetalBend",

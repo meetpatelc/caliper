@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "@instrument/ui/instrument.css";
-@source "../node_modules/@instrument/ui/src";
+@source "../packages/ui/src";
 @import "./styles/desk.css";
 @import "./diagrams.css";
 
@@ -27,44 +27,6 @@
 }
 
 @layer components {
-  .measurement-field {
-    display: flex;
-    min-width: 0;
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-bg);
-  }
-  .measurement-field:hover {
-    border-color: color-mix(in srgb, var(--color-fg) 25%, var(--color-border));
-  }
-  .measurement-field:focus-within {
-    outline: var(--focus-ring);
-    outline-offset: var(--focus-offset);
-  }
-  .measurement-field-invalid {
-    border-color: var(--color-danger);
-  }
-  .measurement-field input,
-  .measurement-field select,
-  .measurement-field > * {
-    border: 0 !important;
-    border-radius: 0 !important;
-    outline: none !important;
-    box-shadow: none !important;
-    background: transparent;
-  }
-  .measurement-field input {
-    flex: 1;
-    min-width: 0;
-  }
-  .measurement-field select,
-  .measurement-field > :not(input) {
-    width: var(--spacing-unit);
-    flex: 0 0 var(--spacing-unit);
-    border-left: 1px solid var(--color-border) !important;
-  }
-
   .field-control.tabular-nums {
     font-family: var(--font-mono);
   }
@@ -87,13 +49,6 @@
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.15;
-}
-
-.instrument-sheet {
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-border);
 }
 
 [cmdk-group-heading] {

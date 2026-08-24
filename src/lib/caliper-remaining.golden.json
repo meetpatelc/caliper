@@ -1,0 +1,1692 @@
+{
+  "airConsumption": {
+    "values": [
+      {
+        "key": "cycleAir",
+        "label": "Ideal normalized free air per cycle",
+        "raw": 6.32245521534946,
+        "display": "6.3225",
+        "unit": "NL/cycle"
+      },
+      {
+        "key": "minuteAir",
+        "label": "Ideal normalized free-air rate",
+        "raw": 113.80419387629027,
+        "display": "113.8",
+        "unit": "NL/min"
+      },
+      {
+        "key": "sweptVolume",
+        "label": "Cylinder swept volume per cycle",
+        "raw": 0.0009032078879070656,
+        "display": "0.90321",
+        "unit": "L/cycle"
+      }
+    ],
+    "warnings": [
+      "This is an ideal double-acting full-stroke consumption estimate normalized to 1 bar absolute. It excludes dead volume, cushioning, valve/line loss, leakage, regulator dynamics, air temperature, compressor duty, load motion, speed control, and component sizing."
+    ],
+    "errors": [],
+    "method": "Vfree = (Aextend + Aretract)s·(Pgauge + 1 bar)"
+  },
+  "arithmeticScratchpad": {
+    "values": [
+      {
+        "key": "result",
+        "label": "Bracket load subtotal",
+        "raw": 1839.9999999999998,
+        "display": "1,840",
+        "unit": "N"
+      }
+    ],
+    "warnings": [
+      "Declared input label: N. This evaluates only the displayed scalar arithmetic grammar. Formula names and unit labels are retained user context, not parsed or validated. It does not support variables, functions, unit conversion, dimension checking, symbolic algebra, code execution, or engineering-model validation."
+    ],
+    "errors": [],
+    "method": "Fixed grammar: number · ( ) · + · − · * · / · ^"
+  },
+  "beam": {
+    "values": [
+      {
+        "key": "reaction",
+        "label": "Fixed-end reaction",
+        "raw": 1000,
+        "display": "1",
+        "unit": "kN"
+      },
+      {
+        "key": "moment",
+        "label": "Maximum bending moment",
+        "raw": 1200,
+        "display": "1.2",
+        "unit": "kN·m"
+      },
+      {
+        "key": "deflection",
+        "label": "Maximum elastic deflection",
+        "raw": 0.0024,
+        "display": "2.4",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This response uses a narrow, linear-elastic straight-beam model. Check that support conditions, small-deflection behavior, load position, and bending axis match the diagram."
+    ],
+    "errors": [],
+    "method": "δmax = PL³ / 3EI · Mmax = PL"
+  },
+  "beamDiagram": {
+    "values": [
+      {
+        "key": "leftReaction",
+        "label": "Left support reaction",
+        "raw": 6800,
+        "display": "6.8",
+        "unit": "kN"
+      },
+      {
+        "key": "rightReaction",
+        "label": "Right support reaction",
+        "raw": 5200,
+        "display": "5.2",
+        "unit": "kN"
+      },
+      {
+        "key": "shearLeftOfPoint",
+        "label": "Shear left of point load",
+        "raw": 5200,
+        "display": "5.2",
+        "unit": "kN"
+      },
+      {
+        "key": "shearRightOfPoint",
+        "label": "Shear right of point load",
+        "raw": -2800,
+        "display": "-2.8",
+        "unit": "kN"
+      },
+      {
+        "key": "momentAtPoint",
+        "label": "Moment at point-load location",
+        "raw": 4800,
+        "display": "4.8",
+        "unit": "kN·m"
+      },
+      {
+        "key": "peakMoment",
+        "label": "Largest-magnitude bending moment",
+        "raw": 4800,
+        "display": "4.8",
+        "unit": "kN·m"
+      },
+      {
+        "key": "peakMomentLocation",
+        "label": "Peak-moment location from left",
+        "raw": 0.8,
+        "display": "0.8",
+        "unit": "m"
+      }
+    ],
+    "warnings": [
+      "This is a static, simply supported single-span equilibrium screen with one downward point load and/or full-span downward uniform load. It does not produce a scaled plot, deflection, stress, connection, dynamic, plasticity, code, capacity, or approval result."
+    ],
+    "errors": [],
+    "method": "RA = P(L−a)/L + wL/2 · RB = Pa/L + wL/2 · V(x) = RA − wx − P·H(x−a) · M(x) = RAx − wx²/2 − P(x−a)H(x−a)"
+  },
+  "bearingLife": {
+    "values": [
+      {
+        "key": "millionRevolutions",
+        "label": "Basic L10 life",
+        "raw": 67.047119140625,
+        "display": "67.047",
+        "unit": "million rev"
+      },
+      {
+        "key": "hours",
+        "label": "Basic L10 life",
+        "raw": 770.6565418462644,
+        "display": "770.66",
+        "unit": "h"
+      },
+      {
+        "key": "loadRatio",
+        "label": "Dynamic-rating to equivalent-load ratio",
+        "raw": 4.0625,
+        "display": "4.0625",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This is a baseline statistical L10 rating-life screen for one entered equivalent load and constant speed. It excludes load-spectrum effects, lubrication, contamination, temperature, misalignment, shock, reliability adjustment, mounting, and manufacturer-specific life factors."
+    ],
+    "errors": [],
+    "method": "L10 = (C/P)³ · hours = L10·10⁶/(60n)"
+  },
+  "brakingDuty": {
+    "values": [
+      {
+        "key": "peakPower",
+        "label": "Declared peak braking power",
+        "raw": 5.5,
+        "display": "5.5",
+        "unit": "kW"
+      },
+      {
+        "key": "dutyRatio",
+        "label": "Declared braking-duty ratio",
+        "raw": 0.1,
+        "display": "10",
+        "unit": "%"
+      },
+      {
+        "key": "derivedResistance",
+        "label": "Source-relation derived resistance",
+        "raw": 76.81818181818181,
+        "display": "76.818",
+        "unit": "Ω"
+      },
+      {
+        "key": "peakCurrent",
+        "label": "Source-relation peak braking current",
+        "raw": 8.461538461538462,
+        "display": "8.4615",
+        "unit": "A"
+      },
+      {
+        "key": "averageWattage",
+        "label": "Source-relation average braking wattage",
+        "raw": 0.275,
+        "display": "0.275",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This applies the cited declared-power, brake-torque multiplier, DC-bus voltage, and time-duty relations for the selected source arithmetic mode. It does not select a drive, resistor, minimum resistance, current limit, braking torque, regeneration type, enclosure, protection, wiring, thermal rating, deceleration profile, energy recovery, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "PW = MW·BT · R = Vdc²/PW · DC = tb/tc · DBRW = PW·DC·(1/2 normal, 1 overhauling)"
+  },
+  "circularArc": {
+    "values": [
+      {
+        "key": "arc",
+        "label": "Arc length",
+        "raw": 157.07963267948963,
+        "display": "157.08",
+        "unit": "mm"
+      },
+      {
+        "key": "chord",
+        "label": "Chord length",
+        "raw": 129.9038105676658,
+        "display": "129.9",
+        "unit": "mm"
+      },
+      {
+        "key": "sector",
+        "label": "Sector area",
+        "raw": 5890.486225480861,
+        "display": "5,890.5",
+        "unit": "mm²"
+      },
+      {
+        "key": "segment",
+        "label": "Circular-segment area",
+        "raw": 3454.7897773371274,
+        "display": "3,454.8",
+        "unit": "mm²"
+      }
+    ],
+    "warnings": [
+      "This is nominal planar-circle geometry. It excludes manufacturing tolerances, three-dimensional curvature, material thickness, bend allowance, forming response, and any manufacturing or inspection decision."
+    ],
+    "errors": [],
+    "method": "s = rθ · c = 2r sin(θ/2) · Asector = r²θ/2 · Asegment = Asector − r²sinθ/2"
+  },
+  "clampForce": {
+    "values": [
+      {
+        "key": "transferred",
+        "label": "Transferred clamp force",
+        "raw": 1948.557158514987,
+        "display": "1.9486",
+        "unit": "kN"
+      },
+      {
+        "key": "pivot",
+        "label": "Ideal pivot-side component",
+        "raw": 1250.0000000000002,
+        "display": "1.25",
+        "unit": "kN"
+      },
+      {
+        "key": "transferRatio",
+        "label": "Force transfer ratio",
+        "raw": 0.7794228634059948,
+        "display": "0.77942",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This is one planar transfer-angle relationship. It excludes linkage stiffness, bearing/friction variation, dynamics, buckling, contact geometry, retaining force under vibration, and machine-safety assessment."
+    ],
+    "errors": [],
+    "method": "Ftransfer = F·sin(θ)·η · Fpivot = F·|cos(θ)|"
+  },
+  "compressionSpring": {
+    "values": [
+      {
+        "key": "rate",
+        "label": "Elementary spring rate",
+        "raw": 9643.554687500002,
+        "display": "9.6436",
+        "unit": "N/mm"
+      },
+      {
+        "key": "force",
+        "label": "Ideal spring force",
+        "raw": 115.72265625000003,
+        "display": "115.72",
+        "unit": "N"
+      },
+      {
+        "key": "springIndex",
+        "label": "Spring index D/d",
+        "raw": 8,
+        "display": "8",
+        "unit": "—"
+      },
+      {
+        "key": "shearStress",
+        "label": "Uncorrected wire torsional shear",
+        "raw": 147342662.15929377,
+        "display": "147.34",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This is an elementary close-coiled round-wire spring screen. It excludes Wahl/direct-shear correction, end condition, solid height, buckling, coil clash, residual stress, material allowables, fatigue, relaxation, corrosion, temperature, dynamics, and spring selection."
+    ],
+    "errors": [],
+    "method": "k = Gd⁴/(8D³Na) · F = kδ · τbasic = 8FD/(πd³)"
+  },
+  "controlChart": {
+    "values": [
+      {
+        "key": "subgroupCount",
+        "label": "Subgroup summaries entered",
+        "raw": 5,
+        "display": "5",
+        "unit": "subgroups"
+      },
+      {
+        "key": "grandMean",
+        "label": "X-bar chart center line",
+        "raw": 10.040000000000001,
+        "display": "10.04",
+        "unit": "unit"
+      },
+      {
+        "key": "xbarUcl",
+        "label": "X-bar chart upper limit",
+        "raw": 11.101680000000002,
+        "display": "11.102",
+        "unit": "unit"
+      },
+      {
+        "key": "xbarLcl",
+        "label": "X-bar chart lower limit",
+        "raw": 8.97832,
+        "display": "8.9783",
+        "unit": "unit"
+      },
+      {
+        "key": "variationCenter",
+        "label": "Range chart center line",
+        "raw": 1.8400000000000003,
+        "display": "1.84",
+        "unit": "unit"
+      },
+      {
+        "key": "variationUcl",
+        "label": "Range chart upper limit",
+        "raw": 3.891600000000001,
+        "display": "3.8916",
+        "unit": "unit"
+      },
+      {
+        "key": "variationLcl",
+        "label": "Range chart lower limit",
+        "raw": 0,
+        "display": "0",
+        "unit": "unit"
+      }
+    ],
+    "warnings": [
+      "This reports conventional X-bar/R or X-bar/S limit arithmetic from user-entered subgroup summaries. It does not recreate subgroup observations, test normality, independence, rational subgrouping, data integrity, special-cause signals, trends, rules, capability, process control, process acceptance, or a control decision."
+    ],
+    "errors": [],
+    "method": "X-bar limits = x̄̄ ± A2·R̄ · R limits = D3/D4·R̄"
+  },
+  "converter": {
+    "values": [
+      {
+        "key": "converted",
+        "label": "Converted value",
+        "raw": 224.8089430997105,
+        "display": "224.8089",
+        "unit": "lbf"
+      },
+      {
+        "key": "canonical",
+        "label": "Canonical SI value",
+        "raw": 1000,
+        "display": "1,000",
+        "unit": "N"
+      }
+    ],
+    "warnings": [
+      "Only units from the same quantity family are available together. Display precision is rounded; the canonical value is retained separately."
+    ],
+    "errors": [],
+    "method": "Canonical SI conversion: kN → N → lbf"
+  },
+  "conveyorLine": {
+    "values": [
+      {
+        "key": "itemRate",
+        "label": "Literal item rate",
+        "raw": 120,
+        "display": "120",
+        "unit": "items/min"
+      },
+      {
+        "key": "lineSpeed",
+        "label": "Declared line speed",
+        "raw": 30,
+        "display": "30",
+        "unit": "m/min"
+      },
+      {
+        "key": "pitchDensity",
+        "label": "Declared items per metre at pitch",
+        "raw": 4,
+        "display": "4",
+        "unit": "items/m"
+      }
+    ],
+    "warnings": [
+      "This converts a declared uniform pitch and stated steady conveyor line speed into a literal item rate. It does not select or size a conveyor, validate accumulation, transfers, product stability, dwell/process requirements, equipment capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "q = v·1000/p"
+  },
+  "cuttingParameters": {
+    "values": [
+      {
+        "key": "rpm",
+        "label": "Calculated spindle speed",
+        "raw": 399.99998044434017,
+        "display": "400",
+        "unit": "rpm"
+      },
+      {
+        "key": "feedRate",
+        "label": "Table feed rate",
+        "raw": 299.99998533325515,
+        "display": "300",
+        "unit": "mm/min"
+      },
+      {
+        "key": "chipLoad",
+        "label": "Feed per tooth",
+        "raw": 0.07500000000000001,
+        "display": "0.075",
+        "unit": "mm/tooth"
+      },
+      {
+        "key": "mrr",
+        "label": "Theoretical material removal rate",
+        "raw": 104.9999948666393,
+        "display": "105",
+        "unit": "cm³/min"
+      },
+      {
+        "key": "power",
+        "label": "Specific-force power estimate",
+        "raw": 3.937499807498974,
+        "display": "3.9375",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This is face-milling reference arithmetic using user-entered cutting conditions, specific force, and efficiency. It excludes selection of speed/feed/tool/material parameters, tooth engagement variation, radial chip thinning, cutter geometry, runout, acceleration, spindle torque limits, rigidity, chatter, coolant, tool wear, fixture limits, thermal effects, surface quality, and process qualification."
+    ],
+    "errors": [],
+    "method": "n = 1000vc/(πDc) · vf = fz·z·n · MRR = ap·ae·vf/1000 · Pc = ap·ae·vf·Kc/(60·10⁶·η)"
+  },
+  "cycleBuilder": {
+    "values": [
+      {
+        "key": "cycleTime",
+        "label": "Declared serial local cycle time",
+        "raw": 9.5,
+        "display": "9.5",
+        "unit": "s"
+      },
+      {
+        "key": "longestStep",
+        "label": "Longest declared local step · Process",
+        "raw": 4,
+        "display": "4",
+        "unit": "s"
+      },
+      {
+        "key": "idealThroughput",
+        "label": "Ideal repeated-cycle throughput",
+        "raw": 378.94736842105266,
+        "display": "378.95",
+        "unit": "cycles/h"
+      },
+      {
+        "key": "batchTime",
+        "label": "Declared repeated-cycle batch time",
+        "raw": 95,
+        "display": "95",
+        "unit": "s"
+      }
+    ],
+    "warnings": [
+      "This sums up to six user-named, serial, local step durations and reports ideal repeated-cycle arithmetic only. It does not infer missing steps, construct a schedule, model parallel work, queues, downtime, changeovers, OEE, staffing, bottlenecks, capacity, takt compliance, quality, safety, or approval."
+    ],
+    "errors": [],
+    "method": "tcycle = Σti · throughputideal = 3600/tcycle · tbatch = n·tcycle"
+  },
+  "darcyFrictionFactor": {
+    "values": [
+      {
+        "key": "frictionFactor",
+        "label": "Literal Darcy friction factor",
+        "raw": 0.02019570290604238,
+        "display": "0.020196",
+        "unit": "—"
+      },
+      {
+        "key": "reynoldsNumber",
+        "label": "Declared Reynolds number",
+        "raw": 100000,
+        "display": "100,000",
+        "unit": "—"
+      },
+      {
+        "key": "relativeRoughness",
+        "label": "Literal declared relative roughness",
+        "raw": 0.00045,
+        "display": "0.00045",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "The user declares the Swamee–Jain relation; this workspace does not classify flow regime or solve Colebrook iteratively. It does not calculate pressure drop, determine fluid properties, select pipe, pump, or fittings, solve a pipe network, establish capacity, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "fD = 0.25 / [log10(ε/(3.7D) + 5.74/Re^0.9)]²"
+  },
+  "dimensionCheck": {
+    "values": [
+      {
+        "key": "consistent",
+        "label": "Entered dimensions match (1=yes, 0=no)",
+        "raw": 1,
+        "display": "1",
+        "unit": "—"
+      },
+      {
+        "key": "deltaMass",
+        "label": "Mass exponent difference (left − right)",
+        "raw": 0,
+        "display": "0",
+        "unit": "—"
+      },
+      {
+        "key": "deltaLength",
+        "label": "Length exponent difference (left − right)",
+        "raw": 0,
+        "display": "0",
+        "unit": "—"
+      },
+      {
+        "key": "deltaTime",
+        "label": "Time exponent difference (left − right)",
+        "raw": 0,
+        "display": "0",
+        "unit": "—"
+      },
+      {
+        "key": "deltaElectriccurrent",
+        "label": "Electric current exponent difference (left − right)",
+        "raw": 0,
+        "display": "0",
+        "unit": "—"
+      },
+      {
+        "key": "deltaTemperature",
+        "label": "Temperature exponent difference (left − right)",
+        "raw": 0,
+        "display": "0",
+        "unit": "—"
+      },
+      {
+        "key": "deltaAmountofsubstance",
+        "label": "Amount of substance exponent difference (left − right)",
+        "raw": 0,
+        "display": "0",
+        "unit": "—"
+      },
+      {
+        "key": "deltaLuminousintensity",
+        "label": "Luminous intensity exponent difference (left − right)",
+        "raw": 0,
+        "display": "0",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This compares only the two entered base-dimension vectors. It does not parse symbols or equations, infer a quantity’s dimensions, convert units, assess constants, prove numerical correctness, validate signs or boundary conditions, or establish physical-model validity."
+    ],
+    "errors": [],
+    "method": "Compare entered exponent vectors over SI base dimensions: [M, L, T, I, Θ, N, J]left − [M, L, T, I, Θ, N, J]right"
+  },
+  "drillingTime": {
+    "values": [
+      {
+        "key": "cuttingSpeed",
+        "label": "Peripheral cutting speed",
+        "raw": 47.1238898038469,
+        "display": "47.124",
+        "unit": "m/min"
+      },
+      {
+        "key": "feedRate",
+        "label": "Spindle feed rate",
+        "raw": 150,
+        "display": "150",
+        "unit": "mm/min"
+      },
+      {
+        "key": "timeMinutes",
+        "label": "Nominal cutting time",
+        "raw": 1.4,
+        "display": "84",
+        "unit": "s"
+      },
+      {
+        "key": "distance",
+        "label": "Total programmed cutting depth",
+        "raw": 210,
+        "display": "210",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This is reference machining arithmetic for constant-speed, constant-feed drilling. It excludes approach, breakthrough, retract, peck cycles, tool wear, material and coolant effects, machine acceleration, fixturing, chip evacuation, spindle limits, power, quality, and process qualification."
+    ],
+    "errors": [],
+    "method": "vc = πDcn/1000 · vf = frn · Tc = ld·i/(frn)"
+  },
+  "driveRatio": {
+    "values": [
+      {
+        "key": "ratio",
+        "label": "Driven / driver ratio",
+        "raw": 3,
+        "display": "3",
+        "unit": "—"
+      },
+      {
+        "key": "outputSpeed",
+        "label": "Ideal output speed",
+        "raw": 600,
+        "display": "600",
+        "unit": "rpm"
+      },
+      {
+        "key": "outputTorque",
+        "label": "Output torque with stated efficiency",
+        "raw": 124.2,
+        "display": "124.2",
+        "unit": "N·m"
+      },
+      {
+        "key": "pitchLineSpeed",
+        "label": "Driver pitch-line speed",
+        "raw": 7.539822368615504,
+        "display": "7.5398",
+        "unit": "m/s"
+      },
+      {
+        "key": "tangentialForce",
+        "label": "Driver tangential force",
+        "raw": 1125,
+        "display": "1,125",
+        "unit": "N"
+      },
+      {
+        "key": "radialForce",
+        "label": "Elementary radial force component",
+        "raw": 409.4665135494776,
+        "display": "409.47",
+        "unit": "N"
+      },
+      {
+        "key": "axialForce",
+        "label": "Elementary axial force component",
+        "raw": 301.44284148501305,
+        "display": "301.44",
+        "unit": "N"
+      }
+    ],
+    "warnings": [
+      "This is an ideal user-declared drive-ratio screen. It uses a simple pitch-circle tangential-force relation and an elementary pressure/helix-angle force decomposition; axial force is reported only for the declared helical option. It excludes component selection, planetary topology, gear tooth strength, mesh stiffness, backlash, lubrication, heat, durability, manufacturing quality, belt/chain tension, vibration, dynamic load factors, bearing reactions, and system validation."
+    ],
+    "errors": [],
+    "method": "i = N2/N1 · n2 = n1/i · T2 = T1·i·η · v = πd1n1/60 · Ft = 2T1/d1"
+  },
+  "fits": {
+    "values": [
+      {
+        "key": "minimumClearance",
+        "label": "Minimum clearance (+) / interference (−)",
+        "raw": 0.0070000000000014495,
+        "display": "0.007",
+        "unit": "mm"
+      },
+      {
+        "key": "maximumClearance",
+        "label": "Maximum clearance (+) / interference (−)",
+        "raw": 0.04100000000000037,
+        "display": "0.041",
+        "unit": "mm"
+      },
+      {
+        "key": "holeTolerance",
+        "label": "Hole tolerance width",
+        "raw": 0.021000000000000796,
+        "display": "0.021",
+        "unit": "mm"
+      },
+      {
+        "key": "shaftTolerance",
+        "label": "Shaft tolerance width",
+        "raw": 0.012999999999998124,
+        "display": "0.013",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "Clearance fit. This workspace uses only stated size limits; form, position, texture, thermal growth, loading, and assembly method are excluded."
+    ],
+    "errors": [],
+    "method": "Cmin = Hmin − Smax · Cmax = Hmax − Smin"
+  },
+  "formControl": {
+    "values": [
+      {
+        "key": "observedSpan",
+        "label": "Observed flatness extrema span",
+        "raw": 0.044,
+        "display": "0.044",
+        "unit": "mm"
+      },
+      {
+        "key": "toleranceRatio",
+        "label": "Observed span / stated tolerance",
+        "raw": 0.8799999999999999,
+        "display": "88",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This subtracts user-entered extrema for a declared form-control record. It is not a minimum-zone algorithm and does not validate sampling density, filters, instrument calibration, probe compensation, datum/setup strategy, part geometry, drawing interpretation, uncertainty, or compliance."
+    ],
+    "errors": [],
+    "method": "Observed screening span = user-entered xmax − user-entered xmin"
+  },
+  "gaugeBiasStudy": {
+    "values": [
+      {
+        "key": "bias",
+        "label": "Study bias",
+        "raw": 0.12000000000000455,
+        "display": "0.12",
+        "unit": "unit"
+      },
+      {
+        "key": "relativeBias",
+        "label": "Relative study bias",
+        "raw": 0.0012000000000000454,
+        "display": "0.12",
+        "unit": "%"
+      },
+      {
+        "key": "linearityPointCount",
+        "label": "Declared linearity points",
+        "raw": 3,
+        "display": "3",
+        "unit": "points"
+      },
+      {
+        "key": "linearityBias1",
+        "label": "Linearity pair 1 bias",
+        "raw": 0.0799999999999983,
+        "display": "0.08",
+        "unit": "unit"
+      },
+      {
+        "key": "linearityBias2",
+        "label": "Linearity pair 2 bias",
+        "raw": 0.12000000000000455,
+        "display": "0.12",
+        "unit": "unit"
+      },
+      {
+        "key": "linearityBias3",
+        "label": "Linearity pair 3 bias",
+        "raw": 0.18000000000000682,
+        "display": "0.18",
+        "unit": "unit"
+      },
+      {
+        "key": "linearitySpan",
+        "label": "Multi-point bias span",
+        "raw": 0.10000000000000853,
+        "display": "0.1",
+        "unit": "unit"
+      },
+      {
+        "key": "stabilityCheckCount",
+        "label": "Declared stability checks",
+        "raw": 3,
+        "display": "3",
+        "unit": "checks"
+      },
+      {
+        "key": "stabilitySpan",
+        "label": "Time-ordered stability span",
+        "raw": 0.05000000000001137,
+        "display": "0.05",
+        "unit": "unit"
+      }
+    ],
+    "warnings": [
+      "This is literal arithmetic on user-entered reference/mean pairs and time-ordered check values. It does not choose or certify a reference, infer uncertainty, apply acceptance limits, make a conformance decision, substitute for calibration, evaluate drift causes, approve a measurement system, or release a product."
+    ],
+    "errors": [],
+    "method": "Bias = ȳ − xref · multi-point span = max(ȳi−xi) − min(ȳi−xi) · stability span = max(yt) − min(yt)"
+  },
+  "gearToothStress": {
+    "values": [
+      {
+        "key": "normalForce",
+        "label": "Spur tangential tooth force",
+        "raw": 1000,
+        "display": "1,000",
+        "unit": "N"
+      },
+      {
+        "key": "virtualToothCount",
+        "label": "Declared tooth count",
+        "raw": 20,
+        "display": "20",
+        "unit": "teeth"
+      },
+      {
+        "key": "loadedSection",
+        "label": "Lewis-type loaded section factor",
+        "raw": 30,
+        "display": "30",
+        "unit": "mm²"
+      },
+      {
+        "key": "rootStress",
+        "label": "Static Lewis-type spur root bending stress",
+        "raw": 33.333333333333336,
+        "display": "33.333",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This is a basic static Lewis-type spur/helical root-bending arithmetic screen using a user-entered form factor. For the parallel-axis helical first estimate it exposes normal force and virtual tooth count, but does not select a form factor or apply rating factors. It does not select module, pressure angle, material, hardness, tooth form, or Lewis factor; calculate dynamic factors, contact stress, AGMA/ISO rating, mesh load distribution, lubrication, life, reliability, gearbox design, or approval."
+    ],
+    "errors": [],
+    "method": "σF = Ft/(b m Y)"
+  },
+  "isentropicMachine": {
+    "values": [
+      {
+        "key": "pressureRatio",
+        "label": "Declared pressure ratio p₂/p₁",
+        "raw": 5,
+        "display": "5",
+        "unit": "—"
+      },
+      {
+        "key": "isentropicOutletTemperature",
+        "label": "Isentropic outlet temperature",
+        "raw": 475.14588262997364,
+        "display": "475.15",
+        "unit": "K"
+      },
+      {
+        "key": "actualOutletTemperature",
+        "label": "Declared-efficiency outlet temperature",
+        "raw": 518.9323532874671,
+        "display": "518.93",
+        "unit": "K"
+      },
+      {
+        "key": "specificWork",
+        "label": "Declared-efficiency compressor specific work input",
+        "raw": 220.02701505390436,
+        "display": "220.03",
+        "unit": "kJ/kg"
+      },
+      {
+        "key": "power",
+        "label": "Declared-efficiency compressor shaft power input",
+        "raw": 110.01350752695218,
+        "display": "110.01",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This is ideal-gas isentropic state and user-entered-efficiency work arithmetic only. It does not select or rate equipment, use compressor maps, evaluate surge, choking, staging, cooling, losses beyond the declared efficiency, controls, mechanical design, safety, operability, or approval."
+    ],
+    "errors": [],
+    "method": "T2s/T1 = (p2/p1)^((γ−1)/γ) · wis = cp(T2s−T1) · wactual = wis/ηis · P = ṁw"
+  },
+  "leadScrew": {
+    "values": [
+      {
+        "key": "torque",
+        "label": "Ideal raising torque",
+        "raw": 7.763655760580262,
+        "display": "7.7637",
+        "unit": "N·m"
+      },
+      {
+        "key": "speed",
+        "label": "Linear travel speed",
+        "raw": 0.1,
+        "display": "100",
+        "unit": "mm/s"
+      },
+      {
+        "key": "power",
+        "label": "Mechanical output power",
+        "raw": 400,
+        "display": "0.4",
+        "unit": "kW"
+      }
+    ],
+    "warnings": [
+      "This is an ideal constant-load power-screw relationship using a user-entered efficiency. It excludes thread geometry verification, friction variation, back-driving, buckling, critical speed, bearings, misalignment, acceleration torque, duty cycle, lubrication, wear, and component selection."
+    ],
+    "errors": [],
+    "method": "T = F·l/(2πη) · v = l·n/60 · P = Fv"
+  },
+  "linearGuideLife": {
+    "values": [
+      {
+        "key": "nominalLifeKm",
+        "label": "Nominal travel life",
+        "raw": 3200,
+        "display": "3,200",
+        "unit": "km"
+      },
+      {
+        "key": "literalTravelTimeHours",
+        "label": "Literal time at declared travel rate",
+        "raw": 4444.444444444444,
+        "display": "4,444.4",
+        "unit": "h"
+      },
+      {
+        "key": "ratingToLoadRatio",
+        "label": "Declared dynamic-rating / calculated-load ratio",
+        "raw": 4,
+        "display": "4",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This applies the cited nominal ball/roller linear-guide travel-life relation using user-entered dynamic rating and calculated load, then makes a literal time conversion at the declared constant travel rate. It does not select a rail/block, derive equivalent or moment loading, model acceleration, load distribution, lubrication, contamination, alignment, rigidity, reliability modifiers, installation, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "L10 = Lref(C/Pc)^p · thours = L10·1000/(v·60)"
+  },
+  "lmtd": {
+    "values": [
+      {
+        "key": "lmtd",
+        "label": "Log mean temperature difference",
+        "raw": 37.44437844709309,
+        "display": "37.444",
+        "unit": "K or °C"
+      },
+      {
+        "key": "duty",
+        "label": "Declared-UA heat-transfer rate",
+        "raw": 67399.88120476756,
+        "display": "67.4",
+        "unit": "kW"
+      },
+      {
+        "key": "areaPerKilowatt",
+        "label": "Required area per 1 kW at declared U",
+        "raw": 0.05934728561089894,
+        "display": "0.059347",
+        "unit": "m²/kW"
+      },
+      {
+        "key": "delta1",
+        "label": "First terminal difference",
+        "raw": 35,
+        "display": "35",
+        "unit": "K or °C"
+      },
+      {
+        "key": "delta2",
+        "label": "Second terminal difference",
+        "raw": 40,
+        "display": "40",
+        "unit": "K or °C"
+      }
+    ],
+    "warnings": [
+      "This evaluates only ideal parallel or counterflow LMTD and user-entered UA arithmetic. It excludes correction factors, phase change, heat capacity rates, fouling, heat-transfer-coefficient derivation, pressure drop, transient behavior, materials, exchanger design/selection/rating, safety, and approval."
+    ],
+    "errors": [],
+    "method": "ΔTlm = (ΔT1 − ΔT2) / ln(ΔT1/ΔT2) · Q = UAΔTlm, counterflow"
+  },
+  "mmc": {
+    "values": [
+      {
+        "key": "bonus",
+        "label": "Available bonus tolerance",
+        "raw": 0.15000000000000036,
+        "display": "0.15",
+        "unit": "mm"
+      },
+      {
+        "key": "totalPosition",
+        "label": "Total position tolerance",
+        "raw": 0.35000000000000037,
+        "display": "0.35",
+        "unit": "mm"
+      },
+      {
+        "key": "virtualCondition",
+        "label": "Simplified virtual condition",
+        "raw": 9.8,
+        "display": "9.8",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This single-feature screen assumes one cylindrical feature, one MMC position control, and no datum shift, composite frame, projected zone, or functional-gage interpretation beyond the displayed formula."
+    ],
+    "errors": [],
+    "method": "Bonus = actual hole − MMC hole · VC = MMC hole − ⌀T"
+  },
+  "mohrCircle": {
+    "values": [
+      {
+        "key": "center",
+        "label": "Mohr circle center stress",
+        "raw": 60,
+        "display": "60",
+        "unit": "MPa"
+      },
+      {
+        "key": "radius",
+        "label": "Mohr circle radius / max in-plane shear",
+        "raw": 50,
+        "display": "50",
+        "unit": "MPa"
+      },
+      {
+        "key": "principalOne",
+        "label": "Maximum principal stress",
+        "raw": 110,
+        "display": "110",
+        "unit": "MPa"
+      },
+      {
+        "key": "principalTwo",
+        "label": "Minimum principal stress",
+        "raw": 10,
+        "display": "10",
+        "unit": "MPa"
+      },
+      {
+        "key": "principalAngle",
+        "label": "One principal-plane orientation",
+        "raw": 26.56505117707799,
+        "display": "26.565",
+        "unit": "°"
+      },
+      {
+        "key": "doublePrincipalAngle",
+        "label": "Mohr-circle double angle to principal plane",
+        "raw": 53.13010235415598,
+        "display": "53.13",
+        "unit": "°"
+      },
+      {
+        "key": "doubleMaxShearAngle",
+        "label": "Mohr-circle double angle to max-shear plane",
+        "raw": 143.13010235415598,
+        "display": "143.13",
+        "unit": "°"
+      }
+    ],
+    "warnings": [
+      "This transforms one entered plane-stress state at one point. The reported angle follows the entered sign convention and is one of two orthogonal principal-plane orientations; the two Mohr-circle double-angle outputs are shown explicitly. It excludes 3D stress, stress gradients, principal strain, material failure criteria, buckling, fatigue, fracture, local concentration, and any design or compliance decision."
+    ],
+    "errors": [],
+    "method": "σavg = (σx + σy)/2 · R = √[((σx−σy)/2)² + τxy²] · σ1,2 = σavg ± R · 2θp = atan2(2τxy, σx−σy) · 2θs = 2θp + 90°"
+  },
+  "motionProfile": {
+    "values": [
+      {
+        "key": "acceleration",
+        "label": "Profile acceleration",
+        "raw": 2.6666666666666665,
+        "display": "2.6667",
+        "unit": "m/s²"
+      },
+      {
+        "key": "peakSpeed",
+        "label": "Peak speed",
+        "raw": 0.6666666666666666,
+        "display": "0.66667",
+        "unit": "m/s"
+      },
+      {
+        "key": "totalTime",
+        "label": "Total move time",
+        "raw": 1,
+        "display": "1",
+        "unit": "s"
+      },
+      {
+        "key": "distance",
+        "label": "Move distance",
+        "raw": 0.5,
+        "display": "500",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This is an ideal symmetric trapezoidal/triangular profile. It excludes jerk limits, structural compliance, load inertia, friction, servo tuning, actuator force limits, and safety margins."
+    ],
+    "errors": [],
+    "method": "a = s / [ta(ta + tc)] · vmax = a·ta · T = 2ta + tc"
+  },
+  "motorOperatingPoint": {
+    "values": [
+      {
+        "key": "angularSpeed",
+        "label": "Declared shaft angular speed",
+        "raw": 157.07963267948966,
+        "display": "157.08",
+        "unit": "rad/s"
+      },
+      {
+        "key": "shaftPower",
+        "label": "Literal mechanical shaft power",
+        "raw": 0.7853981633974484,
+        "display": "0.7854",
+        "unit": "kW"
+      },
+      {
+        "key": "torqueReferenceRatio",
+        "label": "Declared torque / reference-torque ratio",
+        "raw": 0.7142857142857143,
+        "display": "0.71429",
+        "unit": "—"
+      },
+      {
+        "key": "powerReferenceRatio",
+        "label": "Literal shaft-power / reference-power ratio",
+        "raw": 0.6544984694978736,
+        "display": "0.6545",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This applies the mechanical shaft-power relation to a user-classified servo, stepper, or AC motor record, then reports literal ratios to user-entered references. It does not compare motor types; select a motor/drive; predict torque-speed, holding, pull-out, overload, voltage/current, control, thermal, duty, efficiency, safety, suitability, or approval."
+    ],
+    "errors": [],
+    "method": "Pshaft = T·ω = T·n·2π/60 · rT = T/Tref · rP = Pshaft/Pref"
+  },
+  "orientationControl": {
+    "values": [
+      {
+        "key": "variation",
+        "label": "Observed orientation-reading variation",
+        "raw": 0.04,
+        "display": "0.04",
+        "unit": "mm"
+      },
+      {
+        "key": "ratio",
+        "label": "Observed variation / stated tolerance",
+        "raw": 0.7999999999999999,
+        "display": "80",
+        "unit": "%"
+      },
+      {
+        "key": "difference",
+        "label": "Stated tolerance − observed variation",
+        "raw": 0.010000000000000002,
+        "display": "0.01",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This is extrema subtraction for a user-declared parallelism record. It does not establish datum simulation, validate feature-control-frame syntax, construct a tolerance zone, choose a measurement strategy, compensate instruments, assess repeatability, determine conformance, or certify drawing compliance."
+    ],
+    "errors": [],
+    "method": "observed variation = rmax − rmin · ratio = observed variation / stated tolerance"
+  },
+  "pinStress": {
+    "values": [
+      {
+        "key": "loadPerPin",
+        "label": "Direct load per equal pin",
+        "raw": 6000,
+        "display": "6,000",
+        "unit": "N"
+      },
+      {
+        "key": "shearArea",
+        "label": "One nominal pin shear area",
+        "raw": 78.53981633974483,
+        "display": "78.54",
+        "unit": "mm²"
+      },
+      {
+        "key": "nominalShear",
+        "label": "Nominal pin shear stress",
+        "raw": 38.19718634205488,
+        "display": "38.197",
+        "unit": "MPa"
+      },
+      {
+        "key": "projectedBearingArea",
+        "label": "Projected plate bearing area per pin",
+        "raw": 80,
+        "display": "80",
+        "unit": "mm²"
+      },
+      {
+        "key": "projectedBearingStress",
+        "label": "Projected plate bearing stress",
+        "raw": 75,
+        "display": "75",
+        "unit": "MPa"
+      }
+    ],
+    "warnings": [
+      "This assumes identical pins share the entered direct load equally, uses circular nominal shear area, and applies a projected-area bearing approximation. It does not evaluate pin bending, clearance, load-sharing variation, local contact/Hertz stress, yielding, fatigue, stress concentrations, material allowables, hole edge distance, joint geometry, selection, or approval."
+    ],
+    "errors": [],
+    "method": "Fpin = F/n · As = πd²/4 · τnom = Fpin/(pAs) · Aprojected = dt · σbearing = Fpin/(dt)"
+  },
+  "pneumatic": {
+    "values": [
+      {
+        "key": "extend",
+        "label": "Applied extend force",
+        "raw": 1001.3826583317467,
+        "display": "1.0014",
+        "unit": "kN"
+      },
+      {
+        "key": "retract",
+        "label": "Applied retract force",
+        "raw": 841.1614329986672,
+        "display": "0.84116",
+        "unit": "kN"
+      },
+      {
+        "key": "boreArea",
+        "label": "Bore area",
+        "raw": 0.001963495408493621,
+        "display": "1,963.5",
+        "unit": "mm²"
+      },
+      {
+        "key": "retractArea",
+        "label": "Retract-side area",
+        "raw": 0.0016493361431346417,
+        "display": "1,649.3",
+        "unit": "mm²"
+      }
+    ],
+    "warnings": [
+      "Pressure times area is theoretical. The applied force factor is user-entered; supply pressure drop, speed, cushioning, side load, seal friction, air flow, impact energy, and safety functions remain outside this screen."
+    ],
+    "errors": [],
+    "method": "Fextend = P·Abore·η · Fretract = P(Abore − Arod)·η"
+  },
+  "processCapability": {
+    "values": [
+      {
+        "key": "cp",
+        "label": "Potential capability Cp",
+        "raw": 1.3333333333333284,
+        "display": "1.3333",
+        "unit": "—"
+      },
+      {
+        "key": "cpk",
+        "label": "Centered capability Cpk",
+        "raw": 1.0666666666666675,
+        "display": "1.0667",
+        "unit": "—"
+      },
+      {
+        "key": "cpu",
+        "label": "Upper capability Cpu",
+        "raw": 1.0666666666666675,
+        "display": "1.0667",
+        "unit": "—"
+      },
+      {
+        "key": "cpl",
+        "label": "Lower capability Cpl",
+        "raw": 1.5999999999999894,
+        "display": "1.6",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "Cp and Cpk compare user-entered specifications with user-entered process statistics. This screen does not establish statistical control, distribution suitability, rational subgrouping, measurement-system adequacy, sampling validity, customer requirements, capability thresholds, or production acceptance."
+    ],
+    "errors": [],
+    "method": "Cp = (USL−LSL)/(6s) · Cpk = min[(USL−x̄)/(3s), (x̄−LSL)/(3s)]"
+  },
+  "processPerformance": {
+    "values": [
+      {
+        "key": "pp",
+        "label": "Pp (overall spread index)",
+        "raw": 1.1111111111111072,
+        "display": "1.1111",
+        "unit": "—"
+      },
+      {
+        "key": "ppl",
+        "label": "PPL (lower performance)",
+        "raw": 1.3333333333333246,
+        "display": "1.3333",
+        "unit": "—"
+      },
+      {
+        "key": "ppu",
+        "label": "PPU (upper performance)",
+        "raw": 0.8888888888888897,
+        "display": "0.88889",
+        "unit": "—"
+      },
+      {
+        "key": "ppk",
+        "label": "Ppk (nearest-side performance)",
+        "raw": 0.8888888888888897,
+        "display": "0.88889",
+        "unit": "—"
+      },
+      {
+        "key": "centeringRatio",
+        "label": "Ppk / Pp centering comparison",
+        "raw": 0.8000000000000036,
+        "display": "80",
+        "unit": "%"
+      }
+    ],
+    "warnings": [
+      "This reports formula values using a user-entered overall standard deviation in a stated normal-analysis context.",
+      "This screen does not test normality or stability, create control charts, account for measurement-system error, calculate confidence bounds, select a benchmark, recommend acceptance, or establish process or product capability."
+    ],
+    "errors": [],
+    "method": "Pp = (USL−LSL)/(6soverall) · PPL = (x̄−LSL)/(3soverall) · PPU = (USL−x̄)/(3soverall) · Ppk = min(PPL, PPU)"
+  },
+  "profileRunout": {
+    "values": [
+      {
+        "key": "variation",
+        "label": "Observed indicator variation",
+        "raw": 0.05,
+        "display": "0.05",
+        "unit": "mm"
+      },
+      {
+        "key": "ratio",
+        "label": "Observed variation / stated tolerance",
+        "raw": 0.8333333333333334,
+        "display": "83.333",
+        "unit": "%"
+      },
+      {
+        "key": "difference",
+        "label": "Stated tolerance − observed variation",
+        "raw": 0.009999999999999995,
+        "display": "0.01",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This is extrema subtraction for a user-declared circularRunout record. It does not establish a datum axis, construct profile or runout zones, parse feature-control frames, select fixture/CMM/indicator strategy, assess measurement uncertainty, determine conformance, or certify drawing compliance."
+    ],
+    "errors": [],
+    "method": "observed variation = rmax − rmin · ratio = observed variation / stated tolerance"
+  },
+  "sCurveProfile": {
+    "values": [
+      {
+        "key": "peakSpeed",
+        "label": "Profile peak speed",
+        "raw": 100,
+        "display": "100",
+        "unit": "mm/s"
+      },
+      {
+        "key": "accelerationTime",
+        "label": "Acceleration segment time",
+        "raw": 0.2,
+        "display": "0.2",
+        "unit": "s"
+      },
+      {
+        "key": "cruiseTime",
+        "label": "Constant-speed time",
+        "raw": 1.8,
+        "display": "1.8",
+        "unit": "s"
+      },
+      {
+        "key": "totalTime",
+        "label": "Equivalent point-to-point time",
+        "raw": 2.2,
+        "display": "2.2",
+        "unit": "s"
+      },
+      {
+        "key": "peakAcceleration",
+        "label": "Jerk-percent peak acceleration",
+        "raw": 666.6666666666666,
+        "display": "666.67",
+        "unit": "mm/s²"
+      },
+      {
+        "key": "jerkRampTime",
+        "label": "Per-ramp jerk time",
+        "raw": 0.05,
+        "display": "0.05",
+        "unit": "s"
+      }
+    ],
+    "warnings": [
+      "This symmetric zero-start/zero-stop S-curve screen preserves equivalent trapezoidal timing using user-entered average acceleration and jerk percentage. It does not generate controller commands, model short-move sampling, validate axis limits or tuning, predict vibration, overshoot, mechanical load, safety, or motion-system suitability."
+    ],
+    "errors": [],
+    "method": "tacc = v/aavg · vpeak = min(vmax, √(d aavg)) · ttotal = 2tacc + tcruise · apeak = aavg/(1 − 0.005J%)"
+  },
+  "section": {
+    "values": [
+      {
+        "key": "area",
+        "label": "Cross-sectional area",
+        "raw": 7200,
+        "display": "7,200",
+        "unit": "mm²"
+      },
+      {
+        "key": "inertia",
+        "label": "Second moment of area",
+        "raw": 8640000,
+        "display": "8,640,000",
+        "unit": "mm⁴"
+      },
+      {
+        "key": "sectionModulus",
+        "label": "Section modulus",
+        "raw": 144000,
+        "display": "144,000",
+        "unit": "mm³"
+      }
+    ],
+    "warnings": [
+      "Geometry values are calculated about the displayed centroidal horizontal axis. Verify the chosen axis and that the basic shape represents the actual section."
+    ],
+    "errors": [],
+    "method": "A = bh · Iₓ = bh³ / 12 · Sₓ = Iₓ / (h/2)"
+  },
+  "taylorToolLife": {
+    "values": [
+      {
+        "key": "cuttingSpeed",
+        "label": "Declared cutting speed",
+        "raw": 150,
+        "display": "150",
+        "unit": "m/min"
+      },
+      {
+        "key": "toolLife",
+        "label": "Taylor-relation tool life",
+        "raw": 16,
+        "display": "16",
+        "unit": "min"
+      },
+      {
+        "key": "relationResidual",
+        "label": "Relation residual",
+        "raw": 0,
+        "display": "0",
+        "unit": "(m/min)·minⁿ"
+      }
+    ],
+    "warnings": [
+      "This solves only the user-entered empirical Taylor relation on the stated matched test basis. It does not select a tool or condition, derive C or n, account for feed/depth/coolant/material/coating/geometry, predict wear mechanisms, establish capability, or approve machining."
+    ],
+    "errors": [],
+    "method": "V·Tⁿ = C · T = (C/V)^(1/n)"
+  },
+  "toleranceSampling": {
+    "values": [
+      {
+        "key": "sampleCount",
+        "label": "Generated local samples",
+        "raw": 1000,
+        "display": "1,000",
+        "unit": "samples"
+      },
+      {
+        "key": "seed",
+        "label": "Reproducibility seed",
+        "raw": 20260819,
+        "display": "20,260,819",
+        "unit": "—"
+      },
+      {
+        "key": "sampleMean",
+        "label": "Generated sample mean",
+        "raw": 99.99829989104586,
+        "display": "99.998",
+        "unit": "mm"
+      },
+      {
+        "key": "sampleStandardDeviation",
+        "label": "Generated sample standard deviation",
+        "raw": 0.06517877702360768,
+        "display": "0.065179",
+        "unit": "mm"
+      },
+      {
+        "key": "sampleMinimum",
+        "label": "Generated sample minimum",
+        "raw": 99.82802164581139,
+        "display": "99.828",
+        "unit": "mm"
+      },
+      {
+        "key": "sampleMaximum",
+        "label": "Generated sample maximum",
+        "raw": 100.16165909950156,
+        "display": "100.16",
+        "unit": "mm"
+      },
+      {
+        "key": "p01",
+        "label": "Generated 1st percentile",
+        "raw": 99.86353057481814,
+        "display": "99.864",
+        "unit": "mm"
+      },
+      {
+        "key": "p99",
+        "label": "Generated 99th percentile",
+        "raw": 100.134944198397,
+        "display": "100.13",
+        "unit": "mm"
+      },
+      {
+        "key": "declaredWorstCase",
+        "label": "Declared worst-case envelope half-width",
+        "raw": 0.18000000000000002,
+        "display": "0.18",
+        "unit": "mm"
+      }
+    ],
+    "warnings": [
+      "This is a reproducible local pseudo-random sample of a user-declared independent uniform linear stack. It does not infer contributor distributions or independence, model geometry or assembly, estimate a physical population, predict yield, determine capability/compliance, recommend tolerances, or approve an assembly."
+    ],
+    "errors": [],
+    "method": "xi = N + Σ[(2ui−1)·ti], ui from visible seeded LCG · reported percentiles use nearest generated rank"
+  },
+  "torsionSpring": {
+    "values": [
+      {
+        "key": "rate",
+        "label": "Ideal angular spring rate",
+        "raw": 21.701388888888882,
+        "display": "21.701",
+        "unit": "N·mm/deg"
+      },
+      {
+        "key": "moment",
+        "label": "Applied spring moment",
+        "raw": 976.5624999999997,
+        "display": "976.56",
+        "unit": "N·mm"
+      },
+      {
+        "key": "stress",
+        "label": "Nominal wire bending stress",
+        "raw": 368.414220120128,
+        "display": "368.41",
+        "unit": "MPa"
+      },
+      {
+        "key": "index",
+        "label": "Spring index",
+        "raw": 8,
+        "display": "8",
+        "unit": "—"
+      }
+    ],
+    "warnings": [
+      "This is an elementary round-wire torsion-spring screen using stated modulus, geometry, and angle. The 10.8 coefficient is a per-turn (360°) rate; it is divided by 360 so the displayed rate is per degree. It excludes leg geometry, coil contact, set, stress correction factors, fatigue, material heat treatment, residual stress, winding direction, coil clearance, tolerances, mounting, and design approval."
+    ],
+    "errors": [],
+    "method": "k_360 = E·d⁴/(10.8·D·n) · kθ = k_360/360 · M = kθ·θ · σnom = 32M/(πd³)"
+  },
+  "triangle": {
+    "values": [
+      {
+        "key": "hypotenuse",
+        "label": "Hypotenuse",
+        "raw": 500,
+        "display": "500",
+        "unit": "mm"
+      },
+      {
+        "key": "area",
+        "label": "Triangle area",
+        "raw": 60000,
+        "display": "60,000",
+        "unit": "mm²"
+      },
+      {
+        "key": "alpha",
+        "label": "Angle from horizontal",
+        "raw": 53.13010235415598,
+        "display": "53.13",
+        "unit": "°"
+      },
+      {
+        "key": "beta",
+        "label": "Other acute angle",
+        "raw": 36.86989764584402,
+        "display": "36.87",
+        "unit": "°"
+      }
+    ],
+    "warnings": [
+      "This uses a flat Euclidean right triangle. It does not infer dimensions from a drawing, field measurement, tolerance, or a non-perpendicular geometry."
+    ],
+    "errors": [],
+    "method": "c = √(a² + b²) · A = ab / 2 · α = tan⁻¹(b/a)"
+  },
+  "vacuumHolding": {
+    "values": [
+      {
+        "key": "gravityForce",
+        "label": "Weight component",
+        "raw": 98.10000000000001,
+        "display": "98.1",
+        "unit": "N"
+      },
+      {
+        "key": "accelerationForce",
+        "label": "Inertial force component",
+        "raw": 20,
+        "display": "20",
+        "unit": "N"
+      },
+      {
+        "key": "baseForce",
+        "label": "Vertical-lift base holding force",
+        "raw": 118.10000000000001,
+        "display": "118.1",
+        "unit": "N"
+      },
+      {
+        "key": "requiredHoldingForce",
+        "label": "Multiplier-adjusted required holding force",
+        "raw": 177.15,
+        "display": "177.15",
+        "unit": "N"
+      }
+    ],
+    "warnings": [
+      "This is a simplified theoretical holding-force requirement for the selected declared load case. It does not select suction cups, count cups, calculate cup area, infer surface quality, assess seal/leakage, prescribe a safety factor, validate friction, determine vacuum level, size pumps or ejectors, analyze moments, certify handling safety, or approve an end-of-arm tool. Validate the full worst-case handling sequence and system on the real workpiece."
+    ],
+    "errors": [],
+    "method": "FTH = m(g + a)M"
+  }
+}

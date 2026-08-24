@@ -1,0 +1,61 @@
+/**
+ * Instrument tokens — single source of truth.
+ *
+ * Metrology: cool gray paper, DIN red, IBM Plex, tight radii, almost no shadow.
+ * Light is default. html.dark reassigns the same names.
+ * Do not put raw hex in app components.
+ */
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --color-bg: #e8eaed;
+  --color-surface: #f4f5f7;
+  --color-elevated: #ffffff;
+  --color-fg: #1b1e24;
+  --color-muted: #5c6370;
+  --color-accent: #c8102e;
+  --color-accent-fg: #ffffff;
+  --color-mark: #c8102e;
+  --color-border: #cfd3da;
+  --color-danger: #9b1830;
+  --color-ok: #2f6f4e;
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+
+  --shadow-menu: 0 8px 24px color-mix(in srgb, var(--color-fg) 10%, transparent);
+
+  --spacing-unit: 4.75rem;
+  --spacing-control: 2.5rem;
+  --spacing-page: 1.25rem;
+}
+
+:root {
+  --focus-ring: 2px solid var(--color-accent);
+  --focus-offset: 2px;
+  --duration-fast: 120ms;
+  --ease-desk: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --desk-amber: var(--color-mark);
+  --desk-cyan-wash: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --desk-ink: var(--color-fg);
+  color-scheme: light;
+}
+
+html.dark {
+  --color-bg: #14161a;
+  --color-surface: #1c1f26;
+  --color-elevated: #262a33;
+  --color-fg: #e8eaed;
+  --color-muted: #8b909a;
+  --color-accent: #e23b4c;
+  --color-accent-fg: #ffffff;
+  --color-mark: #e23b4c;
+  --color-border: #2e333d;
+  --color-danger: #f07178;
+  --color-ok: #5ea86a;
+  --shadow-menu: 0 8px 24px rgb(0 0 0 / 0.4);
+  color-scheme: dark;
+}

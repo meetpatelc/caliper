@@ -2,10 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ClipboardList, FolderPlus, PenLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { panelClass } from "@/components/ui/panel";
+import { EmptyState, LoadingState } from "@/components/ui/status";
 import { getTool } from "@/lib/catalog";
 import { savedHeadline } from "@/lib/desk";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
@@ -47,9 +48,7 @@ function ProjectPage() {
             {onAccount ? "On this account." : fallback || (!isPending && !hydrating) ? "On this device." : "Loading."}
           </h1>
           {loadingDesk ? (
-            <p className="mt-4 text-sm text-muted" role="status">
-              {hydrating ? "Loading the account desk." : "Loading."}
-            </p>
+            <LoadingState className="mt-4">{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
           ) : (
           <p className="mt-4 max-w-xl text-base leading-7 text-muted">
             {onAccount
@@ -87,15 +86,15 @@ function ProjectPage() {
       </div>
 
       {loadingDesk ? null : empty ? (
-        <p className={cn(panelClass, "mt-10 p-6 text-sm text-muted")}>
+        <EmptyState className={cn(panelClass, "mt-10 p-6")}>
           Nothing here yet. Open a model and save a check, write one in Studio, or start a review.
-        </p>
+        </EmptyState>
       ) : null}
 
       <section className="mt-10">
         <h2 className="text-xl font-semibold">Your models</h2>
         {loadingDesk ? null : items.length === 0 ? (
-          <p className="mt-3 text-sm text-muted">{onAccount ? "No drafts on this account." : "No drafts on this device."}</p>
+          <EmptyState className="mt-3">{onAccount ? "No drafts on this account." : "No drafts on this device."}</EmptyState>
         ) : (
           <ul className="mt-4 grid gap-3">
             {items.map((item) => (
@@ -191,7 +190,7 @@ function ProjectPage() {
           </div>
         )}
         {loadingDesk ? null : visible.length === 0 ? (
-          <p className="mt-4 text-sm text-muted">No snapshots yet. Open a model and press Save.</p>
+          <EmptyState className="mt-4">No snapshots yet. Open a model and press Save.</EmptyState>
         ) : (
           <ul className="mt-4 grid gap-2">
             {visible.map((record) => {

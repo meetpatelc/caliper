@@ -1,0 +1,26 @@
+{
+  "name": "@instrument/ui",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Metrology tokens and primitives for Instrument.",
+  "type": "module",
+  "sideEffects": ["**/*.css"],
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css",
+    "./base.css": "./src/base.css",
+    "./recipes.css": "./src/recipes.css",
+    "./instrument.css": "./src/instrument.css"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.5.0"
+  },
+  "license": "MIT"
+}

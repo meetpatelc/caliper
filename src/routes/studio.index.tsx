@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, FilePlus, PenLine } from "lucide-react";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { studioDocuments } from "@/lib/document";
 import { Button, buttonVariants, panelClass, panelHoverClass } from "@instrument/ui";
+import { LoadingState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/studio/")({ component: StudioHome });
@@ -59,9 +60,7 @@ function StudioHome() {
       </Link>
 
       {hydrating ? (
-        <p className="mt-12 text-sm text-muted" role="status">
-          Loading the account desk.
-        </p>
+        <LoadingState className="mt-12">Loading the account desk.</LoadingState>
       ) : items.length > 0 ? (
         <section className="mt-12">
           <p className="eyebrow">Your drafts</p>

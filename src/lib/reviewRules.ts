@@ -92,3 +92,19 @@ export const calculateFmea = ({ severity, occurrence, detection }: FmeaInput): F
   const rpn = severity * occurrence * detection;
   return { rpn, severityShare: severity / 10, occurrenceShare: occurrence / 10, detectionShare: detection / 10 };
 };
+
+export const FMEA_ERROR_ID = "fmea-error";
+
+export function isFmeaRatingText(value: string) {
+  const rating = Number(value);
+  return Number.isInteger(rating) && rating >= 1 && rating <= 10;
+}
+
+/** Link every FMEA rating to the shared error when the group cannot calculate. */
+export function fmeaFieldA11y(error: string, value: string) {
+  const hasError = Boolean(error);
+  return {
+    "aria-invalid": hasError || !isFmeaRatingText(value),
+    "aria-describedby": hasError ? FMEA_ERROR_ID : undefined,
+  };
+}

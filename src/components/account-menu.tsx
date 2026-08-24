@@ -4,6 +4,7 @@ import { signOut } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { panelClass } from "@/components/ui/panel";
+import { LoadingState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
 function initialFor(name: string | null, email: string | null) {
@@ -34,7 +35,7 @@ export function AccountMenu() {
   }, [open]);
 
   if (isPending) {
-    return <div className="size-10 shrink-0 animate-pulse rounded-md bg-elevated" aria-hidden="true" />;
+    return <LoadingState variant="avatar" />;
   }
   if (!user) {
     return (

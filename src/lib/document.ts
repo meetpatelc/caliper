@@ -3,7 +3,7 @@
  * Shop units on the glass, SI in the expression, kit conversion underneath.
  * Studio authors this record. Custom TypeScript is only for models this cannot say yet.
  */
-import { evaluateExpression } from "@instrument/formula";
+import { evaluateExpression, FormulaError } from "@instrument/formula";
 import { convertQuantity, unitFamilies, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { quantitySymbol } from "@/lib/quantity-symbols";
 import { band1Documents } from "@/lib/library-band1";
@@ -12,7 +12,16 @@ import { atlasDocuments } from "@/lib/library-atlas";
 import { pilotDocuments } from "@/lib/library-pilot";
 import { wave2Documents } from "@/lib/library-wave2";
 import { nearDocuments } from "@/lib/library-near";
+import { remainingDocuments } from "@/lib/library-remaining";
 import type { EngineeringDomain } from "@/lib/platform";
+import {
+  applyDocumentBounds,
+  applyFieldBound,
+  fieldBounds,
+  optionalOutputs,
+  outputRawScale,
+  remainingRawScale,
+} from "@/lib/document-constraints";
 
 export type InstrumentField = {
   id: string;
@@ -23,6 +32,8 @@ export type InstrumentField = {
   defaultValue: number;
   defaultUnit: string;
   signed?: boolean;
+  choice?: string[];
+  choiceMessage?: string;
 };
 
 export type InstrumentOutput = {
@@ -32,6 +43,9 @@ export type InstrumentOutput = {
   family?: UnitFamilyId;
   defaultUnit: string;
   expression: string;
+  when?: string;
+  labels?: Record<string, string>;
+  labelChoice?: string;
 };
 
 export type InstrumentDocument = {
@@ -51,9 +65,14 @@ export type InstrumentDocument = {
   related: string[];
   warnings: string[];
   sketch?: string;
+  lookups?: Record<string, Record<string, number>>;
+  methods?: Record<string, string>;
+  methodChoice?: string;
+  warningsBy?: Record<string, string[]>;
+  warningsChoice?: string;
 };
 
-type CalculationValue = { key: string; label: string; raw: number; display: string; unit: string };
+type CalculationValue = { key: string; label: string; raw: number; display: string; unit: string; symbol?: string };
 type CalculationState = { values: CalculationValue[]; warnings: string[]; errors: string[]; method: string };
 
 const finite = (value: string, label: string, positive = true) => {
@@ -149,6 +168,7 @@ export const libraryDocuments: Record<string, InstrumentDocument> = {
   ...pilotDocuments,
   ...wave2Documents,
   ...nearDocuments,
+  ...remainingDocuments,
 };
 
 export function isStudioDocument(document: InstrumentDocument) {
@@ -159,12 +179,58 @@ export function studioDocuments() {
   return Object.values(libraryDocuments).filter((document) => STUDIO_SEED_SLUGS.has(document.slug));
 }
 
+const interpolate = (template: string, strings: Record<string, string>) =>
+  template.replace(/\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (match, id) => (id in strings ? strings[id] : match));
+
+const resolveLabel = (output: InstrumentOutput, strings: Record<string, string>) => {
+  if (output.labels && output.labelChoice) {
+    const chosen = strings[output.labelChoice];
+    if (chosen && output.labels[chosen]) return interpolate(output.labels[chosen], strings);
+  }
+  return interpolate(output.label, strings);
+};
+
+const resolveMethod = (document: InstrumentDocument, strings: Record<string, string>) => {
+  if (document.methods) {
+    const choiceId = document.methodChoice ?? document.fields.find((field) => field.choice)?.id;
+    const chosen = choiceId ? strings[choiceId] : undefined;
+    if (chosen && document.methods[chosen]) return document.methods[chosen];
+  }
+  return interpolate(document.formula, strings);
+};
+
+const parseField = (toolId: string, field: InstrumentField, rawInput: string) => {
+  const bound = fieldBounds[toolId]?.[field.id];
+  if (bound?.afterUnsigned) {
+    const parsed = finite(rawInput, field.label, true);
+    applyFieldBound(parsed, bound);
+    return parsed;
+  }
+  if (bound) {
+    if (rawInput.trim() === "") throw new Error(`${field.label} is required.`);
+    const parsed = Number(rawInput);
+    if (!Number.isFinite(parsed)) throw new Error(`${field.label} must be a finite number.`);
+    applyFieldBound(parsed, bound);
+    return parsed;
+  }
+  return finite(rawInput, field.label, !field.signed);
+};
+
 export function runLibraryDocument(toolId: string, input: Record<string, string>): CalculationState {
   const document = libraryDocuments[toolId];
   if (!document) throw new Error(`No library document for ${toolId}.`);
   const scope: Record<string, number> = {};
+  const strings: Record<string, string> = {};
   for (const field of document.fields) {
-    const shop = finite(input[field.id] ?? "", field.label, !field.signed);
+    if (field.choice) {
+      const value = (input[field.id] ?? "").trim();
+      if (!field.choice.includes(value)) throw new Error(field.choiceMessage ?? `Select a supported ${field.label.toLowerCase()}.`);
+      strings[field.id] = value;
+      const asNumber = Number(value);
+      if (value !== "" && Number.isFinite(asNumber)) scope[field.id] = asNumber;
+      continue;
+    }
+    const shop = parseField(toolId, field, input[field.id] ?? "");
     if (!field.family) {
       scope[field.id] = shop;
       continue;
@@ -173,28 +239,53 @@ export function runLibraryDocument(toolId: string, input: Record<string, string>
     const converted = convertQuantity(family, shop, field.defaultUnit, field.defaultUnit);
     scope[field.id] = converted.canonical;
   }
-  const values: CalculationValue[] = document.outputs.map((output) => {
-    const canonical = evaluateExpression(output.expression, scope);
+  const context = { strings, tables: document.lookups ?? {} };
+  applyDocumentBounds(toolId, scope, context);
+  const chosenWarnings =
+    document.warningsBy && document.warningsChoice
+      ? document.warningsBy[strings[document.warningsChoice]]
+      : undefined;
+  const warnings = (chosenWarnings ?? document.warnings).map((warning) => interpolate(warning, strings));
+  const values: CalculationValue[] = [];
+  for (const output of document.outputs) {
+    if (output.when) {
+      const flag = evaluateExpression(output.when, scope, context);
+      if (flag === 0) continue;
+    }
+    let shopOrCanonical: number;
+    try {
+      shopOrCanonical = evaluateExpression(output.expression, scope, context);
+    } catch (error) {
+      const skipMessage = optionalOutputs[toolId]?.[output.id];
+      if (skipMessage && error instanceof FormulaError) {
+        warnings.push(skipMessage);
+        continue;
+      }
+      throw error;
+    }
+    const scale = outputRawScale[toolId]?.[output.id] ?? remainingRawScale[toolId]?.[output.id] ?? 1;
+    const label = resolveLabel(output, strings);
     if (!output.family) {
-      return {
+      values.push({
         key: output.id,
-        label: output.label,
+        label,
         symbol: quantitySymbol(output.id, output.symbol),
-        raw: canonical,
-        display: round(canonical),
+        raw: shopOrCanonical * scale,
+        display: round(shopOrCanonical),
         unit: output.defaultUnit,
-      };
+      });
+      continue;
     }
     const family = output.family;
-    const shop = convertQuantity(family, canonical, unitFamilies[family].canonicalUnit, output.defaultUnit);
-    return {
+    const shop = convertQuantity(family, shopOrCanonical, unitFamilies[family].canonicalUnit, output.defaultUnit);
+    values.push({
       key: output.id,
-      label: output.label,
+      label,
       symbol: quantitySymbol(output.id, output.symbol),
-      raw: canonical,
+      raw: shopOrCanonical * scale,
       display: round(shop.converted),
       unit: unitSymbol(family, output.defaultUnit),
-    };
-  });
-  return { values, warnings: document.warnings, errors: [], method: document.formula };
-}
+    });
+  }
+  return { values, warnings, errors: [], method: resolveMethod(document, strings) };
+};

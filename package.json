@@ -14,14 +14,14 @@
     "preview": "node scripts/with-app-env.mjs vite preview",
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test": "node --test 'scripts/**/*.test.mjs' && node --experimental-strip-types --import ./scripts/alias-register.mjs --test src/lib/app-data/app-data.test.ts src/lib/auth/gate-identity.test.ts src/gauge/test/unit-preserve.test.mjs src/lib/formula-corrections.test.mjs src/lib/caliper-band1.test.mjs src/lib/caliper-pilot.test.mjs src/lib/caliper-wave2.test.mjs src/lib/caliper-near.test.mjs packages/formula/test/formula.test.mjs",
+    "test": "node --test 'scripts/**/*.test.mjs' && node --experimental-strip-types --import ./scripts/alias-register.mjs --test src/lib/app-data/app-data.test.ts src/lib/auth/gate-identity.test.ts src/studio/test/unit-preserve.test.mjs src/lib/formula-corrections.test.mjs src/lib/caliper-band1.test.mjs src/lib/caliper-pilot.test.mjs src/lib/caliper-wave2.test.mjs src/lib/caliper-near.test.mjs src/lib/caliper-migration.test.mjs src/lib/caliper-remaining.test.mjs packages/formula/test/formula.test.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
     "@hookform/resolvers": "^5.7.0",
-    "@instrument/ui": "github:meetpatelc/instrument-ui#v0.1.0",
+    "@instrument/ui": "file:packages/ui",
     "@instrument/units": "github:meetpatelc/instrument-units#v0.1.2",
     "@instrument/formula": "file:packages/formula",
     "@radix-ui/react-accordion": "^1.2.12",

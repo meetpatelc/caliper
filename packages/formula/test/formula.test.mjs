@@ -41,3 +41,12 @@ test("kit: scientific notation is a number, not the constant e", () => {
   assert.equal(evaluateExpression("1E+9", {}), 1e9);
   assert.ok(Math.abs(evaluateExpression("cte*1e-6*deltaT*length", { cte: -6, deltaT: 80, length: 975 }) - -0.468) < 1e-12);
 });
+
+test("kit: hypot, atan2, logmean, eq", () => {
+  assert.equal(evaluateExpression("hypot(3, 4)", {}), 5);
+  assert.ok(Math.abs(evaluateExpression("atan2(0, 1)", {}) - 0) < 1e-12);
+  assert.equal(evaluateExpression("logmean(10, 10)", {}), 10);
+  assert.ok(Math.abs(evaluateExpression("logmean(10, 20)", {}) - (10 - 20) / Math.log(10 / 20)) < 1e-12);
+  assert.equal(evaluateExpression("eq(1, 1)", {}), 1);
+  assert.equal(evaluateExpression("eq(1, 2)", {}), 0);
+});

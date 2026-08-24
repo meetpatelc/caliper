@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import {
   calculateFmea,
   calculateTradeStudy,
+  FMEA_ERROR_ID,
+  fmeaFieldA11y,
   reviewAreas,
   reviewRules,
   selectionWorkflows,
@@ -12,7 +14,7 @@ import {
 } from "@/lib/reviewRules";
 import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemplates";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Field, Input, Select, controlClass } from "@/components/ui/field";
+import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { panelClass, panelHoverClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
@@ -235,13 +237,30 @@ function ReviewPage() {
                 ["Occurrence", occurrence, setOccurrence],
                 ["Detection", detection, setDetection],
               ] as const
-            ).map(([label, value, setter]) => (
-              <Field key={label} htmlFor={`fmea-${label}`} label={label}>
-                <Input id={`fmea-${label}`} value={value} onChange={(event) => setter(event.target.value)} className="font-mono" />
-              </Field>
-            ))}
+            ).map(([label, value, setter]) => {
+              const a11y = fmeaFieldA11y(fmea.error, value);
+              return (
+                <Field key={label} htmlFor={`fmea-${label}`} label={label}>
+                  <Input
+                    id={`fmea-${label}`}
+                    value={value}
+                    onChange={(event) => setter(event.target.value)}
+                    className="font-mono"
+                    inputMode="numeric"
+                    aria-invalid={a11y["aria-invalid"]}
+                    aria-describedby={a11y["aria-describedby"]}
+                  />
+                </Field>
+              );
+            })}
           </div>
-          {fmea.error ? <p className="mt-4 text-sm text-danger">{fmea.error}</p> : fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>}
+          {fmea.error ? (
+            <p id={FMEA_ERROR_ID} role="alert" className="mt-4 text-sm text-danger">
+              {fmea.error}
+            </p>
+          ) : (
+            fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>
+          )}
           <Field htmlFor="review-workflow" label="Selection workflow">
             <Select id="review-workflow" className="w-full min-w-0 max-w-full" value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)}>
               {selectionWorkflows.map((item) => (
@@ -283,7 +302,7 @@ function ReviewPage() {
           </Field>
         </div>
         <Field htmlFor="review-notes" label="Notes">
-          <textarea id="review-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className={cn(controlClass, "mt-0 h-auto w-full min-w-0 py-2")} placeholder="Optional context for this snapshot" />
+          <Textarea id="review-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className="w-full" placeholder="Optional context for this snapshot" />
         </Field>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="accent" onClick={persist}>

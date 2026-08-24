@@ -1,10 +1,5 @@
 {
   "darcy": {
-    "method": "\u0394p = f(L/D)(\u03c1v\u00b2/2) \u00b7 hL = \u0394p/(\u03c1g)",
-    "warnings": [
-      "This is Darcy\u2013Weisbach major loss with a user-entered Darcy factor. It excludes fittings and minor losses, elevation, pumps, compressibility, entrance/development effects, non-Newtonian behavior, transient flow, pressure rating, and any pipe-size decision."
-    ],
-    "errors": [],
     "values": [
       {
         "key": "pressureLoss",
@@ -27,44 +22,44 @@
         "display": "1,620",
         "unit": "Pa"
       }
-    ]
-  },
-  "reflectedInertia": {
-    "method": "Jref = JL / N\u00b2 \u00b7 Jtotal = JM + Jref",
+    ],
     "warnings": [
-      "This reflects one rigid load through one ideal ratio. It excludes gearbox inertia, efficiency, backlash, compliance, duty cycle, peak torque, motor control behavior, and any motor-selection decision."
+      "This is Darcy–Weisbach major loss with a user-entered Darcy factor. It excludes fittings and minor losses, elevation, pumps, compressibility, entrance/development effects, non-Newtonian behavior, transient flow, pressure rating, and any pipe-size decision."
     ],
     "errors": [],
+    "method": "Δp = f(L/D)(ρv²/2) · hL = Δp/(ρg)"
+  },
+  "reflectedInertia": {
     "values": [
       {
         "key": "reflected",
         "label": "Reflected load inertia",
         "raw": 0.0032,
         "display": "0.0032",
-        "unit": "kg\u00b7m\u00b2"
+        "unit": "kg·m²"
       },
       {
         "key": "inertiaRatio",
         "label": "Reflected-to-motor inertia ratio",
         "raw": 1.6,
         "display": "1.6",
-        "unit": "\u2014"
+        "unit": "—"
       },
       {
         "key": "total",
         "label": "Motor-side total inertia",
         "raw": 0.0052,
         "display": "0.0052",
-        "unit": "kg\u00b7m\u00b2"
+        "unit": "kg·m²"
       }
-    ]
-  },
-  "wristInertia": {
-    "method": "Iaxis = Icg + mr\u00b2 \u00b7 Itotal = IEOAT,axis + Ipayload,axis",
+    ],
     "warnings": [
-      "This is a one-axis, user-entered parallel-axis inertia sum for two rigid declared bodies. It does not construct an inertia tensor, infer geometry, identify a robot axis, calculate motion dynamics, establish payload/reach/duty limits, validate collision, select hardware, establish safety, or approve a robot cell."
+      "This reflects one rigid load through one ideal ratio. It excludes gearbox inertia, efficiency, backlash, compliance, duty cycle, peak torque, motor control behavior, and any motor-selection decision."
     ],
     "errors": [],
+    "method": "Jref = JL / N² · Jtotal = JM + Jref"
+  },
+  "wristInertia": {
     "values": [
       {
         "key": "totalMass",
@@ -78,30 +73,30 @@
         "label": "EOAT inertia about stated wrist axis",
         "raw": 0.13249999999999998,
         "display": "0.1325",
-        "unit": "kg\u00b7m\u00b2"
+        "unit": "kg·m²"
       },
       {
         "key": "payloadAxisInertia",
         "label": "Payload inertia about stated wrist axis",
         "raw": 0.185,
         "display": "0.185",
-        "unit": "kg\u00b7m\u00b2"
+        "unit": "kg·m²"
       },
       {
         "key": "totalInertia",
         "label": "Declared total wrist/tool inertia",
         "raw": 0.3175,
         "display": "0.3175",
-        "unit": "kg\u00b7m\u00b2"
+        "unit": "kg·m²"
       }
-    ]
-  },
-  "kinetic": {
-    "method": "KE = \u00bdmv\u00b2 \u00b7 p = mv",
+    ],
     "warnings": [
-      "This is the classical translational relationship. It excludes rotational energy, deformation, drag, gradients, and relativistic behavior."
+      "This is a one-axis, user-entered parallel-axis inertia sum for two rigid declared bodies. It does not construct an inertia tensor, infer geometry, identify a robot axis, calculate motion dynamics, establish payload/reach/duty limits, validate collision, select hardware, establish safety, or approve a robot cell."
     ],
     "errors": [],
+    "method": "Iaxis = Icg + mr² · Itotal = IEOAT,axis + Ipayload,axis"
+  },
+  "kinetic": {
     "values": [
       {
         "key": "energy",
@@ -122,16 +117,16 @@
         "label": "Momentum magnitude",
         "raw": 20000,
         "display": "20,000",
-        "unit": "kg\u00b7m/s"
+        "unit": "kg·m/s"
       }
-    ]
-  },
-  "newton": {
-    "method": "Fnet = ma",
+    ],
     "warnings": [
-      "This is a net-force relationship in a stated inertial-frame context. It does not resolve individual loads, friction, gravity components, constraints, or a free-body diagram."
+      "This is the classical translational relationship. It excludes rotational energy, deformation, drag, gradients, and relativistic behavior."
     ],
     "errors": [],
+    "method": "KE = ½mv² · p = mv"
+  },
+  "newton": {
     "values": [
       {
         "key": "force",
@@ -150,18 +145,18 @@
       {
         "key": "accelerationG",
         "label": "Acceleration magnitude",
-        "raw": 0.25492905324448206,
+        "raw": 2.5,
         "display": "0.25493",
         "unit": "g"
       }
-    ]
-  },
-  "rmsDutyTorque": {
-    "method": "Trms = \u221a[(T1\u00b2t1 + T2\u00b2t2 + T3\u00b2t3)/(t1 + t2 + t3)]",
+    ],
     "warnings": [
-      "This applies a three-segment root-mean-square torque relation to user-entered constant torque/time values. It does not derive an axis motion profile or load, determine motor/drive thermal capacity, compare torque-speed curves, infer a duty cycle, select a motor/drive, establish safety, suitability, or approval."
+      "This is a net-force relationship in a stated inertial-frame context. It does not resolve individual loads, friction, gravity components, constraints, or a free-body diagram."
     ],
     "errors": [],
+    "method": "Fnet = ma"
+  },
+  "rmsDutyTorque": {
     "values": [
       {
         "key": "cycleTime",
@@ -175,60 +170,60 @@
         "label": "Declared RMS torque",
         "raw": 4.949747468305833,
         "display": "4.9497",
-        "unit": "N\u00b7m"
+        "unit": "N·m"
       },
       {
         "key": "absolutePeakTorque",
         "label": "Declared absolute peak torque",
         "raw": 8,
         "display": "8",
-        "unit": "N\u00b7m"
+        "unit": "N·m"
       },
       {
         "key": "signedMeanTorque",
         "label": "Declared signed mean torque",
         "raw": 2.5,
         "display": "2.5",
-        "unit": "N\u00b7m"
+        "unit": "N·m"
       }
-    ]
-  },
-  "screwCriticalSpeed": {
-    "method": "ncrit = Cs\u00b74.76\u00d710\u2076\u00b7dr(in)/L(in)\u00b2 \u00b7 r = ndeclared/ncrit",
+    ],
     "warnings": [
-      "This applies the cited manufacturer critical-speed relation with user-entered root diameter, unsupported length, and end-fixity factor. It does not select a screw, bearing support, or fixity factor; predict actual shaft whirl/resonance; model straightness, preload, bearing stiffness, buckling, acceleration, drive control, load, fatigue, life, safety factor, suitability, or approval."
+      "This applies a three-segment root-mean-square torque relation to user-entered constant torque/time values. It does not derive an axis motion profile or load, determine motor/drive thermal capacity, compare torque-speed curves, infer a duty cycle, select a motor/drive, establish safety, suitability, or approval."
     ],
     "errors": [],
+    "method": "Trms = √[(T1²t1 + T2²t2 + T3²t3)/(t1 + t2 + t3)]"
+  },
+  "screwCriticalSpeed": {
     "values": [
       {
         "key": "criticalSpeed",
         "label": "Calculated critical speed",
-        "raw": 3022.5999999999995,
+        "raw": 50.376666666666765,
         "display": "3,022.6",
         "unit": "rpm"
       },
       {
         "key": "operatingRatio",
         "label": "Declared operating / critical-speed ratio",
-        "raw": 0.3970091973797394,
+        "raw": 0.39700919737973855,
         "display": "0.39701",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "rootToLengthRatio",
         "label": "Declared root-diameter / unsupported-length ratio",
         "raw": 0.02,
         "display": "0.02",
-        "unit": "\u2014"
+        "unit": "1"
       }
-    ]
-  },
-  "ohm": {
-    "method": "V = IR \u00b7 P = VI = V\u00b2/R",
+    ],
     "warnings": [
-      "This is one ideal DC resistor with constant resistance. It does not size wire, protection, a power source, thermal management, or any electrical installation, and it excludes AC, transients, and nonlinear components."
+      "This applies the cited manufacturer critical-speed relation with user-entered root diameter, unsupported length, and end-fixity factor. It does not select a screw, bearing support, or fixity factor; predict actual shaft whirl/resonance; model straightness, preload, bearing stiffness, buckling, acceleration, drive control, load, fatigue, life, safety factor, suitability, or approval."
     ],
     "errors": [],
+    "method": "ncrit = Cs·4.76×10⁶·dr(in)/L(in)² · r = ndeclared/ncrit"
+  },
+  "ohm": {
     "values": [
       {
         "key": "current",
@@ -247,22 +242,22 @@
       {
         "key": "powerMilli",
         "label": "Resistor power",
-        "raw": 48,
+        "raw": 48000,
         "display": "48,000",
         "unit": "mW"
       }
-    ]
-  },
-  "bernoulli": {
-    "method": "p\u2081 + \u00bd\u03c1v\u2081\u00b2 + \u03c1gz\u2081 = p\u2082 + \u00bd\u03c1v\u2082\u00b2 + \u03c1gz\u2082",
+    ],
     "warnings": [
-      "This is Bernoulli\u2019s ideal steady, incompressible, frictionless streamline relationship with no pump, turbine, or loss term. It excludes real pipe loss, fittings, separation, compressibility, cavitation, transient flow, and pressure-rating or equipment-selection decisions."
+      "This is one ideal DC resistor with constant resistance. It does not size wire, protection, a power source, thermal management, or any electrical installation, and it excludes AC, transients, and nonlinear components."
     ],
     "errors": [],
+    "method": "V = IR · P = VI = V²/R"
+  },
+  "bernoulli": {
     "values": [
       {
         "key": "pressureChange",
-        "label": "Ideal pressure change p\u2082 \u2212 p\u2081",
+        "label": "Ideal pressure change p₂ − p₁",
         "raw": -3375,
         "display": "-3.375",
         "unit": "kPa"
@@ -272,7 +267,7 @@
         "label": "Pressure-head change",
         "raw": -0.3441542218800508,
         "display": "-0.34415",
-        "unit": "m liquid"
+        "unit": "m"
       },
       {
         "key": "velocityHeadChange",
@@ -281,14 +276,14 @@
         "display": "-0.34415",
         "unit": "m"
       }
-    ]
-  },
-  "continuity": {
-    "method": "Q = A\u2081v\u2081 = A\u2082v\u2082",
+    ],
     "warnings": [
-      "This is continuity for steady incompressible flow using mean section velocities. It does not calculate pressure change, loss, turbulence, cavitation, pipe sizing, or pump performance."
+      "This is Bernoulli’s ideal steady, incompressible, frictionless streamline relationship with no pump, turbine, or loss term. It excludes real pipe loss, fittings, separation, compressibility, cavitation, transient flow, and pressure-rating or equipment-selection decisions."
     ],
     "errors": [],
+    "method": "p₁ + ½ρv₁² + ρgz₁ = p₂ + ½ρv₂² + ρgz₂"
+  },
+  "continuity": {
     "values": [
       {
         "key": "flow",
@@ -306,19 +301,19 @@
       },
       {
         "key": "areaRatio",
-        "label": "Area ratio A\u2081/A\u2082",
+        "label": "Area ratio A₁/A₂",
         "raw": 2.5000000000000004,
         "display": "2.5",
-        "unit": "\u2014"
+        "unit": "1"
       }
-    ]
-  },
-  "hydrostatic": {
-    "method": "pg = \u03c1gh",
+    ],
     "warnings": [
-      "This is the static hydrostatic relation for a uniform-density liquid. It excludes flow, gas compression, temperature-dependent density, vessel loads, and any pressure-rating or design decision."
+      "This is continuity for steady incompressible flow using mean section velocities. It does not calculate pressure change, loss, turbulence, cavitation, pipe sizing, or pump performance."
     ],
     "errors": [],
+    "method": "Q = A₁v₁ = A₂v₂"
+  },
+  "hydrostatic": {
     "values": [
       {
         "key": "pressure",
@@ -339,113 +334,113 @@
         "label": "Pressure head",
         "raw": 2.5,
         "display": "2.5",
-        "unit": "m liquid"
+        "unit": "m"
       }
-    ]
-  },
-  "pipeSizing": {
-    "method": "D = \u221a(4Q/(\u03c0vtarget)) \u00b7 A = Q/vtarget",
+    ],
     "warnings": [
-      "This is target-velocity circular-passage arithmetic only. It does not select a nominal pipe, tube, hose, schedule, material, wall thickness, pressure rating, fitting, pump, velocity target, pressure loss, structural support, corrosion allowance, fluid compatibility, safety, or approval."
+      "This is the static hydrostatic relation for a uniform-density liquid. It excludes flow, gas compression, temperature-dependent density, vessel loads, and any pressure-rating or design decision."
     ],
     "errors": [],
+    "method": "pg = ρgh"
+  },
+  "pipeSizing": {
     "values": [
       {
         "key": "flow",
         "label": "Declared volumetric flow",
-        "raw": 0.001,
+        "raw": 0.000999999999999998,
         "display": "0.001",
-        "unit": "m\u00b3/s"
+        "unit": "m³/s"
       },
       {
         "key": "requiredArea",
         "label": "Required internal flow area at target velocity",
-        "raw": 0.0005,
+        "raw": 0.000499999999999999,
         "display": "0.0005",
-        "unit": "m\u00b2"
+        "unit": "m²"
       },
       {
         "key": "diameter",
         "label": "Calculated circular inside diameter",
-        "raw": 25.2313252202016,
+        "raw": 0.025231325220201578,
         "display": "25.231",
         "unit": "mm"
       }
-    ]
-  },
-  "valveCv": {
-    "method": "Q = Cv\u221a(\u0394P/SG) \u00b7 Cvrequired = Q\u221a(SG/\u0394P)",
+    ],
     "warnings": [
-      "This is a liquid-water Cv convention only. Do not use it for compressible air, pneumatic valve sizing, gas flow, flashing, choking, cavitation, viscosity correction, pressure-recovery correction, two-phase flow, or a manufacturer-specific valve rating/test condition. Confirm the supplier\u2019s published flow method before selecting hardware."
+      "This is target-velocity circular-passage arithmetic only. It does not select a nominal pipe, tube, hose, schedule, material, wall thickness, pressure rating, fitting, pump, velocity target, pressure loss, structural support, corrosion allowance, fluid compatibility, safety, or approval."
     ],
     "errors": [],
+    "method": "D = √(4Q/(πvtarget)) · A = Q/vtarget"
+  },
+  "valveCv": {
     "values": [
       {
         "key": "liquidFlow",
         "label": "Flow from declared Cv",
-        "raw": 4.743416490252569,
+        "raw": 0.0002992630779770333,
         "display": "4.7434",
-        "unit": "US gpm"
+        "unit": "gal/min"
       },
       {
         "key": "requiredCv",
         "label": "Required Cv from declared flow",
         "raw": 1.498919610919812,
         "display": "1.4989",
-        "unit": "\u2014"
+        "unit": "1"
       }
-    ]
-  },
-  "density": {
-    "method": "\u03c1 = m / V \u00b7 v = 1 / \u03c1",
+    ],
     "warnings": [
-      "Average density is derived only from the mass and volume entered here. It is not a condition-specific material-property lookup and should not be used as one."
+      "This is a liquid-water Cv convention only. Do not use it for compressible air, pneumatic valve sizing, gas flow, flashing, choking, cavitation, viscosity correction, pressure-recovery correction, two-phase flow, or a manufacturer-specific valve rating/test condition. Confirm the supplier’s published flow method before selecting hardware."
     ],
     "errors": [],
+    "method": "Q = Cv√(ΔP/SG) · Cvrequired = Q√(SG/ΔP)"
+  },
+  "density": {
     "values": [
       {
         "key": "density",
         "label": "Average density",
         "raw": 7849.999999999999,
         "display": "7,850",
-        "unit": "kg/m\u00b3"
+        "unit": "kg/m³"
       },
       {
         "key": "specificVolume",
         "label": "Specific volume",
         "raw": 0.00012738853503184715,
         "display": "0.00012739",
-        "unit": "m\u00b3/kg"
+        "unit": "m³/kg"
       },
       {
         "key": "specificGravity",
         "label": "Specific gravity vs. water",
         "raw": 7.849999999999999,
         "display": "7.85",
-        "unit": "\u2014"
+        "unit": "1"
       }
-    ]
-  },
-  "safetyMargin": {
-    "method": "Factor = \u03c3allow/\u03c3app \u00b7 margin = factor \u2212 1 \u00b7 utilization = \u03c3app/\u03c3allow",
+    ],
     "warnings": [
-      "This is arithmetic on two user-entered like-for-like stress magnitudes. It does not establish an allowable, determine a governing load case, apply a design code, account for uncertainty or fatigue, or determine whether the resulting margin is acceptable."
+      "Average density is derived only from the mass and volume entered here. It is not a condition-specific material-property lookup and should not be used as one."
     ],
     "errors": [],
+    "method": "ρ = m / V · v = 1 / ρ"
+  },
+  "safetyMargin": {
     "values": [
       {
         "key": "factor",
         "label": "Allowable-to-applied factor",
         "raw": 2.0833333333333335,
         "display": "2.0833",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "margin",
         "label": "Margin of safety",
         "raw": 1.0833333333333335,
         "display": "1.0833",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "utilization",
@@ -454,21 +449,21 @@
         "display": "48",
         "unit": "%"
       }
-    ]
-  },
-  "cuttingForce": {
-    "method": "Ac = ap\u00b7f \u00b7 Fc = kc\u00b7Ac \u00b7 Pideal = Fc\u00b7Vc/60,000",
+    ],
     "warnings": [
-      "This uses user-entered specific cutting force and a simplified rectangular uncut-chip area. It does not select a process, tool, material, coefficient, speed, feed, coolant, machine, or efficiency; model chip thinning, engagement, dynamics, chatter, wear, temperature, workholding, or safety; or approve machining."
+      "This is arithmetic on two user-entered like-for-like stress magnitudes. It does not establish an allowable, determine a governing load case, apply a design code, account for uncertainty or fatigue, or determine whether the resulting margin is acceptable."
     ],
     "errors": [],
+    "method": "Factor = σallow/σapp · margin = factor − 1 · utilization = σapp/σallow"
+  },
+  "cuttingForce": {
     "values": [
       {
         "key": "uncutChipArea",
         "label": "Declared uncut-chip area",
-        "raw": 0.5,
+        "raw": 5e-7,
         "display": "0.5",
-        "unit": "mm\u00b2"
+        "unit": "mm²"
       },
       {
         "key": "cuttingForce",
@@ -480,97 +475,97 @@
       {
         "key": "idealPower",
         "label": "Ideal cutting power",
-        "raw": 2.7,
+        "raw": 2699.999999999995,
         "display": "2.7",
         "unit": "kW"
       },
       {
         "key": "forcePerDepth",
         "label": "Force per declared depth",
-        "raw": 360,
+        "raw": 360000,
         "display": "360",
         "unit": "N/mm"
       }
-    ]
-  },
-  "millingMrr": {
-    "method": "MRR = ap\u00b7ae\u00b7Vf / 1,000",
+    ],
     "warnings": [
-      "This is theoretical rectangular-engagement volume. It does not choose feeds or speeds and excludes material machinability, spindle power/torque, tool geometry, chip thinning, tool life, runout, workholding, vibration, coolant, machine limits, and process qualification."
+      "This uses user-entered specific cutting force and a simplified rectangular uncut-chip area. It does not select a process, tool, material, coefficient, speed, feed, coolant, machine, or efficiency; model chip thinning, engagement, dynamics, chatter, wear, temperature, workholding, or safety; or approve machining."
     ],
     "errors": [],
+    "method": "Ac = ap·f · Fc = kc·Ac · Pideal = Fc·Vc/60,000"
+  },
+  "millingMrr": {
     "values": [
       {
         "key": "rate",
         "label": "Theoretical material removal rate",
-        "raw": 28.8,
+        "raw": 28.79999999999994,
         "display": "28.8",
-        "unit": "cm\u00b3/min"
+        "unit": "cm³/min"
       },
       {
         "key": "hourly",
         "label": "Theoretical hourly removed volume",
-        "raw": 28.8,
+        "raw": 1727.9999999999964,
         "display": "1,728",
-        "unit": "cm\u00b3/h"
+        "unit": "cm³/h"
       },
       {
         "key": "chipArea",
         "label": "Engaged chip cross-section",
-        "raw": 32,
+        "raw": 0.000032,
         "display": "32",
-        "unit": "mm\u00b2"
+        "unit": "mm²"
       }
-    ]
-  },
-  "turningMrr": {
-    "method": "MRR = ap\u00b7f\u00b7Vc",
+    ],
     "warnings": [
-      "This is theoretical steady turning removal rate from user-entered depth, feed, and cutting speed. It excludes parameter selection, diameter variation, approach/retract, interruptions, insert geometry, tool wear, coolant, power, rigidity, chip control, machine limits, tolerance, surface integrity, and process qualification."
+      "This is theoretical rectangular-engagement volume. It does not choose feeds or speeds and excludes material machinability, spindle power/torque, tool geometry, chip thinning, tool life, runout, workholding, vibration, coolant, machine limits, and process qualification."
     ],
     "errors": [],
+    "method": "MRR = ap·ae·Vf / 1,000"
+  },
+  "turningMrr": {
     "values": [
       {
         "key": "rate",
         "label": "Theoretical turning removal rate",
-        "raw": 112.5,
+        "raw": 112.49999999999977,
         "display": "112.5",
-        "unit": "cm\u00b3/min"
+        "unit": "cm³/min"
       },
       {
         "key": "hourly",
         "label": "Theoretical hourly removed volume",
-        "raw": 6750,
+        "raw": 6749.999999999986,
         "display": "6,750",
-        "unit": "cm\u00b3/h"
+        "unit": "cm³/h"
       },
       {
         "key": "chipSection",
         "label": "Nominal chip cross-section",
-        "raw": 0.625,
+        "raw": 6.249999999999999e-7,
         "display": "0.625",
-        "unit": "mm\u00b2"
+        "unit": "mm²"
       }
-    ]
-  },
-  "thermalExpansion": {
-    "method": "\u0394L = \u03b1L\u2080\u0394T \u00b7 \u03b5th = \u03b1\u0394T",
+    ],
     "warnings": [
-      "This is ideal free linear expansion using a user-entered signed average CTE; a negative coefficient is contraction on heating. It excludes restraint, temperature gradients, anisotropy, phase change, joints, nonlinear material response, property variation, and thermal-stress or design decisions."
+      "This is theoretical steady turning removal rate from user-entered depth, feed, and cutting speed. It excludes parameter selection, diameter variation, approach/retract, interruptions, insert geometry, tool wear, coolant, power, rigidity, chip control, machine limits, tolerance, surface integrity, and process qualification."
     ],
     "errors": [],
+    "method": "MRR = ap·f·Vc"
+  },
+  "thermalExpansion": {
     "values": [
       {
         "key": "extension",
         "label": "Ideal free length change",
-        "raw": 0.9359999999999999,
+        "raw": 0.000936,
         "display": "0.936",
         "unit": "mm"
       },
       {
         "key": "finalLength",
         "label": "Ideal final length",
-        "raw": 1200.936,
+        "raw": 1.200936,
         "display": "1,200.9",
         "unit": "mm"
       },
@@ -579,16 +574,16 @@
         "label": "Free thermal strain",
         "raw": 0.00078,
         "display": "780",
-        "unit": "\u00b5\u03b5"
+        "unit": "µε"
       }
-    ]
-  },
-  "thermalStress": {
-    "method": "\u03c3th = E\u03b1\u0394T",
+    ],
     "warnings": [
-      "This represents a uniform, fully restrained, linear-elastic axial member. It is not an allowable-stress, strength, fatigue, support-stiffness, thermal-gradient, creep, joint, or code-compliance calculation."
+      "This is ideal free linear expansion using a user-entered signed average CTE; a negative coefficient is contraction on heating. It excludes restraint, temperature gradients, anisotropy, phase change, joints, nonlinear material response, property variation, and thermal-stress or design decisions."
     ],
     "errors": [],
+    "method": "ΔL = αL₀ΔT · εth = αΔT"
+  },
+  "thermalStress": {
     "values": [
       {
         "key": "thermalStress",
@@ -602,7 +597,7 @@
         "label": "Suppressed free thermal strain",
         "raw": 0.00078,
         "display": "780",
-        "unit": "\u00b5\u03b5"
+        "unit": "µε"
       },
       {
         "key": "stressMagnitude",
@@ -611,88 +606,88 @@
         "display": "156",
         "unit": "MPa"
       }
-    ]
-  },
-  "coordinate": {
-    "method": "d = \u221a[(x\u2082\u2212x\u2081)\u00b2 + (y\u2082\u2212y\u2081)\u00b2 + (z\u2082\u2212z\u2081)\u00b2]",
+    ],
     "warnings": [
-      "Coordinates must share one origin, axis convention, and unit. The result is a straight-line geometric span, not a routed path or a tolerance analysis."
+      "This represents a uniform, fully restrained, linear-elastic axial member. It is not an allowable-stress, strength, fatigue, support-stiffness, thermal-gradient, creep, joint, or code-compliance calculation."
     ],
     "errors": [],
+    "method": "σth = EαΔT"
+  },
+  "coordinate": {
     "values": [
       {
         "key": "dx",
         "label": "x displacement",
-        "raw": 300,
+        "raw": 0.3,
         "display": "300",
         "unit": "mm"
       },
       {
         "key": "dy",
         "label": "y displacement",
-        "raw": 400,
+        "raw": 0.4,
         "display": "400",
         "unit": "mm"
       },
       {
         "key": "dz",
         "label": "z displacement",
-        "raw": 120,
+        "raw": 0.12,
         "display": "120",
         "unit": "mm"
       },
       {
         "key": "span",
         "label": "Straight-line span",
-        "raw": 514.1984052872976,
+        "raw": 0.5141984052872977,
         "display": "514.2",
         "unit": "mm"
       }
-    ]
-  },
-  "cylinder": {
-    "method": "V = \u03c0(D/2)\u00b2L \u00b7 Aend = \u03c0(D/2)\u00b2 \u00b7 Alateral = \u03c0DL",
+    ],
     "warnings": [
-      "This is nominal closed-cylinder geometry. Wall thickness, end shape, internal fittings, deformation, and manufacturing tolerances are outside the model."
+      "Coordinates must share one origin, axis convention, and unit. The result is a straight-line geometric span, not a routed path or a tolerance analysis."
     ],
     "errors": [],
+    "method": "d = √[(x₂−x₁)² + (y₂−y₁)² + (z₂−z₁)²]"
+  },
+  "cylinder": {
     "values": [
       {
         "key": "volume",
         "label": "Cylinder volume",
-        "raw": 3926990.8169872416,
+        "raw": 0.003926990816987242,
         "display": "3.927",
         "unit": "L"
       },
       {
         "key": "endArea",
         "label": "End area",
-        "raw": 7853.981633974483,
+        "raw": 0.007853981633974483,
         "display": "7,854",
-        "unit": "mm\u00b2"
+        "unit": "mm²"
       },
       {
         "key": "lateralArea",
         "label": "Lateral surface",
-        "raw": 157079.63267948967,
+        "raw": 0.15707963267948966,
         "display": "157,080",
-        "unit": "mm\u00b2"
+        "unit": "mm²"
       },
       {
         "key": "totalSurface",
         "label": "Total outer surface",
-        "raw": 172787.59594743865,
+        "raw": 0.17278759594743864,
         "display": "172,788",
-        "unit": "mm\u00b2"
+        "unit": "mm²"
       }
-    ]
-  },
-  "axial": {
-    "method": "\u03c3 = F / A \u00b7 \u03b5 = \u03c3 / E \u00b7 \u0394L = FL / AE",
+    ],
     "warnings": [
-      "Average stress is a simplified measure; do not apply it at a local load introduction, notch, or connection without a suitable model."
+      "This is nominal closed-cylinder geometry. Wall thickness, end shape, internal fittings, deformation, and manufacturing tolerances are outside the model."
     ],
     "errors": [],
+    "method": "V = π(D/2)²L · Aend = π(D/2)² · Alateral = πDL"
+  },
+  "axial": {
     "values": [
       {
         "key": "stress",
@@ -704,25 +699,25 @@
       {
         "key": "strain",
         "label": "Elastic strain",
-        "raw": 5e-05,
+        "raw": 0.00005,
         "display": "50",
-        "unit": "\u00b5\u03b5"
+        "unit": "µε"
       },
       {
         "key": "extension",
         "label": "Ideal length change",
-        "raw": 5e-05,
+        "raw": 0.00005,
         "display": "0.05",
         "unit": "mm"
       }
-    ]
-  },
-  "bearingAdjustedLife": {
-    "method": "L10 = (C/P)^p \u00b7 Ladj = L10\u00b7a1\u00b7a2\u00b7a3 \u00b7 hours = Ladj\u00b710^6/(60n)",
+    ],
     "warnings": [
-      "This is a basic rating-life calculation with all reliability, material, and other factors supplied by the user. It is not a bearing selection, factor lookup, reliability prediction, variable-duty, misalignment, lubrication, temperature, mounting, static-adequacy, safety, or approval analysis."
+      "Average stress is a simplified measure; do not apply it at a local load introduction, notch, or connection without a suitable model."
     ],
     "errors": [],
+    "method": "σ = F / A · ε = σ / E · ΔL = FL / AE"
+  },
+  "bearingAdjustedLife": {
     "values": [
       {
         "key": "basicLifeMillion",
@@ -736,7 +731,7 @@
         "label": "Product of declared life factors",
         "raw": 1,
         "display": "1",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "adjustedLifeMillion",
@@ -748,18 +743,18 @@
       {
         "key": "adjustedLifeHours",
         "label": "Declared-factor adjusted operating life",
-        "raw": 1736.111111111111,
+        "raw": 1736.1111111111147,
         "display": "1,736.1",
         "unit": "h"
       }
-    ]
-  },
-  "boltLoad": {
-    "method": "\u03c3 = Ft/(\u03c0d\u00b2/4) \u00b7 \u03c4 = Fs/(\u03c0d\u00b2/4) \u00b7 \u03c3bearing = Fb/(dt)",
+    ],
     "warnings": [
-      "This is a single-bolt, known-direct-load screen using nominal shank and projected bearing areas. It excludes threads/tensile-stress area, preload, joint stiffness, load distribution, eccentricity, friction, slip, prying, washer geometry, proof/yield allowables, fatigue, tear-out, thread stripping, and factor-of-safety conclusions."
+      "This is a basic rating-life calculation with all reliability, material, and other factors supplied by the user. It is not a bearing selection, factor lookup, reliability prediction, variable-duty, misalignment, lubrication, temperature, mounting, static-adequacy, safety, or approval analysis."
     ],
     "errors": [],
+    "method": "L10 = (C/P)^p · Ladj = L10·a1·a2·a3 · hours = Ladj·10^6/(60n)"
+  },
+  "boltLoad": {
     "values": [
       {
         "key": "tensileStress",
@@ -789,14 +784,14 @@
         "display": "93.574",
         "unit": "MPa"
       }
-    ]
-  },
-  "cantileverFrame": {
-    "method": "Vbase = H \u00b7 Mbase = Hh",
+    ],
     "warnings": [
-      "This is one vertical cantilever-frame free-body equilibrium only: a single stated lateral top-load magnitude, base shear, and fixed-base couple moment. It excludes portal-frame redistribution, axial load, member stiffness, deflection, stress, connection behavior, second-order effects, stability, code requirements, safety factors, and approval."
+      "This is a single-bolt, known-direct-load screen using nominal shank and projected bearing areas. It excludes threads/tensile-stress area, preload, joint stiffness, load distribution, eccentricity, friction, slip, prying, washer geometry, proof/yield allowables, fatigue, tear-out, thread stripping, and factor-of-safety conclusions."
     ],
     "errors": [],
+    "method": "σ = Ft/(πd²/4) · τ = Fs/(πd²/4) · σbearing = Fb/(dt)"
+  },
+  "cantileverFrame": {
     "values": [
       {
         "key": "baseShear",
@@ -810,60 +805,60 @@
         "label": "Base couple-moment magnitude",
         "raw": 36000,
         "display": "36,000",
-        "unit": "N\u00b7m"
+        "unit": "N·m"
       }
-    ]
-  },
-  "combinedStress": {
-    "method": "\u03c3x = \u03c3a + \u03c3b \u00b7 \u03c3\u2081,\u2082 = \u03c3x/2 \u00b1 \u221a[(\u03c3x/2)\u00b2 + \u03c4xy\u00b2] \u00b7 \u03c3vm = \u221a(\u03c3x\u00b2 + 3\u03c4xy\u00b2)",
+    ],
     "warnings": [
-      "This screen adds user-entered axial and bending normal stresses and combines them with one in-plane shear stress under plane stress. It excludes local stress concentration, multiaxial/through-thickness stress, material allowables, fatigue, buckling, contact, and safety-factor decisions."
+      "This is one vertical cantilever-frame free-body equilibrium only: a single stated lateral top-load magnitude, base shear, and fixed-base couple moment. It excludes portal-frame redistribution, axial load, member stiffness, deflection, stress, connection behavior, second-order effects, stability, code requirements, safety factors, and approval."
     ],
     "errors": [],
+    "method": "Vbase = H · Mbase = Hh"
+  },
+  "combinedStress": {
     "values": [
       {
         "key": "normalStress",
-        "label": "Combined normal stress \u03c3x",
-        "raw": 120,
+        "label": "Combined normal stress σx",
+        "raw": 120000000,
         "display": "120",
         "unit": "MPa"
       },
       {
         "key": "principal1",
-        "label": "First principal stress \u03c3\u2081",
-        "raw": 127.0820393249937,
+        "label": "First principal stress σ₁",
+        "raw": 127082039.32499368,
         "display": "127.08",
         "unit": "MPa"
       },
       {
         "key": "principal2",
-        "label": "Second principal stress \u03c3\u2082",
-        "raw": -7.082039324993701,
+        "label": "Second principal stress σ₂",
+        "raw": -7082039.324993687,
         "display": "-7.082",
         "unit": "MPa"
       },
       {
         "key": "maxShear",
         "label": "Maximum in-plane shear",
-        "raw": 67.0820393249937,
+        "raw": 67082039.324993685,
         "display": "67.082",
         "unit": "MPa"
       },
       {
         "key": "vonMises",
         "label": "Plane-stress von Mises equivalent",
-        "raw": 130.7669683062202,
+        "raw": 130766968.3062202,
         "display": "130.77",
         "unit": "MPa"
       }
-    ]
-  },
-  "couplingTorsion": {
-    "method": "\u03b8 = T/kt \u00b7 U = T\u00b2/(2kt)",
+    ],
     "warnings": [
-      "This is declared linear torsional stiffness arithmetic for a coupling. It excludes coupling selection, torque capacity, flexible-element geometry, fatigue, resonance, damping, misalignment, shaft/bearing loads, safety, and approval."
+      "This screen adds user-entered axial and bending normal stresses and combines them with one in-plane shear stress under plane stress. It excludes local stress concentration, multiaxial/through-thickness stress, material allowables, fatigue, buckling, contact, and safety-factor decisions."
     ],
     "errors": [],
+    "method": "σx = σa + σb · σ₁,₂ = σx/2 ± √[(σx/2)² + τxy²] · σvm = √(σx² + 3τxy²)"
+  },
+  "couplingTorsion": {
     "values": [
       {
         "key": "twistRad",
@@ -886,14 +881,14 @@
         "display": "2.6042",
         "unit": "J"
       }
-    ]
-  },
-  "extensionSpring": {
-    "method": "F = Fi + kx",
+    ],
     "warnings": [
-      "This applies F = Fi + kx using user-entered rate and initial tension. It excludes hook geometry, pretension manufacture, coil contact, nonlinear travel, travel stops, fatigue, corrosion, material condition, dynamic response, and manufacturer load or life limits."
+      "This is declared linear torsional stiffness arithmetic for a coupling. It excludes coupling selection, torque capacity, flexible-element geometry, fatigue, resonance, damping, misalignment, shaft/bearing loads, safety, and approval."
     ],
     "errors": [],
+    "method": "θ = T/kt · U = T²/(2kt)"
+  },
+  "extensionSpring": {
     "values": [
       {
         "key": "force",
@@ -912,53 +907,53 @@
       {
         "key": "rate",
         "label": "Declared spring rate",
-        "raw": 1.5,
+        "raw": 1500,
         "display": "1.5",
         "unit": "N/mm"
       }
-    ]
-  },
-  "fractureIntensity": {
-    "method": "KI = Y\u03c3\u221a(\u03c0a) \u00b7 ratio = KI / KIC,declared",
+    ],
     "warnings": [
-      "This is declared-geometry-factor Mode-I linear-elastic fracture-mechanics arithmetic. Stress intensity depends on detailed geometry and loading; this workspace does not infer a factor, establish LEFM applicability, determine fracture or crack growth, predict life, define inspection intervals, select a material, establish safety, or approve a design."
+      "This applies F = Fi + kx using user-entered rate and initial tension. It excludes hook geometry, pretension manufacture, coil contact, nonlinear travel, travel stops, fatigue, corrosion, material condition, dynamic response, and manufacturer load or life limits."
     ],
     "errors": [],
+    "method": "F = Fi + kx"
+  },
+  "fractureIntensity": {
     "values": [
       {
         "key": "stressIntensity",
         "label": "Mode-I stress intensity",
         "raw": 14.037118337933604,
         "display": "14.037",
-        "unit": "MPa\u221am"
+        "unit": "MPa√m"
       },
       {
         "key": "toughnessRatio",
         "label": "Intensity / declared toughness reference",
         "raw": 0.2807423667586721,
         "display": "0.28074",
-        "unit": "\u2014"
+        "unit": "—"
       },
       {
         "key": "arithmeticDifference",
         "label": "Declared-reference minus intensity",
         "raw": 35.962881662066394,
         "display": "35.963",
-        "unit": "MPa\u221am"
+        "unit": "MPa√m"
       }
-    ]
-  },
-  "jointSeparation": {
-    "method": "C = kb/(kb+km) \u00b7 \u0394Fb = CP \u00b7 Fm = Fp\u2212(1\u2212C)P \u00b7 Psep = Fp/(1\u2212C)",
+    ],
     "warnings": [
-      "This is a one-bolt, axial, linear parallel-spring screen with user-entered equivalent stiffnesses. It does not infer stiffness from geometry, distribute a system load among bolts, account for preload variation or relaxation, nonlinear contact, shear, bending, thermal effects, fatigue, gasket behavior, joint slip, safety factors, or prove that a joint will not separate."
+      "This is declared-geometry-factor Mode-I linear-elastic fracture-mechanics arithmetic. Stress intensity depends on detailed geometry and loading; this workspace does not infer a factor, establish LEFM applicability, determine fracture or crack growth, predict life, define inspection intervals, select a material, establish safety, or approve a design."
     ],
     "errors": [],
+    "method": "KI = Yσ√(πa) · ratio = KI / KIC,declared"
+  },
+  "jointSeparation": {
     "values": [
       {
         "key": "loadFraction",
         "label": "Bolt load fraction C",
-        "raw": 0.3333333333333333,
+        "raw": 33.33333333333333,
         "display": "33.333",
         "unit": "%"
       },
@@ -990,65 +985,65 @@
         "display": "12",
         "unit": "kN"
       }
-    ]
-  },
-  "minerDamage": {
-    "method": "D = n1/N1 + n2/N2 + n3/N3",
+    ],
     "warnings": [
-      "This three-bin Palmgren-Miner sum excludes sequence effects, stress-history generation, S-N curve fitting, nonlinear damage, crack growth, reliability, safety factors, failure prediction, and design approval."
+      "This is a one-bolt, axial, linear parallel-spring screen with user-entered equivalent stiffnesses. It does not infer stiffness from geometry, distribute a system load among bolts, account for preload variation or relaxation, nonlinear contact, shear, bending, thermal effects, fatigue, gasket behavior, joint slip, safety factors, or prove that a joint will not separate."
     ],
     "errors": [],
+    "method": "C = kb/(kb+km) · ΔFb = CP · Fm = Fp−(1−C)P · Psep = Fp/(1−C)"
+  },
+  "minerDamage": {
     "values": [
       {
         "key": "damage1",
         "label": "Bin 1 cycle ratio",
         "raw": 0.1,
         "display": "0.1",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "damage2",
         "label": "Bin 2 cycle ratio",
         "raw": 0.1,
         "display": "0.1",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "damage3",
         "label": "Bin 3 cycle ratio",
         "raw": 0.1,
         "display": "0.1",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "totalDamage",
         "label": "Three-bin linear damage sum",
         "raw": 0.30000000000000004,
         "display": "0.3",
-        "unit": "\u2014"
+        "unit": "1"
       }
-    ]
-  },
-  "motionDuty": {
-    "method": "\u03b1 = (\u03c91\u2212\u03c90)/tacc \u00b7 Tacc = J\u03b1 \u00b7 Trms = \u221a(\u03a3T\u1d62\u00b2t\u1d62/\u03a3t\u1d62) \u00b7 Ereleased = \u00bdJ(\u03c90\u00b2\u2212\u03c91\u00b2)",
+    ],
     "warnings": [
-      "This is declared-duty arithmetic: inertia acceleration torque from user-entered reflected inertia and speed change; RMS torque from three user-entered constant-torque segments; and a kinetic-energy upper bound only when the stated interval decelerates. It does not infer friction, gravity, cutting/process load, reflected inertia, motor capability, drive current, thermal limits, braking hardware, bus capacity, power regeneration, safety category, or motion-profile suitability."
+      "This three-bin Palmgren-Miner sum excludes sequence effects, stress-history generation, S-N curve fitting, nonlinear damage, crack growth, reliability, safety factors, failure prediction, and design approval."
     ],
     "errors": [],
+    "method": "D = n1/N1 + n2/N2 + n3/N3"
+  },
+  "motionDuty": {
     "values": [
       {
         "key": "angularAcceleration",
         "label": "Angular acceleration",
         "raw": 471.2388980384689,
         "display": "471.24",
-        "unit": "rad/s\u00b2"
+        "unit": "rad/s²"
       },
       {
         "key": "inertiaTorque",
         "label": "Inertia acceleration torque",
         "raw": 5.654866776461627,
         "display": "5.6549",
-        "unit": "N\u00b7m"
+        "unit": "N·m"
       },
       {
         "key": "totalCycleTime",
@@ -1062,7 +1057,7 @@
         "label": "Declared-duty RMS torque",
         "raw": 3.2847379883189927,
         "display": "3.2847",
-        "unit": "N\u00b7m"
+        "unit": "N·m"
       },
       {
         "key": "recoverableKineticEnergyUpperBound",
@@ -1071,58 +1066,58 @@
         "display": "0",
         "unit": "J"
       }
-    ]
-  },
-  "shaftCombined": {
-    "method": "\u03c3b = 32M/(\u03c0d\u00b3) \u00b7 \u03c4t = 16T/(\u03c0d\u00b3) \u00b7 \u03c3vm = \u221a(\u03c3b\u00b2 + 3\u03c4t\u00b2)",
+    ],
     "warnings": [
-      "This is an elastic outer-fiber point-stress screen for one solid circular shaft section. It excludes axial load, stress concentrations, keyways, fillets, fluctuating loading, fatigue, material allowables, deflection, bearing reaction, torsional vibration, buckling, and design approval."
+      "This is declared-duty arithmetic: inertia acceleration torque from user-entered reflected inertia and speed change; RMS torque from three user-entered constant-torque segments; and a kinetic-energy upper bound only when the stated interval decelerates. It does not infer friction, gravity, cutting/process load, reflected inertia, motor capability, drive current, thermal limits, braking hardware, bus capacity, power regeneration, safety category, or motion-profile suitability."
     ],
     "errors": [],
+    "method": "α = (ω1−ω0)/tacc · Tacc = Jα · Trms = √(ΣTᵢ²tᵢ/Σtᵢ) · Ereleased = ½J(ω0²−ω1²)"
+  },
+  "shaftCombined": {
     "values": [
       {
         "key": "bendingStress",
         "label": "Outer-fiber bending stress",
-        "raw": 71.6197243913529,
+        "raw": 71619724.3913529,
         "display": "71.62",
         "unit": "MPa"
       },
       {
         "key": "torsionalShear",
         "label": "Outer-fiber torsional shear",
-        "raw": 23.873241463784304,
+        "raw": 23873241.463784304,
         "display": "23.873",
         "unit": "MPa"
       },
       {
         "key": "principalOne",
         "label": "Maximum principal stress",
-        "raw": 78.84796030028009,
+        "raw": 78847960.3002801,
         "display": "78.848",
         "unit": "MPa"
       },
       {
         "key": "principalTwo",
         "label": "Minimum principal stress",
-        "raw": -7.228235908927189,
+        "raw": -7228235.908927189,
         "display": "-7.2282",
         "unit": "MPa"
       },
       {
         "key": "vonMises",
         "label": "Plane-stress von Mises equivalent",
-        "raw": 82.6993343132688,
+        "raw": 82699334.31326881,
         "display": "82.699",
         "unit": "MPa"
       }
-    ]
-  },
-  "stability": {
-    "method": "Pcr = \u03c0\u00b2EI / (KL)\u00b2",
+    ],
     "warnings": [
-      "This is an ideal elastic stability estimate. It excludes imperfections, residual stress, eccentricity, inelastic behavior, connection restraint, and code-required resistance checks."
+      "This is an elastic outer-fiber point-stress screen for one solid circular shaft section. It excludes axial load, stress concentrations, keyways, fillets, fluctuating loading, fatigue, material allowables, deflection, bearing reaction, torsional vibration, buckling, and design approval."
     ],
     "errors": [],
+    "method": "σb = 32M/(πd³) · τt = 16T/(πd³) · σvm = √(σb² + 3τt²)"
+  },
+  "stability": {
     "values": [
       {
         "key": "effectiveLength",
@@ -1138,44 +1133,44 @@
         "display": "219.32",
         "unit": "kN"
       }
-    ]
-  },
-  "toolDeflection": {
-    "method": "I = \u03c0d\u2074/64 \u00b7 \u03b4 = FL\u00b3/(3EI) \u00b7 \u03c3 = 32FL/(\u03c0d\u00b3)",
+    ],
     "warnings": [
-      "Elementary circular constant-section cantilever only; flutes, taper, holder/spindle/fixture compliance, contact distribution, runout, dynamics, chatter, fatigue, tool selection, safety, and production approval are excluded."
+      "This is an ideal elastic stability estimate. It excludes imperfections, residual stress, eccentricity, inelastic behavior, connection restraint, and code-required resistance checks."
     ],
     "errors": [],
+    "method": "Pcr = π²EI / (KL)²"
+  },
+  "toolDeflection": {
     "values": [
       {
         "key": "inertia",
         "label": "Circular core second moment",
-        "raw": 1.017876019763093e-09,
+        "raw": 1.017876019763093e-9,
         "display": "0.000000001",
-        "unit": "m\u2074"
+        "unit": "m⁴"
       },
       {
         "key": "deflection",
         "label": "Ideal tip deflection",
-        "raw": 0.010233728336670226,
+        "raw": 0.000010233728336670226,
         "display": "0.010234",
         "unit": "mm"
       },
       {
         "key": "stress",
         "label": "Outer-fiber bending stress",
-        "raw": 44.20970641441537,
+        "raw": 44209706.414415374,
         "display": "44.21",
         "unit": "MPa"
       }
-    ]
-  },
-  "torsion": {
-    "method": "J = \u03c0D\u2074/32 \u00b7 \u03c4max = Tc/J \u00b7 \u03c6 = TL/GJ \u00b7 P = T\u03c9",
+    ],
     "warnings": [
-      "This is a uniform solid circular elastic shaft under steady torque. It excludes stress concentration, combined bending, fatigue, keyways, bearings, critical speed, torsional vibration, material strength limits, and code or safety-factor decisions."
+      "Elementary circular constant-section cantilever only; flutes, taper, holder/spindle/fixture compliance, contact distribution, runout, dynamics, chatter, fatigue, tool selection, safety, and production approval are excluded."
     ],
     "errors": [],
+    "method": "I = πd⁴/64 · δ = FL³/(3EI) · σ = 32FL/(πd³)"
+  },
+  "torsion": {
     "values": [
       {
         "key": "shearStress",
@@ -1189,30 +1184,30 @@
         "label": "Elastic angle of twist",
         "raw": 0.017184259905008017,
         "display": "0.98459",
-        "unit": "\u00b0"
+        "unit": "°"
       },
       {
         "key": "power",
         "label": "Transmitted mechanical power",
-        "raw": 37960.91123087667,
+        "raw": 37960.91123087659,
         "display": "37.961",
         "unit": "kW"
       },
       {
         "key": "polarMoment",
         "label": "Polar second moment",
-        "raw": 1.4732351486853704e-07,
+        "raw": 1.4732351486853704e-7,
         "display": "147,324",
-        "unit": "mm\u2074"
+        "unit": "mm⁴"
       }
-    ]
-  },
-  "triangleTruss": {
-    "method": "\u03a3Fy = 0 \u00b7 RA = RB = P/2 \u00b7 Ndiagonal = (P/2)/sin \u03b8 \u00b7 Nbottom = Ndiagonal cos \u03b8",
+    ],
     "warnings": [
-      "This is a symmetric three-member, pin-jointed, two-force-member equilibrium model with one vertical apex load. It excludes arbitrary truss topology, joint rigidity, member sizing, buckling, deflection, connection design, stability, code checks, and approval."
+      "This is a uniform solid circular elastic shaft under steady torque. It excludes stress concentration, combined bending, fatigue, keyways, bearings, critical speed, torsional vibration, material strength limits, and code or safety-factor decisions."
     ],
     "errors": [],
+    "method": "J = πD⁴/32 · τmax = Tc/J · φ = TL/GJ · P = Tω"
+  },
+  "triangleTruss": {
     "values": [
       {
         "key": "diagonalLength",
@@ -1249,14 +1244,14 @@
         "display": "4.5",
         "unit": "kN"
       }
-    ]
-  },
-  "vesselGeometry": {
-    "method": "Vi = \u03c0(Di/2)\u00b2L \u00b7 Ai = \u03c0DiL \u00b7 Vshell = \u03c0[(Di/2+t)\u00b2 \u2212 (Di/2)\u00b2]L",
+    ],
     "warnings": [
-      "This is straight cylindrical shell geometry only. It excludes heads, nozzles, discontinuities, membrane or local stress, pressure rating, corrosion allowance, external pressure, code compliance, safety, and approval."
+      "This is a symmetric three-member, pin-jointed, two-force-member equilibrium model with one vertical apex load. It excludes arbitrary truss topology, joint rigidity, member sizing, buckling, deflection, connection design, stability, code checks, and approval."
     ],
     "errors": [],
+    "method": "ΣFy = 0 · RA = RB = P/2 · Ndiagonal = (P/2)/sin θ · Nbottom = Ndiagonal cos θ"
+  },
+  "vesselGeometry": {
     "values": [
       {
         "key": "internalVolume",
@@ -1270,7 +1265,7 @@
         "label": "Straight-cylinder internal wetted area",
         "raw": 1.8849555921538759,
         "display": "1.885",
-        "unit": "m\u00b2"
+        "unit": "m²"
       },
       {
         "key": "shellVolume",
@@ -1279,44 +1274,44 @@
         "display": "15.321",
         "unit": "L"
       }
-    ]
-  },
-  "position": {
-    "method": "\u2300 deviation = 2\u221a(\u0394x\u00b2 + \u0394y\u00b2)",
+    ],
     "warnings": [
-      "The calculated two-dimensional deviation is within the entered tolerance. Confirm datum establishment, feature size, orientation, depth, and inspection method separately."
+      "This is straight cylindrical shell geometry only. It excludes heads, nozzles, discontinuities, membrane or local stress, pressure rating, corrosion allowance, external pressure, code compliance, safety, and approval."
     ],
     "errors": [],
+    "method": "Vi = π(Di/2)²L · Ai = πDiL · Vshell = π[(Di/2+t)² − (Di/2)²]L"
+  },
+  "position": {
     "values": [
       {
         "key": "diametricalDeviation",
         "label": "Diametrical position deviation",
-        "raw": 0.007211102550927979,
+        "raw": 0.000007211102550927979,
         "display": "0.0072111",
         "unit": "mm"
       },
       {
         "key": "radialOffset",
         "label": "Radial center offset",
-        "raw": 0.0036055512754639895,
+        "raw": 0.0000036055512754639896,
         "display": "0.0036056",
         "unit": "mm"
       },
       {
         "key": "remainingMargin",
         "label": "Remaining tolerance margin",
-        "raw": 0.0007888974490720211,
+        "raw": 7.888974490720211e-7,
         "display": "0.0007889",
         "unit": "mm"
       }
-    ]
-  },
-  "convectionHeat": {
-    "method": "Q\u0307 = hA\u0394T",
+    ],
     "warnings": [
-      "This is user-entered convection coefficient arithmetic only. It does not derive a heat-transfer coefficient or correlation, determine flow regime, calculate a temperature field, model radiation, conduction, phase change, fins, contact resistance, material selection, service-temperature rating, equipment suitability, safety, or approval."
+      "The calculated two-dimensional deviation is within the entered tolerance. Confirm datum establishment, feature size, orientation, depth, and inspection method separately."
     ],
     "errors": [],
+    "method": "⌀ deviation = 2√(Δx² + Δy²)"
+  },
+  "convectionHeat": {
     "values": [
       {
         "key": "heatRate",
@@ -1328,7 +1323,7 @@
       {
         "key": "heatRateKw",
         "label": "Declared convection heat rate",
-        "raw": 1575,
+        "raw": 1.575,
         "display": "1.575",
         "unit": "kW"
       },
@@ -1339,28 +1334,28 @@
         "display": "63",
         "unit": "W/K"
       }
-    ]
-  },
-  "idealGas": {
-    "method": "pV = nRuT \u00b7 \u03c1 = pM/(RuT) = p/(RspecT)",
+    ],
     "warnings": [
-      "This is a user-entered ideal-gas equation-of-state arithmetic screen only. It does not convert gauge pressure, identify a gas, infer composition, model real-gas effects, phase change, mixtures, humidity, heat transfer, equipment selection, safety, operability, or approval."
+      "This is user-entered convection coefficient arithmetic only. It does not derive a heat-transfer coefficient or correlation, determine flow regime, calculate a temperature field, model radiation, conduction, phase change, fins, contact resistance, material selection, service-temperature rating, equipment suitability, safety, or approval."
     ],
     "errors": [],
+    "method": "Q̇ = hAΔT"
+  },
+  "idealGas": {
     "values": [
       {
         "key": "density",
         "label": "Ideal-gas density",
         "raw": 1.204317574558035,
         "display": "1.2043",
-        "unit": "kg/m\u00b3"
+        "unit": "kg/m³"
       },
       {
         "key": "specificVolume",
         "label": "Ideal-gas specific volume",
         "raw": 0.8303457668688292,
         "display": "0.83035",
-        "unit": "m\u00b3/kg"
+        "unit": "m³/kg"
       },
       {
         "key": "amount",
@@ -1381,20 +1376,20 @@
         "label": "Specific gas constant from declared molar mass",
         "raw": 287.0025066620642,
         "display": "287",
-        "unit": "J/(kg\u00b7K)"
+        "unit": "J/(kg·K)"
       }
-    ]
-  },
-  "planeConduction": {
-    "method": "Q\u0307 = kA(Th \u2212 Tc)/L \u00b7 Rth = L/(kA)",
+    ],
     "warnings": [
-      "This is steady, one-dimensional plane-wall conduction using one user-entered conductivity. It excludes contact resistance, convection, radiation, thermal bridges, multilayer interfaces, temperature-dependent properties, phase change, transient response, and insulation selection."
+      "This is a user-entered ideal-gas equation-of-state arithmetic screen only. It does not convert gauge pressure, identify a gas, infer composition, model real-gas effects, phase change, mixtures, humidity, heat transfer, equipment selection, safety, operability, or approval."
     ],
     "errors": [],
+    "method": "pV = nRuT · ρ = pM/(RuT) = p/(RspecT)"
+  },
+  "planeConduction": {
     "values": [
       {
         "key": "heatRate",
-        "label": "Conductive heat rate hot \u2192 cold",
+        "label": "Conductive heat rate hot → cold",
         "raw": 1000,
         "display": "1,000",
         "unit": "W"
@@ -1408,19 +1403,19 @@
       },
       {
         "key": "heatFlux",
-        "label": "Heat flux hot \u2192 cold",
+        "label": "Heat flux hot → cold",
         "raw": 400,
         "display": "400",
-        "unit": "W/m\u00b2"
+        "unit": "W/m²"
       }
-    ]
-  },
-  "sensibleHeat": {
-    "method": "Q = mc\u0394T",
+    ],
     "warnings": [
-      "The specific heat is user-entered. This approximation requires no phase change and excludes heat loss, temperature-dependent properties, mixing, reaction, and work by/on the system."
+      "This is steady, one-dimensional plane-wall conduction using one user-entered conductivity. It excludes contact resistance, convection, radiation, thermal bridges, multilayer interfaces, temperature-dependent properties, phase change, transient response, and insulation selection."
     ],
     "errors": [],
+    "method": "Q̇ = kA(Th − Tc)/L · Rth = L/(kA)"
+  },
+  "sensibleHeat": {
     "values": [
       {
         "key": "heat",
@@ -1443,88 +1438,88 @@
         "display": "104.65",
         "unit": "kJ/kg"
       }
-    ]
-  },
-  "hydraulicReservoirDwell": {
-    "method": "tdwell = Vworking/Qreturn \u00b7 Vref = Qreturn\u00b7tref \u00b7 ratio = tdwell/tref",
+    ],
     "warnings": [
-      "This divides only a declared working reservoir volume by a declared steady flow, then compares that result to a user-entered reference time. It does not select a reservoir, apply a rule-of-thumb, estimate cooling, aeration, contamination, geometry, fluid level, heat rejection, flow distribution, capacity, safety, suitability, or approval."
+      "The specific heat is user-entered. This approximation requires no phase change and excludes heat loss, temperature-dependent properties, mixing, reaction, and work by/on the system."
     ],
     "errors": [],
+    "method": "Q = mcΔT"
+  },
+  "hydraulicReservoirDwell": {
     "values": [
       {
         "key": "dwellTime",
         "label": "Literal reservoir dwell time",
-        "raw": 5,
+        "raw": 300.00000000000057,
         "display": "5",
         "unit": "min"
       },
       {
         "key": "referenceVolume",
         "label": "Literal volume at declared dwell-time reference",
-        "raw": 120,
+        "raw": 0.11999999999999976,
         "display": "120",
         "unit": "L"
       },
       {
         "key": "dwellReferenceRatio",
         "label": "Literal dwell-time / reference ratio",
-        "raw": 1.25,
+        "raw": 1.2500000000000024,
         "display": "1.25",
-        "unit": "\u2014"
+        "unit": "1"
       },
       {
         "key": "returnFlow",
         "label": "Declared return or pump flow",
-        "raw": 30,
+        "raw": 0.0005,
         "display": "30",
         "unit": "L/min"
       }
-    ]
-  },
-  "idealGasEntropyChange": {
-    "method": "\u0394s = cp\u00b7ln(T\u2082/T\u2081) \u2212 R\u00b7ln(p\u2082/p\u2081)",
+    ],
     "warnings": [
-      "This applies NASA\u2019s constant-specific-heat ideal-gas pressure-temperature entropy relation only to user-declared state values. It does not determine gas properties, phase, process path, reversibility, heat or work transfer, state validity, isentropic efficiency, refrigeration, equipment, capacity, safety, suitability, or approval."
+      "This divides only a declared working reservoir volume by a declared steady flow, then compares that result to a user-entered reference time. It does not select a reservoir, apply a rule-of-thumb, estimate cooling, aeration, contamination, geometry, fluid level, heat rejection, flow distribution, capacity, safety, suitability, or approval."
     ],
     "errors": [],
+    "method": "tdwell = Vworking/Qreturn · Vref = Qreturn·tref · ratio = tdwell/tref"
+  },
+  "idealGasEntropyChange": {
     "values": [
       {
         "key": "entropyChange",
         "label": "Literal ideal-gas specific entropy change",
         "raw": 497.6796756420407,
         "display": "497.68",
-        "unit": "J/(kg\u00b7K)"
+        "unit": "J/(kg·K)"
       },
       {
         "key": "temperatureTerm",
         "label": "Literal temperature contribution",
         "raw": 696.612916462745,
         "display": "696.61",
-        "unit": "J/(kg\u00b7K)"
+        "unit": "J/(kg·K)"
       },
       {
         "key": "pressureTerm",
         "label": "Literal pressure contribution",
         "raw": 198.9332408207043,
         "display": "198.93",
-        "unit": "J/(kg\u00b7K)"
+        "unit": "J/(kg·K)"
       },
       {
         "key": "temperatureRatio",
         "label": "Declared temperature ratio",
         "raw": 2,
         "display": "2",
-        "unit": "\u2014"
+        "unit": "1"
       }
-    ]
-  },
-  "manningUniformFlow": {
-    "method": "v = (1/n)\u00b7R^(2/3)\u00b7S^(1/2) \u00b7 Q = A\u00b7v (metric uniform-flow form)",
+    ],
     "warnings": [
-      "This applies only the metric Manning uniform-flow relation to user-declared roughness, hydraulic radius, energy slope, and area. It does not infer cross-section geometry, select roughness, calculate normal depth or a water-surface profile, model nonuniform flow, design a channel, determine flood flow or capacity, safety, suitability, or approval."
+      "This applies NASA’s constant-specific-heat ideal-gas pressure-temperature entropy relation only to user-declared state values. It does not determine gas properties, phase, process path, reversibility, heat or work transfer, state validity, isentropic efficiency, refrigeration, equipment, capacity, safety, suitability, or approval."
     ],
     "errors": [],
+    "method": "Δs = cp·ln(T₂/T₁) − R·ln(p₂/p₁)"
+  },
+  "manningUniformFlow": {
     "values": [
       {
         "key": "meanVelocity",
@@ -1538,7 +1533,7 @@
         "label": "Literal metric Manning discharge",
         "raw": 5.270462766947299,
         "display": "5.2705",
-        "unit": "m\u00b3/s"
+        "unit": "m³/s"
       },
       {
         "key": "hydraulicRadius",
@@ -1552,16 +1547,16 @@
         "label": "Declared flow area",
         "raw": 5,
         "display": "5",
-        "unit": "m\u00b2"
+        "unit": "m²"
       }
-    ]
-  },
-  "npshAvailableBudget": {
-    "method": "NPSHa = Hsurface + Hsuction \u2212 Hloss \u2212 Hvapor \u00b7 stated difference = NPSHa \u2212 NPSHr",
+    ],
     "warnings": [
-      "This sums only user-declared surface-pressure, signed static-suction, suction-loss, and vapor-pressure heads, then subtracts a user-declared NPSH-required reference. It does not calculate properties, determine vapor pressure, derive losses, select a pump, determine cavitation risk, establish NPSH margin adequacy, capacity, safety, suitability, or approval."
+      "This applies only the metric Manning uniform-flow relation to user-declared roughness, hydraulic radius, energy slope, and area. It does not infer cross-section geometry, select roughness, calculate normal depth or a water-surface profile, model nonuniform flow, design a channel, determine flood flow or capacity, safety, suitability, or approval."
     ],
     "errors": [],
+    "method": "v = (1/n)·R^(2/3)·S^(1/2) · Q = A·v (metric uniform-flow form)"
+  },
+  "npshAvailableBudget": {
     "values": [
       {
         "key": "npshAvailable",
@@ -1579,7 +1574,7 @@
       },
       {
         "key": "statedHeadDifference",
-        "label": "Literal NPSHa \u2212 declared NPSHr difference",
+        "label": "Literal NPSHa − declared NPSHr difference",
         "raw": 4.53,
         "display": "4.53",
         "unit": "m"
@@ -1591,14 +1586,14 @@
         "display": "-2",
         "unit": "m"
       }
-    ]
-  },
-  "robotPayloadMoment": {
-    "method": "Fg = m\u00b7g \u00b7 Mstatic = Fg\u00b7e",
+    ],
     "warnings": [
-      "This applies static gravity force and a declared flange-to-CoG lever arm. It does not compare a result to any robot payload/moment curve or capacity; calculate acceleration, inertia, motion, mounting, stability, safety, suitability, or approval."
+      "This sums only user-declared surface-pressure, signed static-suction, suction-loss, and vapor-pressure heads, then subtracts a user-declared NPSH-required reference. It does not calculate properties, determine vapor pressure, derive losses, select a pump, determine cavitation risk, establish NPSH margin adequacy, capacity, safety, suitability, or approval."
     ],
     "errors": [],
+    "method": "NPSHa = Hsurface + Hsuction − Hloss − Hvapor · stated difference = NPSHa − NPSHr"
+  },
+  "robotPayloadMoment": {
     "values": [
       {
         "key": "gravityForce",
@@ -1612,35 +1607,35 @@
         "label": "Literal static weight moment",
         "raw": 19.6133,
         "display": "19.613",
-        "unit": "N\u00b7m"
+        "unit": "N·m"
       },
       {
         "key": "cogOffset",
         "label": "Declared flange-to-CoG offset",
-        "raw": 250,
+        "raw": 0.25,
         "display": "250",
         "unit": "mm"
       }
-    ]
-  },
-  "robotReach": {
-    "method": "r = \u221a(x\u00b2 + y\u00b2 + z\u00b2) \u00b7 rratio = r/Rref",
+    ],
     "warnings": [
-      "This calculates only a target radial distance and literal comparison to a user-entered reference reach. It is not a six-axis robot workspace, pose, orientation, collision, joint-limit, singularity, path, payload, reachability, safety, suitability, or approval result."
+      "This applies static gravity force and a declared flange-to-CoG lever arm. It does not compare a result to any robot payload/moment curve or capacity; calculate acceleration, inertia, motion, mounting, stability, safety, suitability, or approval."
     ],
     "errors": [],
+    "method": "Fg = m·g · Mstatic = Fg·e"
+  },
+  "robotReach": {
     "values": [
       {
         "key": "radialDistance",
         "label": "Literal target radial distance",
-        "raw": 781.0249675906655,
+        "raw": 0.7810249675906655,
         "display": "781.02",
         "unit": "mm"
       },
       {
         "key": "referenceReach",
         "label": "Declared radial reference reach",
-        "raw": 1000,
+        "raw": 1,
         "display": "1,000",
         "unit": "mm"
       },
@@ -1649,16 +1644,16 @@
         "label": "Literal distance / reference-reach ratio",
         "raw": 0.7810249675906655,
         "display": "0.78102",
-        "unit": "\u2014"
+        "unit": "1"
       }
-    ]
-  },
-  "rotaryIndexing": {
-    "method": "\u03b8 = \u03b1\u00b7\u03c0/180 \u00b7 \u03c9avg = \u03b8/tmove \u00b7 rate(move-only) = 60/tmove \u00b7 KE = \u00bdI\u03c9avg\u00b2",
+    ],
     "warnings": [
-      "This applies only declared index-angle, move-time, and table-plus-load-inertia arithmetic. It excludes acceleration profile, peak/RMS torque, friction, gearing, motor/table selection, capacity, position accuracy, dwell/process timing, safety, suitability, and approval."
+      "This calculates only a target radial distance and literal comparison to a user-entered reference reach. It is not a six-axis robot workspace, pose, orientation, collision, joint-limit, singularity, path, payload, reachability, safety, suitability, or approval result."
     ],
     "errors": [],
+    "method": "r = √(x² + y² + z²) · rratio = r/Rref"
+  },
+  "rotaryIndexing": {
     "values": [
       {
         "key": "indexAngleRad",
@@ -1688,6 +1683,11 @@
         "display": "0.10966",
         "unit": "J"
       }
-    ]
+    ],
+    "warnings": [
+      "This applies only declared index-angle, move-time, and table-plus-load-inertia arithmetic. It excludes acceleration profile, peak/RMS torque, friction, gearing, motor/table selection, capacity, position accuracy, dwell/process timing, safety, suitability, and approval."
+    ],
+    "errors": [],
+    "method": "θ = α·π/180 · ωavg = θ/tmove · rate(move-only) = 60/tmove · KE = ½Iωavg²"
   }
 }

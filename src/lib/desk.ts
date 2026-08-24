@@ -4,12 +4,6 @@ import { domains } from "@/lib/platform";
 export const APP_NAME = "Library";
 export const APP_TAGLINE = "Set the numbers. Keep the model in frame.";
 export const APP_JOB = "Open a finished model and get a number.";
-export const SIBLING = {
-  name: "Studio",
-  job: "Write and publish a model",
-  path: "/studio",
-  repo: "https://github.com/meetpatelc/gauge",
-} as const;
 export const MODEL_COUNT = tools.length;
 
 export const activeDomains = domains.map((domain) => {
@@ -36,7 +30,7 @@ export function savedHeadline(resultJson: string): string {
 
 export function openDeskSearch() {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new Event("caliper:open-search"));
+  window.dispatchEvent(new Event("instrument:open-search"));
 }
 
 export function isFieldHidden(toolId: ToolId, key: string, input: Record<string, string>) {

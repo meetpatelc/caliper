@@ -3,11 +3,11 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { CircleAlert, Copy, Link2, PenLine, RotateCcw, Save, Star } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
-import { InstrumentSheet, QuantityName } from "@/components/instrument-sheet";
+import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
 import { GoverningRelation } from "@/components/governing-relation";
 import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Select, UnitBadge, UnitSelect, controlClass } from "@/components/ui/field";
+import { Field, Input, Select, Textarea, UnitBadge, UnitSelect } from "@/components/ui/field";
 import { MeasurementField } from "@/components/ui/measurement-field";
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
@@ -22,9 +22,8 @@ import { resolveSketchId } from "@/lib/diagrams";
 import { quantitySymbol } from "@/lib/quantity-symbols";
 import { inlineRelations } from "@/lib/formula-display";
 import { useDeskStore } from "@/lib/workspace-store";
-import { useWorkshop } from "@/gauge/lib/workshop-store";
+import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
-import { cn } from "@/lib/utils";
 
 export function CalculatorWorkspace({ toolId, search }: { toolId: string; search: Record<string, string> }) {
   const tool = getTool(toolId);
@@ -379,12 +378,12 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     </Select>
                   ) : field.kind === "text" ? (
                     field.key === "observations" ? (
-                      <textarea
+                      <Textarea
                         id={fieldId}
                         rows={4}
                         value={input[field.key] ?? ""}
                         onChange={(event) => update(field.key, event.target.value)}
-                        className={cn(controlClass, "h-auto py-2", fieldError && "border-danger")}
+                        aria-invalid={Boolean(fieldError)}
                       />
                     ) : (
                       <Input
@@ -441,14 +440,13 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               <>
                 <div className="grid gap-4">
                   {displayGroups.map(({ group, spec, stored, shown, options, canSwitch, unitLabel }) => (
-                      <div key={group.label} className="grid gap-1.5">
-                        <QuantityName
-                          label={group.label}
-                          symbol={quantitySymbol(group.primary.key, group.primary.symbol)}
-                        />
-                        <span className="flex items-center gap-2">
-                          <p className="min-w-0 flex-1 font-mono text-3xl font-medium tabular-nums tracking-tight">{shown}</p>
-                          {canSwitch && spec ? (
+                      <ResultQuantity
+                        key={group.label}
+                        label={group.label}
+                        symbol={quantitySymbol(group.primary.key, group.primary.symbol)}
+                        value={shown}
+                        unit={
+                          canSwitch && spec ? (
                             <UnitSelect
                               aria-label={`${group.label} unit`}
                               value={stored}
@@ -472,9 +470,9 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                             </UnitSelect>
                           ) : (
                             <UnitBadge>{unitLabel}</UnitBadge>
-                          )}
-                        </span>
-                      </div>
+                          )
+                        }
+                      />
                     ))}
                 </div>
                 <GoverningRelation formula={result.method} className="text-sm" />

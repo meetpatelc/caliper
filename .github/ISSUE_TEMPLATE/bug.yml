@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in Caliper is wrong or unclear
+description: Something in Instrument is wrong or unclear
 title: "[bug] "
 labels: ["bug"]
 body:

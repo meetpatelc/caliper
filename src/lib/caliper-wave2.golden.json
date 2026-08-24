@@ -11,14 +11,14 @@
       {
         "key": "contactRadius",
         "label": "Contact radius",
-        "raw": 0.0004250357524709563,
+        "raw": 0.00042503575247095635,
         "display": "0.42504",
         "unit": "mm"
       },
       {
         "key": "contactDiameter",
         "label": "Contact diameter",
-        "raw": 0.0008500715049419126,
+        "raw": 0.0008500715049419127,
         "display": "0.85007",
         "unit": "mm"
       },
@@ -32,7 +32,7 @@
       {
         "key": "indentation",
         "label": "Elastic approach",
-        "raw": 0.000015054615906546003,
+        "raw": 0.000015054615906546001,
         "display": "15.055",
         "unit": "µm"
       }
@@ -786,7 +786,7 @@
       {
         "key": "quadratureLineLoad",
         "label": "Quadrature line-load magnitude",
-        "raw": 121.15693000762364,
+        "raw": 121.15693000762363,
         "display": "121.16",
         "unit": "N/mm"
       }
