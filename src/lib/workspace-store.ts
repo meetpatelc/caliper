@@ -58,8 +58,13 @@ type DeskState = {
 const uid = () =>
   typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `id-${Date.now()}-${Math.random()}`;
 
-function sync(run: () => Promise<unknown>) {
-  enqueueAccountWrite(run);
+/**
+ * `key` coalesces repeated writes to the same thing — see enqueueAccountWrite.
+ * Deletes are left unkeyed: they are not last-one-wins, and dropping one would
+ * leave a row the user asked to remove.
+ */
+function sync(run: () => Promise<unknown>, key?: string) {
+  enqueueAccountWrite(run, key);
 }
 
 export const useDeskStore = create<DeskState>()(
@@ -76,7 +81,7 @@ export const useDeskStore = create<DeskState>()(
         set((state) => ({
           favorites: on ? [id, ...state.favorites] : state.favorites.filter((item) => item !== id),
         }));
-        sync(() => setFavoriteAccount({ data: { toolId: id, on } }));
+        sync(() => setFavoriteAccount({ data: { toolId: id, on } }), `favourite:${id}`);
       },
       touchRecent: (id) =>
         set((state) => ({
@@ -103,7 +108,7 @@ export const useDeskStore = create<DeskState>()(
       saveCalculation: (entry) => {
         const record: SavedCalculation = { ...entry, id: uid(), savedAt: new Date().toISOString() };
         set((state) => ({ calculations: [record, ...state.calculations] }));
-        sync(() => saveCalculationAccount({ data: record }));
+        sync(() => saveCalculationAccount({ data: record }), `calculation:${record.id}`);
         return record;
       },
       deleteCalculation: (id) => {
@@ -113,7 +118,7 @@ export const useDeskStore = create<DeskState>()(
       saveReview: (entry) => {
         const record: ReviewSnapshot = { ...entry, id: uid(), savedAt: new Date().toISOString() };
         set((state) => ({ reviews: [record, ...state.reviews] }));
-        sync(() => saveReviewAccount({ data: record }));
+        sync(() => saveReviewAccount({ data: record }), `review:${record.id}`);
         return record;
       },
       deleteReview: (id) => {

@@ -65,7 +65,9 @@ function normalizeWorkshopItem(item: WorkshopCalculator): WorkshopCalculator {
 
 function syncDraft(item: WorkshopCalculator) {
   const data = JSON.parse(JSON.stringify(item)) as WorkshopCalculator;
-  enqueueAccountWrite(() => upsertDraftAccount({ data }));
+  // Keyed by draft id: publishing fires several saves for the same draft in
+  // one second, and only the last one carries the state worth keeping.
+  enqueueAccountWrite(() => upsertDraftAccount({ data }), `draft:${item.id}`);
 }
 
 export const useWorkshop = create<WorkshopState>()(

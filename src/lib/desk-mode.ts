@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { StateStorage } from "zustand/middleware";
 import { toast } from "sonner";
+import { createSingleFlight } from "@/lib/single-flight";
 
 export const DESK_STORAGE_KEY = "caliper-desk-v1";
 
@@ -117,16 +118,49 @@ async function runAccountWrite(run: () => Promise<unknown>) {
   throw last;
 }
 
-export function enqueueAccountWrite(run: () => Promise<unknown>) {
+/**
+ * One in-flight write per key, plus at most one queued behind it.
+ *
+ * A single Studio publish used to fire six writes for the same draft inside
+ * one second — the debounced autosave, the explicit save before validation,
+ * and the state update that follows each. All six reached the server and all
+ * six returned 200, but the client's own retry budget was spent competing
+ * with itself, so the user was told their work had not saved when it had.
+ *
+ * Single-flight rather than a debounce, because a debounce delays the first
+ * write and this is somebody's work: the first save goes immediately, and
+ * anything that arrives while it is in flight collapses into one trailing
+ * write carrying the latest state. Bursts cost two writes instead of six, and
+ * the last thing the user did is always what lands.
+ *
+ * Keyed, so saving a draft never cancels a favourite.
+ */
+const accountWrites = createSingleFlight((run) => runAccountWrite(run));
+
+/**
+ * `key` identifies the thing being written, not the operation — every save of
+ * draft X shares a key so they coalesce. Omitting it opts out of coalescing,
+ * which is right for writes that are not last-one-wins (a delete, say).
+ */
+export function enqueueAccountWrite(run: () => Promise<unknown>, key?: string) {
   if (!accountMode) return;
   const wrapped = () => runAccountWrite(run);
   if (hydrating) {
     pendingWrites.push(wrapped);
     return;
   }
-  void wrapped().catch(() => {
-    /* already toasted */
-  });
+  if (!key) {
+    void wrapped().catch(() => {
+      /* already toasted */
+    });
+    return;
+  }
+  accountWrites.push(key, run);
+}
+
+/** Whether any coalesced write is still outstanding (used by the unload guard). */
+export function hasPendingAccountWrites() {
+  return accountWrites.pending();
 }
 
 export async function flushAccountWrites() {
