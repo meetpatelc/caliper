@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { toast } from "sonner";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { claimDesk, getDesk, type DeskSnapshot } from "@/lib/desk-account";
@@ -6,6 +6,7 @@ import { WORKSHOP_KEY } from "@/studio/lib/brand";
 import {
   consumeClaimedUnsignedDesk,
   flushAccountWrites,
+  hasPendingAccountWrites,
   isAccountMode,
   retryAccountCall,
   setAccountMode,
@@ -171,6 +172,20 @@ export function DeskSync() {
     // every session refresh. Only `user?.id` changing means a different person.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, isPending]);
+
+  // Coalescing means a save can still be queued when the tab goes away. Warn
+  // rather than lose it — the browser only honours this if the user has
+  // interacted with the page, which by definition they have if a write is
+  // pending. Nothing is shown when nothing is outstanding.
+  useEffect(() => {
+    const guard = (event: BeforeUnloadEvent) => {
+      if (!hasPendingAccountWrites()) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", guard);
+    return () => window.removeEventListener("beforeunload", guard);
+  }, []);
 
   return null;
 }
