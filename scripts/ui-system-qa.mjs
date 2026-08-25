@@ -279,6 +279,22 @@ try {
   await tablet.screenshot({ path: `${outDir}/qa-axial-tablet.png`, fullPage: true });
   await tablet.close();
 
+  // A shared record is a page someone else opens cold, so it has to render
+  // the finished calculation from the URL alone — no store, no session.
+  await page.goto(`${BASE}/record/axial?force=%2220%22&area=%221000%22&length=%221000%22&modulus=%22200%22`, {
+    waitUntil: "networkidle",
+  });
+  const recordText = await page.locator("body").innerText();
+  record("record renders from the url alone", /calculation record/i.test(recordText));
+  record(
+    "record carries the computed result",
+    /20/.test(recordText) && /MPa/.test(recordText),
+    recordText.replace(/\s+/g, " ").slice(0, 70),
+  );
+  record("record states its boundary", /stops being valid|not an approval/i.test(recordText));
+  const recordTitle = await page.title();
+  record("record title names the result", /20 MPa/.test(recordTitle), recordTitle);
+
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
 
   // ── Token regression ───────────────────────────────────────────────────────

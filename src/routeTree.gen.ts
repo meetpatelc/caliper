@@ -23,6 +23,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as WorkshopRouteImport } from './routes/workshop'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
+import { Route as RecordToolIdRouteImport } from './routes/record/$toolId'
 import { Route as StudioIndexRouteImport } from './routes/studio.index'
 import { Route as StudioIdRouteImport } from './routes/studio.$id'
 import { Route as ToolToolIdRouteImport } from './routes/tool/$toolId'
@@ -98,6 +99,11 @@ const CSlugRoute = CSlugRouteImport.update({
   path: '/c/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecordToolIdRoute = RecordToolIdRouteImport.update({
+  id: '/record/$toolId',
+  path: '/record/$toolId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudioIndexRoute = StudioIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof StudioRouteWithChildren
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
+  '/record/$toolId': typeof RecordToolIdRoute
   '/studio/$id': typeof StudioIdRoute
   '/tool/$toolId': typeof ToolToolIdRoute
   '/studio/': typeof StudioIndexRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
+  '/record/$toolId': typeof RecordToolIdRoute
   '/studio/$id': typeof StudioIdRoute
   '/tool/$toolId': typeof ToolToolIdRoute
   '/studio': typeof StudioIndexRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/studio': typeof StudioRouteWithChildren
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
+  '/record/$toolId': typeof RecordToolIdRoute
   '/studio/$id': typeof StudioIdRoute
   '/tool/$toolId': typeof ToolToolIdRoute
   '/studio/': typeof StudioIndexRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/workshop'
     | '/c/$slug'
+    | '/record/$toolId'
     | '/studio/$id'
     | '/tool/$toolId'
     | '/studio/'
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/workshop'
     | '/c/$slug'
+    | '/record/$toolId'
     | '/studio/$id'
     | '/tool/$toolId'
     | '/studio'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/workshop'
     | '/c/$slug'
+    | '/record/$toolId'
     | '/studio/$id'
     | '/tool/$toolId'
     | '/studio/'
@@ -256,6 +268,7 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRouteWithChildren
   WorkshopRoute: typeof WorkshopRoute
   CSlugRoute: typeof CSlugRoute
+  RecordToolIdRoute: typeof RecordToolIdRoute
   ToolToolIdRoute: typeof ToolToolIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -360,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/record/$toolId': {
+      id: '/record/$toolId'
+      path: '/record/$toolId'
+      fullPath: '/record/$toolId'
+      preLoaderRoute: typeof RecordToolIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studio/': {
       id: '/studio/'
       path: '/'
@@ -419,6 +439,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRouteWithChildren,
   WorkshopRoute: WorkshopRoute,
   CSlugRoute: CSlugRoute,
+  RecordToolIdRoute: RecordToolIdRoute,
   ToolToolIdRoute: ToolToolIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
