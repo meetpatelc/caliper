@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { domains, type DomainId } from "@/studio/lib/brand";
 import { isUnitFamilyId, type UnitFamilyId } from "@/lib/units";
-import { axialDocument, type InstrumentDocument } from "@/lib/document";
+// The seed only — importing it from `@/lib/document` would pull that module's
+// static library-*.ts imports (all ~123 documents) into the entry chunk.
+import { axialDocument } from "@/lib/document-axial";
+import type { InstrumentDocument } from "@/lib/document";
 import { resolveSketchId } from "@/lib/diagrams";
 
 const DOMAIN_IDS = domains.map((domain) => domain.id) as [DomainId, ...DomainId[]];

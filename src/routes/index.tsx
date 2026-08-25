@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { tools, type ToolId } from "@/lib/catalog";
-import { libraryDocuments } from "@/lib/document";
+// The generated relation index, NOT `@/lib/document` — importing the documents
+// here pulls all ~123 of them into the entry chunk to render one line per card.
+import { libraryFormulas } from "@/lib/library-formulas";
 import { MODEL_COUNT, releasedDomains, savedHeadline } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { Button } from "@/components/ui/button";
@@ -131,7 +133,7 @@ function Home() {
               <div className="grid gap-3 sm:grid-cols-2">
                 {shown.map((tool) => {
                   const formula =
-                    libraryDocuments[tool.id]?.formula ?? (tool.id === "fits" ? "cmax = ES − ei; imax = es − EI" : undefined);
+                    libraryFormulas[tool.id] ?? (tool.id === "fits" ? "cmax = ES − ei; imax = es − EI" : undefined);
                   return (
                     <SelectableCard
                       key={tool.id}
