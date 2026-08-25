@@ -47,11 +47,11 @@ export function isAdminEmail(email: string | null | undefined): boolean {
  * Resolve the caller and confirm they are an admin, or throw `ForbiddenError`.
  * Use via `adminMiddleware` (`./middleware`) rather than calling directly.
  */
-export async function requireAdminUser(bearerToken?: string): Promise<VerifiedUser> {
+export async function requireAdminUser(): Promise<VerifiedUser> {
   // Imported here, not at module scope, so the allowlist helpers above stay
   // free of server-only dependencies and can be unit-tested directly.
   const { getSessionUser } = await import("./verify.server");
-  const user = await getSessionUser(bearerToken);
+  const user = await getSessionUser();
   if (!user || !isAdminEmail(user.email)) throw new ForbiddenError();
   return user;
 }

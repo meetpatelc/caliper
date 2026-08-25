@@ -21,7 +21,6 @@
  * `@/lib/auth/middleware`.
  */
 import { betterAuth } from "better-auth";
-import { bearer } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { randomBytes } from "node:crypto";
@@ -103,7 +102,7 @@ const database = databaseUrl
   ? new Pool({ connectionString: databaseUrl })
   : { dialect: pgliteDialect(() => getPglite()), type: "postgres" as const };
 
-/** Session token cookie name — also read by the live-preview popup completion page. */
+/** Session token cookie name. */
 export const SESSION_TOKEN_COOKIE = "__Host-grok-auth.session_token";
 
 export const auth = betterAuth({
@@ -114,8 +113,8 @@ export const auth = betterAuth({
   database,
 
   // CSRF / origin check for credentialed auth POSTs (email sign-up/sign-in, …).
-  // See `trustedOrigins` construction above — must cover live preview hosts AND
-  // local loopback variants, or clients get "Invalid origin".
+  // See `trustedOrigins` above — must cover the deployed origin AND the local
+  // loopback variants, or clients get "Invalid origin".
   trustedOrigins,
 
   // The platform identity gate (inert unless GROK_PROJECT_ID is set) is the only
@@ -159,14 +158,6 @@ export const auth = betterAuth({
 
   plugins: [
     gateIdentitySessions(),
-
-    // Accept `Authorization: Bearer <session-token>` as an alternative to the
-    // cookie. Needed for the LIVE PREVIEW: the app runs in an embedded iframe
-    // where cookies are partitioned, so after popup sign-in it authenticates with
-    // a bearer token instead (see `client.ts` / the `auth` skill). The hook only
-    // fires when an Authorization header is present, so the cookie path
-    // (deployed apps) is unaffected.
-    bearer(),
 
     // Bridges Better Auth's Set-Cookie into TanStack Start responses. MUST be
     // last so it runs after every other plugin's hooks.
