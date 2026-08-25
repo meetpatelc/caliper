@@ -90,21 +90,30 @@ function FeedbackPage() {
 
 function FeedbackInbox({ tick }: { tick: number }) {
   const [rows, setRows] = useState<FeedbackRow[] | null>(null);
+  // The inbox is admin-only server-side. A non-admin's call is rejected, and
+  // there is nothing for them to see here — so render nothing at all rather
+  // than an empty state that reads as "no messages yet".
+  const [permitted, setPermitted] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     setRows(null);
     listFeedback()
       .then((next) => {
-        if (!cancelled) setRows(next);
+        if (cancelled) return;
+        setRows(next);
+        setPermitted(true);
       })
       .catch(() => {
-        if (!cancelled) setRows([]);
+        if (cancelled) return;
+        setPermitted(false);
       });
     return () => {
       cancelled = true;
     };
   }, [tick]);
+
+  if (!permitted) return null;
 
   return (
     <section className="mt-12">
