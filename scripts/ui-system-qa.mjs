@@ -110,9 +110,18 @@ try {
   record("library favourite buttons present", (await favButtons.count()) > 0, String(await favButtons.count()));
   await shot(page, "qa-library");
 
+  // Assert the filter actually narrows the grid, rather than that a "N shown"
+  // caption exists — the caption was removed as redundant, and counting the
+  // cards tests the behaviour instead of a label that happened to describe it.
+  const cardsBefore = await page.locator('a[href*="/tool/"]').count();
   await page.getByRole("group", { name: "Domain filter" }).getByRole("button", { name: /Statics & mechanics/ }).click();
-  await page.waitForTimeout(200);
-  record("library domain filter", /shown/i.test(await page.locator("body").innerText()));
+  await page.waitForTimeout(300);
+  const cardsAfter = await page.locator('a[href*="/tool/"]').count();
+  record(
+    "library domain filter narrows the grid",
+    cardsAfter > 0 && cardsAfter < cardsBefore,
+    `${cardsBefore} -> ${cardsAfter}`,
+  );
 
   await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
   await page.locator("#results, #inputs").first().waitFor();

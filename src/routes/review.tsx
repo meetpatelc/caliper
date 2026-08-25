@@ -28,6 +28,14 @@ import { useDeskStatus } from "@/lib/desk-mode";
 type ReviewSearch = { id?: string };
 
 export const Route = createFileRoute("/review")({
+  head: () => ({
+    meta: [
+      { title: "Review · Instrument" },
+      { name: "description", content: "Engineering review: checklists, weighted trade study, and FMEA arithmetic." },
+      { property: "og:title", content: "Review · Instrument" },
+      { property: "og:description", content: "Engineering review: checklists, weighted trade study, and FMEA arithmetic." },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>): ReviewSearch => ({
     id: typeof search.id === "string" ? search.id : undefined,
   }),

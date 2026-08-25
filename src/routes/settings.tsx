@@ -13,7 +13,15 @@ import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/settings")({ component: SettingsPage });
+export const Route = createFileRoute("/settings")({   head: () => ({
+    meta: [
+      { title: "Account settings · Instrument" },
+      { name: "description", content: "Manage your account." },
+      { property: "og:title", content: "Account settings · Instrument" },
+      { property: "og:description", content: "Manage your account." },
+    ],
+  }),
+  component: SettingsPage });
 
 function SettingsPage() {
   const { user, isPending } = useCurrentUserState();

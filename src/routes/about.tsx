@@ -7,7 +7,15 @@ import { panelClass } from "@/components/ui/panel";
 import { PageHeader } from "@/components/ui/page";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/about")({ component: AboutPage });
+export const Route = createFileRoute("/about")({   head: () => ({
+    meta: [
+      { title: "About & limits · Instrument" },
+      { name: "description", content: "What Instrument is designed to support, and what it is not." },
+      { property: "og:title", content: "About & limits · Instrument" },
+      { property: "og:description", content: "What Instrument is designed to support, and what it is not." },
+    ],
+  }),
+  component: AboutPage });
 
 const suitable = [
   "Engineering explanation and independent study.",

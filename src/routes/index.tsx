@@ -18,6 +18,14 @@ import type { EngineeringDomain } from "@/lib/platform";
 type LibrarySearch = { domain?: string };
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Library · Instrument" },
+      { name: "description", content: "Every released model — 169 finished engineering calculators with method, assumptions and source attached." },
+      { property: "og:title", content: "Library · Instrument" },
+      { property: "og:description", content: "Every released model — 169 finished engineering calculators with method, assumptions and source attached." },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>): LibrarySearch => ({
     domain: typeof search.domain === "string" ? search.domain : undefined,
   }),
@@ -73,7 +81,7 @@ function Home() {
               const tool = tools.find((item) => item.id === record.toolId);
               const headline = savedHeadline(record.resultJson);
               return (
-                <Button key={record.id} asChild variant="outline" size="sm">
+                <Button key={record.id} asChild variant="outline">
                   <Link
                     to="/tool/$toolId"
                     params={{ toolId: record.toolId }}
@@ -87,7 +95,7 @@ function Home() {
               );
             })}
             {recentTools.map((tool) => (
-              <Button key={tool!.id} asChild variant="outline" size="sm">
+              <Button key={tool!.id} asChild variant="outline">
                 <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="whitespace-nowrap">
                   {tool!.title}
                 </Link>
@@ -97,12 +105,13 @@ function Home() {
         </section>
       )}
 
-      <SegmentedControl aria-label="Domain filter" appearance="chip" className="mt-8">
+      <SectionHeader className="mt-12" kicker="Browse" title="Pick a field." />
+      <SegmentedControl aria-label="Domain filter" appearance="chip" className="mt-4">
         <SegmentedItem
           selected={domain === "all"}
           onClick={() => void navigate({ search: (prev) => ({ ...prev, domain: undefined }) })}
         >
-          All · {tools.length}
+          All
         </SegmentedItem>
         {releasedDomains.map((item) => (
           <SegmentedItem
@@ -110,12 +119,10 @@ function Home() {
             selected={domain === item.id}
             onClick={() => void navigate({ search: (prev) => ({ ...prev, domain: item.id }) })}
           >
-            {item.label} · {item.count}
+            {item.label}
           </SegmentedItem>
         ))}
       </SegmentedControl>
-
-      <p className="mt-8 text-sm text-muted">{visible.length} shown</p>
 
       <div className="mt-8 grid gap-10">
         {grouped.map(({ domain: groupDomain, tools: groupTools }) => {

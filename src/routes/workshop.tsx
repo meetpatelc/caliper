@@ -19,7 +19,15 @@ import { useHydrated } from "@/lib/use-hydrated";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/workshop")({ component: ProjectPage });
+export const Route = createFileRoute("/workshop")({   head: () => ({
+    meta: [
+      { title: "Project · Instrument" },
+      { name: "description", content: "Project snapshots and saved checks, with the inputs that produced them." },
+      { property: "og:title", content: "Project · Instrument" },
+      { property: "og:description", content: "Project snapshots and saved checks, with the inputs that produced them." },
+    ],
+  }),
+  component: ProjectPage });
 
 type PendingDelete = { kind: "model" | "check" | "review" | "folder"; id: string; title: string };
 

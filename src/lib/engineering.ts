@@ -2109,8 +2109,29 @@ const calculateConverter = (input: Record<string, string>): CalculationState => 
   };
 };
 
-export const calculateTool = (toolId: ToolId, input: Record<string, string>): CalculationState => {
-  try {
+/**
+ * A number that is not finite is not a result.
+ *
+ * Overflow used to reach the glass: a section height of 1e300 rendered
+ * "inertia = ∞ mm⁴" beside a 300-digit area, with no error. CONTRIBUTING is
+ * explicit that invalid input must produce a visible error rather than a
+ * silent fallback, and an engineer reading ∞ off a screening tool is exactly
+ * the failure this app exists to avoid.
+ */
+const guardFinite = (state: CalculationState): CalculationState => {
+  const bad = state.values.filter((value) => !Number.isFinite(value.raw));
+  if (!bad.length) return state;
+  return {
+    values: [],
+    warnings: [],
+    errors: [
+      `${bad.map((value) => value.label).join(", ")} overflowed to a value the model cannot express. Reduce the magnitude of the inputs.`,
+    ],
+    method: state.method,
+  };
+};
+
+const computeTool = (toolId: ToolId, input: Record<string, string>): CalculationState => {
     if (toolId in libraryDocuments) return runLibraryDocument(toolId, input);
     if (toolId === "beam") return calculateBeam(input);
     if (toolId === "beamDiagram") return calculateBeamDiagram(input);
@@ -2155,7 +2176,12 @@ export const calculateTool = (toolId: ToolId, input: Record<string, string>): Ca
     if (toolId === "mohrCircle") return calculateMohrCircle(input);
     if (toolId === "arithmeticScratchpad") return calculateArithmeticScratchpad(input);
     if (toolId === "converter") return calculateConverter(input);
-    return { values: [], warnings: [], errors: [`No released method is registered for “${toolId}”.`], method: "Unregistered model" };
+  return { values: [], warnings: [], errors: [`No released method is registered for “${toolId}”.`], method: "Unregistered model" };
+};
+
+export const calculateTool = (toolId: ToolId, input: Record<string, string>): CalculationState => {
+  try {
+    return guardFinite(computeTool(toolId, input));
   } catch (error) {
     return { values: [], warnings: [], errors: [error instanceof Error ? error.message : "The current configuration could not be calculated."], method: "Awaiting valid inputs" };
   }

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Account-scoped pages hold nothing a crawler can reach, and indexing them
+# only produces sign-in walls in results.
+Disallow: /profile
+Disallow: /settings
+Disallow: /login
+Disallow: /api/
+
+Sitemap: https://instrument-eta.vercel.app/sitemap.xml

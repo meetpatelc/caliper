@@ -491,7 +491,9 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       {printScope && (
         <section className="print-sheet mt-12 hidden print:block">
           <p className="eyebrow">Calculation snapshot</p>
-          <h1>{printScope.title}</h1>
+          {/* Repeats the page heading for the printed sheet, so it is not a
+              second h1 — the page already has one. */}
+          <h2>{printScope.title}</h2>
           <p>Formula version {printScope.formulaVersion}</p>
           <h2>Conditions</h2>
           <table>

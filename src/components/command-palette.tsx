@@ -49,7 +49,12 @@ export function CommandPalette({
         filter={(value, search) => {
           const query = search.trim().toLowerCase();
           if (!query) return 1;
-          return value.toLowerCase().includes(query) ? 1 : 0;
+          // Every word must appear, in any order. Matching the whole query as
+          // one string meant "bolt torque" missed a tool whose text says
+          // "torque … bolt", and word order is not something a person typing
+          // into a search box should have to guess.
+          const haystack = value.toLowerCase();
+          return query.split(/\s+/).every((term) => haystack.includes(term)) ? 1 : 0;
         }}
       >
         <Command.Input
