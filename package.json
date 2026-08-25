@@ -17,7 +17,7 @@
     "preview": "node scripts/with-app-env.mjs vite preview",
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test": "node --test \"scripts/**/*.test.mjs\" && node --experimental-strip-types --import ./scripts/alias-register.mjs --test src/lib/app-data/app-data.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/admin.test.ts src/lib/db-fallback.test.ts src/studio/test/unit-preserve.test.mjs src/lib/formula-corrections.test.mjs src/lib/formula-truth.test.mjs src/lib/caliper-band1.test.mjs src/lib/caliper-pilot.test.mjs src/lib/caliper-wave2.test.mjs src/lib/caliper-near.test.mjs src/lib/caliper-migration.test.mjs src/lib/caliper-remaining.test.mjs packages/formula/test/formula.test.mjs",
+    "test": "node --test \"scripts/**/*.test.mjs\" && node --experimental-strip-types --import ./scripts/alias-register.mjs --test src/lib/app-data/app-data.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/admin.test.ts src/lib/db-fallback.test.ts src/studio/test/unit-preserve.test.mjs src/lib/formula-corrections.test.mjs src/lib/formula-truth.test.mjs src/lib/library-formulas.test.mjs src/lib/caliper-band1.test.mjs src/lib/caliper-pilot.test.mjs src/lib/caliper-wave2.test.mjs src/lib/caliper-near.test.mjs src/lib/caliper-migration.test.mjs src/lib/caliper-remaining.test.mjs packages/formula/test/formula.test.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
