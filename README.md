@@ -18,7 +18,7 @@ Instrument is a **preliminary screening desk**, not a design approval, sealed ca
 - Command palette (`⌘K` / `Ctrl+K`)
 - Project snapshots and review records (no account required)
 - Engineering review: checklists, weighted trade study, FMEA arithmetic
-- Optional Google / X sign-in
+- Optional account (email + password) to sync work across devices
 - Dark and light themes
 
 ## Requirements

@@ -14,6 +14,9 @@ export default tseslint.config(
       ".vercel/**",
       ".nitro/**",
       "node_modules/**",
+      // Agent scratch space — `.claude/worktrees/` holds whole checkouts of
+      // this repo, which would otherwise be linted a second time.
+      ".claude/**",
       "src/routeTree.gen.ts",
     ],
   },
