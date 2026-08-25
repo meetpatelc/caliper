@@ -3,6 +3,12 @@
   "version": "0.1.2",
   "private": false,
   "description": "Canonical SI unit inventory and convertQuantity for Instrument.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetpatelc/instrument.git",
+    "directory": "packages/units"
+  },
+  "homepage": "https://github.com/meetpatelc/instrument/tree/main/packages/units",
   "type": "module",
   "exports": {
     ".": {
@@ -14,5 +20,12 @@
     "build:inventory": "python3 scripts/build-inventory.py",
     "test": "node --test test/*.test.mjs"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "files": [
+    "src",
+    "data",
+    "INVENTORY.md",
+    "README.md",
+    "LICENSE"
+  ]
 }

@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "description": "Product-neutral expression evaluator. Numbers in, number out. No units, catalog, or Studio.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetpatelc/instrument.git",
+    "directory": "packages/formula"
+  },
+  "homepage": "https://github.com/meetpatelc/instrument/tree/main/packages/formula",
   "type": "module",
   "exports": {
     ".": {
