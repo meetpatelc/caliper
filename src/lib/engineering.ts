@@ -1344,7 +1344,6 @@ const round = (value: number, significant = 5) => {
 const quantity = (key: string, label: string, raw: number, value: number, unit: string, significant = 5): CalculationValue => ({ key, label, raw, display: round(value, significant), unit });
 
 const fromKiloNewton = (value: number) => value * 1000;
-const fromMillimetre = (value: number) => value * 1e-3;
 const fromGigaPascal = (value: number) => value * 1e9;
 const fromCentimetre4 = (value: number) => value * 1e-8;
 

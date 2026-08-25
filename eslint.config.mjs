@@ -14,6 +14,9 @@ export default tseslint.config(
       ".vercel/**",
       ".nitro/**",
       "node_modules/**",
+      // Agent scratch space — `.claude/worktrees/` holds whole checkouts of
+      // this repo, which would otherwise be linted a second time.
+      ".claude/**",
       "src/routeTree.gen.ts",
     ],
   },
@@ -40,6 +43,16 @@ export default tseslint.config(
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  // Test and QA runners are .mjs files that import .ts sources directly (run
+  // under Node's type stripping); they open with `@ts-nocheck` so `tsc --noEmit`
+  // (checkJs) skips them. Allow that one directive there — product code keeps
+  // the ban.
+  {
+    files: ["**/*.test.mjs", "scripts/*-qa.mjs"],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
     },
   },
   // Disable rules that conflict with Prettier formatting.

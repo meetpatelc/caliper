@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { authMiddleware } from "@/lib/auth/middleware";
+import { adminMiddleware } from "@/lib/auth/middleware";
 
 const inputSchema = z.object({
   kind: z.enum(["bug", "message"]),
@@ -40,8 +40,13 @@ export const submitFeedback = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+/**
+ * Everyone's messages in one list — shared data, so this is admin-only
+ * (`ADMIN_EMAILS`). Submissions are anonymous and free-text, so any signed-in
+ * visitor reading them would be a disclosure, not a feature.
+ */
 export const listFeedback = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([adminMiddleware])
   .handler(async (): Promise<FeedbackRow[]> => {
     const { getSql } = await import("@/lib/db");
     const sql = await getSql();

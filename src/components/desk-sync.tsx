@@ -126,14 +126,17 @@ async function joinAccountDesk() {
     await restoreUnsignedDesk();
     toast.error("Could not load the account desk. Showing this device.");
   } finally {
-    if (gen !== syncGeneration) return;
-    setDeskHydrating(false);
-    const queued = await flushAccountWrites();
-    if (queued && gen === syncGeneration) {
-      try {
-        applyDesk(await getDesk());
-      } catch {
-        /* keep optimistic memory */
+    // Guarded block, not an early return — a `return` here would also swallow
+    // any exception already unwinding out of the catch above.
+    if (gen === syncGeneration) {
+      setDeskHydrating(false);
+      const queued = await flushAccountWrites();
+      if (queued && gen === syncGeneration) {
+        try {
+          applyDesk(await getDesk());
+        } catch {
+          /* keep optimistic memory */
+        }
       }
     }
   }

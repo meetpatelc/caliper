@@ -43,7 +43,6 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
   const items = useWorkshop((state) => state.items);
   const [draft, setDraft] = useState<WorkshopCalculator>(item);
   const [step, setStep] = useState<StepId>(isBlankDraft(item) ? "name" : "engine");
-  const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [activeOutput, setActiveOutput] = useState(0);
   const expressionRef = useRef<HTMLInputElement>(null);
@@ -166,11 +165,11 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
         lede="Drafts autosave. Signed in, they live on your account. Method is only required to publish."
         actions={
           draft.published ? (
-            <Button disabled={busy} onClick={retract}>
+            <Button onClick={retract}>
               Unpublish
             </Button>
           ) : (
-            <Button variant="accent" disabled={busy} onClick={publish}>
+            <Button variant="accent" onClick={publish}>
               Publish
             </Button>
           )

@@ -29,19 +29,42 @@ npm test
 
 ## Adding or changing a model
 
+Most models are **documents**: data, not code. You declare fields, output
+expressions, method, assumptions, and source, and the shared evaluator runs it
+(`runLibraryDocument`). Write custom TypeScript only for a model the document
+schema cannot express yet — branching case tables, iterative solves, and the
+like.
+
 A released tool must have all of:
 
 | Piece | Where |
 | --- | --- |
-| Catalog entry (`id`, title, assumptions, source, contract) | `src/lib/catalog.ts` |
+| `ToolId` union member | `src/lib/catalog.ts` |
+| Catalog entry (title, assumptions, source, contract) | `tools` in `src/lib/catalog.ts` |
 | Search aliases | `toolAliases` in `src/lib/catalog.ts` |
-| Fields + example inputs | `src/lib/engineering.ts` |
-| `calculateTool` branch | `src/lib/engineering.ts` |
-| Dedicated diagram | `src/components/MechanicalDiagram.tsx` |
+| Field definitions | `toolFields` in `src/lib/engineering.ts` |
+| Example inputs | `initialInputs` in `src/lib/engineering.ts` |
+| The document (fields, expressions, method, source) | one of `src/lib/library-*.ts` |
+
+The last three `Record<ToolId, …>` maps are exhaustive over `ToolId`, so
+`npm run typecheck` tells you what you missed.
+
+Two things the old version of this file got wrong, worth stating plainly:
+
+- **You do not add a `calculateTool` branch.** Documents are dispatched by
+  `toolId in libraryDocuments`. A branch there is only for a custom TypeScript
+  model.
+- **Diagrams live in `src/components/sketches.tsx`** (`MechanicalDiagram` is a
+  thin wrapper around it) and are **optional** — most released models have none.
+  Add one when the geometry is load-bearing for reading the result.
+
+Field definitions currently duplicate what the document already declares. That
+is migration debt, not a design goal; keep the two in agreement until they are
+unified.
 
 If you add a model, also:
 
-- Keep `MODEL_COUNT` derived from `tools.length` (do not hardcode 166).
+- Keep `MODEL_COUNT` derived from `tools.length` (never hardcode the count).
 - Hand-check the default example against a trusted source and paste that check in the PR.
 - State the formula version and what would invalidate the method.
 

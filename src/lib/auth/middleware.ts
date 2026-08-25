@@ -45,3 +45,24 @@ export const authMiddleware = createMiddleware({ type: "function" })
     const userId = await requireUserId(context.bearerToken);
     return next({ context: { userId } });
   });
+
+/**
+ * Like `authMiddleware`, but additionally requires the caller to be on the
+ * `ADMIN_EMAILS` allowlist (see `./admin.server`). Throws `ForbiddenError`
+ * otherwise.
+ *
+ * Use this — not `authMiddleware` — for SHARED data that is not scoped to one
+ * user. Where sign-up is open, "signed in" is not an authorization check.
+ */
+export const adminMiddleware = createMiddleware({ type: "function" })
+  .client(async ({ next }) => {
+    const { getBearerToken } = await import("./client");
+    return next({ sendContext: { bearerToken: getBearerToken() ?? undefined } });
+  })
+  .server(async ({ next, context }) => {
+    const { assertSameSiteRequest } = await import("./isolation.server");
+    const { requireAdminUser } = await import("./admin.server");
+    assertSameSiteRequest();
+    const user = await requireAdminUser(context.bearerToken);
+    return next({ context: { userId: user.id } });
+  });
