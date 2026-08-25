@@ -103,17 +103,18 @@ test("the build side resolves the app env from a workspace root", () => {
   assert.equal(buildAuthEnabled(overridden, { VITE_AUTH_ENABLED: "true" }), true);
 });
 
-test("the CLI reports rather than silently passing when run via a symlink", async (t) => {
+test("the CLI reports rather than silently passing when run via a symlink", async () => {
   // A check whose exit code is the whole signal must never no-op to 0 because
   // process.argv[1] came in through a symlinked path.
+  //
+  // A junction on Windows: a plain symlink needs elevation there, and skipping
+  // the test is how this kind of failure stays hidden until CI.
   const link = join(mkdtempSync(join(tmpdir(), "auth-invariant-link-")), "scripts");
-  try {
-    symlinkSync(join(projectRoot(), "scripts"), link);
-  } catch (err) {
-    // Windows only grants symlink creation to elevated/dev-mode users.
-    if (err?.code === "EPERM") return t.skip("symlinks not permitted here");
-    throw err;
-  }
+  symlinkSync(
+    join(projectRoot(), "scripts"),
+    link,
+    process.platform === "win32" ? "junction" : undefined,
+  );
   const error = await promisify(execFile)(process.execPath, [
     join(link, "check-auth-invariant.mjs"),
     "--dev-url",

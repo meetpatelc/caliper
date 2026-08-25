@@ -17,6 +17,18 @@ const execFileAsync = promisify(execFile);
 const WRAPPER = join(projectRoot(), "scripts/with-app-env.mjs");
 const PRINT_FLAG = "process.stdout.write(String(process.env.VITE_AUTH_ENABLED));";
 
+/**
+ * Symlink a directory, portably.
+ *
+ * A plain symlink needs elevation or Developer Mode on Windows, so these tests
+ * used to skip there — which is how a real failure on Linux went unseen. A
+ * junction is the same reparse point for our purposes (realpath resolves it)
+ * and needs no privileges, so the test runs on every platform instead.
+ */
+function linkDir(target, path) {
+  symlinkSync(target, path, process.platform === "win32" ? "junction" : undefined);
+}
+
 function makeWorkspace(appEnvJson) {
   const root = mkdtempSync(join(tmpdir(), "app-env-"));
   if (appEnvJson !== undefined) {
@@ -129,22 +141,26 @@ test("a bare npm-shim command name runs on every platform", async () => {
   assert.match(stdout.trim(), /^\d+\.\d+\.\d+/);
 });
 
-test("the CLI still runs when invoked through a symlinked path", async (t) => {
+test("the CLI still runs when invoked through a symlinked path", async () => {
   // node realpaths import.meta.url but not process.argv[1], so a raw comparison
   // turns the wrapper into a no-op that exits 0 without starting anything.
+  //
+  // Hermetic, like the other app-env tests: the wrapper resolves its app env
+  // relative to its own REAL location, so symlink to a temp workspace that
+  // ships one. Pointing at this repo's own scripts/ asserted a value that comes
+  // from `.grok/app-env.json` — gitignored, so absent in a fresh clone and in
+  // CI, where the wrapper correctly printed "undefined".
+  const root = makeWorkspace('{"VITE_AUTH_ENABLED":"false"}');
+  mkdirSync(join(root, "scripts"), { recursive: true });
+  copyFileSync(WRAPPER, join(root, "scripts", "with-app-env.mjs"));
+
   const link = join(mkdtempSync(join(tmpdir(), "app-env-link-")), "scripts");
-  try {
-    symlinkSync(join(projectRoot(), "scripts"), link);
-  } catch (err) {
-    // Windows only grants symlink creation to elevated/dev-mode users.
-    if (err?.code === "EPERM") return t.skip("symlinks not permitted here");
-    throw err;
-  }
-  const { stdout } = await execFileAsync(process.execPath, [
-    join(link, "with-app-env.mjs"),
+  linkDir(join(root, "scripts"), link);
+
+  const { stdout } = await execFileAsync(
     process.execPath,
-    "-e",
-    PRINT_FLAG,
-  ]);
+    [join(link, "with-app-env.mjs"), process.execPath, "-e", PRINT_FLAG],
+    { env: { ...process.env, VITE_AUTH_ENABLED: undefined } },
+  );
   assert.equal(stdout, "false");
 });
