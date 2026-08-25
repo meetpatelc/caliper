@@ -30,7 +30,13 @@ export function OverlayDialog({
 
   useEffect(() => {
     if (!open) return;
-    lastActive.current = (document.activeElement as HTMLElement | null) ?? restoreFocusTo?.current ?? null;
+    // Read the caller's restore target ONCE, while the overlay opens. Reading
+    // `restoreFocusTo.current` in the cleanup instead would see whatever the
+    // ref points at when the overlay closes — by then the trigger may have
+    // unmounted, and focus would be restored to a detached node or lost to
+    // <body>, dropping the keyboard user's place on the page.
+    const restoreTarget = restoreFocusTo?.current ?? null;
+    lastActive.current = (document.activeElement as HTMLElement | null) ?? restoreTarget;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const panel = panelRef.current;
@@ -71,7 +77,7 @@ export function OverlayDialog({
       window.removeEventListener("keydown", onKey);
       inertTargets.forEach((element) => element.removeAttribute("inert"));
       const remembered = lastActive.current;
-      const restore = remembered && document.contains(remembered) ? remembered : restoreFocusTo?.current;
+      const restore = remembered && document.contains(remembered) ? remembered : restoreTarget;
       restore?.focus?.();
     };
   }, [open, restoreFocusTo]);

@@ -165,6 +165,11 @@ export function DeskSync() {
       return;
     }
     void joinAccountDesk();
+    // Keyed on the user IDENTITY, not the user object. `useSession` returns a
+    // fresh object on every poll, so depending on `user` would re-run the full
+    // desk join — a remote fetch that blanks and repopulates the store — on
+    // every session refresh. Only `user?.id` changing means a different person.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, isPending]);
 
   return null;

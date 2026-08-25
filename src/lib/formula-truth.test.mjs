@@ -278,6 +278,83 @@ const CASES = [
       return { force: m * a, forceKilo: m * a, accelerationG: a };
     },
   },
+  {
+    id: "torsion",
+    source: "J = πD⁴/32 · τ = Tc/J · φ = TL/(GJ) · P = Tω (circular shaft in torsion)",
+    expected() {
+      const T = 250; // N·m
+      const D = 0.035; // 35 mm
+      const L = 0.8; // 800 mm
+      const G = 79e9; // 79 GPa
+      const rpm = 1450;
+      const polarMoment = (Math.PI * D ** 4) / 32;
+      return {
+        polarMoment,
+        shearStress: (T * (D / 2)) / polarMoment,
+        // `twistDeg` is displayed in degrees; the canonical value is radians.
+        twistDeg: (T * L) / (G * polarMoment),
+        power: T * ((2 * Math.PI * rpm) / 60),
+      };
+    },
+  },
+  {
+    id: "bernoulli",
+    source: "p₁ + ½ρv₁² + ρgz₁ = p₂ + ½ρv₂² + ρgz₂ (steady incompressible Bernoulli)",
+    expected() {
+      const rho = 1000;
+      const v1 = 1.5;
+      const v2 = 3.0;
+      // Equal elevations, so the whole change is the velocity head.
+      const pressureChange = 0.5 * rho * (v1 ** 2 - v2 ** 2);
+      const headChange = pressureChange / (rho * G);
+      return { pressureChange, headChange, velocityHeadChange: headChange };
+    },
+  },
+  {
+    id: "continuity",
+    source: "Q = A₁v₁ = A₂v₂ (incompressible continuity)",
+    expected() {
+      const a1 = 1000e-6; // 1000 mm²
+      const v1 = 2;
+      const a2 = 400e-6; // 400 mm²
+      const flow = a1 * v1;
+      return { flow, velocity2: flow / a2, areaRatio: a1 / a2 };
+    },
+  },
+  {
+    id: "thermalExpansion",
+    source: "ΔL = αL₀ΔT · εth = αΔT (linear thermal expansion)",
+    expected() {
+      const L0 = 1.2; // 1200 mm
+      const alpha = 12e-6; // per K
+      const dT = 65;
+      const extension = alpha * L0 * dT;
+      return { extension, finalLength: L0 + extension, thermalStrain: alpha * dT };
+    },
+  },
+  {
+    id: "gravitationalPe",
+    source: "PE = mgh (gravitational potential energy)",
+    expected() {
+      return { energy: 80 * G * 2 };
+    },
+  },
+  {
+    id: "pipeVelocity",
+    source: "V = 4Q/(πD²) (mean velocity in a round pipe)",
+    expected() {
+      const Q = 8e-3; // 8 L/s
+      const D = 0.08; // 80 mm
+      return { speed: (4 * Q) / (Math.PI * D ** 2) };
+    },
+  },
+  {
+    id: "dynamicPressure",
+    source: "q = ½ρV² (dynamic pressure)",
+    expected() {
+      return { q: 0.5 * 1.225 * 20 ** 2 };
+    },
+  },
 ];
 
 for (const { id, source, expected } of CASES) {

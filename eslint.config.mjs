@@ -55,6 +55,56 @@ export default tseslint.config(
       "@typescript-eslint/ban-ts-comment": "off",
     },
   },
+  // `react-refresh/only-export-components` protects Fast Refresh in APP files.
+  // The kit is a library: `buttonVariants`, `panelClass` and `fieldErrorId` are
+  // part of its public API and deliberately ship beside the components they
+  // belong to. Splitting them into sibling files to satisfy a dev-server
+  // heuristic would make the kit worse to consume.
+  {
+    files: ["packages/ui/src/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  // ── Design-system enforcement ──────────────────────────────────────────────
+  // CONTRIBUTING asks for "no ad-hoc hex in JSX", and today the app honours it
+  // exactly: zero raw hex and zero bare <button> across src/. That was
+  // discipline, not a guarantee — these rules make it the latter, so the next
+  // contributor cannot quietly reintroduce an off-system colour.
+  //
+  // Colours belong in packages/ui/src/tokens.css, which is why that file (and
+  // the kit's own CSS) is not covered here.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          // Catches `#c8102e`, `#fff`, `#RRGGBBAA` — in className strings,
+          // style props, chart config, anywhere in a string literal.
+          selector:
+            "Literal[value=/#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\b/]",
+          message:
+            "No raw hex colours. Use a semantic token (bg/surface/elevated/fg/muted/accent/border/danger/ok) from packages/ui/src/tokens.css.",
+        },
+        {
+          // Tailwind's default palette bypasses the token layer entirely and
+          // breaks dark mode, which reassigns token NAMES rather than values.
+          selector:
+            "Literal[value=/\\b(?:bg|text|border|ring|fill|stroke|from|via|to|decoration|outline|shadow|accent|caret|divide)-(?:slate|gray|grey|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950)\\b/]",
+          message:
+            "No Tailwind palette colours. Use a semantic token (bg/surface/elevated/fg/muted/accent/border/danger/ok) — dark mode reassigns token names, so palette classes will not follow the theme.",
+        },
+        {
+          // The kit owns every interactive control; a bare <button> misses the
+          // shared focus ring, sizing and variants.
+          selector: "JSXOpeningElement[name.name='button']",
+          message:
+            "Use <Button> from @instrument/ui (via @/components/ui/button) rather than a bare <button>.",
+        },
+      ],
+    },
+  },
   // Disable rules that conflict with Prettier formatting.
   prettier,
 );
