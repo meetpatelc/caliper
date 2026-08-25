@@ -530,3 +530,32 @@ test("vite plugin bakes og identity as a virtual module", () => {
   assert.match(plugin, /snapshotOgIdentity/);
 });
 
+
+// A shared link is only worth sending if its preview says what the page holds.
+// The head injector strips the route's own share meta before adding its own, so
+// without these the whole site previews as the bare app name — which is how it
+// shipped, unnoticed, until a record page made the loss visible.
+test("og:title follows the page, not the app name", () => {
+  const html = injectGrokPwaHead(
+    "<html><head><title>Axial response: 20 MPa · Instrument</title></head><body></body></html>",
+    { site: { title: "Instrument" }, host: "example.test" },
+  );
+  const titles = [...html.matchAll(/<meta property="og:title" content="([^"]*)">/g)].map((m) => m[1]);
+  assert.deepEqual(titles, ["Axial response: 20 MPa · Instrument"]);
+});
+
+test("og:description survives the strip that removes it", () => {
+  const html = injectGrokPwaHead(
+    '<html><head><title>Axial response</title><meta name="description" content="Average stress 20 MPa."></head><body></body></html>',
+    { site: { title: "Instrument" }, host: "example.test" },
+  );
+  assert.match(html, /<meta property="og:description" content="Average stress 20 MPa\.">/);
+});
+
+test("a page that names nothing still falls back to the app name", () => {
+  const html = injectGrokPwaHead("<html><head></head><body></body></html>", {
+    site: { title: "Instrument" },
+    host: "example.test",
+  });
+  assert.match(html, /<meta property="og:title" content="Instrument">/);
+});
