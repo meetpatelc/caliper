@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 import { tools } from "@/lib/catalog";
 import { PARENT_NAME } from "@/lib/instrument";
@@ -57,14 +58,14 @@ function AboutPage() {
           </>
         }
       />
-      <p className="eyebrow mt-6">Preliminary only · project context required · independent review</p>
-      <div className="mt-10 grid gap-5 md:grid-cols-2">
+      <p className="eyebrow mt-8">Preliminary only · project context required · independent review</p>
+      <div className="mt-8 grid gap-5 md:grid-cols-2">
         <div className={cn(panelClass, "border-ok/30 p-5")}>
           <p className="eyebrow text-ok">Designed to support</p>
           <ul className="mt-4 grid gap-3 text-sm leading-6">
             {suitable.map((item) => (
               <li key={item} className="flex gap-2">
-                <CheckCircle2 size={16} className="mt-0.5 text-ok" />
+                <CheckCircle2 size={ICON.base} className="mt-0.5 text-ok" />
                 {item}
               </li>
             ))}
@@ -75,14 +76,14 @@ function AboutPage() {
           <ul className="mt-4 grid gap-3 text-sm leading-6">
             {unsuitable.map((item) => (
               <li key={item} className="flex gap-2">
-                <CircleAlert size={16} className="mt-0.5 text-mark" />
+                <CircleAlert size={ICON.base} className="mt-0.5 text-mark" />
                 {item}
               </li>
             ))}
           </ul>
         </div>
       </div>
-      <p className="mt-10 text-sm text-muted">
+      <p className="mt-8 text-sm text-muted">
         Found a model issue?{" "}
         <Link to="/feedback" className="link-accent">
           Send feedback

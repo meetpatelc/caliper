@@ -83,7 +83,7 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
             <p className="truncate text-sm text-muted">{email || "—"}</p>
           </div>
         </div>
-        <form className="mt-5 grid gap-4" onSubmit={saveName}>
+        <form className="mt-4 grid gap-4" onSubmit={saveName}>
           <Field htmlFor="profile-name" label="Name">
             <Input id="profile-name" autoComplete="name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} />
           </Field>
@@ -107,10 +107,10 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
           <ErrorState className="mt-2 text-muted">Could not load the account desk. Counts below are this device.</ErrorState>
         ) : null}
         {hydrating ? (
-          <LoadingState className="mt-3">Loading the account desk.</LoadingState>
+          <LoadingState className="mt-2">Loading the account desk.</LoadingState>
         ) : (
           <>
-            <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
+            <dl className="mt-2 grid grid-cols-3 gap-3 text-sm">
               <div>
                 <dt className="text-muted">Favourites</dt>
                 <dd className="mt-1 font-mono tabular-nums">{favouriteTools.length}</dd>
@@ -139,12 +139,12 @@ function ProfileBody({ name, email }: { name: string; email: string }) {
             )}
           </>
         )}
-        <Link to="/workshop" className="link-accent mt-3 inline-block text-sm">
+        <Link to="/workshop" className="link-accent mt-2 inline-block text-sm">
           Open Project
         </Link>
       </section>
 
-      <p className="mt-6 text-sm text-muted">
+      <p className="mt-8 text-sm text-muted">
         Password and sign out are in{" "}
         <Link to="/settings" className="link-accent">
           Account settings

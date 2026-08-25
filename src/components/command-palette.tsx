@@ -1,4 +1,5 @@
 import { Command } from "cmdk";
+import { ICON } from "@instrument/ui";
 import { useRouter } from "@tanstack/react-router";
 import { ClipboardList, PenLine, Star } from "lucide-react";
 import type { RefObject } from "react";
@@ -88,7 +89,7 @@ export function CommandPalette({
                   className={itemClass}
                 >
                   <span>{tool!.title}</span>
-                  <Star size={12} className="shrink-0 text-mark" fill="currentColor" />
+                  <Star size={ICON.inline} className="shrink-0 text-mark" fill="currentColor" />
                 </Command.Item>
               ))}
             </Command.Group>
@@ -136,7 +137,7 @@ export function CommandPalette({
                 >
                   <span>{record.title}</span>
                   <span className="inline-flex items-center gap-1 meta">
-                    <ClipboardList size={11} className="hidden sm:inline" />
+                    <ClipboardList size={ICON.inline} className="hidden sm:inline" />
                     {record.area}
                   </span>
                 </Command.Item>
@@ -157,7 +158,7 @@ export function CommandPalette({
                 >
                   <span>{item.title}</span>
                   <span className="inline-flex items-center gap-1 meta">
-                    <PenLine size={11} className="hidden sm:inline" />
+                    <PenLine size={ICON.inline} className="hidden sm:inline" />
                     {item.published ? "published" : "draft"}
                   </span>
                 </Command.Item>

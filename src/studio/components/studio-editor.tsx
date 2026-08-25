@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -190,7 +191,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
         ))}
       </SegmentedControl>
 
-      <div className="mt-6 grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+      <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <div>
           {step === "name" && (
             <fieldset className={cn(panelClass, "grid gap-3 p-4")}>
@@ -261,7 +262,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       });
                     }}
                   >
-                    <Plus size={14} /> Add
+                    <Plus size={ICON.inline} /> Add
                   </Button>
                 </div>
                 {draft.fields.map((field, index) => (
@@ -281,7 +282,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         aria-label={`Remove ${field.label || "input"}`}
                         onClick={() => setDraft({ ...draft, fields: draft.fields.filter((_, i) => i !== index) })}
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={ICON.base} />
                       </Button>
                     </div>
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_5.5rem_6rem]">
@@ -364,7 +365,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         });
                       }}
                     >
-                      <Plus size={14} /> Add
+                      <Plus size={ICON.inline} /> Add
                     </Button>
                   )}
                 </div>
@@ -388,7 +389,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                             setActiveOutput(0);
                           }}
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={ICON.base} />
                         </Button>
                       )}
                     </div>
@@ -565,7 +566,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
           >
             {draft.title} will be removed from Project. This cannot be undone.
           </ConfirmDialog>
-          <Button variant="ghost" className="mt-6 text-danger" onClick={() => setConfirmDelete(true)}>
+          <Button variant="ghost" className="mt-8 text-danger" onClick={() => setConfirmDelete(true)}>
             Delete draft
           </Button>
         </div>

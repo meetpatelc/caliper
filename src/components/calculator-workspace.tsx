@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ICON } from "@instrument/ui";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { CircleAlert, Copy, Link2, PenLine, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -278,7 +279,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                 void navigate({ to: "/studio/$id", params: { id: item.id } });
               }}
             >
-              <PenLine size={14} />
+              <PenLine size={ICON.inline} />
               Fork in studio
             </Button>
           ) : null}
@@ -424,7 +425,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
             <div id="results" aria-live="polite" className="grid gap-4">
             {result.errors.length ? (
               <ErrorState variant="banner" className="flex items-start gap-2">
-                <CircleAlert size={16} />
+                <CircleAlert size={ICON.base} />
                 <p>{result.errors[0]}</p>
               </ErrorState>
             ) : (
@@ -469,15 +470,15 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                 <GoverningRelation formula={result.method} className="text-sm" />
                 <div className="flex flex-wrap gap-2">
                     <Button variant="accent" onClick={saveLocal}>
-                      <Save size={13} />
+                      <Save size={ICON.inline} />
                       Save this check
                     </Button>
                     <Button onClick={copySummary}>
-                      <Copy size={13} />
+                      <Copy size={ICON.inline} />
                       Copy result
                     </Button>
                     <Button onClick={copyLink}>
-                      <Link2 size={13} />
+                      <Link2 size={ICON.inline} />
                       Copy link
                     </Button>
                   </div>
@@ -488,7 +489,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
         />
 
       {printScope && (
-        <section className="print-sheet mt-8 hidden print:block">
+        <section className="print-sheet mt-12 hidden print:block">
           <p className="eyebrow">Calculation snapshot</p>
           <h1>{printScope.title}</h1>
           <p>Formula version {printScope.formulaVersion}</p>

@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import { ICON } from "@instrument/ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -33,13 +34,13 @@ export function FavouriteButton({
           className,
         )}
       >
-        <Star size={14} fill={favourited ? "currentColor" : "none"} />
+        <Star size={ICON.inline} fill={favourited ? "currentColor" : "none"} />
       </Button>
     );
   }
   return (
     <Button type="button" variant={favourited ? "mark" : "outline"} aria-pressed={favourited} onClick={onToggle} className={className}>
-      <Star size={14} fill={favourited ? "currentColor" : "none"} />
+      <Star size={ICON.inline} fill={favourited ? "currentColor" : "none"} />
       {favourited ? "Favourited" : "Favourite"}
     </Button>
   );

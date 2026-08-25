@@ -1,4 +1,5 @@
 export { cn } from "./cn";
+export { ICON, type IconSize } from "./icon";
 export { Button, buttonVariants } from "./button";
 export {
   Field,
@@ -20,6 +21,6 @@ export { EmptyState, LoadingState, ErrorState, SuccessState } from "./status";
 export { FilterChip, SelectableCard } from "./selection";
 export { SegmentedControl, SegmentedItem } from "./choice";
 export { DataRow } from "./row";
-export { PageHeader } from "./page";
+export { PageHeader, SectionHeader } from "./page";
 export { Menu, MenuItem } from "./menu";
 export { SearchTrigger } from "./search";

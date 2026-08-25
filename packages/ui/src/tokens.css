@@ -15,6 +15,11 @@
   --color-elevated: #ffffff;
   --color-fg: #1b1e24;
   --color-muted: #5c6370;
+  /* Two emphasis colours, deliberately the same value.
+     `accent` is SYSTEM emphasis: links, selected state, primary action.
+     `mark`  is USER emphasis: favourites, and diagram callouts via --desk-amber.
+     They are identical so the two kinds never clash — but they are separate
+     names so either can move without dragging the other. Change both here. */
   --color-accent: #c8102e;
   --color-accent-fg: #ffffff;
   --color-mark: #c8102e;

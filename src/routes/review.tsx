@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { useEffect, useMemo, useState } from "react";
 import { Check, Download, Minus, Plus, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +17,7 @@ import { buildReviewTemplate, type DocumentTemplateKind } from "@/lib/reviewTemp
 import { Button } from "@/components/ui/button";
 import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
-import { PageHeader } from "@/components/ui/page";
+import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { SelectableCard } from "@/components/ui/selection";
 import { ErrorState } from "@/components/ui/status";
@@ -192,7 +193,7 @@ function ReviewPage() {
                 className="flex h-auto w-full justify-start gap-3 p-4 text-left"
               >
                 <span className={`mt-0.5 grid size-5 place-items-center rounded-sm border ${on ? "border-ok bg-ok text-bg" : "border-border"}`}>
-                  {on && <Check size={12} />}
+                  {on && <Check size={ICON.inline} />}
                 </span>
                 <span>
                   <strong className="block">{rule.title}</strong>
@@ -207,8 +208,10 @@ function ReviewPage() {
 
       <section className="mt-12 grid gap-8 lg:grid-cols-2">
         <div className={cn(panelClass, "min-w-0 overflow-hidden p-5")}>
-          <p className="eyebrow">Trade study</p>
-          <h2 className="section-title mt-1">Weighted comparison</h2>
+          <SectionHeader
+            kicker={<>Trade study</>}
+            title={<>Weighted comparison</>}
+          />
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field htmlFor="option-a" label="Option A">
               <Input id="option-a" value={optionAName} onChange={(event) => setOptionAName(event.target.value)} />
@@ -230,13 +233,13 @@ function ReviewPage() {
                 <Input value={criterion.optionA} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionA: event.target.value } : item)))} className="font-mono" aria-label={`Criterion ${index + 1} ${optionAName} score`} />
                 <Input value={criterion.optionB} onChange={(event) => setCriteria((current) => current.map((item, i) => (i === index ? { ...item, optionB: event.target.value } : item)))} className="font-mono" aria-label={`Criterion ${index + 1} ${optionBName} score`} />
                 <Button variant="ghost" size="icon" onClick={() => setCriteria((current) => (current.length === 1 ? current : current.filter((_, i) => i !== index)))} aria-label={`Remove criterion ${index + 1}`}>
-                  <Minus size={14} />
+                  <Minus size={ICON.inline} />
                 </Button>
               </fieldset>
             ))}
           </div>
-          <Button variant="ghost" className="mt-3 text-accent" onClick={() => setCriteria((current) => [...current, { label: "New criterion", weight: "1", optionA: "5", optionB: "5" }])}>
-            <Plus size={14} /> Add criterion
+          <Button variant="ghost" className="mt-2 text-accent" onClick={() => setCriteria((current) => [...current, { label: "New criterion", weight: "1", optionA: "5", optionB: "5" }])}>
+            <Plus size={ICON.inline} /> Add criterion
           </Button>
           {trade.error ? <ErrorState className="mt-4">{trade.error}</ErrorState> : trade.result && (
             <p className="mt-4 font-mono text-sm">
@@ -245,8 +248,10 @@ function ReviewPage() {
           )}
         </div>
         <div className={cn(panelClass, "min-w-0 overflow-hidden p-5")}>
-          <p className="eyebrow">FMEA arithmetic</p>
-          <h2 className="section-title mt-1">Severity × occurrence × detection</h2>
+          <SectionHeader
+            kicker={<>FMEA arithmetic</>}
+            title={<>Severity × occurrence × detection</>}
+          />
           <div className="mt-4 grid grid-cols-3 gap-3">
             {(
               [
@@ -285,8 +290,8 @@ function ReviewPage() {
               ))}
             </Select>
           </Field>
-          <p className="mt-3 text-sm text-muted">{activeWorkflow.scope}</p>
-          <ul className="mt-3 grid gap-2">
+          <p className="mt-2 text-sm text-muted">{activeWorkflow.scope}</p>
+          <ul className="mt-2 grid gap-2">
             {activeWorkflow.evidence.map((item, index) => {
               const id = `${activeWorkflow.id}-${index}`;
               const on = workflowChecks.includes(id);
@@ -307,9 +312,9 @@ function ReviewPage() {
         </div>
       </section>
 
-      <section className={cn(panelClass, "mt-10 min-w-0 overflow-hidden p-5")}>
+      <section className={cn(panelClass, "mt-8 min-w-0 overflow-hidden p-5")}>
         <p className="eyebrow">Record</p>
-        <div className="mt-3 grid min-w-0 gap-3 md:grid-cols-2">
+        <div className="mt-2 grid min-w-0 gap-3 md:grid-cols-2">
           <Field htmlFor="review-title" label="Snapshot title">
             <Input id="review-title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Evidence review" />
           </Field>
@@ -327,10 +332,10 @@ function ReviewPage() {
         </Field>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="accent" onClick={persist}>
-            <Save size={15} /> Save snapshot
+            <Save size={ICON.base} /> Save snapshot
           </Button>
           <Button onClick={download}>
-            <Download size={15} /> Download markdown
+            <Download size={ICON.base} /> Download markdown
           </Button>
         </div>
         {reviews.length > 0 && (

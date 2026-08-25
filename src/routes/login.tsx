@@ -43,12 +43,12 @@ function Login() {
         <Link to="/" className="wordmark">
           Instrument
         </Link>
-        <h1 className="page-title mt-6">{mode === "up" ? "Create an account" : "Sign in"}</h1>
+        <h1 className="page-title mt-8">{mode === "up" ? "Create an account" : "Sign in"}</h1>
         <p className="lede">
           Email and a password. No Google or X. Sign in and Favourites, Project, and Studio drafts follow the account. Without an account they stay on this device.
         </p>
         {authEnabled ? (
-          <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
+          <form className="mt-8 grid gap-4" onSubmit={onSubmit}>
             {mode === "up" ? (
               <Field htmlFor="account-name" label="Name">
                 <Input
@@ -86,7 +86,7 @@ function Login() {
             </Button>
           </form>
         ) : (
-          <p className="mt-6 text-sm text-muted">Sign-in is disabled.</p>
+          <p className="mt-8 text-sm text-muted">Sign-in is disabled.</p>
         )}
         <Button
           type="button"
@@ -100,7 +100,7 @@ function Login() {
           {mode === "up" ? "Already have an account? Sign in" : "Need an account? Create one"}
         </Button>
         <div>
-          <Link to="/" className="link-quiet mt-6 inline-block text-sm">
+          <Link to="/" className="link-quiet mt-8 inline-block text-sm">
             Back to the library
           </Link>
         </div>

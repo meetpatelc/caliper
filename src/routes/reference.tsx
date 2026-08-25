@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { ArrowUpRight } from "lucide-react";
 import { tools } from "@/lib/catalog";
 import { releasedDomains } from "@/lib/desk";
 import { panelClass } from "@/components/ui/panel";
-import { PageHeader } from "@/components/ui/page";
+import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { governedReferenceData } from "@/lib/referenceData";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,7 @@ function ReferencePage() {
         lede="Sources explain the concept. Each workspace still declares its own narrow boundary. Read both before treating a result as evidence."
       />
 
-      <ol className="mt-10 grid gap-3 md:grid-cols-3">
+      <ol className="mt-8 grid gap-3 md:grid-cols-3">
         {[
           ["01", "Check the boundary", "Use the workspace only when geometry, loading, and material assumptions match the question."],
           ["02", "Check the quantity", "Keep units compatible and inspect display precision before comparing sources."],
@@ -33,19 +34,23 @@ function ReferencePage() {
         ))}
       </ol>
 
-      <section className="mt-14">
-        <p className="eyebrow">Governed reference data</p>
-        <h2 className="section-title mt-1">Version, range, and source before a value.</h2>
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+      <section className="mt-12">
+        <SectionHeader
+          kicker={<>Governed reference data</>}
+          title={<>Version, range, and source before a value.</>}
+        />
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
           {governedReferenceData.map((dataset) => (
             <article key={dataset.id} className={`${panelClass} p-5`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="eyebrow">{dataset.id.replace(/-/g, " ")}</p>
-                  <h3 className="section-title-sm mt-1">{dataset.title}</h3>
+                  <SectionHeader size="sm"
+                    kicker={<>{dataset.id.replace(/-/g, " ")}</>}
+                    title={<>{dataset.title}</>}
+                  />
                 </div>
                 <a href={dataset.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Open ${dataset.sourceLabel}`}>
-                  <ArrowUpRight size={16} />
+                  <ArrowUpRight size={ICON.base} />
                 </a>
               </div>
               <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-muted">
@@ -82,10 +87,12 @@ function ReferencePage() {
         </div>
       </section>
 
-      <section className="mt-14">
-        <p className="eyebrow">Workspace provenance</p>
-        <h2 className="section-title mt-1">Every released method, one step away</h2>
-        <div className="mt-6 grid gap-8">
+      <section className="mt-12">
+        <SectionHeader
+          kicker={<>Workspace provenance</>}
+          title={<>Every released method, one step away</>}
+        />
+        <div className="mt-8 grid gap-8">
           {releasedDomains.map((domain) => {
             const domainTools = tools.filter((tool) => tool.contract.domain === domain.id);
             if (!domainTools.length) return null;
@@ -102,7 +109,7 @@ function ReferencePage() {
                         {tool.title}
                       </Link>
                       <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="meta link-quiet inline-flex items-center gap-1">
-                        {tool.sourceLabel} <ArrowUpRight size={12} />
+                        {tool.sourceLabel} <ArrowUpRight size={ICON.inline} />
                       </a>
                     </div>
                   ))}
