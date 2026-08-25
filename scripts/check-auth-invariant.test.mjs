@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdtempSync, symlinkSync } from "node:fs";
+import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -90,16 +90,30 @@ test("only a divergence warns the smoke verdict", () => {
   }
 });
 
-test("the build side resolves the template's shipped app-env", () => {
-  assert.equal(buildAuthEnabled(projectRoot(), {}), false);
-  assert.equal(buildAuthEnabled(projectRoot(), { VITE_AUTH_ENABLED: "true" }), true);
+test("the build side resolves the app env from a workspace root", () => {
+  // No app-env file (this repo's shipped state — .grok/ is gitignored): unset
+  // means sign-in on. A workspace file flips it off; explicit env still wins.
+  const bare = mkdtempSync(join(tmpdir(), "auth-invariant-env-"));
+  assert.equal(buildAuthEnabled(bare, {}), true);
+
+  const overridden = mkdtempSync(join(tmpdir(), "auth-invariant-env-"));
+  mkdirSync(join(overridden, ".grok"), { recursive: true });
+  writeFileSync(join(overridden, ".grok/app-env.json"), '{"VITE_AUTH_ENABLED":"false"}');
+  assert.equal(buildAuthEnabled(overridden, {}), false);
+  assert.equal(buildAuthEnabled(overridden, { VITE_AUTH_ENABLED: "true" }), true);
 });
 
-test("the CLI reports rather than silently passing when run via a symlink", async () => {
+test("the CLI reports rather than silently passing when run via a symlink", async (t) => {
   // A check whose exit code is the whole signal must never no-op to 0 because
   // process.argv[1] came in through a symlinked path.
   const link = join(mkdtempSync(join(tmpdir(), "auth-invariant-link-")), "scripts");
-  symlinkSync(join(projectRoot(), "scripts"), link);
+  try {
+    symlinkSync(join(projectRoot(), "scripts"), link);
+  } catch (err) {
+    // Windows only grants symlink creation to elevated/dev-mode users.
+    if (err?.code === "EPERM") return t.skip("symlinks not permitted here");
+    throw err;
+  }
   const error = await promisify(execFile)(process.execPath, [
     join(link, "check-auth-invariant.mjs"),
     "--dev-url",

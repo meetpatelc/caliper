@@ -42,6 +42,16 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
+  // Test and QA runners are .mjs files that import .ts sources directly (run
+  // under Node's type stripping); they open with `@ts-nocheck` so `tsc --noEmit`
+  // (checkJs) skips them. Allow that one directive there — product code keeps
+  // the ban.
+  {
+    files: ["**/*.test.mjs", "scripts/*-qa.mjs"],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
+    },
+  },
   // Disable rules that conflict with Prettier formatting.
   prettier,
 );

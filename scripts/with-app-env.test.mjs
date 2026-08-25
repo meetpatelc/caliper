@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -59,8 +59,11 @@ test("an explicit process-env override wins over the file", () => {
   assert.equal(merged.PATH, "/usr/bin");
 });
 
-test("the template ships auth off", () => {
-  assert.deepEqual(readAppEnv(projectRoot()), { VITE_AUTH_ENABLED: "false" });
+test("a clone ships no app-env override (auth defaults on)", () => {
+  // .grok/ is gitignored (workspace-only), so a fresh clone must resolve an
+  // empty app env — VITE_AUTH_ENABLED unset means sign-in is on by default,
+  // matching .env.example.
+  assert.deepEqual(readAppEnv(projectRoot()), {});
 });
 
 test("vite loadEnv resolves the wrapped value", () => {
@@ -74,12 +77,18 @@ test("vite loadEnv resolves the wrapped value", () => {
 });
 
 test("the wrapped command runs with the app env applied", async () => {
-  const { stdout } = await execFileAsync(process.execPath, [
-    WRAPPER,
+  // Hermetic workspace: the wrapper resolves the app env relative to its own
+  // location, so run a copy from a temp root that ships an app-env.json —
+  // this repo's clone deliberately has none.
+  const root = makeWorkspace('{"VITE_AUTH_ENABLED":"false"}');
+  mkdirSync(join(root, "scripts"), { recursive: true });
+  const wrapperCopy = join(root, "scripts", "with-app-env.mjs");
+  copyFileSync(WRAPPER, wrapperCopy);
+  const { stdout } = await execFileAsync(
     process.execPath,
-    "-e",
-    PRINT_FLAG,
-  ]);
+    [wrapperCopy, process.execPath, "-e", PRINT_FLAG],
+    { env: { ...process.env, VITE_AUTH_ENABLED: undefined } },
+  );
   assert.equal(stdout, "false");
 });
 
@@ -113,11 +122,24 @@ test("a signal-killed command is never reported as success", async () => {
   );
 });
 
-test("the CLI still runs when invoked through a symlinked path", async () => {
+test("a bare npm-shim command name runs on every platform", async () => {
+  // On Windows `npm` (like `vite`) is a .cmd batch shim: spawning it without a
+  // shell fails with ENOENT, which broke `npm run dev/build/preview` there.
+  const { stdout } = await execFileAsync(process.execPath, [WRAPPER, "npm", "--version"]);
+  assert.match(stdout.trim(), /^\d+\.\d+\.\d+/);
+});
+
+test("the CLI still runs when invoked through a symlinked path", async (t) => {
   // node realpaths import.meta.url but not process.argv[1], so a raw comparison
   // turns the wrapper into a no-op that exits 0 without starting anything.
   const link = join(mkdtempSync(join(tmpdir(), "app-env-link-")), "scripts");
-  symlinkSync(join(projectRoot(), "scripts"), link);
+  try {
+    symlinkSync(join(projectRoot(), "scripts"), link);
+  } catch (err) {
+    // Windows only grants symlink creation to elevated/dev-mode users.
+    if (err?.code === "EPERM") return t.skip("symlinks not permitted here");
+    throw err;
+  }
   const { stdout } = await execFileAsync(process.execPath, [
     join(link, "with-app-env.mjs"),
     process.execPath,

@@ -17,7 +17,6 @@ test("family ids are unique and every family has a canonical unit that exists", 
   const ids = inventory.families.map((family) => family.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const family of inventory.families) {
-    const symbols = family.units.map((unit) => unit.symbol);
     const canonical = family.units.find((unit) => unit.symbol === family.canonicalUnit && unit.status === "canonical");
     assert.ok(canonical, `${family.id} missing canonical ${family.canonicalUnit}`);
     assert.equal(new Set(family.units.map((unit) => unit.id)).size, family.units.length, family.id);
