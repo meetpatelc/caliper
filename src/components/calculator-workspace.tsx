@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ICON } from "@instrument/ui";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { CircleAlert, Copy, Link2, PenLine, Save } from "lucide-react";
+import { CircleAlert, Copy, FileText, Link2, PenLine, Save } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
 import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
@@ -219,6 +219,27 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     try {
       await navigator.clipboard.writeText(href);
       toast.success("Link copied. It opens this model with these numbers.");
+    } catch {
+      toast.error("Clipboard unavailable. Copy the address bar instead.");
+    }
+  };
+
+  /**
+   * The record is the artefact an engineer files, so it gets its own link
+   * rather than being buried behind the browser's print dialog. Same params as
+   * `copyLink`, different destination: `/record/...` renders the finished
+   * calculation, `/tool/...` reopens the controls.
+   */
+  const copyRecordLink = async () => {
+    if (result.errors.length) {
+      toast.error("Resolve the input state before sharing a record.");
+      return;
+    }
+    const path = sharePath(tool.id, input, toolFields[tool.id].map((field) => field.key));
+    const href = `${window.location.origin}${path.replace("/tool/", "/record/")}`;
+    try {
+      await navigator.clipboard.writeText(href);
+      toast.success("Record link copied. It opens the finished calculation.");
     } catch {
       toast.error("Clipboard unavailable. Copy the address bar instead.");
     }
@@ -480,6 +501,10 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     <Button onClick={copyLink}>
                       <Link2 size={ICON.inline} />
                       Copy link
+                    </Button>
+                    <Button onClick={copyRecordLink}>
+                      <FileText size={ICON.inline} />
+                      Copy record
                     </Button>
                   </div>
               </>

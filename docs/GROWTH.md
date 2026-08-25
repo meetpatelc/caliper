@@ -52,7 +52,18 @@ already works with no account, so the gap is only:
 - the app's own manifest (currently the platform's `/__grok/` one)
 - a service worker covering the shell and the document chunk
 
-## 5. Embed / read-only API
+## 5. Studio Engine, made learnable
+
+Not a defect — the Engine step works and is powerful. It is dense: roughly 21
+selects, 19 inputs and 32 buttons on one screen, with the full quantity-kind
+list repeated per field. On a phone it is hard to scan.
+
+Progressive disclosure is the shape of the fix: kind, then unit, then value,
+with advanced controls collapsed until asked for. Worth treating as a design
+pass on the authoring experience rather than a bug fix, because the thing to
+get right is the order a person thinks in, not the control count.
+
+## 6. Embed / read-only API
 
 `GET /api/calc/:model?force=10kN` and an embeddable widget turn 169 models
 into an integration surface for internal wikis, runbooks and reports.
