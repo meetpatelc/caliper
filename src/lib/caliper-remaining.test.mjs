@@ -4,11 +4,19 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { remainingDocuments } from "./library-remaining.ts";
+import { libraryDocuments } from "./document.ts";
 import { calculateTool, initialInputs } from "./engineering.ts";
 
 const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "caliper-remaining.golden.json"), "utf8"));
-const IDS = Object.keys(remainingDocuments).sort();
+/**
+ * The golden covers two kinds of model: those that became library documents,
+ * and those that stayed hand-written TypeScript. This used to read the id list
+ * out of `library-remaining.ts` — the migration wave they happened to be
+ * converted in. That file is gone now that documents are grouped by domain, and
+ * the wave was never what the test meant: it meant "is this a document yet".
+ * Ask that directly.
+ */
+const IDS = Object.keys(golden).filter((id) => libraryDocuments[id]).sort();
 const relClose = (a, b) => Math.abs(a - b) <= 1e-8 || Math.abs(a - b) / Math.max(1e-12, Math.abs(b)) <= 1e-8;
 
 test("Remaining closed-form documents match frozen TypeScript goldens", () => {
@@ -49,7 +57,7 @@ test("Remaining TypeScript-irreducible models still have goldens and are not doc
     "toleranceSampling",
   ];
   for (const id of stay) {
-    assert.equal(remainingDocuments[id], undefined, id);
+    assert.equal(libraryDocuments[id], undefined, `${id} is now a document — move it out of this list`);
     const expected = golden[id];
     const actual = calculateTool(id, initialInputs[id]);
     assert.ok(expected, `${id} missing golden`);
