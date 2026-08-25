@@ -58,11 +58,17 @@ function ProjectPage() {
   // again on two empty states).
   const hydrated = useHydrated();
   const loadingDesk = !hydrated || hydrating || isPending;
-  const deskTitle = onAccount
+  // The heading stays put. Where the desk lives is a property of the desk, not
+  // of the page, and swapping the h1 from "Loading." to "On this device." made
+  // the first paint flicker and gave screen readers a heading that announced
+  // itself twice. The lede below already carries that state, and it still
+  // renders identically on the server and the first client pass, so the
+  // hydration match the comment above protects is unaffected.
+  const deskScope = onAccount
     ? "On this account."
     : fallback || !loadingDesk
       ? "On this device."
-      : "Loading.";
+      : null;
   const projectId = activeProjectId ?? projects[0]?.id ?? null;
   const visible = calculations.filter((item) => (projectId ? item.projectId === projectId : true));
   const empty = items.length === 0 && calculations.length === 0 && reviews.length === 0;
@@ -89,12 +95,13 @@ function ProjectPage() {
     <div className="page-wrap">
       <PageHeader
         kicker="Project"
-        title={deskTitle}
+        title="Your work."
         lede={
           loadingDesk ? (
             <LoadingState>{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
           ) : (
             <>
+              {deskScope ? <strong className="block">{deskScope}</strong> : null}
               {onAccount
                 ? "Drafts, saved checks, and reviews follow this account. Write in "
                 : fallback

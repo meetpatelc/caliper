@@ -37,6 +37,11 @@ const ALIAS_FAMILY: Record<string, UnitFamilyId> = {
   "mbar abs": "pressure",
   "°": "angle",
   deg: "angle",
+  // A bare "1" is dimensionless. `inferFamily` scans families in declaration
+  // order and `strain` also carries a unit whose symbol is "1", so a safety
+  // FACTOR was being handed strain's menu and offered microstrain. Pin it.
+  // Strain outputs default to "µε", which still infers strain correctly.
+  "1": "dimensionless",
 };
 
 const DELTA_OUTPUT_KEYS = new Set(["lmtd", "delta1", "delta2", "totalTemperatureDifference"]);
@@ -54,6 +59,9 @@ export function unitSwitchFor(unit?: string, familyHint?: UnitFamilyId): UnitSwi
   }
   const preferred = SHORT[familyId] ?? [];
   const options = [engine, ...preferred.filter((item) => item !== engine)];
+  // A menu with one entry is not a choice. Render nothing rather than a
+  // control that cannot change anything.
+  if (options.length < 2) return null;
   return { family: familyId, engine, options };
 }
 

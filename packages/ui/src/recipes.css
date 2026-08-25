@@ -38,6 +38,20 @@
   color: var(--color-muted);
 }
 
+/* Navigation-style links sat at 18-21px tall on a phone — under the 24x24
+   minimum WCAG 2.5.8 asks for. These are standalone targets (logo, footer nav,
+   Nearby, source), not links inside a sentence, so giving them a floor costs
+   nothing in prose and makes them reliably tappable. Centred so the extra
+   height grows around the text rather than pushing it off its baseline. */
+.link-quiet,
+.link-row,
+.link-accent,
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
 .link-quiet {
   color: var(--color-muted);
 }
