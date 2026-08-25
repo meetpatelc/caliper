@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ICON } from "@instrument/ui";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Bug, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
 import { listFeedback, submitFeedback, type FeedbackRow } from "@/lib/feedback";
@@ -26,15 +26,22 @@ export const Route = createFileRoute("/feedback")({   head: () => ({
 function FeedbackPage() {
   const [kind, setKind] = useState<"bug" | "message">("bug");
   const [message, setMessage] = useState("");
+  const [messageError, setMessageError] = useState<string | null>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
   const [pending, setPending] = useState(false);
   const [inboxTick, setInboxTick] = useState(0);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!message.trim()) {
-      toast.error("Add a message first.");
+      // A toast alone left the field unmarked and the focus on the button, so
+      // nothing told a keyboard or screen-reader user WHERE the problem was.
+      // `Field` already wires aria-invalid and aria-errormessage from `error`.
+      setMessageError("Add a message before sending.");
+      messageRef.current?.focus();
       return;
     }
+    setMessageError(null);
     setPending(true);
     try {
       await submitFeedback({ data: { kind, message, pagePath: window.location.pathname } });
@@ -82,8 +89,8 @@ function FeedbackPage() {
             </SelectableCard>
           </div>
         </fieldset>
-        <Field htmlFor="feedback-message" label="Full message">
-          <Textarea id="feedback-message" value={message} onChange={(event) => setMessage(event.target.value)} rows={12} placeholder="Paste steps, values, and URLs." />
+        <Field htmlFor="feedback-message" label="Full message" required error={messageError ?? undefined}>
+          <Textarea id="feedback-message" ref={messageRef} value={message} onChange={(event) => { setMessage(event.target.value); if (messageError) setMessageError(null); }} rows={12} placeholder="Paste steps, values, and URLs." />
         </Field>
         <Button type="submit" variant="accent" disabled={pending} className="justify-self-start">
           <Send size={ICON.base} />

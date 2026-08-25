@@ -18,6 +18,10 @@ import { InstrumentSheet, QuantityName, ResultQuantity } from "@/components/inst
 import { GoverningRelation } from "@/components/governing-relation";
 import { ExampleButton } from "@/components/example-button";
 import { FavouriteButton } from "@/components/favourite-button";
+import { Button } from "@/components/ui/button";
+import { ICON } from "@instrument/ui";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 import { MeasurementField } from "@/components/ui/measurement-field";
 import { Field, Input, Select, UnitBadge } from "@/components/ui/field";
 import { ErrorState } from "@/components/ui/status";
@@ -87,6 +91,31 @@ export function Iso286Instrument() {
   const favourited = favorites.includes("fits");
   const nearby = relatedTools("fits");
 
+  // The other 168 models offer Copy result; this one is a bespoke page and was
+  // left without it. Save and Copy link still are: both need the page to round
+  // trip its state through the URL, and it currently reads none — a saved check
+  // that cannot reopen is worse than no button.
+  const copyResult = async () => {
+    if (!result.ok) return;
+    const f = result.fit;
+    const summary = [
+      `${tool.title} — ${f.holeClass}/${f.shaftClass} at ⌀${D} mm`,
+      `Fit: ${fitLabel(f.kind)}`,
+      `Maximum clearance: ${mm(f.cmax)} mm`,
+      `Maximum interference: ${mm(f.imax)} mm`,
+      `Hole: ${mm(f.holeMin, "limit")} / ${mm(f.holeMax, "limit")} mm`,
+      `Shaft: ${mm(f.shaftMin, "limit")} / ${mm(f.shaftMax, "limit")} mm`,
+      `Method: ${calculator.formula}`,
+      `Boundary: ${tool.assumptions.join("; ")}`,
+    ].join(String.fromCharCode(10));
+    try {
+      await navigator.clipboard.writeText(summary);
+      toast.success("Result copied with method context.");
+    } catch {
+      toast.error("Clipboard unavailable. Select the result text instead.");
+    }
+  };
+
   const result = useMemo(() => {
     const diameter = Number(D);
     try {
@@ -101,7 +130,13 @@ export function Iso286Instrument() {
       kicker={tool.kicker}
       title={tool.title}
       actions={
-        <FavouriteButton favourited={favourited} onToggle={() => toggleFavorite("fits")} />
+        <>
+          <Button onClick={copyResult} disabled={!result.ok}>
+            <Copy size={ICON.inline} />
+            Copy result
+          </Button>
+          <FavouriteButton favourited={favourited} onToggle={() => toggleFavorite("fits")} />
+        </>
       }
       nearby={
         nearby.length > 0 ? (
