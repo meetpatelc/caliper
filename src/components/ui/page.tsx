@@ -1,1 +1,1 @@
-export { PageHeader } from "@instrument/ui";
+export { PageHeader, SectionHeader } from "@instrument/ui";

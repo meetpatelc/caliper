@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { PenLine } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { AnyCalculator, WorkshopCalculator } from "@/studio/lib/calculator-types";
@@ -238,7 +239,7 @@ export function CalculatorFrame({
               variant="outline"
               onClick={() => void navigate({ to: "/studio/$id", params: { id: workshopItem.id } })}
             >
-              <PenLine size={14} />
+              <PenLine size={ICON.inline} />
               Edit in studio
             </Button>
           ) : !isPackedCalculator(calculator) ? (
@@ -249,7 +250,7 @@ export function CalculatorFrame({
                 void navigate({ to: "/studio/$id", params: { id: item.id } });
               }}
             >
-              <PenLine size={14} />
+              <PenLine size={ICON.inline} />
               Fork in studio
             </Button>
           ) : null}

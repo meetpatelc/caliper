@@ -1,4 +1,5 @@
 import { RotateCcw } from "lucide-react";
+import { ICON } from "@instrument/ui";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +14,7 @@ export function ExampleButton({ onRestore }: { onRestore: () => void }) {
         toast.success("Example restored.");
       }}
     >
-      <RotateCcw size={13} />
+      <RotateCcw size={ICON.inline} />
       Example
     </Button>
   );

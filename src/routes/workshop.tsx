@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { useState } from "react";
 import { ClipboardList, FolderPlus, PenLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -106,7 +107,7 @@ function ProjectPage() {
           <>
             <Button asChild variant="outline">
               <Link to="/review">
-                <ClipboardList size={16} />
+                <ClipboardList size={ICON.base} />
                 Start a review
               </Link>
             </Button>
@@ -117,7 +118,7 @@ function ProjectPage() {
                 navigate({ to: "/studio/$id", params: { id: item.id } });
               }}
             >
-              <PenLine size={16} />
+              <PenLine size={ICON.base} />
               Create from scratch
             </Button>
           </>
@@ -126,7 +127,7 @@ function ProjectPage() {
 
       {loadingDesk ? null : empty ? (
         <EmptyState
-          className={cn(panelClass, "mt-10 p-6")}
+          className={cn(panelClass, "mt-8 p-6")}
           action={
             <Link to="/" className="link-accent">
               Open library
@@ -137,10 +138,10 @@ function ProjectPage() {
         </EmptyState>
       ) : null}
 
-      <section className="mt-10">
+      <section className="mt-12">
         <h2 className="section-title">Your models</h2>
         {loadingDesk ? null : items.length === 0 ? (
-          <EmptyState className="mt-3">{onAccount ? "No drafts on this account." : "No drafts on this device."}</EmptyState>
+          <EmptyState className="mt-2">{onAccount ? "No drafts on this account." : "No drafts on this device."}</EmptyState>
         ) : (
           <ul className="mt-4 grid gap-3">
             {items.map((item) => (
@@ -169,7 +170,7 @@ function ProjectPage() {
                         aria-label={`Delete ${item.title}`}
                         onClick={() => setPending({ kind: "model", id: item.id, title: item.title })}
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={ICON.base} />
                       </Button>
                     </>
                   }
@@ -206,7 +207,7 @@ function ProjectPage() {
             </Field>
           </div>
           <Button type="submit" variant="accent" disabled={!name.trim()}>
-            <FolderPlus size={16} /> Create
+            <FolderPlus size={ICON.base} /> Create
           </Button>
         </form>
         {projects.length > 0 && (
@@ -228,7 +229,7 @@ function ProjectPage() {
                   aria-label={`Delete ${project.name}`}
                   onClick={() => setPending({ kind: "folder", id: project.id, title: project.name })}
                 >
-                  <Trash2 size={13} />
+                  <Trash2 size={ICON.inline} />
                 </Button>
               </span>
             ))}
@@ -268,7 +269,7 @@ function ProjectPage() {
                         aria-label="Delete snapshot"
                         onClick={() => setPending({ kind: "check", id: record.id, title: record.title })}
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={ICON.base} />
                       </Button>
                     }
                   />
@@ -304,7 +305,7 @@ function ProjectPage() {
                       aria-label="Delete review"
                       onClick={() => setPending({ kind: "review", id: record.id, title: record.title })}
                     >
-                      <Trash2 size={15} />
+                      <Trash2 size={ICON.base} />
                     </Button>
                   }
                 />

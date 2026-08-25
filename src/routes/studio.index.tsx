@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { Copy, FilePlus, PenLine } from "lucide-react";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { studioDocuments } from "@/lib/document";
 import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page";
+import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { LoadingState } from "@/components/ui/status";
 import { SelectableCard } from "@/components/ui/selection";
 
@@ -36,7 +37,7 @@ function StudioHome() {
           className="h-auto min-h-28 flex-col items-start justify-between px-5 py-4 text-left"
           onClick={() => open(createBlank())}
         >
-          <FilePlus size={18} />
+          <FilePlus size={ICON.lead} />
           <span>
             <span className="block text-base font-medium">Create from scratch</span>
             <span className="mt-1 block text-sm text-accent-fg/80">Empty inputs. You name the quantities.</span>
@@ -48,7 +49,7 @@ function StudioHome() {
           className="h-auto min-h-28 flex-col items-start justify-between px-5 py-4 text-left"
           onClick={() => open(createStarter())}
         >
-          <PenLine size={18} />
+          <PenLine size={ICON.lead} />
           <span>
             <span className="block text-base font-medium">Start from a working example</span>
             <span className="mt-1 block text-sm text-muted">Axial stress, already computing. Rename it.</span>
@@ -84,9 +85,11 @@ function StudioHome() {
       ) : null}
 
       <section className="mt-12">
-        <p className="eyebrow">Start from a published model</p>
-        <h2 className="section-title mt-1">Start from something you already trust.</h2>
-        <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+        <SectionHeader
+          kicker="Start from a published model"
+          title="Start from something you already trust."
+        />
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2">
           {studioDocuments().map((item) => (
             <li key={item.slug}>
               <SelectableCard asChild key={item.slug}>
@@ -100,7 +103,7 @@ function StudioHome() {
                   <span className="block text-sm font-medium">{item.title}</span>
                   <span className="font-mono text-xs text-muted">{item.formula}</span>
                 </span>
-                  <Copy size={14} className="shrink-0 text-accent" />
+                  <Copy size={ICON.inline} className="shrink-0 text-accent" />
                 </Button>
               </SelectableCard>
             </li>

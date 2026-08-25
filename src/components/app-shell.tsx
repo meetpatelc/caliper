@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { ICON } from "@instrument/ui";
 import { Menu, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AccountMenu } from "@/components/account-menu";
@@ -63,7 +64,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             aria-label="Search"
             className="min-w-0 flex-1"
           >
-            <Search size={15} className="shrink-0" aria-hidden="true" />
+            <Search size={ICON.base} className="shrink-0" aria-hidden="true" />
             <span className="truncate">Search</span>
           </SearchTrigger>
           <Button
@@ -75,7 +76,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             aria-label="Open menu"
             onClick={() => setMenuOpen(true)}
           >
-            <Menu size={18} aria-hidden="true" />
+            <Menu size={ICON.lead} aria-hidden="true" />
           </Button>
         </div>
         <div className="relative hidden h-14 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:px-5">
@@ -94,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       aria-current={active ? "page" : undefined}
                       className={cn(active && "bg-elevated text-fg")}
                     >
-                      <Icon size={15} />
+                      <Icon size={ICON.base} />
                       {item.label}
                     </Link>
                   </Button>
@@ -108,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               shortcut={shortcut}
               className="w-[min(28rem,32vw)]"
             >
-              <Search size={15} className="shrink-0" aria-hidden="true" />
+              <Search size={ICON.base} className="shrink-0" aria-hidden="true" />
               <span className="flex-1 truncate text-left">Search…</span>
             </SearchTrigger>
             <ThemeToggle />
@@ -128,7 +129,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mb-6 flex items-center justify-between">
           <FamilySwitch />
           <Button variant="outline" size="icon" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
-            <X size={16} />
+            <X size={ICON.base} />
           </Button>
         </div>
         <nav className="grid gap-1">
@@ -143,7 +144,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   aria-current={active ? "page" : undefined}
                   className={cn("w-full justify-start", active && "bg-elevated text-fg")}
                 >
-                  <Icon size={16} />
+                  <Icon size={ICON.base} />
                   {item.label}
                 </Link>
               </Button>

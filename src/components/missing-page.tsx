@@ -44,7 +44,7 @@ export function PageLoading({ kicker }: { kicker: string }) {
   return (
     <div className="page-wrap">
       <p className="eyebrow">{kicker}</p>
-      <LoadingState variant="block" className="mt-6" />
+      <LoadingState variant="block" className="mt-8" />
     </div>
   );
 }

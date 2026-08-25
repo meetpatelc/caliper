@@ -30,9 +30,9 @@ export function FavouriteRail() {
       <div className={cn(panelClass, "pointer-events-auto max-h-full overflow-auto p-4")}>
         <p className="eyebrow">Favourite</p>
         {loading ? (
-          <LoadingState className="mt-3">{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
+          <LoadingState className="mt-2">{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>
         ) : favouriteTools.length ? (
-          <ul className="mt-3 grid gap-1">
+          <ul className="mt-2 grid gap-1">
             {favouriteTools.map((tool) => (
               <li key={tool!.id}>
                 <Link
@@ -46,7 +46,7 @@ export function FavouriteRail() {
             ))}
           </ul>
         ) : (
-          <EmptyState className="mt-3 leading-6">Favourite a model. It stays here.</EmptyState>
+          <EmptyState className="mt-2 leading-6">Favourite a model. It stays here.</EmptyState>
         )}
       </div>
     </aside>

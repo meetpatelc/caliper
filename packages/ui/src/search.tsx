@@ -12,7 +12,7 @@ export const SearchTrigger = forwardRef<
       type="button"
       variant="outline"
       className={cn(
-        "min-h-10 justify-start gap-2 bg-surface font-normal text-muted hover:border-accent hover:text-fg",
+        "min-h-10 justify-start gap-2 bg-surface font-normal text-muted hover:text-fg",
         className,
       )}
       {...props}

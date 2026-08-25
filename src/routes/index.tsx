@@ -8,7 +8,7 @@ import { MODEL_COUNT, releasedDomains, savedHeadline } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { Button } from "@/components/ui/button";
 import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
-import { PageHeader } from "@/components/ui/page";
+import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { SelectableCard } from "@/components/ui/selection";
 import { EmptyState } from "@/components/ui/status";
 import { FavouriteButton } from "@/components/favourite-button";
@@ -66,14 +66,14 @@ function Home() {
       />
 
       {(saved.length > 0 || recentTools.length > 0) && (
-        <section className="mt-8">
+        <section className="mt-12">
           <p className="eyebrow">Continue</p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {saved.map((record) => {
               const tool = tools.find((item) => item.id === record.toolId);
               const headline = savedHeadline(record.resultJson);
               return (
-                <Button key={record.id} asChild variant="outline">
+                <Button key={record.id} asChild variant="outline" size="sm">
                   <Link
                     to="/tool/$toolId"
                     params={{ toolId: record.toolId }}
@@ -87,7 +87,7 @@ function Home() {
               );
             })}
             {recentTools.map((tool) => (
-              <Button key={tool!.id} asChild variant="outline">
+              <Button key={tool!.id} asChild variant="outline" size="sm">
                 <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="whitespace-nowrap">
                   {tool!.title}
                 </Link>
@@ -115,21 +115,21 @@ function Home() {
         ))}
       </SegmentedControl>
 
-      <p className="mt-6 text-sm text-muted">{visible.length} shown</p>
+      <p className="mt-8 text-sm text-muted">{visible.length} shown</p>
 
-      <div className="mt-6 grid gap-10">
+      <div className="mt-8 grid gap-10">
         {grouped.map(({ domain: groupDomain, tools: groupTools }) => {
           const open = domain === groupDomain.id || expanded[groupDomain.id] || groupTools.length <= 8;
           const shown = open ? groupTools : groupTools.slice(0, 8);
           return (
             <section key={groupDomain.id}>
-              <div className="mb-3 flex items-end justify-between">
-                <div>
-                  <p className="eyebrow">{groupDomain.label}</p>
-                  <h2 className="section-title-sm">{groupDomain.note}</h2>
-                </div>
-                <span className="font-mono text-xs text-muted">{groupTools.length}</span>
-              </div>
+              <SectionHeader
+                size="sm"
+                className="mb-3"
+                kicker={groupDomain.label}
+                title={groupDomain.note}
+                aside={<span className="font-mono text-xs text-muted">{groupTools.length}</span>}
+              />
               <div className="grid gap-3 sm:grid-cols-2">
                 {shown.map((tool) => {
                   const formula =
@@ -138,7 +138,7 @@ function Home() {
                     <SelectableCard
                       key={tool.id}
                       asChild
-                      className="group relative grid h-full content-start bg-surface p-0 hover:border-accent"
+                      className="group relative grid h-full content-start bg-surface p-0"
                     >
                       <div>
                         <Link to="/tool/$toolId" params={{ toolId: tool.id }} className="grid h-full content-start gap-2 p-4 pr-12">
@@ -172,7 +172,7 @@ function Home() {
         })}
       </div>
 
-      {!visible.length && <EmptyState className="mt-10">Nothing in that domain.</EmptyState>}
+      {!visible.length && <EmptyState className="mt-8">Nothing in that domain.</EmptyState>}
     </div>
   );
 }
