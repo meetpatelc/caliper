@@ -313,12 +313,26 @@ export const upsertDraftAccount = createServerFn({ method: "POST" })
       `;
       return { id: item.id };
     }
-    const taken = await sql<{ id: string }>`select id from desk_drafts where id = ${item.id}`;
-    if (taken.length) throw new Error("Draft already exists.");
-    await sql`
+    // Insert idempotently rather than check-then-insert.
+    //
+    // One publish fires several writes in the same second — the debounced
+    // autosave, `persistNow`, and the state update that follows it — so two
+    // calls can both find no row, both pass a "does this id exist" check, and
+    // both insert. `on conflict` makes that harmless instead of a lost save.
+    //
+    // The id predicate keeps ownership intact: a row belonging to someone else
+    // updates nothing rather than being overwritten, and the caller is told.
+    const written = await sql<{ id: string }>`
       insert into desk_drafts (id, user_id, slug, document_json, updated_at)
       values (${item.id}, ${context.userId}, ${item.slug}, ${json}, ${updatedAt})
+      on conflict (id) do update
+        set slug = excluded.slug,
+            document_json = excluded.document_json,
+            updated_at = excluded.updated_at
+        where desk_drafts.user_id = ${context.userId}
+      returning id
     `;
+    if (!written.length) throw new Error("Draft already exists.");
     return { id: item.id };
   });
 
