@@ -14,6 +14,7 @@ import { getTool } from "@/lib/catalog";
 import { savedHeadline } from "@/lib/desk";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { useDeskStatus } from "@/lib/desk-mode";
+import { useHydrated } from "@/lib/use-hydrated";
 import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +41,19 @@ function ProjectPage() {
   const { isPending } = useCurrentUserState();
   const { accountMode, hydrating, fallback } = useDeskStatus();
   const onAccount = accountMode;
-  const loadingDesk = hydrating || isPending;
+  // The desk lives in localStorage and the session resolves client-side, so the
+  // server cannot know what this page shows. Folding `!hydrated` into the
+  // desk-loading state makes every guard below render the same thing on the
+  // server and on the first client render — otherwise React discards the whole
+  // server tree for this page (it did: "Loading." vs "On this device.", then
+  // again on two empty states).
+  const hydrated = useHydrated();
+  const loadingDesk = !hydrated || hydrating || isPending;
+  const deskTitle = onAccount
+    ? "On this account."
+    : fallback || !loadingDesk
+      ? "On this device."
+      : "Loading.";
   const projectId = activeProjectId ?? projects[0]?.id ?? null;
   const visible = calculations.filter((item) => (projectId ? item.projectId === projectId : true));
   const empty = items.length === 0 && calculations.length === 0 && reviews.length === 0;
@@ -67,7 +80,7 @@ function ProjectPage() {
     <div className="page-wrap">
       <PageHeader
         kicker="Project"
-        title={onAccount ? "On this account." : fallback || (!isPending && !hydrating) ? "On this device." : "Loading."}
+        title={deskTitle}
         lede={
           loadingDesk ? (
             <LoadingState>{hydrating ? "Loading the account desk." : "Loading."}</LoadingState>

@@ -24,6 +24,22 @@ export function MissingPage({
   );
 }
 
+/**
+ * The router's `defaultNotFoundComponent`. Without one, an unmatched URL
+ * renders TanStack Router's built-in `<p>Not Found</p>` — no shell, no way
+ * back — and the server logs a warning on every miss.
+ */
+export function NotFoundPage() {
+  return (
+    <MissingPage
+      kicker="Not here"
+      title="That page is not on this desk."
+      to="/"
+      backLabel="Back to library"
+    />
+  );
+}
+
 export function PageLoading({ kicker }: { kicker: string }) {
   return (
     <div className="page-wrap">

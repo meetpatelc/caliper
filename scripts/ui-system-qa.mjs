@@ -1,9 +1,29 @@
 #!/usr/bin/env node
+/**
+ * Design-system QA against a running app: checks that shared kit components
+ * are the ones actually on the page (one SegmentedControl for the domain
+ * filter, no nested interactive controls inside cards, and so on).
+ *
+ * Run it against a dev server:
+ *   npm run dev
+ *   npm run qa:ui                      # defaults to http://127.0.0.1:8080
+ *   npm run qa:ui -- http://host:port  # or point it somewhere else
+ *
+ * Screenshots go to ./screenshots (gitignored) unless UI_QA_OUT_DIR says
+ * otherwise. This previously wrote to a hardcoded /workspace/screenshots,
+ * which does not exist outside the original sandbox — so the script could not
+ * run anywhere else and drifted out of use.
+ */
 import { mkdirSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
-const BASE = process.argv[2] || "http://127.0.0.1:8080";
-const outDir = "/workspace/screenshots";
+const BASE = process.argv[2] || process.env.UI_QA_BASE_URL || "http://127.0.0.1:8080";
+const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+const outDir = process.env.UI_QA_OUT_DIR
+  ? resolve(process.env.UI_QA_OUT_DIR)
+  : join(repoRoot, "screenshots");
 mkdirSync(outDir, { recursive: true });
 
 const findings = [];
@@ -200,8 +220,11 @@ try {
   await shot(page, "qa-library-dark");
   await page.evaluate(() => document.documentElement.classList.remove("dark"));
 
-  const realErrors = errors.filter((message) => !/Hydration failed/.test(message));
-  record("no unexpected page errors", realErrors.length === 0, realErrors.join(" | "));
+  // Hydration failures used to be filtered out here. They are real bugs — React
+  // throws away the server markup and re-renders the whole tree — and the app
+  // is clean on a fresh load of every route this script visits, so they are
+  // now reported like any other page error rather than swallowed.
+  record("no unexpected page errors", errors.length === 0, errors.join(" | "));
 } finally {
   await browser.close();
 }
