@@ -14,9 +14,10 @@
  * which does not exist outside the original sandbox — so the script could not
  * run anywhere else and drifted out of use.
  */
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { get as httpGet } from "node:http";
 import { chromium } from "playwright";
 
 const BASE = process.argv[2] || process.env.UI_QA_BASE_URL || "http://127.0.0.1:8080";
@@ -31,6 +32,60 @@ function record(name, ok, detail) {
   findings.push({ name, ok, detail });
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? " — " + detail : ""}`);
 }
+
+/**
+ * Stale-server guard.
+ *
+ * `vite preview` keeps serving whatever it loaded at start-up, so a rebuild
+ * leaves it handing out HTML that references asset hashes no longer on disk.
+ * The symptom is specific and misleading: SSR renders correct values while the
+ * client sits dead, because its JS 404s — which reads exactly like a
+ * regression in the code under test. It cost two false alarms before being
+ * recognised, so check it before running anything else.
+ */
+async function assertServingCurrentBuild(base) {
+  const assetsDir = join(repoRoot, ".vercel/output/static/assets");
+  if (!existsSync(assetsDir)) return; // dev server: nothing was built to compare
+  // Raw http rather than fetch: this runs before the browser starts and may
+  // exit the process, and undici keeps its socket pooled long enough for an
+  // abrupt exit to trip a libuv assertion on Windows. Own the socket, close it.
+  const html = await new Promise((resolvePage) => {
+    const request = httpGet(base, (response) => {
+      let body = "";
+      response.setEncoding("utf8");
+      response.on("data", (chunk) => (body += chunk));
+      response.on("end", () => {
+        response.destroy();
+        resolvePage(body);
+      });
+    });
+    request.on("error", () => resolvePage(""));
+    request.setTimeout(5000, () => {
+      request.destroy();
+      resolvePage("");
+    });
+  });
+  const served = html.match(/index-[A-Za-z0-9_-]+\.js/)?.[0];
+  if (!served) return; // unreachable, or dev HTML with no hashed entry chunk
+  const built = readdirSync(assetsDir).find((f) => /^index-.*\.js$/.test(f));
+  if (built && served !== built) {
+    console.error(
+      `
+Stale server: it is serving ${served} but the build produced ${built}.
+` +
+        `Restart the preview so it picks up the current build — any failures
+` +
+        `below would be about assets that no longer exist, not about the code.
+`,
+    );
+    process.exitCode = 3;
+    return false;
+  }
+  return true;
+}
+
+const buildIsCurrent = await assertServingCurrentBuild(BASE);
+if (buildIsCurrent === false) process.exit(3);
 
 const browser = await chromium.launch({ headless: true });
 
