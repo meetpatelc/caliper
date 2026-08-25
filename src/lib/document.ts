@@ -7,13 +7,19 @@ import { evaluateExpression, FormulaError } from "@instrument/formula";
 import { axialDocument } from "@/lib/document-axial";
 import { convertQuantity, unitFamilies, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { quantitySymbol } from "@/lib/quantity-symbols";
-import { band1Documents } from "@/lib/library-band1";
-import { leftoverDocuments } from "@/lib/library-leftovers";
-import { atlasDocuments } from "@/lib/library-atlas";
-import { pilotDocuments } from "@/lib/library-pilot";
-import { wave2Documents } from "@/lib/library-wave2";
-import { nearDocuments } from "@/lib/library-near";
-import { remainingDocuments } from "@/lib/library-remaining";
+import { appliedDocuments } from "@/lib/library-applied";
+import { automationDocuments } from "@/lib/library-automation";
+import { dynamicsDocuments } from "@/lib/library-dynamics";
+import { electricalDocuments } from "@/lib/library-electrical";
+import { fluidsDocuments } from "@/lib/library-fluids";
+import { foundationDocuments } from "@/lib/library-foundation";
+import { manufacturingDocuments } from "@/lib/library-manufacturing";
+import { materialsDocuments } from "@/lib/library-materials";
+import { mathematicsDocuments } from "@/lib/library-mathematics";
+import { mechanicsDocuments } from "@/lib/library-mechanics";
+import { qualityDocuments } from "@/lib/library-quality";
+import { thermalDocuments } from "@/lib/library-thermal";
+import { studioSeedDocuments } from "@/lib/library-studio-seeds";
 import type { EngineeringDomain } from "@/lib/platform";
 import {
   applyDocumentBounds,
@@ -103,13 +109,19 @@ export { axialDocument };
 
 export const libraryDocuments: Record<string, InstrumentDocument> = {
   axial: axialDocument,
-  ...band1Documents,
-  ...leftoverDocuments,
-  ...atlasDocuments,
-  ...pilotDocuments,
-  ...wave2Documents,
-  ...nearDocuments,
-  ...remainingDocuments,
+  ...appliedDocuments,
+  ...automationDocuments,
+  ...dynamicsDocuments,
+  ...electricalDocuments,
+  ...fluidsDocuments,
+  ...foundationDocuments,
+  ...manufacturingDocuments,
+  ...materialsDocuments,
+  ...mathematicsDocuments,
+  ...mechanicsDocuments,
+  ...qualityDocuments,
+  ...thermalDocuments,
+  ...studioSeedDocuments,
 };
 
 export function isStudioDocument(document: InstrumentDocument) {

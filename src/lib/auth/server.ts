@@ -27,7 +27,6 @@ import { randomBytes } from "node:crypto";
 import { Pool } from "pg";
 import { ensureDbReady, getPglite } from "../db";
 import { emailAndPasswordEnabled } from "./email-password";
-import { GATE_PROVIDER_ID, gateIdentitySessions } from "./gate-session.server";
 import { pgliteDialect } from "./pglite-dialect";
 
 // Kick (and share) PGLite bootstrap as soon as the auth server module loads.
@@ -117,17 +116,6 @@ export const auth = betterAuth({
   // loopback variants, or clients get "Invalid origin".
   trustedOrigins,
 
-  // The platform identity gate (inert unless GROK_PROJECT_ID is set) is the only
-  // non-credential provider left, and it must be linkable without requiring a
-  // verified local email.
-  account: {
-    encryptOAuthTokens: true,
-    accountLinking: {
-      enabled: true,
-      trustedProviders: [GATE_PROVIDER_ID],
-      requireLocalEmailVerified: false,
-    },
-  },
 
   // Cache the session in the short-lived signed `session_data` cookie so reads
   // (incl. the client's `/get-session`) skip the DB — this shrinks the "loading"
@@ -157,8 +145,6 @@ export const auth = betterAuth({
   },
 
   plugins: [
-    gateIdentitySessions(),
-
     // Bridges Better Auth's Set-Cookie into TanStack Start responses. MUST be
     // last so it runs after every other plugin's hooks.
     tanstackStartCookies(),

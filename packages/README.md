@@ -16,12 +16,26 @@ All three resolve through `file:` dependencies in the root `package.json`, so a 
 
 `formula` and `ui` export TypeScript source directly. That works because Vite compiles them as part of the app — but it also means **neither is consumable outside this repo without a build step**, and both are `private: true` to say so.
 
-`units` is the exception: it ships plain ESM plus hand-written `.d.ts`, so it needs no compilation and is marked publishable. `files` limits what a publish would actually include.
+`units` needs no compilation — it ships plain ESM plus hand-written `.d.ts` — so it is the one package that *could* be published as-is. It is nonetheless `private: true` like its siblings, because the `@instrument` scope is not claimed. That makes a stray `npm publish` fail safely instead of attempting to push to a scope nobody here controls.
 
-> ⚠️ `units` is the only package with `private: false`, which means `npm publish` in that directory would push to the public registry under the `@instrument` scope. If that scope is not yours, either claim it or set `private: true`. The asymmetry looks deliberate, so it has been left as it is rather than changed silently.
+To publish it later: claim the scope, set `private: false`, and keep the `files` allowlist so a release ships only `src/` and `data/`.
 
 ## Testing
 
 `units` and `formula` carry their own `node --test` suites, run from the root `npm test`.
 
 `ui` has no unit tests — it is presentation, and the things worth asserting about it are behavioural. Those live in `npm run qa:ui` (38 checks: focus restore, Escape, mobile overflow, token wiring, hydration errors) which drives a real browser against a running app. Run it after any change to `packages/ui`.
+
+**Point it at the production preview, not the dev server:**
+
+```bash
+npm run build && npm run preview        # serves on :8081
+npm run qa:ui -- http://127.0.0.1:8081
+```
+
+The dev server can report a single spurious hydration error on the very first
+load after a cold start, while Vite settles its SSR and client module graphs.
+It clears on the next run and does not occur in the production build, but it
+makes a first dev run an unreliable signal — and hydration errors are exactly
+what this check exists to catch, so it should not be run somewhere they appear
+for reasons unrelated to the code.

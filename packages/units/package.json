@@ -1,7 +1,7 @@
 {
   "name": "@instrument/units",
   "version": "0.1.2",
-  "private": false,
+  "private": true,
   "description": "Canonical SI unit inventory and convertQuantity for Instrument.",
   "repository": {
     "type": "git",

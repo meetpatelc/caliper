@@ -1,7 +1,34 @@
 import type { InstrumentDocument } from "@/lib/document";
 
-/** Unique Atlas algebra that the document can already say. Shop units on the glass, SI in the expression. */
-export const atlasDocuments: Record<string, InstrumentDocument> = {
+/**
+ * The Studio seeds. These stay hand-written literals rather than deriving from
+ * the catalog: their prose is deliberately richer than the terse card text a
+ * Library tile needs, because this is what an engineer reads beside the result.
+ * `catalog-document-agreement.test.mjs` records that divergence as intentional.
+ */
+export const studioSeedDocuments: Record<string, InstrumentDocument> = {
+  dynamicPressure: {
+    slug: "dynamicPressure",
+    title: "Dynamic pressure",
+    description: "Bernoulli dynamic pressure from density and speed.",
+    domain: "fluids",
+    fields: [
+      { id: "density", label: "Density", symbol: "ρ", help: "Free-stream or mean-duct density at the stated condition.", family: "density", defaultValue: 1.225, defaultUnit: "kg/m³" },
+      { id: "speed", label: "Speed", symbol: "V", help: "Free-stream or mean duct speed.", family: "speed", defaultValue: 20, defaultUnit: "m/s" },
+    ],
+    outputs: [
+      { id: "q", label: "Dynamic pressure", family: "pressure", defaultUnit: "Pa", expression: "0.5 * density * speed^2" },
+    ],
+    formula: "q = ½ ρ V²",
+    purpose: "Kinetic term in Bernoulli’s equation, used as a wind or duct screen.",
+    assumptions: ["Incompressible.", "Uniform density.", "Speed is the free-stream or mean duct speed."],
+    boundary: "Not a stagnation-temperature calculation and not a Cd-applied load.",
+    interpretation: "Multiply by an area and a coefficient to estimate a force. State both.",
+    sourceLabel: "Bernoulli",
+    sourceUrl: "https://en.wikipedia.org/wiki/Dynamic_pressure",
+    related: ["pipeVelocity", "bernoulli"],
+    warnings: ["This is the kinetic term ½ρV². It is not a stagnation temperature, not a drag load, and not a code wind pressure."],
+  },
   gravitationalPe: {
     slug: "gravitationalPe",
     title: "Gravitational potential energy",
@@ -46,27 +73,5 @@ export const atlasDocuments: Record<string, InstrumentDocument> = {
     sourceUrl: "https://en.wikipedia.org/wiki/Continuity_equation",
     related: ["dynamicPressure", "continuity", "pipeSizing"],
     warnings: ["This is mean velocity from continuity in a circular full pipe. It does not size the pipe, calculate pressure drop, or classify the flow regime."],
-  },
-  dynamicPressure: {
-    slug: "dynamicPressure",
-    title: "Dynamic pressure",
-    description: "Bernoulli dynamic pressure from density and speed.",
-    domain: "fluids",
-    fields: [
-      { id: "density", label: "Density", symbol: "ρ", help: "Free-stream or mean-duct density at the stated condition.", family: "density", defaultValue: 1.225, defaultUnit: "kg/m³" },
-      { id: "speed", label: "Speed", symbol: "V", help: "Free-stream or mean duct speed.", family: "speed", defaultValue: 20, defaultUnit: "m/s" },
-    ],
-    outputs: [
-      { id: "q", label: "Dynamic pressure", family: "pressure", defaultUnit: "Pa", expression: "0.5 * density * speed^2" },
-    ],
-    formula: "q = ½ ρ V²",
-    purpose: "Kinetic term in Bernoulli’s equation, used as a wind or duct screen.",
-    assumptions: ["Incompressible.", "Uniform density.", "Speed is the free-stream or mean duct speed."],
-    boundary: "Not a stagnation-temperature calculation and not a Cd-applied load.",
-    interpretation: "Multiply by an area and a coefficient to estimate a force. State both.",
-    sourceLabel: "Bernoulli",
-    sourceUrl: "https://en.wikipedia.org/wiki/Dynamic_pressure",
-    related: ["pipeVelocity", "bernoulli"],
-    warnings: ["This is the kinetic term ½ρV². It is not a stagnation temperature, not a drag load, and not a code wind pressure."],
   },
 };
