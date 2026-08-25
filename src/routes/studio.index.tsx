@@ -9,7 +9,15 @@ import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { LoadingState } from "@/components/ui/status";
 import { SelectableCard } from "@/components/ui/selection";
 
-export const Route = createFileRoute("/studio/")({ component: StudioHome });
+export const Route = createFileRoute("/studio/")({   head: () => ({
+    meta: [
+      { title: "Studio · Instrument" },
+      { name: "description", content: "Author a unit-aware calculator and keep the method attached to it." },
+      { property: "og:title", content: "Studio · Instrument" },
+      { property: "og:description", content: "Author a unit-aware calculator and keep the method attached to it." },
+    ],
+  }),
+  component: StudioHome });
 
 function StudioHome() {
   const navigate = useNavigate();

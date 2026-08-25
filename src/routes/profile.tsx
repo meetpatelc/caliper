@@ -14,7 +14,15 @@ import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/profile")({ component: ProfilePage });
+export const Route = createFileRoute("/profile")({   head: () => ({
+    meta: [
+      { title: "Profile · Instrument" },
+      { name: "description", content: "Your account and saved work." },
+      { property: "og:title", content: "Profile · Instrument" },
+      { property: "og:description", content: "Your account and saved work." },
+    ],
+  }),
+  component: ProfilePage });
 
 function ProfilePage() {
   const { user, isPending } = useCurrentUserState();

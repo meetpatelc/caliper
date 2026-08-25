@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { ErrorState } from "@/components/ui/status";
 
-export const Route = createFileRoute("/login")({ component: Login });
+export const Route = createFileRoute("/login")({   head: () => ({
+    meta: [
+      { title: "Sign in · Instrument" },
+      { name: "description", content: "Sign in to keep favourites, projects and Studio drafts on your account." },
+      { property: "og:title", content: "Sign in · Instrument" },
+      { property: "og:description", content: "Sign in to keep favourites, projects and Studio drafts on your account." },
+    ],
+  }),
+  component: Login });
 
 function Login() {
   const navigate = useNavigate();

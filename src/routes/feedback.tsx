@@ -13,7 +13,15 @@ import { SelectableCard } from "@/components/ui/selection";
 import { EmptyState, LoadingState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/feedback")({ component: FeedbackPage });
+export const Route = createFileRoute("/feedback")({   head: () => ({
+    meta: [
+      { title: "Feedback · Instrument" },
+      { name: "description", content: "Send a bug report or a message to the product desk." },
+      { property: "og:title", content: "Feedback · Instrument" },
+      { property: "og:description", content: "Send a bug report or a message to the product desk." },
+    ],
+  }),
+  component: FeedbackPage });
 
 function FeedbackPage() {
   const [kind, setKind] = useState<"bug" | "message">("bug");

@@ -18,6 +18,14 @@ import type { EngineeringDomain } from "@/lib/platform";
 type LibrarySearch = { domain?: string };
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Library · Instrument" },
+      { name: "description", content: "Every released model — 169 finished engineering calculators with method, assumptions and source attached." },
+      { property: "og:title", content: "Library · Instrument" },
+      { property: "og:description", content: "Every released model — 169 finished engineering calculators with method, assumptions and source attached." },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>): LibrarySearch => ({
     domain: typeof search.domain === "string" ? search.domain : undefined,
   }),
