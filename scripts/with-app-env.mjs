@@ -112,13 +112,19 @@ function main(argv) {
   }
   const env = mergeAppEnv(readAppEnv(projectRoot()), process.env);
   // On Windows, npm CLI shims (`vite` → `vite.cmd`) are batch files that a
-  // plain spawn cannot execute (ENOENT). Route BARE command names through the
-  // shell there; a concrete path (the tests pass node's execPath, which may
-  // contain spaces) keeps exact-arg spawn semantics. Args must stay free of
-  // spaces and cmd metacharacters — true for every script in package.json.
-  const useShell =
+  // plain spawn cannot execute (ENOENT), so a BARE command name goes through
+  // the command interpreter. Invoke it explicitly rather than with
+  // `shell: true`, which concatenates argv unescaped (DEP0190). A concrete
+  // path — the tests pass node's execPath, which may contain spaces — spawns
+  // directly and keeps exact-arg semantics.
+  const viaInterpreter =
     process.platform === "win32" && !command.includes("\\") && !command.includes("/");
-  const child = spawn(command, args, { stdio: "inherit", env, shell: useShell });
+  const child = viaInterpreter
+    ? spawn(process.env.ComSpec || "cmd.exe", ["/c", command, ...args], {
+        stdio: "inherit",
+        env,
+      })
+    : spawn(command, args, { stdio: "inherit", env });
   // The dev server is long-running and is stopped by signalling this wrapper.
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
     process.on(signal, () => child.kill(signal));
