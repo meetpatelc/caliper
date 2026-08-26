@@ -25,3 +25,32 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      - run: npm run brand-check
+
+  # Kept separate from Check on purpose: a browser test that goes flaky must not
+  # be able to block a formula fix. Playwright was already installed by every
+  # `npm ci` here and never once executed, which is how a dialog nobody could
+  # click shipped, and stayed shipped.
+  browser:
+    name: Browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Serve the build
+        run: |
+          npx vite preview --port 8080 --strictPort &
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://127.0.0.1:8080/; then echo "up"; exit 0; fi
+            sleep 2
+          done
+          echo "preview never answered"; exit 1
+      - run: npm run qa:ui
+      - run: npm run qa:live

@@ -4,11 +4,29 @@
  * Do not put product catalogs, field caps, domains, or Studio here.
  */
 
+/**
+ * Domain guards, not defensive noise.
+ *
+ * A function that returns NaN or ±∞ is already caught downstream and reported.
+ * The dangerous case is the one that returns a number that is finite, plausible
+ * and wrong — `logmean(10, 0)` returning 0 is a pinched heat exchanger reported
+ * as transferring no heat. These throw at the point the domain is left, so the
+ * message can name the condition instead of saying "non-finite value".
+ */
 const FUNCTIONS: Record<string, (...args: number[]) => number> = {
-  sqrt: (x) => Math.sqrt(x),
+  sqrt: (x) => {
+    if (x < 0) throw new Error("sqrt is undefined below zero.");
+    return Math.sqrt(x);
+  },
   abs: (x) => Math.abs(x),
-  ln: (x) => Math.log(x),
-  log: (x) => Math.log10(x),
+  ln: (x) => {
+    if (x <= 0) throw new Error("ln is undefined at and below zero.");
+    return Math.log(x);
+  },
+  log: (x) => {
+    if (x <= 0) throw new Error("log is undefined at and below zero.");
+    return Math.log10(x);
+  },
   exp: (x) => Math.exp(x),
   sin: (x) => Math.sin(x),
   cos: (x) => Math.cos(x),
@@ -19,7 +37,18 @@ const FUNCTIONS: Record<string, (...args: number[]) => number> = {
   hypot: (...xs) => Math.hypot(...xs),
   atan: (x) => Math.atan(x),
   atan2: (y, x) => Math.atan2(y, x),
-  logmean: (a, b) => (Math.abs(a - b) < 1e-10 ? a : (a - b) / Math.log(a / b)),
+  // The log-mean of two driving forces. Both must be strictly positive: a zero
+  // end is a pinch and opposite signs are a cross, and neither has a log mean.
+  // Unguarded, a zero end divided by log(∞) returned 0 — finite, silent, and
+  // read as "this exchanger transfers no heat" rather than "this cannot work".
+  logmean: (a, b) => {
+    if (a <= 0 || b <= 0) {
+      throw new Error(
+        "logmean needs two positive values — a zero end is a pinch, opposite signs are a temperature cross.",
+      );
+    }
+    return Math.abs(a - b) < 1e-10 ? a : (a - b) / Math.log(a / b);
+  },
   eq: (a, b) => (Math.abs(a - b) < 1e-12 ? 1 : 0),
 };
 
@@ -140,13 +169,13 @@ export function evaluateExpression(source: string, scope: Record<string, number>
   }
 
   function parseMul(): number {
-    let left = parsePow();
+    let left = parseUnary();
     for (;;) {
       const token = peek();
       if (token?.kind !== "op" || (token.value !== "*" && token.value !== "/")) break;
       take();
       const rightStart = index;
-      const right = parsePow();
+      const right = parseUnary();
       if (token.value === "/" && right === 0) {
         const divisor = tokens[rightStart];
         const fieldId = divisor?.kind === "id" ? divisor.value : undefined;
@@ -157,12 +186,18 @@ export function evaluateExpression(source: string, scope: Record<string, number>
     return left;
   }
 
+  // Exponentiation binds tighter than a leading sign, so `-x^2` is -(x²), the
+  // reading every engineer and every other tool except Excel uses. Parsing the
+  // base as a unary expression instead gave (-x)², flipping the sign of a
+  // result with nothing on screen to show it had happened.
   function parsePow(): number {
-    const left = parseUnary();
+    const left = parsePrimary();
     const token = peek();
     if (token?.kind === "op" && token.value === "^") {
       take();
-      return left ** parsePow();
+      // The exponent may carry its own sign — `2^-1` — and stays right
+      // associative, so `2^3^2` is 2^(3^2).
+      return left ** parseUnary();
     }
     return left;
   }
@@ -170,7 +205,7 @@ export function evaluateExpression(source: string, scope: Record<string, number>
   function parseUnary(): number {
     if (match("+")) return parseUnary();
     if (match("-")) return -parseUnary();
-    return parsePrimary();
+    return parsePow();
   }
 
   function parsePrimary(): number {

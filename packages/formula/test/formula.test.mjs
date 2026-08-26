@@ -50,3 +50,36 @@ test("kit: hypot, atan2, logmean, eq", () => {
   assert.equal(evaluateExpression("eq(1, 1)", {}), 1);
   assert.equal(evaluateExpression("eq(1, 2)", {}), 0);
 });
+
+// `-x^2` is -(x²) everywhere an engineer writes it — Python, MATLAB, and every
+// textbook. Only Excel disagrees. Parsing the base as a unary expression gave
+// (-x)², which flips the sign of a result with nothing on screen to show it.
+test("kit: exponentiation binds tighter than a leading sign", () => {
+  assert.equal(evaluateExpression("-2^2", {}), -4);
+  assert.equal(evaluateExpression("-x^2", { x: 3 }), -9);
+  assert.equal(evaluateExpression("(-2)^2", {}), 4);
+  assert.equal(evaluateExpression("0-2^2", {}), -4);
+});
+
+test("kit: exponentiation stays right associative and takes a signed exponent", () => {
+  assert.equal(evaluateExpression("2^3^2", {}), 512);
+  assert.equal(evaluateExpression("2^-1", {}), 0.5);
+  assert.equal(evaluateExpression("-2^-2", {}), -0.25);
+});
+
+// The failure that matters is not NaN — that is caught and reported. It is a
+// finite, plausible, wrong number: logmean(10, 0) returned 0, which reads as a
+// heat exchanger transferring nothing rather than one that cannot work.
+test("kit: logmean refuses a pinch and a temperature cross", () => {
+  assert.throws(() => evaluateExpression("logmean(10, 0)", {}), /pinch|positive/i);
+  assert.throws(() => evaluateExpression("logmean(10, -5)", {}), /cross|positive/i);
+  assert.throws(() => evaluateExpression("logmean(0, 0)", {}), /positive/i);
+  assert.equal(evaluateExpression("logmean(10, 10)", {}), 10);
+});
+
+test("kit: log and sqrt name the domain they left", () => {
+  assert.throws(() => evaluateExpression("sqrt(-1)", {}), /below zero/i);
+  assert.throws(() => evaluateExpression("ln(0)", {}), /at and below zero/i);
+  assert.throws(() => evaluateExpression("log(-3)", {}), /at and below zero/i);
+  assert.equal(evaluateExpression("sqrt(9)", {}), 3);
+});

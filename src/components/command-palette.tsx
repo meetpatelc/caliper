@@ -177,7 +177,7 @@ export function CommandPalette({
               </Command.Item>
             ))}
           </Command.Group>
-          {releasedDomains.map((domain) => {
+          {releasedDomains().map((domain) => {
             const group = tools.filter((tool) => tool.contract.domain === domain.id && !recentIds.has(tool.id) && !favoriteIds.has(tool.id));
             if (!group.length) return null;
             return (

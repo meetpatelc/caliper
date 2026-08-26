@@ -29,6 +29,13 @@ const calculationSchema = z.object({
   method: z.string().max(400),
   resultJson: z.string().max(20_000),
   savedAt: z.string().max(40),
+  // Optional because a client that predates provenance still saves valid
+  // checks, and because "unknown" is the honest value for those — not a
+  // default that would assert they were made with the current model.
+  formulaVersion: z.string().max(40).optional(),
+  appVersion: z.string().max(40).optional(),
+  assumptions: z.array(z.string().max(400)).max(40).optional(),
+  boundary: z.string().max(1000).optional(),
 });
 
 const reviewSchema = z.object({
@@ -178,10 +185,13 @@ export const claimDesk = createServerFn({ method: "POST" })
       }
       for (const record of data.calculations) {
         await sql`
-          insert into desk_calculations (id, user_id, project_id, tool_id, title, input_json, method, result_json, saved_at)
+          insert into desk_calculations (id, user_id, project_id, tool_id, title, input_json, method, result_json, saved_at,
+            formula_version, app_version, assumptions_json, boundary)
           values (
             ${record.id}, ${context.userId}, ${record.projectId}, ${record.toolId}, ${record.title},
-            ${JSON.stringify(record.input)}, ${record.method}, ${record.resultJson}, ${record.savedAt}
+            ${JSON.stringify(record.input)}, ${record.method}, ${record.resultJson}, ${record.savedAt},
+            ${record.formulaVersion ?? null}, ${record.appVersion ?? null},
+            ${record.assumptions ? JSON.stringify(record.assumptions) : null}, ${record.boundary ?? null}
           )
           on conflict (id) do nothing
         `;
@@ -254,10 +264,13 @@ export const saveCalculationAccount = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const sql = await sqlClient();
     await sql`
-      insert into desk_calculations (id, user_id, project_id, tool_id, title, input_json, method, result_json, saved_at)
+      insert into desk_calculations (id, user_id, project_id, tool_id, title, input_json, method, result_json, saved_at,
+            formula_version, app_version, assumptions_json, boundary)
       values (
         ${data.id}, ${context.userId}, ${data.projectId}, ${data.toolId}, ${data.title},
-        ${JSON.stringify(data.input)}, ${data.method}, ${data.resultJson}, ${data.savedAt}
+        ${JSON.stringify(data.input)}, ${data.method}, ${data.resultJson}, ${data.savedAt},
+        ${data.formulaVersion ?? null}, ${data.appVersion ?? null},
+        ${data.assumptions ? JSON.stringify(data.assumptions) : null}, ${data.boundary ?? null}
       )
     `;
     return data;

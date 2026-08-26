@@ -280,6 +280,24 @@ export function titleFromDocument(html) {
   return match ? unescapeHtml(match[1]).trim() : "";
 }
 
+/**
+ * The page's own description, read before `stripShareMetaTags` removes it.
+ * Prefers an explicit og:description, falls back to the plain description a
+ * route sets, so a page that describes itself keeps describing itself in a
+ * link preview.
+ */
+export function descriptionFromDocument(html) {
+  const source = String(html ?? "");
+  const og = source.match(
+    /<meta\b[^>]*\bproperty\s*=\s*["']og:description["'][^>]*\bcontent\s*=\s*["']([^"']*)["'][^>]*>/i,
+  );
+  if (og) return unescapeHtml(og[1]).trim();
+  const plain = source.match(
+    /<meta\b[^>]*\bname\s*=\s*["']description["'][^>]*\bcontent\s*=\s*["']([^"']*)["'][^>]*>/i,
+  );
+  return plain ? unescapeHtml(plain[1]).trim() : "";
+}
+
 export function resolveOgTitle(
   site = {},
   appName = DEFAULT_APP_NAME,
@@ -321,15 +339,21 @@ export function grokOgHeadTags({
   appName = DEFAULT_APP_NAME,
   site = {},
   documentTitle = "",
+  documentDescription = "",
   cwd = process.cwd(),
 } = {}) {
-  const title = resolveOgTitle(site, appName, host, documentTitle);
+  // The page wins. `site.title` is the app's name, which is the right answer
+  // only for a page that has not named itself — every route here does, and a
+  // shared link is worth nothing if every one of them previews as "Instrument".
+  const title =
+    String(documentTitle ?? "").trim() || resolveOgTitle(site, appName, host);
   const publicHost = resolvePublicHost(host);
   const tags = [
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta property="og:title" content="${escapeHtml(title)}">`,
   ];
-  const description = String(site.description ?? "").trim();
+  const description =
+    String(documentDescription ?? "").trim() || String(site.description ?? "").trim();
   if (description) {
     tags.push(`<meta property="og:description" content="${escapeHtml(description)}">`);
   }
@@ -409,6 +433,8 @@ export function injectGrokPwaHead(html, ctx = {}) {
   if (typeof html !== "string") return html;
   const { site, projectId, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
   const documentTitle = titleFromDocument(html);
+  // Read before the strip, which deletes the route's own share meta.
+  const documentDescription = descriptionFromDocument(html);
   const appName = resolveOgTitle(
     site,
     ctx.appName ?? DEFAULT_APP_NAME,
@@ -427,7 +453,7 @@ export function injectGrokPwaHead(html, ctx = {}) {
 
   next = insertAfterHeadOpen(
     next,
-    grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
+    grokOgHeadTags({ host, appName, site, documentTitle, documentDescription, cwd }).join(""),
   );
 
   // No platform script is injected — the page stays first-party. The two

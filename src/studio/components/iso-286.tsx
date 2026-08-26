@@ -27,8 +27,15 @@ import { Field, Input, Select, UnitBadge } from "@/components/ui/field";
 import { ErrorState } from "@/components/ui/status";
 import { Link } from "@tanstack/react-router";
 
-const calculator = officialBySlug.get("iso-286-fits")!;
-const tool = tools.find((item) => item.id === "fits")!;
+// Resolved on use rather than at module evaluation. Read at module scope, these
+// two make the whole site's SSR depend on chunk initialisation order: if this
+// module happens to evaluate before the catalog it imports, `tools` is still
+// undefined and every route 500s with "Cannot read properties of undefined
+// (reading 'find')" — from a file that only one page uses. Any change to the
+// import graph could tip it either way, which is exactly what made the failure
+// look like it belonged to whichever edit happened to be in flight.
+const fitsCalculator = () => officialBySlug.get("iso-286-fits")!;
+const fitsTool = () => tools.find((item) => item.id === "fits")!;
 
 function mm(value: number, kind: "limit" | "deviation" = "deviation") {
   return kind === "limit" ? formatLimitMm(value) : formatDeviationMm(value);
@@ -99,14 +106,14 @@ export function Iso286Instrument() {
     if (!result.ok) return;
     const f = result.fit;
     const summary = [
-      `${tool.title} — ${f.holeClass}/${f.shaftClass} at ⌀${D} mm`,
+      `${fitsTool().title} — ${f.holeClass}/${f.shaftClass} at ⌀${D} mm`,
       `Fit: ${fitLabel(f.kind)}`,
       `Maximum clearance: ${mm(f.cmax)} mm`,
       `Maximum interference: ${mm(f.imax)} mm`,
       `Hole: ${mm(f.holeMin, "limit")} / ${mm(f.holeMax, "limit")} mm`,
       `Shaft: ${mm(f.shaftMin, "limit")} / ${mm(f.shaftMax, "limit")} mm`,
-      `Method: ${calculator.formula}`,
-      `Boundary: ${tool.assumptions.join("; ")}`,
+      `Method: ${fitsCalculator().formula}`,
+      `Boundary: ${fitsTool().assumptions.join("; ")}`,
     ].join(String.fromCharCode(10));
     try {
       await navigator.clipboard.writeText(summary);
@@ -127,8 +134,8 @@ export function Iso286Instrument() {
 
   return (
     <InstrumentPage
-      kicker={tool.kicker}
-      title={tool.title}
+      kicker={fitsTool().kicker}
+      title={fitsTool().title}
       actions={
         <>
           <Button onClick={copyResult} disabled={!result.ok}>
@@ -154,12 +161,12 @@ export function Iso286Instrument() {
       }
       method={
         <InstrumentMethod
-          description={calculator.description}
-          formula={calculator.formula}
-          when={calculator.assumptions}
-          dont={calculator.boundary}
-          sourceLabel={calculator.sourceLabel}
-          sourceUrl={calculator.sourceUrl}
+          description={fitsCalculator().description}
+          formula={fitsCalculator().formula}
+          when={fitsCalculator().assumptions}
+          dont={fitsCalculator().boundary}
+          sourceLabel={fitsCalculator().sourceLabel}
+          sourceUrl={fitsCalculator().sourceUrl}
         />
       }
     >
@@ -275,7 +282,7 @@ export function Iso286Instrument() {
                 <div>Hole min {mm(result.fit.holeMin, "limit")} mm</div>
                 <div>Shaft min {mm(result.fit.shaftMin, "limit")} mm</div>
               </dl>
-              <GoverningRelation formula={calculator.formula} className="text-sm" />
+              <GoverningRelation formula={fitsCalculator().formula} className="text-sm" />
             </>
           ) : (
             <ErrorState>{result.error}</ErrorState>

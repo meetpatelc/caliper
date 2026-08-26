@@ -23,6 +23,7 @@ import { studioSeedDocuments } from "@/lib/library-studio-seeds";
 import type { EngineeringDomain } from "@/lib/platform";
 import {
   applyDocumentBounds,
+  collectApplicabilityWarnings,
   applyFieldBound,
   fieldBounds,
   optionalOutputs,
@@ -199,6 +200,9 @@ export function runLibraryDocument(toolId: string, input: Record<string, string>
       ? document.warningsBy[strings[document.warningsChoice]]
       : undefined;
   const warnings = (chosenWarnings ?? document.warnings).map((warning) => interpolate(warning, strings));
+  // Applicability first: if the model is being used outside the range it was
+  // derived for, that outranks its standing caveats.
+  warnings.unshift(...collectApplicabilityWarnings(toolId, scope, context));
   const values: CalculationValue[] = [];
   for (const output of document.outputs) {
     if (output.when) {

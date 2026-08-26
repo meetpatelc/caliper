@@ -295,6 +295,39 @@ try {
   const recordTitle = await page.title();
   record("record title names the result", /20 MPa/.test(recordTitle), recordTitle);
 
+  // A modal marks the page behind it inert so the background cannot be reached.
+  // Rendered inside that same subtree, the dialog inherits the inertness and its
+  // own buttons stop responding — to the mouse and to the keyboard both, leaving
+  // a reload as the only exit. `.click()` still fires the handler, so this is
+  // invisible to any check that clicks programmatically; it has to be asked as a
+  // hit-test question, at the button's own centre.
+  await page.goto(`${BASE}/workshop`, { waitUntil: "networkidle" });
+  await page.fill("#folder-name", "QA hit test");
+  await page.getByRole("button", { name: "Create", exact: true }).click();
+  await page.getByRole("button", { name: "Delete QA hit test" }).click();
+  const confirmReachable = await page.evaluate(() => {
+    const dialog = document.querySelector('[role="dialog"]');
+    if (!dialog) return { open: false };
+    const confirm = [...dialog.querySelectorAll("button")].find((b) => b.textContent.trim() === "Delete");
+    if (!confirm) return { open: true, found: false };
+    const box = confirm.getBoundingClientRect();
+    const top = document.elementFromPoint(Math.round(box.x + box.width / 2), Math.round(box.y + box.height / 2));
+    return { open: true, found: true, reachable: top === confirm || confirm.contains(top) };
+  });
+  record("modal confirm is reachable by a real pointer", confirmReachable.reachable === true);
+  await page.getByRole("button", { name: "Delete", exact: true }).click();
+  // Wait for the dialog to go rather than reading the body straight after the
+  // click — the assertion otherwise races React's re-render and fails for
+  // timing rather than for the thing it is checking.
+  await page.waitForSelector('[role="dialog"]', { state: "detached", timeout: 5000 }).catch(() => {});
+  // Assert on the folder's own control, not on body text: the success toast
+  // names the folder it just removed, so the page still says "QA hit test"
+  // for a few seconds after the delete genuinely succeeded.
+  record(
+    "modal confirm actually commits",
+    (await page.getByRole("button", { name: "Delete QA hit test" }).count()) === 0,
+  );
+
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
 
   // ── Token regression ───────────────────────────────────────────────────────

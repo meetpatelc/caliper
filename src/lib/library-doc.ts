@@ -36,23 +36,65 @@ export type LibraryDocSpec = {
 /** Every derived document carries the same boundary statement. */
 export const LIBRARY_BOUNDARY = "Not a design stamp. Use only inside the stated model boundary.";
 
+/**
+ * Read the catalog entry on first use, then remember it.
+ *
+ * `libraryDoc` is called 156 times at module scope to build every library
+ * document. Reading `tools` there made the whole site's SSR depend on chunk
+ * initialisation order: the source import graph is acyclic, but Rollup's chunk
+ * graph need not be, so a build could evaluate a `library-*` chunk before the
+ * catalog chunk. When that happened `tools` was undefined and *every route*
+ * returned 500 — from a change that had nothing to do with any of this. It
+ * fired four times in a single day's work, each time looking like it belonged
+ * to whichever edit was in flight.
+ *
+ * Deferring the read to first property access moves it to render time, long
+ * after every module has initialised, and removes the ordering question
+ * entirely. The missing-entry check moves with it: still thrown, just on use.
+ */
+function catalogEntry(id: string) {
+  let cached: (typeof tools)[number] | undefined;
+  return () => {
+    if (!cached) {
+      cached = tools.find((item) => item.id === id);
+      if (!cached) throw new Error(`Missing catalog entry ${id}`);
+    }
+    return cached;
+  };
+}
+
 export function libraryDoc(id: string, spec: LibraryDocSpec): InstrumentDocument {
-  const tool = tools.find((item) => item.id === id);
-  if (!tool) throw new Error(`Missing catalog entry ${id}`);
+  const entry = catalogEntry(id);
   return {
     slug: id,
-    title: tool.title,
-    description: tool.description,
-    domain: tool.contract.domain,
+    get title() {
+      return entry().title;
+    },
+    get description() {
+      return entry().description;
+    },
+    get domain() {
+      return entry().contract.domain;
+    },
     fields: spec.fields,
     outputs: spec.outputs,
     formula: spec.formula,
-    purpose: tool.description,
-    assumptions: tool.assumptions,
+    get purpose() {
+      return entry().description;
+    },
+    get assumptions() {
+      return entry().assumptions;
+    },
     boundary: LIBRARY_BOUNDARY,
-    interpretation: tool.outputLabel,
-    sourceLabel: tool.sourceLabel,
-    sourceUrl: tool.sourceUrl,
+    get interpretation() {
+      return entry().outputLabel;
+    },
+    get sourceLabel() {
+      return entry().sourceLabel;
+    },
+    get sourceUrl() {
+      return entry().sourceUrl;
+    },
     related: [],
     warnings: spec.warnings,
     sketch: spec.sketch,

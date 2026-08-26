@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, initialInputs, toolFields } from "@/lib/engineering";
 import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
-import { toolSearchFromUnknown } from "@/lib/search-params";
+import { splitRecordSearch, toolSearchFromUnknown } from "@/lib/search-params";
 import { PARENT_NAME } from "@/lib/instrument";
 import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
@@ -29,7 +29,8 @@ export const Route = createFileRoute("/record/$toolId")({
     const tool = getTool(params.toolId);
     if (!tool) return {};
     const search = (match.search ?? {}) as Record<string, string>;
-    const input = { ...(initialInputs[params.toolId as ToolId] ?? {}), ...search };
+    const { input: stated } = splitRecordSearch(search);
+    const input = { ...(initialInputs[params.toolId as ToolId] ?? {}), ...stated };
     const result = calculateTool(params.toolId as ToolId, input);
     const headline = result.values[0];
     // The result belongs in the title: a shared link should say what it found,
@@ -65,7 +66,8 @@ function RecordPage() {
   }
 
   const fields = toolFields[tool.id] ?? [];
-  const input = { ...(initialInputs[tool.id] ?? {}), ...search };
+  const { input: stated, stampedVersion } = splitRecordSearch(search);
+  const input = { ...(initialInputs[tool.id] ?? {}), ...stated };
   const result = calculateTool(tool.id, input);
   const labels = Object.fromEntries(fields.map((field) => [field.key, field.label]));
 
@@ -81,6 +83,10 @@ function RecordPage() {
   }
 
   const record = buildCalculationPrintScope(tool, input, result, labels);
+  // A stamp that disagrees with the model that just ran is the whole point of
+  // carrying one. An absent stamp says nothing — links shared before stamping
+  // existed cannot be reasoned about, which is why the stamp had to come first.
+  const drifted = Boolean(stampedVersion && stampedVersion !== record.formulaVersion);
 
   return (
     <div className="page-wrap">
@@ -90,11 +96,25 @@ function RecordPage() {
         title={tool.title}
         lede={`Formula version ${record.formulaVersion}. A record of the inputs shown and the output they produce.`}
         actions={
-          <Link to="/tool/$toolId" params={{ toolId: tool.id }} search={search} className="link-accent">
+          <Link to="/tool/$toolId" params={{ toolId: tool.id }} search={stated} className="link-accent">
             Open in the calculator
           </Link>
         }
       />
+
+      {drifted ? (
+        <div
+          role="status"
+          className="mt-8 border-l-2 border-danger bg-danger/8 p-4 text-sm leading-6"
+        >
+          <p className="font-medium">This record was produced by an earlier version of the model.</p>
+          <p className="mt-1 text-muted">
+            Made with {tool.title} v{stampedVersion}; the current model is v{record.formulaVersion}. The
+            numbers below are recomputed with the current model, so they may differ from the ones the
+            sender saw. Check the method before relying on either.
+          </p>
+        </div>
+      ) : null}
 
       <SectionHeader className="mt-12" kicker="Conditions" title="What was entered." />
       <div className={cn(panelClass, "mt-4 overflow-x-auto")}>

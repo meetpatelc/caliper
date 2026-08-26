@@ -62,3 +62,40 @@ export function toolSearchFromUnknown(search: Record<string, unknown>): Record<s
   }
   return out;
 }
+
+/**
+ * The formula version a shared record was produced under.
+ *
+ * A record link carries inputs, not an answer — the page recomputes when it is
+ * opened. That makes it a live link rather than a photograph, and it means a
+ * correction to a model silently changes every link already sent: same URL,
+ * same-looking page, a different number, and nothing telling the reader.
+ *
+ * Stamping the version at the moment the link is made is what makes the change
+ * visible later. It cannot be applied retroactively — a link sent before this
+ * existed carries no stamp and nothing can infer one — which is why this has to
+ * be in place *before* a model is corrected, not after.
+ */
+export const RECORD_VERSION_KEY = "fv";
+
+export function recordPath(
+  toolId: string,
+  input: Record<string, unknown>,
+  allowedKeys: string[],
+  formulaVersion: string,
+) {
+  const path = sharePath(toolId, input, allowedKeys).replace("/tool/", "/record/");
+  const [base, query] = path.split("?");
+  const params = new URLSearchParams(query ?? "");
+  params.set(RECORD_VERSION_KEY, formulaVersion);
+  return `${base}?${params.toString()}`;
+}
+
+/** Split a record's search into the model's inputs and the stamp beside them. */
+export function splitRecordSearch(search: Record<string, string>): {
+  input: Record<string, string>;
+  stampedVersion?: string;
+} {
+  const { [RECORD_VERSION_KEY]: stampedVersion, ...input } = search;
+  return { input, stampedVersion: stampedVersion || undefined };
+}

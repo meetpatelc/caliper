@@ -101,7 +101,7 @@ function ReferencePage() {
           title={<>Every released method, one step away</>}
         />
         <div className="mt-8 grid gap-8">
-          {releasedDomains.map((domain) => {
+          {releasedDomains().map((domain) => {
             const domainTools = tools.filter((tool) => tool.contract.domain === domain.id);
             if (!domainTools.length) return null;
             return (
