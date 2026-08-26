@@ -4,7 +4,7 @@ import { tools, type ToolId } from "@/lib/catalog";
 // The generated relation index, NOT `@/lib/document` — importing the documents
 // here pulls all ~123 of them into the entry chunk to render one line per card.
 import { libraryFormulas } from "@/lib/library-formulas";
-import { MODEL_COUNT, releasedDomains, savedHeadline } from "@/lib/desk";
+import { modelCount, releasedDomains, savedHeadline } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
 import { Button } from "@/components/ui/button";
 import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
@@ -46,7 +46,7 @@ function Home() {
     return tools.filter((tool) => domain === "all" || tool.contract.domain === domain);
   }, [domain]);
 
-  const grouped = releasedDomains
+  const grouped = releasedDomains()
     .map((item) => ({ domain: item, tools: visible.filter((tool) => tool.contract.domain === item.id) }))
     .filter((group) => group.tools.length);
 
@@ -64,7 +64,7 @@ function Home() {
         title="Every released model."
         lede={
           <>
-            {MODEL_COUNT} finished calculators. Filter, search, open. To write your own, open{" "}
+            {modelCount()} finished calculators. Filter, search, open. To write your own, open{" "}
             <Link to="/studio" className="link-accent">
               Studio
             </Link>
@@ -113,7 +113,7 @@ function Home() {
         >
           All
         </SegmentedItem>
-        {releasedDomains.map((item) => (
+        {releasedDomains().map((item) => (
           <SegmentedItem
             key={item.id}
             selected={domain === item.id}

@@ -10,7 +10,7 @@
     "bar(g) is compatibility-only: same factor as bar; no +101325 Pa.",
     "temperature is affine absolute; temperatureDelta is linear interval.",
     "gal/min and US gpm are one unit (volumetricFlow.us_gpm).",
-    "deg and \u00b0 are one unit (angle.degree).",
+    "deg and ° are one unit (angle.degree).",
     "This inventory is the contract. convertQuantity() reads only this file."
   ],
   "families": [
@@ -45,7 +45,7 @@
           "status": "canonical"
         }
       ],
-      "note": "Gauge studio counts, ratios, and percent. Caliper shop skips % on some declared fields \u2014 that skip stays in the Caliper adapter."
+      "note": "Gauge studio counts, ratios, and percent. Caliper shop skips % on some declared fields — that skip stays in the Caliper adapter."
     },
     {
       "id": "length",
@@ -95,7 +95,7 @@
           "symbol": "km",
           "label": "kilometre",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [
             "kilometer"
           ],
@@ -103,10 +103,10 @@
         },
         {
           "id": "length.um",
-          "symbol": "\u00b5m",
+          "symbol": "µm",
           "label": "micrometre",
           "kind": "linear",
-          "factor": 1e-06,
+          "factor": 0.000001,
           "aliases": [
             "um",
             "micrometre",
@@ -154,7 +154,7 @@
     {
       "id": "area",
       "label": "Area",
-      "canonicalUnit": "m\u00b2",
+      "canonicalUnit": "m²",
       "sources": [
         "caliper",
         "gauge"
@@ -162,7 +162,7 @@
       "units": [
         {
           "id": "area.m2",
-          "symbol": "m\u00b2",
+          "symbol": "m²",
           "label": "square metre",
           "kind": "linear",
           "factor": 1,
@@ -173,10 +173,10 @@
         },
         {
           "id": "area.mm2",
-          "symbol": "mm\u00b2",
+          "symbol": "mm²",
           "label": "square millimetre",
           "kind": "linear",
-          "factor": 1e-06,
+          "factor": 0.000001,
           "aliases": [
             "mm2"
           ],
@@ -184,7 +184,7 @@
         },
         {
           "id": "area.cm2",
-          "symbol": "cm\u00b2",
+          "symbol": "cm²",
           "label": "square centimetre",
           "kind": "linear",
           "factor": 0.0001,
@@ -195,7 +195,7 @@
         },
         {
           "id": "area.in2",
-          "symbol": "in\u00b2",
+          "symbol": "in²",
           "label": "square inch",
           "kind": "linear",
           "factor": 0.00064516,
@@ -206,7 +206,7 @@
         },
         {
           "id": "area.ft2",
-          "symbol": "ft\u00b2",
+          "symbol": "ft²",
           "label": "square foot",
           "kind": "linear",
           "factor": 0.09290304,
@@ -220,7 +220,7 @@
     {
       "id": "volume",
       "label": "Volume",
-      "canonicalUnit": "m\u00b3",
+      "canonicalUnit": "m³",
       "sources": [
         "caliper",
         "gauge"
@@ -228,7 +228,7 @@
       "units": [
         {
           "id": "volume.m3",
-          "symbol": "m\u00b3",
+          "symbol": "m³",
           "label": "cubic metre",
           "kind": "linear",
           "factor": 1,
@@ -255,7 +255,7 @@
           "symbol": "mL",
           "label": "millilitre",
           "kind": "linear",
-          "factor": 1e-06,
+          "factor": 0.000001,
           "aliases": [
             "ml"
           ],
@@ -263,7 +263,7 @@
         },
         {
           "id": "volume.ft3",
-          "symbol": "ft\u00b3",
+          "symbol": "ft³",
           "label": "cubic foot",
           "kind": "linear",
           "factor": 0.028316846592,
@@ -319,7 +319,7 @@
           "symbol": "t",
           "label": "metric tonne",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [
             "tonne",
             "t"
@@ -328,12 +328,12 @@
         },
         {
           "id": "mass.lbm",
-          "symbol": "lbm",
-          "label": "pound mass",
+          "symbol": "lb",
+          "label": "pound",
           "kind": "linear",
           "factor": 0.45359237,
           "aliases": [
-            "lb"
+            "lbm"
           ],
           "status": "canonical"
         },
@@ -422,7 +422,7 @@
         },
         {
           "id": "angle.degree",
-          "symbol": "\u00b0",
+          "symbol": "°",
           "label": "degree",
           "kind": "linear",
           "factor": 0.017453292519943295,
@@ -444,7 +444,7 @@
           "status": "canonical"
         }
       ],
-      "note": "Stable id is angle.degree. Symbol \u00b0; alias deg (Caliper engine key). Caliper-only family today."
+      "note": "Stable id is angle.degree. Symbol °; alias deg (Caliper engine key). Caliper-only family today."
     },
     {
       "id": "force",
@@ -469,7 +469,7 @@
           "symbol": "kN",
           "label": "kilonewton",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
@@ -478,8 +478,19 @@
           "symbol": "MN",
           "label": "meganewton",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "force.kgf",
+          "symbol": "kgf",
+          "label": "kilogram-force",
+          "kind": "linear",
+          "factor": 9.80665,
+          "aliases": [
+            "kp"
+          ],
           "status": "canonical"
         },
         {
@@ -516,7 +527,7 @@
           "symbol": "kPa",
           "label": "kilopascal",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
@@ -525,7 +536,7 @@
           "symbol": "MPa",
           "label": "megapascal",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [],
           "status": "canonical"
         },
@@ -534,7 +545,7 @@
           "symbol": "bar",
           "label": "bar",
           "kind": "linear",
-          "factor": 100000.0,
+          "factor": 100000,
           "aliases": [],
           "status": "canonical"
         },
@@ -543,7 +554,7 @@
           "symbol": "bar(g)",
           "label": "bar gauge",
           "kind": "linear",
-          "factor": 100000.0,
+          "factor": 100000,
           "aliases": [
             "barg"
           ],
@@ -555,7 +566,7 @@
           "symbol": "bar(abs)",
           "label": "bar absolute",
           "kind": "linear",
-          "factor": 100000.0,
+          "factor": 100000,
           "aliases": [
             "bara"
           ],
@@ -567,7 +578,7 @@
           "symbol": "kPa(abs)",
           "label": "kilopascal absolute",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "compatibility"
         },
@@ -626,7 +637,7 @@
           "symbol": "kPa",
           "label": "kilopascal",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
@@ -635,7 +646,7 @@
           "symbol": "MPa",
           "label": "megapascal",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [],
           "status": "canonical"
         },
@@ -644,16 +655,16 @@
           "symbol": "GPa",
           "label": "gigapascal",
           "kind": "linear",
-          "factor": 1000000000.0,
+          "factor": 1000000000,
           "aliases": [],
           "status": "canonical"
         },
         {
           "id": "stress.N_per_mm2",
-          "symbol": "N/mm\u00b2",
+          "symbol": "N/mm²",
           "label": "newton per square millimetre",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [
             "N/mm2"
           ],
@@ -683,7 +694,7 @@
     {
       "id": "torque",
       "label": "Torque",
-      "canonicalUnit": "N\u00b7m",
+      "canonicalUnit": "N·m",
       "sources": [
         "caliper",
         "gauge"
@@ -691,7 +702,7 @@
       "units": [
         {
           "id": "torque.N_m",
-          "symbol": "N\u00b7m",
+          "symbol": "N·m",
           "label": "newton metre",
           "kind": "linear",
           "factor": 1,
@@ -703,16 +714,16 @@
         },
         {
           "id": "torque.kN_m",
-          "symbol": "kN\u00b7m",
+          "symbol": "kN·m",
           "label": "kilonewton metre",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
         {
           "id": "torque.lbf_ft",
-          "symbol": "lbf\u00b7ft",
+          "symbol": "lbf·ft",
           "label": "pound-force foot",
           "kind": "linear",
           "factor": 1.3558179483314,
@@ -721,7 +732,7 @@
         },
         {
           "id": "torque.lbf_in",
-          "symbol": "lbf\u00b7in",
+          "symbol": "lbf·in",
           "label": "pound-force inch",
           "kind": "linear",
           "factor": 0.1129848290276167,
@@ -733,7 +744,7 @@
     {
       "id": "acceleration",
       "label": "Acceleration",
-      "canonicalUnit": "m/s\u00b2",
+      "canonicalUnit": "m/s²",
       "sources": [
         "caliper",
         "gauge"
@@ -741,7 +752,7 @@
       "units": [
         {
           "id": "acceleration.m_s2",
-          "symbol": "m/s\u00b2",
+          "symbol": "m/s²",
           "label": "metres per second squared",
           "kind": "linear",
           "factor": 1,
@@ -761,7 +772,7 @@
         },
         {
           "id": "acceleration.ft_s2",
-          "symbol": "ft/s\u00b2",
+          "symbol": "ft/s²",
           "label": "feet per second squared",
           "kind": "linear",
           "factor": 0.3048,
@@ -811,7 +822,7 @@
           "symbol": "mm/min",
           "label": "millimetres per minute",
           "kind": "linear",
-          "factor": 1.6666666666666667e-05,
+          "factor": 0.000016666666666666667,
           "aliases": [],
           "status": "canonical"
         },
@@ -867,7 +878,7 @@
           "symbol": "kJ",
           "label": "kilojoule",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
@@ -876,7 +887,7 @@
           "symbol": "MJ",
           "label": "megajoule",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [],
           "status": "canonical"
         },
@@ -894,7 +905,7 @@
           "symbol": "kWh",
           "label": "kilowatt-hour",
           "kind": "linear",
-          "factor": 3600000.0,
+          "factor": 3600000,
           "aliases": [],
           "status": "canonical"
         },
@@ -932,7 +943,7 @@
           "symbol": "kW",
           "label": "kilowatt",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
@@ -941,7 +952,7 @@
           "symbol": "MW",
           "label": "megawatt",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [],
           "status": "canonical"
         },
@@ -988,7 +999,7 @@
         },
         {
           "id": "temperature.degC",
-          "symbol": "\u00b0C",
+          "symbol": "°C",
           "label": "degree Celsius",
           "kind": "affine",
           "scale": 1,
@@ -1001,7 +1012,7 @@
         },
         {
           "id": "temperature.degF",
-          "symbol": "\u00b0F",
+          "symbol": "°F",
           "label": "degree Fahrenheit",
           "kind": "affine",
           "scale": 0.5555555555555556,
@@ -1014,7 +1025,7 @@
         },
         {
           "id": "temperature.degR",
-          "symbol": "\u00b0R",
+          "symbol": "°R",
           "label": "degree Rankine",
           "kind": "affine",
           "scale": 0.5555555555555556,
@@ -1026,7 +1037,7 @@
           "status": "canonical"
         }
       ],
-      "note": "Affine: canonical K = scale \u00d7 value + offset. Do not use this family for intervals (LMTD, \u0394T). Use temperatureDelta."
+      "note": "Affine: canonical K = scale × value + offset. Do not use this family for intervals (LMTD, ΔT). Use temperatureDelta."
     },
     {
       "id": "temperatureDelta",
@@ -1047,7 +1058,7 @@
         },
         {
           "id": "temperatureDelta.degC",
-          "symbol": "\u00b0C",
+          "symbol": "°C",
           "label": "celsius interval",
           "kind": "linear",
           "factor": 1,
@@ -1058,7 +1069,7 @@
         },
         {
           "id": "temperatureDelta.degF",
-          "symbol": "\u00b0F",
+          "symbol": "°F",
           "label": "fahrenheit interval",
           "kind": "linear",
           "factor": 0.5555555555555556,
@@ -1068,12 +1079,12 @@
           "status": "canonical"
         }
       ],
-      "note": "Linear intervals. 1 \u00b0C \u0394 = 1 K; 1 \u00b0F \u0394 = 5/9 K. Gauge-only family today."
+      "note": "Linear intervals. 1 °C Δ = 1 K; 1 °F Δ = 5/9 K. Gauge-only family today."
     },
     {
       "id": "density",
       "label": "Density",
-      "canonicalUnit": "kg/m\u00b3",
+      "canonicalUnit": "kg/m³",
       "sources": [
         "caliper",
         "gauge"
@@ -1081,7 +1092,7 @@
       "units": [
         {
           "id": "density.kg_m3",
-          "symbol": "kg/m\u00b3",
+          "symbol": "kg/m³",
           "label": "kilograms per cubic metre",
           "kind": "linear",
           "factor": 1,
@@ -1090,16 +1101,16 @@
         },
         {
           "id": "density.g_cm3",
-          "symbol": "g/cm\u00b3",
+          "symbol": "g/cm³",
           "label": "grams per cubic centimetre",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
         {
           "id": "density.lbm_ft3",
-          "symbol": "lbm/ft\u00b3",
+          "symbol": "lbm/ft³",
           "label": "pounds mass per cubic foot",
           "kind": "linear",
           "factor": 16.01846337396,
@@ -1108,7 +1119,7 @@
         },
         {
           "id": "density.lbm_in3",
-          "symbol": "lbm/in\u00b3",
+          "symbol": "lbm/in³",
           "label": "pounds mass per cubic inch",
           "kind": "linear",
           "factor": 27679.904710191,
@@ -1120,7 +1131,7 @@
     {
       "id": "dynamicViscosity",
       "label": "Dynamic viscosity",
-      "canonicalUnit": "Pa\u00b7s",
+      "canonicalUnit": "Pa·s",
       "sources": [
         "caliper",
         "gauge"
@@ -1128,7 +1139,7 @@
       "units": [
         {
           "id": "dynamicViscosity.Pa_s",
-          "symbol": "Pa\u00b7s",
+          "symbol": "Pa·s",
           "label": "pascal second",
           "kind": "linear",
           "factor": 1,
@@ -1158,14 +1169,14 @@
     {
       "id": "kinematicViscosity",
       "label": "Kinematic viscosity",
-      "canonicalUnit": "m\u00b2/s",
+      "canonicalUnit": "m²/s",
       "sources": [
         "caliper"
       ],
       "units": [
         {
           "id": "kinematicViscosity.m2_s",
-          "symbol": "m\u00b2/s",
+          "symbol": "m²/s",
           "label": "square metre per second",
           "kind": "linear",
           "factor": 1,
@@ -1177,13 +1188,13 @@
           "symbol": "cSt",
           "label": "centistokes",
           "kind": "linear",
-          "factor": 1e-06,
+          "factor": 0.000001,
           "aliases": [],
           "status": "canonical"
         },
         {
           "id": "kinematicViscosity.ft2_s",
-          "symbol": "ft\u00b2/s",
+          "symbol": "ft²/s",
           "label": "square foot per second",
           "kind": "linear",
           "factor": 0.09290304,
@@ -1195,7 +1206,7 @@
     {
       "id": "volumetricFlow",
       "label": "Volumetric flow",
-      "canonicalUnit": "m\u00b3/s",
+      "canonicalUnit": "m³/s",
       "sources": [
         "caliper",
         "gauge"
@@ -1203,7 +1214,7 @@
       "units": [
         {
           "id": "volumetricFlow.m3_s",
-          "symbol": "m\u00b3/s",
+          "symbol": "m³/s",
           "label": "cubic metres per second",
           "kind": "linear",
           "factor": 1,
@@ -1224,7 +1235,7 @@
           "symbol": "L/min",
           "label": "litres per minute",
           "kind": "linear",
-          "factor": 1.6666666666666667e-05,
+          "factor": 0.000016666666666666667,
           "aliases": [],
           "status": "canonical"
         },
@@ -1233,7 +1244,7 @@
           "symbol": "gal/min",
           "label": "US gallons per minute",
           "kind": "linear",
-          "factor": 6.30901964e-05,
+          "factor": 0.0000630901964,
           "aliases": [
             "US gpm",
             "gpm"
@@ -1274,7 +1285,7 @@
           "symbol": "kHz",
           "label": "kilohertz",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
@@ -1283,7 +1294,7 @@
           "symbol": "MHz",
           "label": "megahertz",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [],
           "status": "canonical"
         },
@@ -1332,7 +1343,7 @@
           "symbol": "kV",
           "label": "kilovolt",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         }
@@ -1370,7 +1381,7 @@
           "symbol": "kA",
           "label": "kiloampere",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         }
@@ -1379,7 +1390,7 @@
     {
       "id": "resistance",
       "label": "Resistance",
-      "canonicalUnit": "\u03a9",
+      "canonicalUnit": "Ω",
       "sources": [
         "caliper",
         "gauge"
@@ -1387,7 +1398,7 @@
       "units": [
         {
           "id": "resistance.ohm",
-          "symbol": "\u03a9",
+          "symbol": "Ω",
           "label": "ohm",
           "kind": "linear",
           "factor": 1,
@@ -1398,19 +1409,19 @@
         },
         {
           "id": "resistance.kohm",
-          "symbol": "k\u03a9",
+          "symbol": "kΩ",
           "label": "kilo-ohm",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
         {
           "id": "resistance.Mohm",
-          "symbol": "M\u03a9",
+          "symbol": "MΩ",
           "label": "mega-ohm",
           "kind": "linear",
-          "factor": 1000000.0,
+          "factor": 1000000,
           "aliases": [],
           "status": "canonical"
         }
@@ -1444,10 +1455,10 @@
         },
         {
           "id": "capacitance.uF",
-          "symbol": "\u00b5F",
+          "symbol": "µF",
           "label": "microfarad",
           "kind": "linear",
-          "factor": 1e-06,
+          "factor": 0.000001,
           "aliases": [
             "uF"
           ],
@@ -1458,7 +1469,7 @@
           "symbol": "nF",
           "label": "nanofarad",
           "kind": "linear",
-          "factor": 1e-09,
+          "factor": 1e-9,
           "aliases": [],
           "status": "canonical"
         }
@@ -1520,10 +1531,10 @@
         },
         {
           "id": "strain.micro",
-          "symbol": "\u00b5\u03b5",
+          "symbol": "µε",
           "label": "microstrain",
           "kind": "linear",
-          "factor": 1e-06,
+          "factor": 0.000001,
           "aliases": [
             "ue"
           ],
@@ -1534,7 +1545,7 @@
     {
       "id": "secondMoment",
       "label": "Second moment of area",
-      "canonicalUnit": "m\u2074",
+      "canonicalUnit": "m⁴",
       "sources": [
         "caliper",
         "gauge"
@@ -1542,7 +1553,7 @@
       "units": [
         {
           "id": "secondMoment.m4",
-          "symbol": "m\u2074",
+          "symbol": "m⁴",
           "label": "metre to the fourth",
           "kind": "linear",
           "factor": 1,
@@ -1551,16 +1562,16 @@
         },
         {
           "id": "secondMoment.cm4",
-          "symbol": "cm\u2074",
+          "symbol": "cm⁴",
           "label": "centimetre to the fourth",
           "kind": "linear",
-          "factor": 1e-08,
+          "factor": 1e-8,
           "aliases": [],
           "status": "canonical"
         },
         {
           "id": "secondMoment.mm4",
-          "symbol": "mm\u2074",
+          "symbol": "mm⁴",
           "label": "millimetre to the fourth",
           "kind": "linear",
           "factor": 1e-12,
@@ -1569,10 +1580,10 @@
         },
         {
           "id": "secondMoment.in4",
-          "symbol": "in\u2074",
+          "symbol": "in⁴",
           "label": "inch to the fourth",
           "kind": "linear",
-          "factor": 4.162314255999999e-07,
+          "factor": 4.162314255999999e-7,
           "aliases": [],
           "status": "canonical"
         }
@@ -1600,7 +1611,7 @@
           "symbol": "N/mm",
           "label": "newton per millimetre",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         },
@@ -1647,14 +1658,14 @@
     {
       "id": "specificHeat",
       "label": "Specific heat",
-      "canonicalUnit": "J/(kg\u00b7K)",
+      "canonicalUnit": "J/(kg·K)",
       "sources": [
         "gauge"
       ],
       "units": [
         {
           "id": "specificHeat.J_kg_K",
-          "symbol": "J/(kg\u00b7K)",
+          "symbol": "J/(kg·K)",
           "label": "joule per kilogram kelvin",
           "kind": "linear",
           "factor": 1,
@@ -1663,10 +1674,10 @@
         },
         {
           "id": "specificHeat.kJ_kg_K",
-          "symbol": "kJ/(kg\u00b7K)",
+          "symbol": "kJ/(kg·K)",
           "label": "kilojoule per kilogram kelvin",
           "kind": "linear",
-          "factor": 1000.0,
+          "factor": 1000,
           "aliases": [],
           "status": "canonical"
         }
@@ -1676,14 +1687,14 @@
     {
       "id": "thermalConductivity",
       "label": "Thermal conductivity",
-      "canonicalUnit": "W/(m\u00b7K)",
+      "canonicalUnit": "W/(m·K)",
       "sources": [
         "gauge"
       ],
       "units": [
         {
           "id": "thermalConductivity.W_m_K",
-          "symbol": "W/(m\u00b7K)",
+          "symbol": "W/(m·K)",
           "label": "watt per metre kelvin",
           "kind": "linear",
           "factor": 1,

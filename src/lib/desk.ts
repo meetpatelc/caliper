@@ -5,18 +5,41 @@ import { domains } from "@/lib/platform";
 export const APP_NAME = "Library";
 export const APP_TAGLINE = "Set the numbers. Keep the model in frame.";
 export const APP_JOB = "Open a finished model and get a number.";
-export const MODEL_COUNT = tools.length;
-
-export const activeDomains = domains.map((domain) => {
-  const count = tools.filter((tool) => tool.contract.domain === domain.id).length;
-  return {
-    ...domain,
-    count,
-    state: count > 0 ? ("released" as const) : domain.state,
+/**
+ * Counted on first use, not at module evaluation.
+ *
+ * Reading `tools` here made the site's SSR depend on chunk initialisation
+ * order — see the note in `library-doc.ts`. `tools` could still be undefined
+ * when this module ran, and every route returned 500. Both values are read
+ * during render, so deferring them costs nothing and removes the ordering
+ * question. `memo` keeps the work once-only, as the eager version was.
+ */
+function memo<T>(build: () => T): () => T {
+  let value: T | undefined;
+  let done = false;
+  return () => {
+    if (!done) {
+      value = build();
+      done = true;
+    }
+    return value as T;
   };
-});
+}
 
-export const releasedDomains = activeDomains.filter((domain) => domain.state === "released");
+export const modelCount = memo(() => tools.length);
+
+export const activeDomains = memo(() =>
+  domains.map((domain) => {
+    const count = tools.filter((tool) => tool.contract.domain === domain.id).length;
+    return {
+      ...domain,
+      count,
+      state: count > 0 ? ("released" as const) : domain.state,
+    };
+  }),
+);
+
+export const releasedDomains = memo(() => activeDomains().filter((domain) => domain.state === "released"));
 
 export function savedHeadline(resultJson: string): string {
   try {

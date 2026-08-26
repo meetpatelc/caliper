@@ -385,3 +385,66 @@ export function applyDocumentBounds(
     if (bound.lt != null && !(value < bound.lt)) throw new Error(bound.message);
   }
 }
+
+/**
+ * Applicability warnings — the model runs, but outside the range it was derived
+ * for. Distinct from `documentBounds`, which rejects input that is invalid:
+ * D/t = 5 is a perfectly well-formed vessel, it is just not a thin-walled one,
+ * and refusing to compute it would be wrong. Saying nothing is also wrong,
+ * because the number that comes back looks exactly like a valid one.
+ */
+export type ApplicabilityWarning = {
+  expression: string;
+  min?: number;
+  max?: number;
+  gt?: number;
+  lt?: number;
+  message: string;
+};
+
+export const applicabilityWarnings: Record<string, ApplicabilityWarning[]> = {
+  thinVessel: [
+    {
+      expression: "diameter/thickness",
+      // Membrane theory assumes stress is uniform through the wall. Below about
+      // D/t = 20 the through-wall gradient stops being negligible and the hoop
+      // stress reported here reads low.
+      min: 20,
+      message:
+        "Diameter-to-thickness is below 20, so this is not a thin wall. Membrane theory understates the hoop stress here — use a thick-wall (Lamé) treatment.",
+    },
+  ],
+  // `stability` wants the same treatment and cannot have it yet. Euler buckling
+  // is elastic, so below a critical slenderness it returns a load the column
+  // cannot reach — it squashes first. Testing for that needs the squash load,
+  // σy·A, and the model takes neither cross-sectional area nor yield strength:
+  // its inputs are end condition, length, modulus and second moment. Adding the
+  // check means adding two inputs, which changes what the model asks of the
+  // person using it. That is a product decision, not a guard.
+};
+
+export function collectApplicabilityWarnings(
+  toolId: string,
+  scope: Record<string, number>,
+  context: { strings?: Record<string, string>; tables?: Record<string, Record<string, number>> } = {},
+): string[] {
+  const found: string[] = [];
+  for (const rule of applicabilityWarnings[toolId] ?? []) {
+    let value: number;
+    try {
+      value = evaluateExpression(rule.expression, scope, context);
+    } catch {
+      // A rule that cannot be evaluated is not a finding. The bounds and the
+      // outputs themselves already report a genuinely broken input.
+      continue;
+    }
+    if (!Number.isFinite(value)) continue;
+    const outside =
+      (rule.min != null && value < rule.min) ||
+      (rule.max != null && value > rule.max) ||
+      (rule.gt != null && !(value > rule.gt)) ||
+      (rule.lt != null && !(value < rule.lt));
+    if (outside) found.push(rule.message);
+  }
+  return found;
+}
