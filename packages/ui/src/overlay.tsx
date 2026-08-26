@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "./cn";
 import { panelClass } from "./panel";
 
@@ -27,6 +28,11 @@ export function OverlayDialog({
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
   const titleId = useId();
+  // There is no document to portal into during SSR, so the overlay stays out of
+  // the server render and appears on the client. Overlays are only ever opened
+  // by an interaction, so nothing is lost from the first paint.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!open) return;
@@ -82,9 +88,15 @@ export function OverlayDialog({
     };
   }, [open, restoreFocusTo]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  // Portalled to <body> because the open overlay marks `#main-content` inert to
+  // hold the background back. Rendered in place, the dialog is a descendant of
+  // that very element, so `inert` took the dialog with it: Confirm and Cancel
+  // stopped responding to the mouse and could not be reached by keyboard
+  // either, leaving a reload as the only way out. Programmatic .click() still
+  // fired the handlers, which is how it stayed hidden from scripted checks.
+  return createPortal(
     <div className="fixed inset-0 z-50">
       <button type="button" className="absolute inset-0 bg-fg/45" aria-label={`Close ${title}`} onClick={onClose} />
       <div
@@ -103,6 +115,7 @@ export function OverlayDialog({
         </h2>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
