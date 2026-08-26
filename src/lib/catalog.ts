@@ -319,7 +319,7 @@ export const tools: ToolDefinition[] = [
     status: "ready",
     sourceLabel: "ISO 286:2010",
     sourceUrl: "https://www.iso.org/standard/45975.html",
-    contract: { formulaVersion: "1.0.0", domain: "quality", safetyTier: "B", validation: "verified", prerequisites: ["nominal size", "hole class", "shaft class"], sourceIds: ["iso-fits-method"] },
+    contract: { formulaVersion: "2.0.0", domain: "quality", safetyTier: "B", validation: "verified", prerequisites: ["nominal size", "hole class", "shaft class"], sourceIds: ["iso-fits-method"] },
   },
   {
     id: "toleranceStack",

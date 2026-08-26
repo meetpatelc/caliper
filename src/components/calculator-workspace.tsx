@@ -18,7 +18,7 @@ import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
 import { convertShop, formatShop, hydrateDisplayInputs, parseShop, shopLabel, unitSwitchFor, unitSwitchForResult } from "@/lib/fieldUnits";
-import { coerceSearchValue, sharePath, stringifySearchPlain } from "@/lib/search-params";
+import { coerceSearchValue, recordPath, sharePath, stringifySearchPlain } from "@/lib/search-params";
 import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
@@ -235,8 +235,16 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       toast.error("Resolve the input state before sharing a record.");
       return;
     }
-    const path = sharePath(tool.id, input, toolFields[tool.id].map((field) => field.key));
-    const href = `${window.location.origin}${path.replace("/tool/", "/record/")}`;
+    // Stamped with the model version that produced it, so a later correction to
+    // the model shows up as a notice on this link instead of silently changing
+    // the number under whoever was sent it.
+    const path = recordPath(
+      tool.id,
+      input,
+      toolFields[tool.id].map((field) => field.key),
+      tool.contract.formulaVersion,
+    );
+    const href = `${window.location.origin}${path}`;
     try {
       await navigator.clipboard.writeText(href);
       toast.success("Record link copied. It opens the finished calculation.");
