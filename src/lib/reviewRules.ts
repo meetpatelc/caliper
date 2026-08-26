@@ -71,7 +71,14 @@ export const selectionWorkflows: SelectionWorkflow[] = [
 export type TradeInput = { weight: number; optionA: number; optionB: number };
 export type TradeResult = { scoreA: number; scoreB: number; weightTotal: number; normalizedA: number; normalizedB: number };
 export type FmeaInput = { severity: number; occurrence: number; detection: number };
-export type FmeaResult = { rpn: number; severityShare: number; occurrenceShare: number; detectionShare: number };
+export type FmeaResult = {
+  rpn: number;
+  severityShare: number;
+  occurrenceShare: number;
+  detectionShare: number;
+  /** Set when severity alone warrants action regardless of what RPN comes to. */
+  severityNotice?: string;
+};
 
 export const calculateTradeStudy = (inputs: TradeInput[]): TradeResult => {
   if (!inputs.length) throw new Error("Add at least one criterion.");
@@ -86,11 +93,41 @@ export const calculateTradeStudy = (inputs: TradeInput[]): TradeResult => {
   return { scoreA, scoreB, weightTotal, normalizedA: scoreA / weightTotal, normalizedB: scoreB / weightTotal };
 };
 
+/**
+ * Severity is not tradeable against detection, and a product of three ratings
+ * hides that. A cosmetic scuff at 2/5/5 comes to RPN 50; a brake line that
+ * ruptures at 10/1/1 comes to 10. Ranked by RPN the scratch outranks the
+ * rupture five to one.
+ *
+ * AIAG-VDA replaced RPN with Action Priority in 2019 for exactly this reason.
+ * The AP tables themselves are published material and are deliberately not
+ * reproduced here — the same policy `referenceData.ts` applies to ISO 2768 and
+ * ASME B46.1. What is stated instead is the part that needs no table: a high
+ * severity demands action on its own terms, and a low RPN does not retire it.
+ */
+function severityNotice(severity: number, rpn: number): string | undefined {
+  if (severity >= 9) {
+    return `Severity ${severity} describes a safety or regulatory consequence. It calls for action on its own${
+      rpn < 100 ? `, and RPN ${rpn} does not retire it` : ""
+    } — severity cannot be offset by better detection.`;
+  }
+  if (severity >= 7 && rpn < 100) {
+    return `Severity ${severity} is high while RPN is ${rpn}. A low product here reflects rarity or good detection, neither of which reduces how bad the failure is.`;
+  }
+  return undefined;
+}
+
 export const calculateFmea = ({ severity, occurrence, detection }: FmeaInput): FmeaResult => {
   if (![severity, occurrence, detection].every(Number.isFinite)) throw new Error("Severity, occurrence, and detection ratings must be finite.");
   if (![severity, occurrence, detection].every((rating) => Number.isInteger(rating) && rating >= 1 && rating <= 10)) throw new Error("Each FMEA rating must be an integer from 1 to 10.");
   const rpn = severity * occurrence * detection;
-  return { rpn, severityShare: severity / 10, occurrenceShare: occurrence / 10, detectionShare: detection / 10 };
+  return {
+    rpn,
+    severityShare: severity / 10,
+    occurrenceShare: occurrence / 10,
+    detectionShare: detection / 10,
+    severityNotice: severityNotice(severity, rpn),
+  };
 };
 
 export const FMEA_ERROR_ID = "fmea-error";

@@ -289,7 +289,16 @@ function ReviewPage() {
               {fmea.error}
             </ErrorState>
           ) : (
-            fmea.result && <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>
+            fmea.result && (
+              <>
+                <p className="mt-4 font-mono text-2xl tabular-nums">RPN {fmea.result.rpn}</p>
+                {fmea.result.severityNotice ? (
+                  <p role="status" className="mt-3 border-l-2 border-danger pl-3 text-sm leading-6 text-muted">
+                    {fmea.result.severityNotice}
+                  </p>
+                ) : null}
+              </>
+            )
           )}
           <Field htmlFor="review-workflow" label="Selection workflow">
             <Select id="review-workflow" className="w-full min-w-0 max-w-full" value={workflowId} onChange={(event) => setWorkflowId(event.target.value as typeof workflowId)}>

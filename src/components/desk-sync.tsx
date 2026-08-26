@@ -120,6 +120,17 @@ async function joinAccountDesk() {
     if (claimed) {
       consumeClaimedUnsignedDesk();
       consumeClaimedWorkshop();
+    } else if (hasWork(local)) {
+      // Work on this device is only claimed into an empty account, so that
+      // signing in can never duplicate or overwrite what the account already
+      // holds. That is the right rule, but silently it looks like data loss:
+      // the drafts on screen a moment ago are simply gone. They are still on
+      // the device — `consumeClaimedUnsignedDesk` runs only on the claim path —
+      // so say so rather than leaving the person to guess.
+      toast("This device had its own work, kept separate from the account.", {
+        description: "The account already had work, so the two were not merged. Sign out to see the device copy again.",
+        duration: 8000,
+      });
     }
   } catch {
     if (gen !== syncGeneration) return;
