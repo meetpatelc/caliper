@@ -29,5 +29,15 @@ function ToolRoute() {
   const { toolId } = Route.useParams();
   const search = Route.useSearch();
   if (toolId === "fits") return <Iso286Instrument />;
-  return <CalculatorWorkspace toolId={toolId} search={search} />;
+  // Keyed by tool so React remounts on a tool change.
+  //
+  // Every piece of per-tool state here is a lazy `useState(() => …)`, which runs
+  // on mount only. Without a key the workspace stays mounted while `toolId`
+  // changes underneath it, so the previous tool's state renders against the new
+  // tool's fields for a frame. Navigating from any calculator into the unit
+  // converter threw outright — `input.category` was still the old tool's input,
+  // so the family lookup got `undefined` and the page died with "Unknown unit
+  // family: undefined". Reported from the field; a fresh page load always
+  // worked, which is what made it look intermittent.
+  return <CalculatorWorkspace key={toolId} toolId={toolId} search={search} />;
 }
