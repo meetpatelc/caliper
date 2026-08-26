@@ -2,8 +2,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { chromium } from "playwright";
 
-const BASE = "http://127.0.0.1:8080";
-const outDir = "/workspace/screenshots";
+const BASE = process.argv[2] || process.env.UI_QA_BASE_URL || "http://127.0.0.1:8080";
+// Was hardcoded to /workspace/screenshots, a path that exists only in the
+// container this was written in. It is why the script could not run on a CI
+// runner or on a contributor's machine — mkdir simply threw before the first
+// check. Relative to the repo by default, overridable for a container.
+const outDir = process.env.QA_SCREENSHOT_DIR || "screenshots";
 mkdirSync(outDir, { recursive: true });
 
 async function fill(page, id, value) {
