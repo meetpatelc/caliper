@@ -164,7 +164,7 @@ export function Iso286Instrument() {
           description={fitsCalculator().description}
           formula={fitsCalculator().formula}
           when={fitsCalculator().assumptions}
-          dont={fitsCalculator().boundary}
+          dont={[fitsCalculator().boundary]}
           sourceLabel={fitsCalculator().sourceLabel}
           sourceUrl={fitsCalculator().sourceUrl}
         />

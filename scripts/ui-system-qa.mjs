@@ -301,6 +301,31 @@ try {
   // a reload as the only exit. `.click()` still fires the handler, so this is
   // invisible to any check that clicks programmatically; it has to be asked as a
   // hit-test question, at the button's own centre.
+  // The catalog decides which models can hurt someone and then said nothing
+  // about it. Tier C must announce itself; tier A must not, or the signal is
+  // worth nothing.
+  await page.goto(`${BASE}/tool/boltPreload`, { waitUntil: "networkidle" });
+  const tierC = await page.locator("body").innerText();
+  record("tier C model warns that a wrong number has consequences", /physical consequences/i.test(tierC));
+  record("boundary is stated at the result, not only on /about", /valid only within/i.test(tierC));
+
+  await page.goto(`${BASE}/tool/ohm`, { waitUntil: "networkidle" });
+  const tierA = await page.locator("body").innerText();
+  record("tier A model does not cry wolf", !/physical consequences/i.test(tierA));
+
+  // The tool page rendered warnings[0] and dropped the rest. thinVessel outside
+  // its range raises an applicability warning on top of its standing caveat, so
+  // both must appear — the applicability one is unshifted to the front, which is
+  // exactly how the standing caveat used to get lost.
+  await page.goto(`${BASE}/tool/thinVessel?pressure=%221.2%22&diameter=%22600%22&thickness=%22120%22`, {
+    waitUntil: "networkidle",
+  });
+  const vessel = await page.locator("body").innerText();
+  record(
+    "every warning is shown, not just the first",
+    /not a thin wall/i.test(vessel) && /membrane/i.test(vessel) && /thin-wall screen|excludes|not a code check/i.test(vessel),
+  );
+
   // Client-side navigation between tools, not a fresh load of each. Per-tool
   // state is initialised on mount, so without a remount the previous tool's
   // input renders against the new tool's fields: going from any calculator into

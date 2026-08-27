@@ -276,7 +276,7 @@ export function CalculatorFrame({
           description={calculator.description}
           formula={calculator.formula}
           when={calculator.assumptions}
-          dont={calculator.boundary}
+          dont={[calculator.boundary]}
           sourceLabel={calculator.sourceLabel}
           sourceUrl={calculator.sourceUrl}
         />
