@@ -175,6 +175,34 @@ try {
   await page.waitForTimeout(200);
   record("studio ConfirmDialog escape", !(await confirm.isVisible()));
 
+  // The unit is shown rather than offered until wanted: a second full select on
+  // every one of up to twelve rows paid a control's price for an edit that
+  // rarely happens. It has to stay a real control, so this drives the whole
+  // round trip rather than counting elements.
+  await page.goto(`${BASE}/studio`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /Start from a working example/ }).click();
+  await page.waitForURL(/\/studio\/[^/]+/);
+  await page.waitForTimeout(800);
+  const unitCell = page.getByRole("button", { name: /^Unit for / }).first();
+  record("engine collapses the unit control", (await unitCell.count()) === 1);
+  const unitBefore = (await unitCell.textContent())?.trim() ?? "";
+  await unitCell.click();
+  await page.waitForTimeout(300);
+  const swapped = await page.evaluate(() => document.activeElement?.tagName === "SELECT");
+  record("the collapsed unit opens focused", swapped);
+  if (swapped) {
+    await page.evaluate(() => {
+      const sel = document.activeElement;
+      const next = [...sel.options].map((o) => o.value).find((v) => v !== sel.value);
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set;
+      setter.call(sel, next);
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await page.waitForTimeout(500);
+    const unitAfter = (await page.getByRole("button", { name: /^Unit for / }).first().textContent())?.trim() ?? "";
+    record("changing the collapsed unit takes effect", unitAfter !== unitBefore, `${unitBefore} -> ${unitAfter}`);
+  }
+
   await page.goto(`${BASE}/review`, { waitUntil: "networkidle" });
   const reviewGroup = page.getByRole("group", { name: "Review area" });
   record("review SegmentedControl", (await reviewGroup.count()) === 1);
@@ -301,6 +329,53 @@ try {
   // a reload as the only exit. `.click()` still fires the handler, so this is
   // invisible to any check that clicks programmatically; it has to be asked as a
   // hit-test question, at the button's own centre.
+
+  // The favourites rail used to live in the viewport gutter behind
+  // `hidden min-[1440px]:block`, so on a 1366px laptop there was no way to
+  // reach a favourite at all. A tab needs 36px, not a 260px gutter.
+  await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const rail = await page.evaluate(() => {
+    const tabs = [...document.querySelectorAll(".side-tab")];
+    return { count: tabs.length, labels: tabs.map((t) => t.getAttribute("aria-label")) };
+  });
+  record("all three side tabs render", rail.count === 3, rail.labels.join(", "));
+
+  await page.getByRole("button", { name: "Convert" }).click();
+  await page.waitForTimeout(300);
+  const railOpen = await page.evaluate(() => {
+    const panel = document.querySelector('[role="region"][aria-label="Convert"]');
+    return {
+      open: Boolean(panel),
+      // The point of building this rather than reusing the modal drawer: the
+      // page behind stays live, unlocked and reachable.
+      inert: document.getElementById("main-content")?.hasAttribute("inert") ?? false,
+      locked: document.body.style.overflow === "hidden",
+      result: panel?.querySelector('[role="status"]')?.textContent ?? "",
+    };
+  });
+  record("a side tab opens without taking the page hostage", railOpen.open && !railOpen.inert && !railOpen.locked);
+  // The tabs are `position: fixed`, so they reserve no layout space and page
+  // content runs underneath them. On a wide screen the gutter absorbs that; at
+  // 375px it took 8px off the Example button before the wrap reserved the strip.
+  // A control you can see and cannot fully press is worse than one that is not
+  // there, so this is measured rather than eyeballed.
+  const narrow = await browser.newPage({ viewport: { width: 375, height: 812 } });
+  await narrow.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const occlusion = await narrow.evaluate(() => {
+    const hit = [];
+    for (const el of document.querySelectorAll("main a, main button, main input, main select")) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height || r.top > window.innerHeight || r.bottom < 0) continue;
+      const probe = document.elementFromPoint(Math.min(r.right - 2, window.innerWidth - 1), Math.round(r.y + r.height / 2));
+      if (probe && probe.closest(".side-tab")) hit.push((el.textContent || "").trim().slice(0, 24));
+    }
+    return { hit, overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+  });
+  record("side tabs cover no control on mobile", occlusion.hit.length === 0, occlusion.hit.join(", "));
+  record("side tabs add no mobile overflow", occlusion.overflow === 0, String(occlusion.overflow));
+  await narrow.close();
+
+  record("quick convert computes in the rail", /1000\s*mm/.test(railOpen.result), railOpen.result);
 
   // Two queries a machinist would actually type used to return an empty list:
   // "cv valve sizing" (no tool text contains "sizing") and "feeds and speeds"

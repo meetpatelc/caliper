@@ -29,9 +29,28 @@ test("a declared family actually owns the unit the output displays in", () => {
  *
  * Declaring a family changes how `raw` is read: with one, the number is taken
  * as canonical SI and converted for display; without one, it is shown as-is.
- * 193 of the library's outputs compute in display units already, so declaring a
- * family on those double-converts — which is why this cannot simply be filled
- * in, and why the count is pinned rather than required to be complete.
+ * Most of the library's remaining outputs compute in display units already, so
+ * declaring a family on those double-converts — which is why this cannot simply
+ * be filled in, and why the count is pinned rather than required to be
+ * complete.
+ *
+ * What the remainder actually costs, measured rather than estimated:
+ *
+ * The mechanical fix is to multiply the expression by the display unit's factor
+ * so it emits canonical SI, then declare the family. Applied to all 243
+ * candidates, that leaves every *displayed* value identical — and moves `raw`
+ * on 131 of them. Excluding the 63 that already carry a `rawScale` entry (that
+ * table exists to fix exactly this, and rescaling those would apply the
+ * correction twice) and the units that are display conventions rather than
+ * symbols — `—`, `×`, `:1`, `deg`, whose family would override the authored
+ * label with a canonical symbol and change `0.78 —` into `0.78 1` — the number
+ * of outputs that can be converted with no observable change at all is zero.
+ *
+ * So the remainder is not cleanup. `raw` is what gets written into
+ * `result_json` when somebody saves a check, so changing it means new records
+ * carry a different basis from old ones for the same output. That is a stored
+ * data migration, and it should ride with a `formulaVersion` bump so the record
+ * drift notice tells the reader their number moved.
  *
  * Raise this number when more are done. It only goes up.
  */

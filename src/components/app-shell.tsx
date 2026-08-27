@@ -6,7 +6,7 @@ import { AccountMenu } from "@/components/account-menu";
 import { CommandPalette } from "@/components/command-palette";
 import { DeskSync } from "@/components/desk-sync";
 import { FamilySwitch } from "@/components/family-switch";
-import { FavouriteRail } from "@/components/favourite-rail";
+import { SideRail } from "@/components/side-rail";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { SignOutButton } from "@/components/sign-out-button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} restoreFocusTo={searchTriggerRef} />
       <DeskSync />
       <main id="main-content">{children}</main>
-      <FavouriteRail />
+      <SideRail />
       <footer className="no-print border-t border-border py-6 text-sm text-muted">
         <div className="page-frame flex flex-wrap items-center justify-between gap-3">
           <p>{PARENT_NAME} · not a design stamp</p>
