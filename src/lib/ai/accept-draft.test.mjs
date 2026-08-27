@@ -1,0 +1,81 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { acceptDraft } from "@/lib/ai/accept-draft";
+import { toJsonSchema } from "@/lib/ai/json-schema";
+import { draftedCalculatorSchema } from "@/lib/ai/draft-contract";
+
+const sound = {
+  title: "Hoop stress",
+  description: "Membrane hoop stress in a thin-walled cylinder under internal pressure.",
+  domain: "mechanics",
+  fields: [
+    { id: "pressure", label: "Internal pressure", family: "pressure", defaultValue: 1.2, defaultUnit: "MPa" },
+    { id: "diameter", label: "Inside diameter", family: "length", defaultValue: 600, defaultUnit: "mm" },
+    { id: "thickness", label: "Wall thickness", family: "length", defaultValue: 12, defaultUnit: "mm" },
+  ],
+  outputs: [
+    { id: "hoop", label: "Hoop stress", family: "stress", defaultUnit: "MPa", expression: "pressure*diameter/(2*thickness)" },
+  ],
+  formula: "σ = pD / 2t",
+  purpose: "Screen a thin-walled cylinder for membrane hoop stress.",
+  assumptions: ["Thin wall", "Uniform internal pressure"],
+  boundary: "Not valid below a diameter-to-thickness ratio of 20.",
+  interpretation: "Hoop stress",
+};
+
+test("a sound draft is accepted and comes back with a worked example", () => {
+  const outcome = acceptDraft(sound);
+  assert.equal(outcome.ok, true, outcome.ok ? "" : outcome.reason);
+  assert.equal(outcome.draft.title, "Hoop stress");
+  assert.equal(outcome.preview.length, 1);
+  // 1.2 MPa x 600 mm / (2 x 12 mm) = 30 MPa.
+  assert.equal(outcome.preview[0].display, "30");
+});
+
+// The gate exists for output that parses and is still not usable. Each of these
+// would otherwise reach the editor looking like somebody's work.
+test("a draft that does not compute is refused, not shown", () => {
+  const broken = { ...sound, outputs: [{ ...sound.outputs[0], expression: "pressure / nonexistent" }] };
+  const outcome = acceptDraft(broken);
+  assert.equal(outcome.ok, false);
+  assert.match(outcome.reason, /does not compute/i);
+});
+
+test("a draft whose result is not finite is refused", () => {
+  const infinite = { ...sound, outputs: [{ ...sound.outputs[0], expression: "pressure / (thickness - thickness)" }] };
+  const outcome = acceptDraft(infinite);
+  assert.equal(outcome.ok, false);
+  assert.match(outcome.reason, /does not compute|finite/i);
+});
+
+test("a draft that misses the contract is refused whole, never partly applied", () => {
+  const { outputs: _outputs, ...noOutputs } = sound;
+  const outcome = acceptDraft(noOutputs);
+  assert.equal(outcome.ok, false);
+  assert.match(outcome.reason, /contract/i);
+});
+
+test("colliding identifiers are caught before evaluation", () => {
+  const collide = { ...sound, outputs: [{ ...sound.outputs[0], id: "pressure" }] };
+  const outcome = acceptDraft(collide);
+  assert.equal(outcome.ok, false);
+  assert.match(outcome.reason, /both an input and a result/i);
+});
+
+test("the model cannot author the fields that decide how a model is treated", () => {
+  // slug and published are not in the drafting contract. Offering them must be
+  // rejected rather than ignored: silently dropping them would let a future
+  // change quietly start honouring them.
+  const overreach = { ...sound, slug: "hand-verified", published: true };
+  const outcome = acceptDraft(overreach);
+  assert.equal(outcome.ok, false);
+});
+
+test("the schema handed to the model forbids invented keys", () => {
+  // Structured outputs only constrain as tightly as the schema does; without
+  // these two properties the constraint quietly becomes a suggestion.
+  const schema = toJsonSchema(draftedCalculatorSchema);
+  assert.equal(schema.additionalProperties, false);
+  assert.ok(Array.isArray(schema.required) && schema.required.includes("outputs"));
+  assert.ok(!("$schema" in schema));
+});

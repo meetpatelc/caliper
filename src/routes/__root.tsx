@@ -2,7 +2,8 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { AuthProvider } from "@/lib/auth/provider";
 import { AppShell } from "@/components/app-shell";
 import { AppToaster } from "@/components/app-toaster";
-import { APP_DESCRIPTION, PARENT_NAME, THEME_COLOR, THEME_KEY } from "@/lib/instrument";
+import { APP_DESCRIPTION, PARENT_NAME, THEME_COLOR } from "@/lib/instrument";
+import { themeInitScript } from "@/lib/theme-init";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -17,8 +18,8 @@ export const Route = createRootRoute({
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/__grok/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
+      { rel: "manifest", href: "/__pwa/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/__pwa/icon-180.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -35,11 +36,7 @@ function RootDocument() {
     <html lang="en" className="light antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('${THEME_KEY}');var r=document.documentElement;var d=t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){r.classList.add('dark');r.classList.remove('light')}else{r.classList.add('light');r.classList.remove('dark')}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'${THEME_COLOR.dark}':'${THEME_COLOR.light}')}catch(e){}`,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
       </head>
       <body>
         <AuthProvider>

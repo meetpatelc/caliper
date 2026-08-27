@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "instrument",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview", "--", "--port", "8080", "--strictPort"],
+      "port": 8080,
+      "autoPort": false
+    }
+  ]
+}

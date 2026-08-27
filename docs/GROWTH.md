@@ -49,7 +49,7 @@ than no shared calculator, given what this app claims about trust.
 It is a calculator for people standing next to machines. Local-first storage
 already works with no account, so the gap is only:
 
-- the app's own manifest (currently the platform's `/__grok/` one)
+- the app's own manifest (currently the platform's `/__pwa/` one)
 - a service worker covering the shell and the document chunk
 
 ## 5. Studio Engine, made learnable

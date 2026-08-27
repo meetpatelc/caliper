@@ -22,7 +22,7 @@ const golden = {
 const PROBE_VALUE = { negativeOne: "-1", zero: "0" };
 
 function parseGuardsCsv() {
-  const text = readFileSync(join(here, "lost-validation-guards.csv"), "utf8").trim();
+  const text = readFileSync(join(here, "guard-regression-probes.csv"), "utf8").trim();
   const rows = [];
   for (const line of text.split("\n").slice(1)) {
     const match = line.match(/^"([^"]+)","([^"]+)","\[""(.+)""\]","([^"]*)"$/);

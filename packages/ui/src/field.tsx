@@ -9,11 +9,11 @@ import {
   type TextareaHTMLAttributes,
 } from "react";
 import { cn } from "./cn";
-import { fieldErrorId } from "./field-id";
+import { fieldErrorId, fieldHintId } from "./field-id";
 
 export { fieldErrorId };
 
-type FieldA11y = { error?: string; errorId?: string; required?: boolean };
+type FieldA11y = { error?: string; errorId?: string; hintId?: string; required?: boolean };
 const FieldContext = createContext<FieldA11y>({});
 
 export function useFieldA11y(props: {
@@ -24,9 +24,11 @@ export function useFieldA11y(props: {
   required?: boolean;
 }) {
   const ctx = useContext(FieldContext);
-  const described = [...new Set([props["aria-describedby"], ctx.error ? ctx.errorId : undefined].filter(Boolean))].join(
-    " ",
-  );
+  // Hint first, then error: a reader announces them in listed order, and the
+  // guidance is what tells you how to fix the complaint.
+  const described = [
+    ...new Set([props["aria-describedby"], ctx.hintId, ctx.error ? ctx.errorId : undefined].filter(Boolean)),
+  ].join(" ");
   return {
     "aria-invalid": props["aria-invalid"] ?? (ctx.error ? true : undefined),
     "aria-describedby": described || undefined,
@@ -55,28 +57,40 @@ export function Field({
   children: ReactNode;
 }) {
   const generatedId = useId();
-  const errorId = error ? (errorIdProp ?? (htmlFor ? fieldErrorId(htmlFor) : `${generatedId}-error`)) : undefined;
+  const base = htmlFor ?? generatedId;
+  const errorId = error ? (errorIdProp ?? fieldErrorId(base)) : undefined;
+  const hintId = hint ? fieldHintId(base) : undefined;
   return (
-    <FieldContext.Provider value={{ error, errorId, required }}>
-      <label htmlFor={htmlFor} className="grid gap-1.5">
-        <span className="flex items-baseline gap-2 text-sm">
-          {label}
-          {required ? (
-            <span className="text-danger" aria-hidden="true">
-              *
-            </span>
-          ) : null}
-          {symbol ? <em className="font-mono text-xs not-italic text-accent">{symbol}</em> : null}
-        </span>
-        {children}
+    <FieldContext.Provider value={{ error, errorId, hintId, required }}>
+      <div className="grid gap-1.5">
+        {/* The label wraps only the name and the control. The hint and the error
+            are siblings, not children: inside the label they became part of the
+            control's accessible name rather than its description. */}
+        <label htmlFor={htmlFor} className="grid gap-1.5">
+          <span className="flex items-baseline gap-2 text-sm">
+            {label}
+            {required ? (
+              <span className="text-danger" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+            {symbol ? <em className="font-mono text-xs not-italic text-accent">{symbol}</em> : null}
+          </span>
+          {children}
+        </label>
+        {/* Both, not either. The guidance used to be replaced by the error —
+            withdrawing the explanation at the moment it is needed. */}
+        {hint ? (
+          <span id={hintId} className="text-sm text-muted">
+            {hint}
+          </span>
+        ) : null}
         {error ? (
           <small id={errorId} role="alert" className="text-xs leading-4 text-danger">
             {error}
           </small>
-        ) : hint ? (
-          <span className="text-sm text-muted">{hint}</span>
         ) : null}
-      </label>
+      </div>
     </FieldContext.Provider>
   );
 }

@@ -10,7 +10,7 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "deltaT", label: "Declared temperature difference", symbol: "ΔT", help: "User-entered signed bulk-to-surface temperature difference; no temperature field is derived.", defaultValue: 25, defaultUnit: "K", signed: true },
     ],
     outputs: [
-      { id: "heatRate", label: "Declared convection heat rate", defaultUnit: "W", expression: "coefficient*area*deltaT" },
+      { id: "heatRate", label: "Declared convection heat rate", family: "power", defaultUnit: "W", expression: "coefficient*area*deltaT" },
       { id: "heatRateKw", label: "Declared convection heat rate", defaultUnit: "kW", expression: "coefficient*area*deltaT/1000" },
       { id: "conductance", label: "Declared convection conductance hA", defaultUnit: "W/K", expression: "coefficient*area" },
     ],
@@ -26,7 +26,7 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "density", label: "Ideal-gas density", family: "density", defaultUnit: "kg/m³", expression: "(((pressure/1000)*1000)*volume/(8.314462618*temperature))*(molarMass/1000)/volume" },
-      { id: "specificVolume", label: "Ideal-gas specific volume", defaultUnit: "m³/kg", expression: "1/((((pressure/1000)*1000)*volume/(8.314462618*temperature))*(molarMass/1000)/volume)" },
+      { id: "specificVolume", label: "Ideal-gas specific volume", family: "specificVolume", defaultUnit: "m³/kg", expression: "1/((((pressure/1000)*1000)*volume/(8.314462618*temperature))*(molarMass/1000)/volume)" },
       { id: "amount", label: "Ideal-gas amount in declared volume", defaultUnit: "mol", expression: "((pressure/1000)*1000)*volume/(8.314462618*temperature)" },
       { id: "mass", label: "Ideal-gas mass in declared volume", family: "mass", defaultUnit: "kg", expression: "(((pressure/1000)*1000)*volume/(8.314462618*temperature))*(molarMass/1000)" },
       { id: "specificGasConstant", label: "Specific gas constant from declared molar mass", family: "specificHeat", defaultUnit: "J/(kg·K)", expression: "8.314462618/(molarMass/1000)" }
@@ -115,8 +115,8 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "heatRate", label: "Conductive heat rate hot → cold", family: "power", defaultUnit: "W", expression: "(hotTemperature-coldTemperature)/(((thickness/0.001)/1000)/(conductivity*area))" },
-      { id: "resistance", label: "Plane-wall thermal resistance", defaultUnit: "K/W", expression: "((thickness/0.001)/1000)/(conductivity*area)" },
-      { id: "heatFlux", label: "Heat flux hot → cold", defaultUnit: "W/m²", expression: "((hotTemperature-coldTemperature)/(((thickness/0.001)/1000)/(conductivity*area)))/area" }
+      { id: "resistance", label: "Plane-wall thermal resistance", family: "thermalResistance", defaultUnit: "K/W", expression: "((thickness/0.001)/1000)/(conductivity*area)" },
+      { id: "heatFlux", label: "Heat flux hot → cold", family: "heatFlux", defaultUnit: "W/m²", expression: "((hotTemperature-coldTemperature)/(((thickness/0.001)/1000)/(conductivity*area)))/area" }
     ],
     formula: "Q̇ = kA(Th − Tc)/L · Rth = L/(kA)",
     warnings: ["This is steady, one-dimensional plane-wall conduction using one user-entered conductivity. It excludes contact resistance, convection, radiation, thermal bridges, multilayer interfaces, temperature-dependent properties, phase change, transient response, and insulation selection."],
@@ -143,9 +143,9 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "surroundingTemperature", label: "Surroundings temperature", help: "Effective large-surroundings absolute temperature in kelvins.", defaultValue: 293.15, defaultUnit: "K" },
     ],
     outputs: [
-      { id: "netRadiation", label: "Net radiation from surface", defaultUnit: "W", expression: "emissivity*5.670374419e-8*(surfaceTemperature^4-surroundingTemperature^4)*area" },
-      { id: "heatFlux", label: "Net radiative heat flux", defaultUnit: "W/m²", expression: "emissivity*5.670374419e-8*(surfaceTemperature^4-surroundingTemperature^4)" },
-      { id: "emittedPower", label: "Surface emitted radiation", defaultUnit: "W", expression: "emissivity*5.670374419e-8*surfaceTemperature^4*area" },
+      { id: "netRadiation", label: "Net radiation from surface", family: "power", defaultUnit: "W", expression: "emissivity*5.670374419e-8*(surfaceTemperature^4-surroundingTemperature^4)*area" },
+      { id: "heatFlux", label: "Net radiative heat flux", family: "heatFlux", defaultUnit: "W/m²", expression: "emissivity*5.670374419e-8*(surfaceTemperature^4-surroundingTemperature^4)" },
+      { id: "emittedPower", label: "Surface emitted radiation", family: "power", defaultUnit: "W", expression: "emissivity*5.670374419e-8*surfaceTemperature^4*area" },
     ],
     formula: "qnet = εσA(Ts⁴ − Tsur⁴) · q''net = εσ(Ts⁴ − Tsur⁴)",
     warnings: ["This is gray-surface Stefan–Boltzmann exchange to large isothermal surroundings using user-entered emissivity and absolute temperatures. It excludes finite-surface view factors, enclosure geometry, spectral and directional behavior, participating gases/flames, reflections, solar load, convection, conduction, insulation, and transient temperature response."],
@@ -159,7 +159,7 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "elapsedTime", label: "Declared elapsed time", symbol: "t", help: "User-entered elapsed time after the stated constant power step; must be zero or greater.", defaultValue: 100, defaultUnit: "s", signed: true },
     ],
     outputs: [
-      { id: "timeConstant", label: "Literal thermal time constant", defaultUnit: "s", expression: "((thermalResistance)*(thermalCapacitance))" },
+      { id: "timeConstant", label: "Literal thermal time constant", family: "time", defaultUnit: "s", expression: "((thermalResistance)*(thermalCapacitance))" },
       { id: "temperatureRise", label: "Literal ideal temperature rise at elapsed time", defaultUnit: "K", expression: "(((constantPower)*(thermalResistance))*(1-exp(-(elapsedTime)/((thermalResistance)*(thermalCapacitance)))))" },
       { id: "nodeTemperature", label: "Literal ideal node temperature", defaultUnit: "°C", expression: "((ambientTemperature)+(((constantPower)*(thermalResistance))*(1-exp(-(elapsedTime)/((thermalResistance)*(thermalCapacitance))))))" },
       { id: "steadyStateRise", label: "Literal ideal steady-state temperature rise", defaultUnit: "K", expression: "((constantPower)*(thermalResistance))" },
@@ -180,10 +180,10 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "heatRate", label: "Declared heat rate", symbol: "Q̇", help: "User-entered rate used only to calculate the total temperature difference across the declared series network.", defaultValue: 500, defaultUnit: "W", signed: true },
     ],
     outputs: [
-      { id: "hotConvectionResistance", label: "Declared hot-side convection resistance", defaultUnit: "K/W", expression: "(1/((hotCoefficient)*(hotArea)))" },
-      { id: "wallResistance", label: "Declared wall conduction resistance", defaultUnit: "K/W", expression: "((wallThickness/1000)/((wallConductivity)*(wallArea)))" },
-      { id: "coldConvectionResistance", label: "Declared cold-side convection resistance", defaultUnit: "K/W", expression: "(1/((coldCoefficient)*(coldArea)))" },
-      { id: "totalResistance", label: "Declared series thermal resistance", defaultUnit: "K/W", expression: "((1/((hotCoefficient)*(hotArea)))+((wallThickness/1000)/((wallConductivity)*(wallArea)))+(contactResistance)+(1/((coldCoefficient)*(coldArea))))" },
+      { id: "hotConvectionResistance", label: "Declared hot-side convection resistance", family: "thermalResistance", defaultUnit: "K/W", expression: "(1/((hotCoefficient)*(hotArea)))" },
+      { id: "wallResistance", label: "Declared wall conduction resistance", family: "thermalResistance", defaultUnit: "K/W", expression: "((wallThickness/1000)/((wallConductivity)*(wallArea)))" },
+      { id: "coldConvectionResistance", label: "Declared cold-side convection resistance", family: "thermalResistance", defaultUnit: "K/W", expression: "(1/((coldCoefficient)*(coldArea)))" },
+      { id: "totalResistance", label: "Declared series thermal resistance", family: "thermalResistance", defaultUnit: "K/W", expression: "((1/((hotCoefficient)*(hotArea)))+((wallThickness/1000)/((wallConductivity)*(wallArea)))+(contactResistance)+(1/((coldCoefficient)*(coldArea))))" },
       { id: "totalTemperatureDifference", label: "Temperature difference at declared heat rate", defaultUnit: "K", expression: "((heatRate)*((1/((hotCoefficient)*(hotArea)))+((wallThickness/1000)/((wallConductivity)*(wallArea)))+(contactResistance)+(1/((coldCoefficient)*(coldArea)))))" },
     ],
     formula: "Rtotal = 1/(hhAh) + L/(kAw) + Rc + 1/(hcAc) · ΔT = Q̇Rtotal",

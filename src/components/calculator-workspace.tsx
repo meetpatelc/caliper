@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
 import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
 import { GoverningRelation } from "@/components/governing-relation";
+import { ResultBoundary, SafetyTierNotice } from "@/components/safety-tier";
 import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
 import { ExampleButton } from "@/components/example-button";
 import { FavouriteButton } from "@/components/favourite-button";
@@ -353,7 +354,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
             description={tool.description}
             formula={result.method}
             when={tool.assumptions}
-            dont={result.warnings[0] ?? "This is a first-pass number, not a code check or approval."}
+            dont={result.warnings.length ? result.warnings : ["This is a first-pass number, not a code check or approval."]}
             sourceLabel={tool.sourceLabel}
             sourceUrl={tool.sourceUrl}
           />
@@ -470,6 +471,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           }
           results={
             <div id="results" aria-live="polite" className="grid gap-4">
+            <SafetyTierNotice tier={tool.contract.safetyTier} />
             {result.errors.length ? (
               <ErrorState variant="banner" className="flex items-start gap-2">
                 <CircleAlert size={ICON.base} />
@@ -515,6 +517,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     ))}
                 </div>
                 <GoverningRelation formula={result.method} className="text-sm" />
+                <ResultBoundary assumptions={tool.assumptions} />
                 <div className="flex flex-wrap gap-2">
                     <Button variant="accent" onClick={saveLocal}>
                       <Save size={ICON.inline} />

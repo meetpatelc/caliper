@@ -253,12 +253,12 @@ test("does not emit x:game:image without a public host or banner", () => {
   assert.doesNotMatch(noBanner, /x:game:image/);
 });
 
-test("site title Grok App is a real name, not a sentinel", () => {
+test("site title Instrument is a real name, not a sentinel", () => {
   const out = injectGrokPwaHead("<html><head></head></html>", {
     host: "wild-race.grok.me",
-    site: { title: "Grok App" },
+    site: { title: "Instrument" },
   });
-  assert.match(out, /property="og:title" content="Grok App"/);
+  assert.match(out, /property="og:title" content="Instrument"/);
 });
 
 test("published grok.me slug is still a title fallback", () => {
@@ -465,7 +465,7 @@ test("filters non-document paths", () => {
   assert.equal(isDocumentPath("/"), true);
   assert.equal(isDocumentPath("/app"), true);
   assert.equal(isDocumentPath("/api/thing"), false);
-  assert.equal(isDocumentPath("/__grok/install/styles.css"), false);
+  assert.equal(isDocumentPath("/__pwa/install/styles.css"), false);
   assert.equal(isDocumentPath("/logo.png"), false);
 });
 
@@ -475,20 +475,20 @@ test("strips install params from the app link", () => {
 });
 
 test("names the install page from host slug", () => {
-  assert.equal(appNameFromHost("localhost:8080"), "Grok App");
-  assert.equal(appNameFromHost("172.17.154.217:8080"), "Grok App");
+  assert.equal(appNameFromHost("localhost:8080"), "Instrument");
+  assert.equal(appNameFromHost("172.17.154.217:8080"), "Instrument");
   assert.equal(appNameFromHost("wild-race.grok.me"), "Wild Race");
 });
 
 test("rejects hosts that are not plain slugs", () => {
-  assert.equal(appNameFromHost("<script>alert(1)</script>"), "Grok App");
-  assert.equal(appNameFromHost('"><img src=x onerror=1>.grok.me'), "Grok App");
+  assert.equal(appNameFromHost("<script>alert(1)</script>"), "Instrument");
+  assert.equal(appNameFromHost('"><img src=x onerror=1>.grok.me'), "Instrument");
 });
 
 test("renders install page markup", () => {
   const html = renderInstallPage("wild-race.grok.me", "/?install=1&platform=ios");
   assert.match(html, /Add Wild Race to your/);
-  assert.match(html, /\/__grok\/install\/styles\.css/);
+  assert.match(html, /\/__pwa\/install\/styles\.css/);
   assert.match(html, /href="\/"/);
   assert.equal(html.includes("{{APP_NAME}}"), false);
   assert.equal(html.includes("{{APP_URL}}"), false);
@@ -503,7 +503,7 @@ test("renders the manifest with the per-app name", () => {
   const manifest = JSON.parse(renderWebManifest("wild-race.grok.me"));
   assert.equal(manifest.name, "Wild Race");
   assert.equal(manifest.short_name, "Wild Race");
-  assert.equal(manifest.icons[0].src, "/__grok/icon-180.png");
+  assert.equal(manifest.icons[0].src, "/__pwa/icon-180.png");
 });
 
 // Tripwires: the deployed-app path only works if Nitro scans server/ — an
@@ -520,8 +520,8 @@ test("nitro middleware and its bundled assets exist", () => {
   assert.match(middleware, /install-page\.html\?raw/);
   assert.match(middleware, /virtual:grok-og-identity/);
   readFileSync(join(TEMPLATE_ROOT, "scripts/install-page.html"));
-  readFileSync(join(TEMPLATE_ROOT, "public/__grok/icon-180.png"));
-  readFileSync(join(TEMPLATE_ROOT, "public/__grok/install/styles.css"));
+  readFileSync(join(TEMPLATE_ROOT, "public/__pwa/icon-180.png"));
+  readFileSync(join(TEMPLATE_ROOT, "public/__pwa/install/styles.css"));
 });
 
 test("vite plugin bakes og identity as a virtual module", () => {

@@ -23,7 +23,7 @@ import { ConfirmDialog } from "@/components/ui/confirm";
 import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
 import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
-import { Field as FormField, Input, Select, Textarea } from "@/components/ui/field";
+import { fieldErrorId, Field as FormField, Input, Select, Textarea } from "@/components/ui/field";
 import { ErrorState, SuccessState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +34,43 @@ const STEPS = [
 ] as const;
 
 type StepId = (typeof STEPS)[number]["id"];
+
+/**
+ * The 33 quantity kinds, grouped.
+ *
+ * Every option already carries a `domain` — foundation, mechanics, thermal,
+ * fluids, electrical — computed in `units.ts` and then thrown away here, so
+ * both selects rendered one flat list of 33 and asked the author to scan it.
+ * Grouping is free; it was already in the data.
+ */
+const FAMILY_GROUPS: { label: string; domain: string }[] = [
+  { label: "Foundation", domain: "foundation" },
+  { label: "Mechanics", domain: "mechanics" },
+  { label: "Fluids", domain: "fluids" },
+  { label: "Thermal", domain: "thermal" },
+  { label: "Electrical", domain: "electrical" },
+];
+
+function QuantityKindOptions() {
+  return (
+    <>
+      <option value="">Number — no conversion</option>
+      {FAMILY_GROUPS.map((group) => {
+        const options = unitFamilyOptions.filter((option) => option.domain === group.domain);
+        if (!options.length) return null;
+        return (
+          <optgroup key={group.domain} label={group.label}>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </optgroup>
+        );
+      })}
+    </>
+  );
+}
 
 const OPS = ["+", "-", "*", "/", "^", "(", ")", "sqrt("] as const;
 
@@ -300,12 +337,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         }}
                         aria-label="Quantity kind"
                       >
-                        <option value="">Number — no conversion</option>
-                        {unitFamilyOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
+                        <QuantityKindOptions />
                       </Select>
                       <Input
                         inputMode="decimal"
@@ -401,11 +433,11 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       onChange={(event) => patchOutput(index, { expression: event.target.value })}
                       aria-label="Expression"
                       aria-invalid={Boolean(formulaErrors[index])}
-                      aria-describedby={formulaErrors[index] ? `studio-expression-error-${index}` : undefined}
+                      aria-describedby={formulaErrors[index] ? fieldErrorId(`studio-expression-${index}`) : undefined}
                       placeholder="x * y / z"
                     />
                     {formulaErrors[index] ? (
-                      <ErrorState id={`studio-expression-error-${index}`}>{formulaErrors[index]}</ErrorState>
+                      <ErrorState id={fieldErrorId(`studio-expression-${index}`)}>{formulaErrors[index]}</ErrorState>
                     ) : null}
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_7rem]">
                       <Select
@@ -421,12 +453,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                           patchOutput(index, { family, defaultUnit: unitsForFamily(family)[0]?.id ?? "dimensionless.one" });
                         }}
                       >
-                        <option value="">Number — no conversion</option>
-                        {unitFamilyOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
+                        <QuantityKindOptions />
                       </Select>
                       {output.family ? (
                         <Select

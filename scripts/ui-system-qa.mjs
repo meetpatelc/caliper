@@ -301,6 +301,78 @@ try {
   // a reload as the only exit. `.click()` still fires the handler, so this is
   // invisible to any check that clicks programmatically; it has to be asked as a
   // hit-test question, at the button's own centre.
+
+  // Two queries a machinist would actually type used to return an empty list:
+  // "cv valve sizing" (no tool text contains "sizing") and "feeds and speeds"
+  // (the text says "speed"). The filter scored 1 or 0, so one unmatched word
+  // discarded the whole query.
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  const searchTop = async (query) => {
+    await page.evaluate(() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true })));
+    await page.waitForSelector("[cmdk-input]", { timeout: 5000 });
+    await page.fill("[cmdk-input]", query);
+    await page.waitForTimeout(400);
+    const top = await page.evaluate(() => {
+      const first = document.querySelector("[cmdk-item]");
+      return first ? first.innerText.trim().split(String.fromCharCode(10))[0] : "";
+    });
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
+    return top;
+  };
+  record("\"cv valve sizing\" finds the valve tool", /valve/i.test(await searchTop("cv valve sizing")));
+  record("\"feeds and speeds\" finds the cutting tool", /cutting/i.test(await searchTop("feeds and speeds")));
+
+  // Help text existed on every field and reached no screen reader: it had no id
+  // to point at, and sitting inside the wrapping <label> it was folded into the
+  // control's accessible name instead of its description.
+  await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const described = await page.evaluate(() => {
+    // Value fields only. The unit selects beside them are a separate control
+    // with no help text of their own, so counting them would make this assert
+    // something untrue.
+    const controls = [...document.querySelectorAll("#inputs input")];
+    const withHint = controls.filter((el) => (el.getAttribute("aria-describedby") ?? "").includes("-hint"));
+    const resolves = withHint.every((el) =>
+      (el.getAttribute("aria-describedby") ?? "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .every((id) => document.getElementById(id) !== null),
+    );
+    return { total: controls.length, withHint: withHint.length, resolves };
+  });
+  record(
+    "every input is described by its help text",
+    described.withHint > 0 && described.withHint === described.total,
+    `${described.withHint}/${described.total}`,
+  );
+  record("every aria-describedby points at an element that exists", described.resolves);
+
+  // The catalog decides which models can hurt someone and then said nothing
+  // about it. Tier C must announce itself; tier A must not, or the signal is
+  // worth nothing.
+  await page.goto(`${BASE}/tool/boltPreload`, { waitUntil: "networkidle" });
+  const tierC = await page.locator("body").innerText();
+  record("tier C model warns that a wrong number has consequences", /physical consequences/i.test(tierC));
+  record("boundary is stated at the result, not only on /about", /valid only within/i.test(tierC));
+
+  await page.goto(`${BASE}/tool/ohm`, { waitUntil: "networkidle" });
+  const tierA = await page.locator("body").innerText();
+  record("tier A model does not cry wolf", !/physical consequences/i.test(tierA));
+
+  // The tool page rendered warnings[0] and dropped the rest. thinVessel outside
+  // its range raises an applicability warning on top of its standing caveat, so
+  // both must appear — the applicability one is unshifted to the front, which is
+  // exactly how the standing caveat used to get lost.
+  await page.goto(`${BASE}/tool/thinVessel?pressure=%221.2%22&diameter=%22600%22&thickness=%22120%22`, {
+    waitUntil: "networkidle",
+  });
+  const vessel = await page.locator("body").innerText();
+  record(
+    "every warning is shown, not just the first",
+    /not a thin wall/i.test(vessel) && /membrane/i.test(vessel) && /thin-wall screen|excludes|not a code check/i.test(vessel),
+  );
+
   // Client-side navigation between tools, not a fresh load of each. Per-tool
   // state is initialised on mount, so without a remount the previous tool's
   // input renders against the new tool's fields: going from any calculator into

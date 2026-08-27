@@ -63,7 +63,7 @@ test("the auth schema is available under migrations/auth", () => {
   assert.ok(readdirSync(join(migrationsDir, "auth")).includes("0001_auth.sql"));
   assert.deepEqual(
     pendingMigrations(readdirSync(migrationsDir), []).map((entry) => entry.name),
-    ["0001_auth.sql", "0002_feedback.sql", "0003_desk.sql", "0004_calculation_provenance.sql"],
+    ["0001_auth.sql", "0002_feedback.sql", "0003_desk.sql", "0004_calculation_provenance.sql", "0005_feedback_attachment.sql"],
   );
 });
 

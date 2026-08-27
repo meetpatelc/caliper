@@ -55,7 +55,16 @@ export function InstrumentMethod({
   description?: string;
   formula: string;
   when: string[];
-  dont: string;
+  /**
+   * Every caveat, not the first one.
+   *
+   * This took a single string, and the workspace passed `result.warnings[0]`.
+   * A model that raises two warnings showed one and dropped the rest with no
+   * indication — and because applicability warnings are unshifted to the front
+   * (`document.ts`), the one that survived was not necessarily the one that
+   * mattered least. The record page has always rendered all of them.
+   */
+  dont: string[];
   sourceLabel: string;
   sourceUrl?: string;
 }) {
@@ -78,7 +87,11 @@ export function InstrumentMethod({
         </div>
         <div>
           <p className="text-sm font-medium">Don’t</p>
-          <p className="mt-2 text-sm leading-6 text-muted">{dont}</p>
+          <ul className="mt-2 grid gap-1.5 text-sm leading-6 text-muted">
+            {dont.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </div>
       </div>
       {sourceUrl ? (

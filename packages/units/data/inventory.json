@@ -29,7 +29,10 @@
           "kind": "linear",
           "factor": 1,
           "aliases": [
-            "ratio"
+            "ratio",
+            "—",
+            ":1",
+            "×"
           ],
           "status": "canonical"
         },
@@ -1932,6 +1935,215 @@
         1,
         -3,
         -1,
+        0
+      ]
+    },
+    {
+      "id": "momentOfInertia",
+      "label": "Moment of inertia",
+      "canonicalUnit": "kg·m²",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "momentOfInertia.kg_m2",
+          "symbol": "kg·m²",
+          "label": "kilogram metre squared",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "momentOfInertia.kg_cm2",
+          "symbol": "kg·cm²",
+          "label": "kilogram centimetre squared",
+          "kind": "linear",
+          "factor": 0.0001,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "dimension": [
+        1,
+        2,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "angularSpeed",
+      "label": "Angular speed",
+      "canonicalUnit": "rad/s",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "angularSpeed.rad_s",
+          "symbol": "rad/s",
+          "label": "radian per second",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "angularSpeed.rpm",
+          "symbol": "rpm",
+          "label": "revolution per minute",
+          "kind": "linear",
+          "factor": 0.10471975511965977,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "dimension": [
+        0,
+        0,
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "angularAcceleration",
+      "label": "Angular acceleration",
+      "canonicalUnit": "rad/s²",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "angularAcceleration.rad_s2",
+          "symbol": "rad/s²",
+          "label": "radian per second squared",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "dimension": [
+        0,
+        0,
+        -2,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "thermalResistance",
+      "label": "Thermal resistance",
+      "canonicalUnit": "K/W",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "thermalResistance.K_W",
+          "symbol": "K/W",
+          "label": "kelvin per watt",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "dimension": [
+        -1,
+        -2,
+        3,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "specificVolume",
+      "label": "Specific volume",
+      "canonicalUnit": "m³/kg",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "specificVolume.m3_kg",
+          "symbol": "m³/kg",
+          "label": "cubic metre per kilogram",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "dimension": [
+        -1,
+        3,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "heatFlux",
+      "label": "Heat flux",
+      "canonicalUnit": "W/m²",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "heatFlux.W_m2",
+          "symbol": "W/m²",
+          "label": "watt per square metre",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "dimension": [
+        1,
+        0,
+        -3,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "specificEnergy",
+      "label": "Specific energy",
+      "canonicalUnit": "J/kg",
+      "sources": [
+        "caliper"
+      ],
+      "units": [
+        {
+          "id": "specificEnergy.J_kg",
+          "symbol": "J/kg",
+          "label": "joule per kilogram",
+          "kind": "linear",
+          "factor": 1,
+          "aliases": [],
+          "status": "canonical"
+        },
+        {
+          "id": "specificEnergy.kJ_kg",
+          "symbol": "kJ/kg",
+          "label": "kilojoule per kilogram",
+          "kind": "linear",
+          "factor": 1000,
+          "aliases": [],
+          "status": "canonical"
+        }
+      ],
+      "dimension": [
+        0,
+        2,
+        -2,
+        0,
         0
       ]
     }

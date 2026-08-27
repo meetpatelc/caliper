@@ -9,5 +9,6 @@ export {
   MeasurementField,
   controlClass,
   fieldErrorId,
+  fieldHintId,
   useFieldA11y,
 } from "@instrument/ui";
