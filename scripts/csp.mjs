@@ -11,19 +11,23 @@
  *
  * Hashing the exact string the app renders removes that whole class.
  *
- * Enforcing by default, after report-only shipped and was checked against the
- * deployed site: nine routes, client-side route transitions (so the dynamic
- * imports), Google Fonts actually applied, the record page, and sign-in — zero
- * violations. `src` contains no WebAssembly, which is the usual thing this
- * policy blocks silently, and every fetch the app makes is same-origin, which
- * `connect-src 'self'` already covers.
+ * Report-only by default. It was briefly enforced and that broke production:
+ * the app never hydrated, because `script-src` with a single hash does not
+ * cover the inline scripts TanStack Start emits for the hydration payload and
+ * router state. Those carry their own hashes, and their content changes with
+ * the page, so hashing them is not a fix either — this needs a per-request
+ * nonce threaded through the SSR response, which is a real change and not a
+ * header tweak.
  *
- * The gap, stated because it is the one that would bite: signed-in traffic was
- * not exercised. Its server calls are same-origin like the rest, so the policy
- * should hold, but nobody has watched it.
+ * The check that cleared it was worthless, and worth recording: a
+ * `securitypolicyviolation` listener attached from the console after load
+ * cannot see violations raised while the document was parsing, which is when
+ * every one of these fires. It reported zero because it was structurally
+ * incapable of reporting anything else. Read the console, or the
+ * `report-only` header's own reports — do not roll your own listener late.
  *
- * Set CSP_REPORT_ONLY=1 to go back to reporting without enforcing. A policy
- * that breaks the app is worse than none, so that escape hatch stays.
+ * Set CSP_ENFORCE=1 to enforce, once the nonce work is done and verified from
+ * a cold load rather than from a listener added afterwards.
  */
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
@@ -75,8 +79,7 @@ export function buildPolicy(scriptHash) {
 function main() {
   const hash = `sha256-${createHash("sha256").update(themeScriptSource(), "utf8").digest("base64")}`;
   const policy = buildPolicy(hash);
-  const key =
-    process.env.CSP_REPORT_ONLY === "1" ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
+  const key = process.env.CSP_ENFORCE === "1" ? "Content-Security-Policy" : "Content-Security-Policy-Report-Only";
 
   if (!existsSync(CONFIG)) {
     console.log("[csp] no build output — skipping");
