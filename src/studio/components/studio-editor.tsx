@@ -35,6 +35,43 @@ const STEPS = [
 
 type StepId = (typeof STEPS)[number]["id"];
 
+/**
+ * The 33 quantity kinds, grouped.
+ *
+ * Every option already carries a `domain` — foundation, mechanics, thermal,
+ * fluids, electrical — computed in `units.ts` and then thrown away here, so
+ * both selects rendered one flat list of 33 and asked the author to scan it.
+ * Grouping is free; it was already in the data.
+ */
+const FAMILY_GROUPS: { label: string; domain: string }[] = [
+  { label: "Foundation", domain: "foundation" },
+  { label: "Mechanics", domain: "mechanics" },
+  { label: "Fluids", domain: "fluids" },
+  { label: "Thermal", domain: "thermal" },
+  { label: "Electrical", domain: "electrical" },
+];
+
+function QuantityKindOptions() {
+  return (
+    <>
+      <option value="">Number — no conversion</option>
+      {FAMILY_GROUPS.map((group) => {
+        const options = unitFamilyOptions.filter((option) => option.domain === group.domain);
+        if (!options.length) return null;
+        return (
+          <optgroup key={group.domain} label={group.label}>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </optgroup>
+        );
+      })}
+    </>
+  );
+}
+
 const OPS = ["+", "-", "*", "/", "^", "(", ")", "sqrt("] as const;
 
 export function StudioEditor({ item }: { item: WorkshopCalculator }) {
@@ -300,12 +337,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         }}
                         aria-label="Quantity kind"
                       >
-                        <option value="">Number — no conversion</option>
-                        {unitFamilyOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
+                        <QuantityKindOptions />
                       </Select>
                       <Input
                         inputMode="decimal"
@@ -421,12 +453,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                           patchOutput(index, { family, defaultUnit: unitsForFamily(family)[0]?.id ?? "dimensionless.one" });
                         }}
                       >
-                        <option value="">Number — no conversion</option>
-                        {unitFamilyOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
+                        <QuantityKindOptions />
                       </Select>
                       {output.family ? (
                         <Select
