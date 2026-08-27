@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ATTACHMENT_MAX_BYTES, decodeBase64, inspectAttachment } from "@/lib/attachment";
 
-const withMagic = (magic, length = 64) => {
+const withMagic = (/** @type {number[]} */ magic, length = 64) => {
   const bytes = new Uint8Array(length);
   bytes.set(magic, 0);
   return bytes;

@@ -24,7 +24,7 @@ const CONFIG = ".vercel/output/config.json";
 export function themeScriptSource() {
   const ts = readFileSync("src/lib/theme-init.ts", "utf8");
   const instrument = readFileSync("src/lib/instrument.ts", "utf8");
-  const literal = ts.match(/export const themeInitScript = `([\s\S]*?)`;/);
+  const literal = ts.match(/return `([\s\S]*?)`;/);
   if (!literal) throw new Error("themeInitScript literal not found — csp.mjs and theme-init.ts have diverged.");
   const value = (name) => {
     const direct = instrument.match(new RegExp(`${name}\\s*=\\s*"([^"]*)"`));

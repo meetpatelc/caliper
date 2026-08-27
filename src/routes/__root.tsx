@@ -36,7 +36,7 @@ function RootDocument() {
     <html lang="en" className="light antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
       </head>
       <body>
         <AuthProvider>
