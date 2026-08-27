@@ -11,9 +11,19 @@
  *
  * Hashing the exact string the app renders removes that whole class.
  *
- * Ships as `Content-Security-Policy-Report-Only` unless CSP_ENFORCE=1. A policy
- * that breaks the app is worse than none, and the only honest way to find out
- * is to watch real traffic report violations first.
+ * Enforcing by default, after report-only shipped and was checked against the
+ * deployed site: nine routes, client-side route transitions (so the dynamic
+ * imports), Google Fonts actually applied, the record page, and sign-in — zero
+ * violations. `src` contains no WebAssembly, which is the usual thing this
+ * policy blocks silently, and every fetch the app makes is same-origin, which
+ * `connect-src 'self'` already covers.
+ *
+ * The gap, stated because it is the one that would bite: signed-in traffic was
+ * not exercised. Its server calls are same-origin like the rest, so the policy
+ * should hold, but nobody has watched it.
+ *
+ * Set CSP_REPORT_ONLY=1 to go back to reporting without enforcing. A policy
+ * that breaks the app is worse than none, so that escape hatch stays.
  */
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
@@ -65,7 +75,8 @@ export function buildPolicy(scriptHash) {
 function main() {
   const hash = `sha256-${createHash("sha256").update(themeScriptSource(), "utf8").digest("base64")}`;
   const policy = buildPolicy(hash);
-  const key = process.env.CSP_ENFORCE === "1" ? "Content-Security-Policy" : "Content-Security-Policy-Report-Only";
+  const key =
+    process.env.CSP_REPORT_ONLY === "1" ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
 
   if (!existsSync(CONFIG)) {
     console.log("[csp] no build output — skipping");
@@ -75,7 +86,13 @@ function main() {
   config.routes ??= [];
   // Header routes must precede the filesystem handler, or the static handler
   // answers first and the header never attaches.
-  const existing = config.routes.findIndex((route) => route.headers && route.headers[key]);
+  // Match either key: switching between enforce and report-only must replace
+  // the previous rule, not add a second one that also matches every path.
+  const existing = config.routes.findIndex(
+    (route) =>
+      route.headers &&
+      (route.headers["Content-Security-Policy"] || route.headers["Content-Security-Policy-Report-Only"]),
+  );
   const rule = { src: "/(.*)", headers: { [key]: policy }, continue: true };
   if (existing >= 0) config.routes[existing] = rule;
   else config.routes.unshift(rule);
