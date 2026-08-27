@@ -18,10 +18,11 @@ export type OutputResult = {
 };
 
 export type Evaluation =
-  | { ok: true; outputs: OutputResult[]; scope: Record<string, number> }
+  | { ok: true; outputs: OutputResult[]; scope: Record<string, number>; warnings: string[] }
   | { ok: false; error: string; fieldId?: string };
 
-type Evaluable = Pick<CalculatorDefinition, "fields" | "outputs" | "tables">;
+type Evaluable = Pick<CalculatorDefinition, "fields" | "outputs" | "tables"> &
+  Partial<Pick<CalculatorDefinition, "constraints">>;
 
 export function defaultFieldState(calculator: Evaluable): Record<string, FieldState> {
   return Object.fromEntries(
@@ -127,6 +128,33 @@ export function evaluateCalculator(
       if (name in scope) throw new Error(`Table column ${name} collides with an input. Rename it.`);
       scope[name] = value;
     }
+
+    // Relational guards, checked once every field is in scope and before any
+    // output runs. Per-field minimum and maximum cannot express a relation
+    // between two fields, which is where the interesting failures live: a
+    // temperature cross, a rod thicker than its bore, a wall too thick to be
+    // thin. An "error" stops the calculation; a "warning" lets it through and
+    // says the model is being used outside what it was derived for.
+    const warnings: string[] = [];
+    for (const constraint of calculator.constraints ?? []) {
+      let value: number;
+      try {
+        value = evaluateExpression(constraint.expression, scope, { strings, tables: resolved.tables });
+      } catch {
+        // A guard that cannot be evaluated is not a finding — the fields and
+        // the outputs already report genuinely broken input.
+        continue;
+      }
+      if (!Number.isFinite(value)) continue;
+      const outside =
+        (constraint.min !== undefined && value < constraint.min) ||
+        (constraint.max !== undefined && value > constraint.max) ||
+        (constraint.gt !== undefined && !(value > constraint.gt)) ||
+        (constraint.lt !== undefined && !(value < constraint.lt));
+      if (!outside) continue;
+      if (constraint.severity === "warning") warnings.push(constraint.message);
+      else throw new FormulaError(constraint.message);
+    }
     const outputs: OutputResult[] = calculator.outputs.map((output) => {
       const canonical = evaluateExpression(output.expression, scope, { strings, tables: resolved.tables });
       if (!output.family) {
@@ -164,7 +192,7 @@ export function evaluateCalculator(
         canonicalUnit: converted.canonicalUnit,
       };
     });
-    return { ok: true, outputs, scope };
+    return { ok: true, outputs, scope, warnings };
   } catch (error) {
     return {
       ok: false,

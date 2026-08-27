@@ -134,6 +134,33 @@ export const auth = betterAuth({
   // Secure + the names ourselves. (Browsers allow Secure cookies on
   // `http://localhost`, so local dev still works.)
   advanced: {
+    /**
+     * Where the client's address comes from.
+     *
+     * Better Auth rate-limits per IP. With nothing configured it cannot resolve
+     * one behind a proxy and says so at boot: it "falls back to a single shared
+     * per-path bucket". That is every visitor sharing one budget — a handful of
+     * sign-in attempts from one person locks out everyone else. An availability
+     * fault that only appears once auth is actually exercised under load.
+     *
+     * Order matters. Without `trustedProxies` configured, Better Auth only
+     * accepts a header carrying a *single* address — a multi-hop
+     * `x-forwarded-for` chain resolves to null and lands back in the shared
+     * bucket. Vercel sets `x-vercel-forwarded-for` and `x-real-ip` as single
+     * values at its own edge, so those are asked for first and the chain is
+     * only a fallback.
+     *
+     * Only trust these where a proxy is guaranteed to rewrite them. Served
+     * directly from the internet these are caller-supplied, and anyone could
+     * mint a fresh rate-limit bucket per request.
+     *
+     * Locally there is no proxy and no header at all, so this changes nothing
+     * there — a bare `vite preview` still logs the fallback warning, which is
+     * correct for a single machine and not a signal about production.
+     */
+    ipAddress: {
+      ipAddressHeaders: ["x-vercel-forwarded-for", "x-real-ip", "x-forwarded-for"],
+    },
     useSecureCookies: false,
     defaultCookieAttributes: { secure: true, sameSite: "lax", path: "/" },
     cookies: {

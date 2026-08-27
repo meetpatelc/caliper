@@ -45,7 +45,14 @@
           "status": "canonical"
         }
       ],
-      "note": "Gauge studio counts, ratios, and percent. Caliper shop skips % on some declared fields — that skip stays in the Caliper adapter."
+      "note": "Gauge studio counts, ratios, and percent. Caliper shop skips % on some declared fields — that skip stays in the Caliper adapter.",
+      "dimension": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     {
       "id": "length",
@@ -149,7 +156,14 @@
           "status": "canonical"
         }
       ],
-      "note": "yd is Caliper-only today; additive for Gauge."
+      "note": "yd is Caliper-only today; additive for Gauge.",
+      "dimension": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     {
       "id": "area",
@@ -215,6 +229,13 @@
           ],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        2,
+        0,
+        0,
+        0
       ]
     },
     {
@@ -285,7 +306,14 @@
           "status": "canonical"
         }
       ],
-      "note": "mL is Caliper-only today."
+      "note": "mL is Caliper-only today.",
+      "dimension": [
+        0,
+        3,
+        0,
+        0,
+        0
+      ]
     },
     {
       "id": "mass",
@@ -347,7 +375,14 @@
           "status": "canonical"
         }
       ],
-      "note": "oz is Caliper-only today."
+      "note": "oz is Caliper-only today.",
+      "dimension": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     {
       "id": "time",
@@ -399,7 +434,14 @@
           "status": "canonical"
         }
       ],
-      "note": "day is Caliper-only today."
+      "note": "day is Caliper-only today.",
+      "dimension": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
     },
     {
       "id": "angle",
@@ -444,7 +486,14 @@
           "status": "canonical"
         }
       ],
-      "note": "Stable id is angle.degree. Symbol °; alias deg (Caliper engine key). Caliper-only family today."
+      "note": "Stable id is angle.degree. Symbol °; alias deg (Caliper engine key). Caliper-only family today.",
+      "dimension": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     {
       "id": "force",
@@ -502,6 +551,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        1,
+        -2,
+        0,
+        0
       ]
     },
     {
@@ -612,7 +668,14 @@
           "status": "canonical"
         }
       ],
-      "note": "bar(g) / bar(abs) / kPa(abs) are compatibility labels. They do not add or subtract 101325 Pa."
+      "note": "bar(g) / bar(abs) / kPa(abs) are compatibility labels. They do not add or subtract 101325 Pa.",
+      "dimension": [
+        1,
+        -1,
+        -2,
+        0,
+        0
+      ]
     },
     {
       "id": "stress",
@@ -689,7 +752,14 @@
           "status": "canonical"
         }
       ],
-      "note": "Pa/psi also exist on pressure. Identity is the unit id (stress.Pa), not the symbol."
+      "note": "Pa/psi also exist on pressure. Identity is the unit id (stress.Pa), not the symbol.",
+      "dimension": [
+        1,
+        -1,
+        -2,
+        0,
+        0
+      ]
     },
     {
       "id": "torque",
@@ -739,6 +809,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        2,
+        -2,
+        0,
+        0
       ]
     },
     {
@@ -779,6 +856,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        1,
+        -2,
+        0,
+        0
       ]
     },
     {
@@ -853,6 +937,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        1,
+        -1,
+        0,
+        0
       ]
     },
     {
@@ -918,6 +1009,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        2,
+        -2,
+        0,
+        0
       ]
     },
     {
@@ -974,6 +1072,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        2,
+        -3,
+        0,
+        0
       ]
     },
     {
@@ -1037,7 +1142,14 @@
           "status": "canonical"
         }
       ],
-      "note": "Affine: canonical K = scale × value + offset. Do not use this family for intervals (LMTD, ΔT). Use temperatureDelta."
+      "note": "Affine: canonical K = scale × value + offset. Do not use this family for intervals (LMTD, ΔT). Use temperatureDelta.",
+      "dimension": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
     },
     {
       "id": "temperatureDelta",
@@ -1079,7 +1191,14 @@
           "status": "canonical"
         }
       ],
-      "note": "Linear intervals. 1 °C Δ = 1 K; 1 °F Δ = 5/9 K. Gauge-only family today."
+      "note": "Linear intervals. 1 °C Δ = 1 K; 1 °F Δ = 5/9 K. Gauge-only family today.",
+      "dimension": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
     },
     {
       "id": "density",
@@ -1126,6 +1245,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        -3,
+        0,
+        0,
+        0
       ]
     },
     {
@@ -1164,6 +1290,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        -1,
+        -1,
+        0,
+        0
       ]
     },
     {
@@ -1201,6 +1334,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        2,
+        -1,
+        0,
+        0
       ]
     },
     {
@@ -1261,6 +1401,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        3,
+        -1,
+        0,
+        0
       ]
     },
     {
@@ -1309,7 +1456,14 @@
           "note": "Categorized as frequency (rev/s), not rad/s. Matches both apps today."
         }
       ],
-      "note": "rpm stays under frequency. Caliper-only family today."
+      "note": "rpm stays under frequency. Caliper-only family today.",
+      "dimension": [
+        0,
+        0,
+        -1,
+        0,
+        0
+      ]
     },
     {
       "id": "voltage",
@@ -1347,6 +1501,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        2,
+        -3,
+        0,
+        -1
       ]
     },
     {
@@ -1385,6 +1546,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        0,
+        0,
+        0,
+        1
       ]
     },
     {
@@ -1425,6 +1593,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        2,
+        -3,
+        0,
+        -2
       ]
     },
     {
@@ -1473,6 +1648,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        -1,
+        -2,
+        4,
+        0,
+        2
       ]
     },
     {
@@ -1510,6 +1692,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        0,
+        1,
+        0,
+        1
       ]
     },
     {
@@ -1540,6 +1729,13 @@
           ],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        0,
+        0,
+        0,
+        0
       ]
     },
     {
@@ -1587,6 +1783,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        0,
+        4,
+        0,
+        0,
+        0
       ]
     },
     {
@@ -1625,7 +1828,14 @@
           "status": "canonical"
         }
       ],
-      "note": "lbf/in factor is lbf/in = 4.4482216152605 / 0.0254 (derived, not a third constant)."
+      "note": "lbf/in factor is lbf/in = 4.4482216152605 / 0.0254 (derived, not a third constant).",
+      "dimension": [
+        1,
+        0,
+        -2,
+        0,
+        0
+      ]
     },
     {
       "id": "massFlow",
@@ -1653,6 +1863,13 @@
           "aliases": [],
           "status": "canonical"
         }
+      ],
+      "dimension": [
+        1,
+        0,
+        -1,
+        0,
+        0
       ]
     },
     {
@@ -1682,7 +1899,14 @@
           "status": "canonical"
         }
       ],
-      "note": "Included: Gauge studio publishes this family."
+      "note": "Included: Gauge studio publishes this family.",
+      "dimension": [
+        0,
+        2,
+        -2,
+        -1,
+        0
+      ]
     },
     {
       "id": "thermalConductivity",
@@ -1702,7 +1926,14 @@
           "status": "canonical"
         }
       ],
-      "note": "Included: Gauge studio publishes this family."
+      "note": "Included: Gauge studio publishes this family.",
+      "dimension": [
+        1,
+        1,
+        -3,
+        -1,
+        0
+      ]
     }
   ]
 }

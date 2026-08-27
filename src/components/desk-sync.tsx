@@ -101,10 +101,21 @@ async function joinAccountDesk() {
   setAccountMode(true);
   setDeskHydrating(true);
   blankAccountView();
+  // Let the blanked view paint before the account data lands, so the desk does
+  // not flash the device's work and then swap it.
+  //
+  // Raced against a timer rather than awaited outright: `requestAnimationFrame`
+  // does not fire in a hidden tab, and this was a hard barrier. Sign in, switch
+  // tabs while it loads — which is exactly when someone switches tabs — and the
+  // desk sat on "Loading the account desk" until the tab was looked at again.
+  // The request had not even been sent. A frame is a nicety; the data is not.
   if (typeof requestAnimationFrame === "function") {
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => resolve());
-    });
+    await Promise.race([
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      }),
+      new Promise<void>((resolve) => setTimeout(resolve, 50)),
+    ]);
   }
   if (gen !== syncGeneration) return;
   try {

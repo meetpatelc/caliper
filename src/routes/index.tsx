@@ -105,7 +105,9 @@ function Home() {
         </section>
       )}
 
-      <SectionHeader className="mt-12" kicker="Browse" title="Pick a field." />
+      {/* No "Browse" eyebrow: it repeated what the heading already said, which
+          is clutter above the one control that actually narrows the library. */}
+      <SectionHeader className="mt-12" title="Pick a field." />
       <SegmentedControl aria-label="Domain filter" appearance="chip" className="mt-4">
         <SegmentedItem
           selected={domain === "all"}

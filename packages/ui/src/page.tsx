@@ -55,7 +55,8 @@ export function SectionHeader({
   aside,
   className,
 }: {
-  kicker: ReactNode;
+  /** Optional: a heading that already carries its own context needs no eyebrow. */
+  kicker?: ReactNode;
   title: ReactNode;
   size?: "md" | "sm";
   aside?: ReactNode;
@@ -64,8 +65,8 @@ export function SectionHeader({
   const Heading = size === "sm" ? "h3" : "h2";
   const heading = (
     <div>
-      <p className="eyebrow">{kicker}</p>
-      <Heading className={cn(size === "sm" ? "section-title-sm" : "section-title", "mt-1")}>
+      {kicker ? <p className="eyebrow">{kicker}</p> : null}
+      <Heading className={cn(size === "sm" ? "section-title-sm" : "section-title", kicker ? "mt-1" : undefined)}>
         {title}
       </Heading>
     </div>

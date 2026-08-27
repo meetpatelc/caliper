@@ -2,9 +2,18 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { adminMiddleware } from "@/lib/auth/middleware";
 
+/**
+ * The cap the server enforces, exported so the form can state it.
+ *
+ * Someone asked, in the form itself, "Is there word limit?" — which means they
+ * hit one or feared one, and nothing on the page answered. A limit the writer
+ * cannot see is only discovered by losing work to it.
+ */
+export const FEEDBACK_MAX_CHARS = 20000;
+
 const inputSchema = z.object({
   kind: z.enum(["bug", "message"]),
-  message: z.string().trim().min(1).max(20000),
+  message: z.string().trim().min(1).max(FEEDBACK_MAX_CHARS),
   pagePath: z.string().max(300),
 });
 

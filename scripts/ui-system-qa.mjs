@@ -301,6 +301,25 @@ try {
   // a reload as the only exit. `.click()` still fires the handler, so this is
   // invisible to any check that clicks programmatically; it has to be asked as a
   // hit-test question, at the button's own centre.
+  // Client-side navigation between tools, not a fresh load of each. Per-tool
+  // state is initialised on mount, so without a remount the previous tool's
+  // input renders against the new tool's fields: going from any calculator into
+  // the unit converter used to kill the page with "Unknown unit family:
+  // undefined". Loading /tool/converter directly always worked, which is what
+  // hid it — this has to be a click, not a goto.
+  await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    history.pushState({}, "", "/tool/converter");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  });
+  await page.waitForTimeout(1200);
+  const converterText = await page.locator("body").innerText();
+  record(
+    "calculator to converter survives client-side navigation",
+    !/Something went wrong|Unknown unit family/i.test(converterText),
+    converterText.replace(/\s+/g, " ").slice(0, 60),
+  );
+
   await page.goto(`${BASE}/workshop`, { waitUntil: "networkidle" });
   await page.fill("#folder-name", "QA hit test");
   await page.getByRole("button", { name: "Create", exact: true }).click();
