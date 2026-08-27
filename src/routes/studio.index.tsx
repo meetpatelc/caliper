@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ICON } from "@instrument/ui";
 import { Copy, FilePlus, PenLine } from "lucide-react";
+import { DraftWithAI } from "@/components/draft-with-ai";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
 import { studioDocuments } from "@/lib/document";
@@ -63,6 +64,14 @@ function StudioHome() {
             <span className="mt-1 block text-sm text-muted">Axial stress, already computing. Rename it.</span>
           </span>
         </Button>
+        <DraftWithAI
+          onAccept={(draft) => {
+            // Lands in the editor as an unsaved draft, exactly like the other
+            // two starts. Nothing is published, and the title carries where it
+            // came from so it is never mistaken for a checked model.
+            open(createFrom({ ...draft, slug: "", related: [], sourceLabel: "", sourceUrl: "", warnings: [] }));
+          }}
+        />
       </div>
       <Button asChild variant="ghost" className="mt-4">
         <Link to="/workshop">Project →</Link>
