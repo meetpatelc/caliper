@@ -326,6 +326,27 @@ try {
     };
   });
   record("a side tab opens without taking the page hostage", railOpen.open && !railOpen.inert && !railOpen.locked);
+  // The tabs are `position: fixed`, so they reserve no layout space and page
+  // content runs underneath them. On a wide screen the gutter absorbs that; at
+  // 375px it took 8px off the Example button before the wrap reserved the strip.
+  // A control you can see and cannot fully press is worse than one that is not
+  // there, so this is measured rather than eyeballed.
+  const narrow = await browser.newPage({ viewport: { width: 375, height: 812 } });
+  await narrow.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const occlusion = await narrow.evaluate(() => {
+    const hit = [];
+    for (const el of document.querySelectorAll("main a, main button, main input, main select")) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height || r.top > window.innerHeight || r.bottom < 0) continue;
+      const probe = document.elementFromPoint(Math.min(r.right - 2, window.innerWidth - 1), Math.round(r.y + r.height / 2));
+      if (probe && probe.closest(".side-tab")) hit.push((el.textContent || "").trim().slice(0, 24));
+    }
+    return { hit, overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+  });
+  record("side tabs cover no control on mobile", occlusion.hit.length === 0, occlusion.hit.join(", "));
+  record("side tabs add no mobile overflow", occlusion.overflow === 0, String(occlusion.overflow));
+  await narrow.close();
+
   record("quick convert computes in the rail", /1000\s*mm/.test(railOpen.result), railOpen.result);
 
   // Two queries a machinist would actually type used to return an empty list:

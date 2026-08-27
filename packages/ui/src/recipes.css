@@ -19,6 +19,25 @@
   padding-block: 1.75rem 3.5rem;
 }
 
+/**
+ * Reserve the side tabs' width once the gutter stops covering it.
+ *
+ * The tabs are `position: fixed`, so they occupy no layout space and page
+ * content runs underneath them. On a wide screen the margin either side of the
+ * 1180px wrap absorbs that; below roughly 1264px it does not, and the tab
+ * clips whatever sits at the right edge of the content — measured at 375px, it
+ * took 8px off the Example button, which is enough to make it miss a thumb.
+ *
+ * Padding rather than a narrower wrap so the reserved strip scrolls with the
+ * page and nothing reflows when a panel opens.
+ */
+@media (max-width: 1264px) {
+  .page-wrap,
+  .page-frame {
+    padding-right: 2.75rem;
+  }
+}
+
 .page-frame {
   width: min(1180px, calc(100% - 2rem));
   margin-inline: auto;
