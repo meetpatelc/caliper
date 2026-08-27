@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { Bug, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
 import { FEEDBACK_MAX_CHARS, listFeedback, submitFeedback, type FeedbackRow } from "@/lib/feedback";
+import { ATTACHMENT_MAX_BYTES, inspectAttachment } from "@/lib/attachment";
 import { SignedIn } from "@/lib/auth/gates";
 import { Button } from "@/components/ui/button";
 import { Field, Textarea } from "@/components/ui/field";
@@ -29,6 +30,8 @@ function FeedbackPage() {
   const [messageError, setMessageError] = useState<string | null>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const [pending, setPending] = useState(false);
+  const [attachment, setAttachment] = useState<{ name: string; data: string } | null>(null);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [inboxTick, setInboxTick] = useState(0);
 
   const onSubmit = async (event: FormEvent) => {
@@ -44,8 +47,11 @@ function FeedbackPage() {
     setMessageError(null);
     setPending(true);
     try {
-      await submitFeedback({ data: { kind, message, pagePath: window.location.pathname } });
+      await submitFeedback({
+        data: { kind, message, pagePath: window.location.pathname, ...(attachment ? { attachment } : {}) },
+      });
       setMessage("");
+      setAttachment(null);
       setInboxTick((value) => value + 1);
       toast.success("Feedback sent. Thank you.");
     } catch {
@@ -97,6 +103,46 @@ function FeedbackPage() {
               {FEEDBACK_MAX_CHARS.toLocaleString("en-US")}.
             </p>
           ) : null}
+        </Field>
+        <Field
+          htmlFor="feedback-attachment"
+          label="Screenshot"
+          hint="Optional. PNG, JPEG, GIF or WebP, up to 2 MB — a picture of the wrong thing beats describing where it was."
+          error={attachmentError ?? undefined}
+        >
+          <input
+            id="feedback-attachment"
+            type="file"
+            accept="image/png,image/jpeg,image/gif,image/webp"
+            className="text-sm file:mr-3 file:rounded-md file:border file:border-border file:bg-surface file:px-3 file:py-1.5 file:text-sm file:text-fg"
+            onChange={async (event) => {
+              setAttachmentError(null);
+              const file = event.target.files?.[0];
+              if (!file) {
+                setAttachment(null);
+                return;
+              }
+              if (file.size > ATTACHMENT_MAX_BYTES) {
+                setAttachmentError("That image is over 2 MB.");
+                setAttachment(null);
+                event.target.value = "";
+                return;
+              }
+              const buffer = new Uint8Array(await file.arrayBuffer());
+              // Sniffed here too, so a wrong file is refused before the upload
+              // rather than after it. The server checks again regardless.
+              const check = inspectAttachment(buffer);
+              if (!check.ok) {
+                setAttachmentError(check.reason);
+                setAttachment(null);
+                event.target.value = "";
+                return;
+              }
+              let binary = "";
+              for (const byte of buffer) binary += String.fromCharCode(byte);
+              setAttachment({ name: file.name.slice(0, 200), data: btoa(binary) });
+            }}
+          />
         </Field>
         <Button type="submit" variant="accent" disabled={pending} className="justify-self-start">
           <Send size={ICON.base} />
