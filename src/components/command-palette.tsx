@@ -2,10 +2,10 @@ import { Command } from "cmdk";
 import { ICON } from "@instrument/ui";
 import { useRouter } from "@tanstack/react-router";
 import { ClipboardList, PenLine, Star } from "lucide-react";
-import type { RefObject } from "react";
+import { useMemo, useState, type RefObject } from "react";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { EmptyState } from "@/components/ui/status";
-import { getTool, tools, searchableToolText } from "@/lib/catalog";
+import { getTool, tools, scoreSearchMatch, searchableToolText } from "@/lib/catalog";
 import { releasedDomains, savedHeadline } from "@/lib/desk";
 import { PAGE_NAV } from "@/lib/nav";
 import { officialCalculators } from "@/studio/lib/catalog";
@@ -25,6 +25,7 @@ export function CommandPalette({
   restoreFocusTo?: RefObject<HTMLElement | null>;
 }) {
   const router = useRouter();
+  const [query, setQuery] = useState("");
   const favorites = useDeskStore((state) => state.favorites);
   const recents = useDeskStore((state) => state.recents);
   const calculations = useDeskStore((state) => state.calculations);
@@ -41,6 +42,20 @@ export function CommandPalette({
   const favoriteIds = new Set(favorites);
   const favouriteTools = favorites.map((id) => tools.find((tool) => tool.id === id)).filter(Boolean);
 
+  // Only worth showing for a multi-word query: a single word already ranks
+  // fine inside its group, and a "best match" heading over one obvious result
+  // is noise. Ties keep catalog order, so the list is stable between keystrokes.
+  const bestMatches = useMemo(() => {
+    const terms = query.trim().split(/\s+/).filter(Boolean);
+    if (terms.length < 2) return [];
+    return tools
+      .map((tool) => ({ tool, score: scoreSearchMatch(searchableToolText(tool), query) }))
+      .filter((entry) => entry.score >= 0.5)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map((entry) => entry.tool);
+  }, [query]);
+
   return (
     <OverlayDialog open={open} onClose={() => onOpenChange(false)} title="Search Instrument" restoreFocusTo={restoreFocusTo}>
       <Command
@@ -49,16 +64,26 @@ export function CommandPalette({
         filter={(value, search) => {
           const query = search.trim().toLowerCase();
           if (!query) return 1;
-          // Every word must appear, in any order. Matching the whole query as
-          // one string meant "bolt torque" missed a tool whose text says
-          // "torque … bolt", and word order is not something a person typing
-          // into a search box should have to guess.
-          const haystack = value.toLowerCase();
-          return query.split(/\s+/).every((term) => haystack.includes(term)) ? 1 : 0;
+          // Word order is not something a person typing into a search box should
+          // have to guess, so terms match in any order.
+          //
+          // Score by the share of terms that hit, rather than demanding all of
+          // them. This returned 1 or 0, which threw away cmdk's ranking *and*
+          // made "no match" all-or-nothing: "cv valve sizing" found nothing
+          // because "sizing" appears nowhere, and "feeds and speeds" found
+          // nothing because the text says "speed". Both are one unmatched word
+          // away from the right tool, and both used to return an empty list.
+          //
+          // A single-term query still scores 1 or 0, so nothing gets noisier;
+          // only multi-word queries gain the partial result, and they arrive
+          // ordered by how much of the query they actually matched.
+          return scoreSearchMatch(value, query);
         }}
       >
         <Command.Input
           autoFocus
+          value={query}
+          onValueChange={setQuery}
           placeholder="Search models, favourites, checks, reviews, drafts"
           className="w-full border-b border-border bg-transparent px-4 py-3 text-base outline-none placeholder:text-muted"
         />
@@ -66,6 +91,26 @@ export function CommandPalette({
           <Command.Empty className="px-3 py-6">
             <EmptyState>No match. Try a favourite, a saved check, or a model name.</EmptyState>
           </Command.Empty>
+          {/* cmdk ranks inside a group but keeps the groups in render order, so
+              the closest answer can sit below a weaker one from an earlier
+              domain — "cv valve sizing" found Liquid valve Cv in fifth place,
+              under three mechanics tools matching one word each. This lifts the
+              best few to the top, scored by the same rule the filter uses. */}
+          {bestMatches.length > 0 && (
+            <Command.Group heading="Best match" className="px-1 py-1">
+              {bestMatches.map((tool) => (
+                <Command.Item
+                  key={`best-${tool.id}`}
+                  value={`best ${tool.id} ${searchableToolText(tool)}`}
+                  onSelect={() => go(`/tool/${tool.id}`)}
+                  className={itemClass}
+                >
+                  <span>{tool.title}</span>
+                  <span className="meta">{tool.outputLabel}</span>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
           {recents.length > 0 && (
             <Command.Group heading="Recent" className="px-1 py-1">
               {recents

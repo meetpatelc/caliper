@@ -301,6 +301,28 @@ try {
   // a reload as the only exit. `.click()` still fires the handler, so this is
   // invisible to any check that clicks programmatically; it has to be asked as a
   // hit-test question, at the button's own centre.
+
+  // Two queries a machinist would actually type used to return an empty list:
+  // "cv valve sizing" (no tool text contains "sizing") and "feeds and speeds"
+  // (the text says "speed"). The filter scored 1 or 0, so one unmatched word
+  // discarded the whole query.
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  const searchTop = async (query) => {
+    await page.evaluate(() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true })));
+    await page.waitForSelector("[cmdk-input]", { timeout: 5000 });
+    await page.fill("[cmdk-input]", query);
+    await page.waitForTimeout(400);
+    const top = await page.evaluate(() => {
+      const first = document.querySelector("[cmdk-item]");
+      return first ? first.innerText.trim().split(String.fromCharCode(10))[0] : "";
+    });
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
+    return top;
+  };
+  record("\"cv valve sizing\" finds the valve tool", /valve/i.test(await searchTop("cv valve sizing")));
+  record("\"feeds and speeds\" finds the cutting tool", /cutting/i.test(await searchTop("feeds and speeds")));
+
   // Help text existed on every field and reached no screen reader: it had no id
   // to point at, and sitting inside the wrapping <label> it was folded into the
   // control's accessible name instead of its description.
