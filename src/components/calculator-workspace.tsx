@@ -203,7 +203,25 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     });
     if (!spec || !Number.isFinite(engineValue)) return;
     try {
-      setDisplayInput((current) => ({ ...current, [key]: formatShop(convertShop(spec.family, engineValue, spec.engine, nextUnit)) }));
+      const before = displayInput[key] ?? "";
+      const beforeUnit = displayUnit[key] || engineUnit;
+      const after = formatShop(convertShop(spec.family, engineValue, spec.engine, nextUnit));
+      setDisplayInput((current) => ({ ...current, [key]: after }));
+      // Switching the unit converts the number and leaves the quantity alone —
+      // 1 kg becomes 1000 g, and the result does not move. That is the safe
+      // reading for an input: the alternative, keeping the digits and changing
+      // what they mean, would silently scale someone's load by a thousand.
+      //
+      // Safe, but not obvious: the field changes under the cursor with nothing
+      // to explain it, which is what prompted "not sure best for user wanting
+      // switch units". So say what happened. One toast id, so holding down the
+      // menu replaces rather than stacks.
+      if (before && after !== before) {
+        toast(`${before} ${beforeUnit} = ${after} ${nextUnit}`, {
+          id: "unit-switch",
+          description: "Same quantity, different unit — the result is unchanged.",
+        });
+      }
     } catch {
       /* keep the typed value */
     }

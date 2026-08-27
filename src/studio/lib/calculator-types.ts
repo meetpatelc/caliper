@@ -90,6 +90,35 @@ export const outputSchema = z.object({
   units: z.array(z.string().min(1).max(32)).max(24).optional(),
 });
 
+/**
+ * A relational guard: an expression over the model's own fields, plus the
+ * sentence to show when it does not hold.
+ *
+ * The Library carries 82 of these in `document-constraints.ts` and Studio had
+ * none — its schema could only express per-field minimum and maximum, so there
+ * was no way to say "hot inlet must exceed cold outlet" or "D/t >= 20". A model
+ * written here could return a number the shipped equivalent would refuse.
+ *
+ * `severity` separates the two things a guard can mean, which the Library
+ * learned the hard way: "error" is input that is invalid and must not compute,
+ * "warning" is input the model will happily evaluate but was not derived for.
+ * Collapsing them either blocks legitimate work or lets a wrong number through
+ * looking exactly like a right one.
+ */
+export const constraintSchema = z.object({
+  expression: z.string().min(1).max(240),
+  // The comparison the expression must satisfy. At least one is required.
+  min: z.number().finite().optional(),
+  max: z.number().finite().optional(),
+  gt: z.number().finite().optional(),
+  lt: z.number().finite().optional(),
+  message: z.string().min(4).max(240),
+  severity: z.enum(["error", "warning"]).default("error"),
+}).refine(
+  (c) => c.min !== undefined || c.max !== undefined || c.gt !== undefined || c.lt !== undefined,
+  { message: "A constraint needs at least one of min, max, gt or lt." },
+);
+
 export const calculatorSchema = z.object({
   slug: z
     .string()
@@ -101,6 +130,7 @@ export const calculatorSchema = z.object({
   domain: z.enum(DOMAIN_IDS),
   fields: z.array(fieldSchema).min(1).max(12),
   outputs: z.array(outputSchema).min(1).max(6),
+  constraints: z.array(constraintSchema).max(12).optional(),
   tables: z.array(tableSchema).max(6).optional(),
   formula: z.string().min(1).max(240),
   purpose: z.string().min(8).max(400),

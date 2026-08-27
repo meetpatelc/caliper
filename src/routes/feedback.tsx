@@ -3,7 +3,7 @@ import { ICON } from "@instrument/ui";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Bug, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
-import { listFeedback, submitFeedback, type FeedbackRow } from "@/lib/feedback";
+import { FEEDBACK_MAX_CHARS, listFeedback, submitFeedback, type FeedbackRow } from "@/lib/feedback";
 import { SignedIn } from "@/lib/auth/gates";
 import { Button } from "@/components/ui/button";
 import { Field, Textarea } from "@/components/ui/field";
@@ -90,7 +90,13 @@ function FeedbackPage() {
           </div>
         </fieldset>
         <Field htmlFor="feedback-message" label="Full message" required error={messageError ?? undefined}>
-          <Textarea id="feedback-message" ref={messageRef} value={message} onChange={(event) => { setMessage(event.target.value); if (messageError) setMessageError(null); }} rows={12} placeholder="Paste steps, values, and URLs." />
+          <Textarea id="feedback-message" ref={messageRef} value={message} onChange={(event) => { setMessage(event.target.value); if (messageError) setMessageError(null); }} rows={12} maxLength={FEEDBACK_MAX_CHARS} placeholder="Paste steps, values, and URLs." />
+          {message.length > FEEDBACK_MAX_CHARS * 0.8 ? (
+            <p role="status" className="mt-2 font-mono text-xs text-muted">
+              {(FEEDBACK_MAX_CHARS - message.length).toLocaleString("en-US")} characters left of{" "}
+              {FEEDBACK_MAX_CHARS.toLocaleString("en-US")}.
+            </p>
+          ) : null}
         </Field>
         <Button type="submit" variant="accent" disabled={pending} className="justify-self-start">
           <Send size={ICON.base} />
