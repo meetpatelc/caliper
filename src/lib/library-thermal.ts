@@ -10,7 +10,7 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "deltaT", label: "Declared temperature difference", symbol: "ΔT", help: "User-entered signed bulk-to-surface temperature difference; no temperature field is derived.", defaultValue: 25, defaultUnit: "K", signed: true },
     ],
     outputs: [
-      { id: "heatRate", label: "Declared convection heat rate", defaultUnit: "W", expression: "coefficient*area*deltaT" },
+      { id: "heatRate", label: "Declared convection heat rate", family: "power", defaultUnit: "W", expression: "coefficient*area*deltaT" },
       { id: "heatRateKw", label: "Declared convection heat rate", defaultUnit: "kW", expression: "coefficient*area*deltaT/1000" },
       { id: "conductance", label: "Declared convection conductance hA", defaultUnit: "W/K", expression: "coefficient*area" },
     ],
@@ -143,9 +143,9 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "surroundingTemperature", label: "Surroundings temperature", help: "Effective large-surroundings absolute temperature in kelvins.", defaultValue: 293.15, defaultUnit: "K" },
     ],
     outputs: [
-      { id: "netRadiation", label: "Net radiation from surface", defaultUnit: "W", expression: "emissivity*5.670374419e-8*(surfaceTemperature^4-surroundingTemperature^4)*area" },
+      { id: "netRadiation", label: "Net radiation from surface", family: "power", defaultUnit: "W", expression: "emissivity*5.670374419e-8*(surfaceTemperature^4-surroundingTemperature^4)*area" },
       { id: "heatFlux", label: "Net radiative heat flux", defaultUnit: "W/m²", expression: "emissivity*5.670374419e-8*(surfaceTemperature^4-surroundingTemperature^4)" },
-      { id: "emittedPower", label: "Surface emitted radiation", defaultUnit: "W", expression: "emissivity*5.670374419e-8*surfaceTemperature^4*area" },
+      { id: "emittedPower", label: "Surface emitted radiation", family: "power", defaultUnit: "W", expression: "emissivity*5.670374419e-8*surfaceTemperature^4*area" },
     ],
     formula: "qnet = εσA(Ts⁴ − Tsur⁴) · q''net = εσ(Ts⁴ − Tsur⁴)",
     warnings: ["This is gray-surface Stefan–Boltzmann exchange to large isothermal surroundings using user-entered emissivity and absolute temperatures. It excludes finite-surface view factors, enclosure geometry, spectral and directional behavior, participating gases/flames, reflections, solar load, convection, conduction, insulation, and transient temperature response."],
@@ -159,7 +159,7 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "elapsedTime", label: "Declared elapsed time", symbol: "t", help: "User-entered elapsed time after the stated constant power step; must be zero or greater.", defaultValue: 100, defaultUnit: "s", signed: true },
     ],
     outputs: [
-      { id: "timeConstant", label: "Literal thermal time constant", defaultUnit: "s", expression: "((thermalResistance)*(thermalCapacitance))" },
+      { id: "timeConstant", label: "Literal thermal time constant", family: "time", defaultUnit: "s", expression: "((thermalResistance)*(thermalCapacitance))" },
       { id: "temperatureRise", label: "Literal ideal temperature rise at elapsed time", defaultUnit: "K", expression: "(((constantPower)*(thermalResistance))*(1-exp(-(elapsedTime)/((thermalResistance)*(thermalCapacitance)))))" },
       { id: "nodeTemperature", label: "Literal ideal node temperature", defaultUnit: "°C", expression: "((ambientTemperature)+(((constantPower)*(thermalResistance))*(1-exp(-(elapsedTime)/((thermalResistance)*(thermalCapacitance))))))" },
       { id: "steadyStateRise", label: "Literal ideal steady-state temperature rise", defaultUnit: "K", expression: "((constantPower)*(thermalResistance))" },

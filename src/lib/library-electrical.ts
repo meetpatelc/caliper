@@ -25,8 +25,8 @@ export const electricalDocuments: Record<string, InstrumentDocument> = {
     outputs: [
       { id: "apparentPower", label: "Literal three-phase apparent power", defaultUnit: "kVA", expression: "(sqrt(3)*(lineVoltage)*(lineCurrent))/1000" },
       { id: "realPower", label: "Literal three-phase real power", defaultUnit: "kW", expression: "((sqrt(3)*(lineVoltage)*(lineCurrent))*(powerFactor))/1000" },
-      { id: "lineVoltage", label: "Declared line-to-line voltage", defaultUnit: "V", expression: "(lineVoltage)" },
-      { id: "lineCurrent", label: "Declared line current", defaultUnit: "A", expression: "(lineCurrent)" },
+      { id: "lineVoltage", label: "Declared line-to-line voltage", family: "voltage", defaultUnit: "V", expression: "(lineVoltage)" },
+      { id: "lineCurrent", label: "Declared line current", family: "current", defaultUnit: "A", expression: "(lineCurrent)" },
     ],
     formula: "S = √3·VLL·I · P = S·PF",
     warnings: ["This applies only the balanced scalar three-phase relation to user-declared line voltage, line current, and power factor. It does not determine phase balance, harmonics, conductor or breaker size, protection, voltage drop, grounding, available fault current, power-quality compliance, capacity, safety, suitability, or approval."],

@@ -16,8 +16,8 @@ export const dynamicsDocuments: Record<string, InstrumentDocument> = {
     outputs: [
       { id: "peakPower", label: "Declared peak braking power", defaultUnit: "kW", expression: "drivePower*brakeTorqueMultiplier" },
       { id: "dutyRatio", label: "Declared braking-duty ratio", defaultUnit: "%", expression: "brakingTime/cycleTime*100" },
-      { id: "derivedResistance", label: "Source-relation derived resistance", defaultUnit: "Ω", expression: "dcBusVoltage^2/(drivePower*1000*brakeTorqueMultiplier)" },
-      { id: "peakCurrent", label: "Source-relation peak braking current", defaultUnit: "A", expression: "sqrt((drivePower*1000*brakeTorqueMultiplier)/(dcBusVoltage^2/(drivePower*1000*brakeTorqueMultiplier)))" },
+      { id: "derivedResistance", label: "Source-relation derived resistance", family: "resistance", defaultUnit: "Ω", expression: "dcBusVoltage^2/(drivePower*1000*brakeTorqueMultiplier)" },
+      { id: "peakCurrent", label: "Source-relation peak braking current", family: "current", defaultUnit: "A", expression: "sqrt((drivePower*1000*brakeTorqueMultiplier)/(dcBusVoltage^2/(drivePower*1000*brakeTorqueMultiplier)))" },
       { id: "averageWattage", label: "Source-relation average braking wattage", defaultUnit: "kW", expression: "drivePower*brakeTorqueMultiplier*(brakingTime/cycleTime)*lookup(avgFactor, regenerationType)" },
     ],
     formula: "PW = MW·BT · R = Vdc²/PW · DC = tb/tc · DBRW = PW·DC·(1/2 normal, 1 overhauling)",
@@ -107,10 +107,10 @@ export const dynamicsDocuments: Record<string, InstrumentDocument> = {
       { id: "systemInertia", label: "Declared table-plus-load inertia", symbol: "I", help: "User-entered rotational inertia about the declared indexing axis; geometry, gearing, and motor inertia are not derived.", defaultValue: 0.05, defaultUnit: "kg·m²" },
     ],
     outputs: [
-      { id: "indexAngleRad", label: "Declared index angle in radians", defaultUnit: "rad", expression: "indexAngle*pi/180" },
+      { id: "indexAngleRad", label: "Declared index angle in radians", family: "angle", defaultUnit: "rad", expression: "indexAngle*pi/180" },
       { id: "averageAngularSpeed", label: "Ideal average angular speed", defaultUnit: "rad/s", expression: "(indexAngle*pi/180)/moveTime" },
       { id: "indexesPerMinute", label: "Literal move-only index rate", defaultUnit: "indexes/min", expression: "60/moveTime" },
-      { id: "kineticEnergy", label: "Rotational kinetic energy at average speed", defaultUnit: "J", expression: "0.5*systemInertia*((indexAngle*pi/180)/moveTime)^2" },
+      { id: "kineticEnergy", label: "Rotational kinetic energy at average speed", family: "energy", defaultUnit: "J", expression: "0.5*systemInertia*((indexAngle*pi/180)/moveTime)^2" },
     ],
     formula: "θ = α·π/180 · ωavg = θ/tmove · rate(move-only) = 60/tmove · KE = ½Iωavg²",
     warnings: ["This applies only declared index-angle, move-time, and table-plus-load-inertia arithmetic. It excludes acceleration profile, peak/RMS torque, friction, gearing, motor/table selection, capacity, position accuracy, dwell/process timing, safety, suitability, and approval."],
