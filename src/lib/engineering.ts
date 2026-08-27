@@ -46,6 +46,8 @@ export const toolFields: Record<ToolId, FieldDefinition[]> = {
     { key: "length", label: "Unsupported length", symbol: "L", helper: "Distance between lateral restraints.", kind: "number", unit: "m" },
     { key: "modulus", label: "Elastic modulus", symbol: "E", helper: "Elastic material property used by the ideal model.", kind: "number", unit: "GPa" },
     { key: "inertia", label: "Least second moment", symbol: "I", helper: "Use the smaller principal-axis value.", kind: "number", unit: "cm⁴" },
+    { key: "area", label: "Cross-sectional area", symbol: "A", helper: "Gross section area, used for slenderness and the squash-load comparison.", kind: "number", unit: "cm²" },
+    { key: "yieldStrength", label: "Yield strength", symbol: "σy", helper: "Material yield used only to check that buckling governs before squashing.", kind: "number", unit: "MPa" },
   ],
   section: [
     { key: "shape", label: "Cross-section", helper: "Basic closed forms with centroidal horizontal axis.", kind: "select", options: [{ value: "rectangle", label: "Rectangle" }, { value: "circle", label: "Solid circle" }, { value: "annulus", label: "Circular tube" }] },
@@ -1158,7 +1160,7 @@ export const toolFields: Record<ToolId, FieldDefinition[]> = {
 export const initialInputs: Record<ToolId, Record<string, string>> = {
   axial: { force: "10", area: "1000", length: "1000", modulus: "200" },
   beam: { case: "cantilever", load: "1", length: "1.2", modulus: "200", inertia: "120" },
-  stability: { endCondition: "1", length: "1.5", modulus: "200", inertia: "25" },
+  stability: { endCondition: "1", length: "1.5", modulus: "200", inertia: "25", area: "12", yieldStrength: "250" },
   section: { shape: "rectangle", width: "60", height: "120", innerDiameter: "30" },
   converter: { category: "force", value: "1", from: "kN", to: "lbf" },
   triangle: { legA: "300", legB: "400" },

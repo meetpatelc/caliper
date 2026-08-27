@@ -91,7 +91,7 @@ export const tools: ToolDefinition[] = [
     status: "ready",
     sourceLabel: "Shigley's Mechanical Engineering Design — Euler column buckling and effective length",
     sourceUrl: "",
-    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "verified", prerequisites: ["effective length", "elastic modulus", "least second moment"], sourceIds: ["shigley-buckling"] },
+    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "verified", prerequisites: ["effective length", "elastic modulus", "least second moment", "cross-sectional area", "yield strength"], sourceIds: ["shigley-buckling"] },
   },
   {
     id: "section",

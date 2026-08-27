@@ -414,13 +414,19 @@ export const applicabilityWarnings: Record<string, ApplicabilityWarning[]> = {
         "Diameter-to-thickness is below 20, so this is not a thin wall. Membrane theory understates the hoop stress here — use a thick-wall (Lamé) treatment.",
     },
   ],
-  // `stability` wants the same treatment and cannot have it yet. Euler buckling
-  // is elastic, so below a critical slenderness it returns a load the column
-  // cannot reach — it squashes first. Testing for that needs the squash load,
-  // σy·A, and the model takes neither cross-sectional area nor yield strength:
-  // its inputs are end condition, length, modulus and second moment. Adding the
-  // check means adding two inputs, which changes what the model asks of the
-  // person using it. That is a product decision, not a guard.
+  stability: [
+    {
+      // Euler is an elastic result. Below the critical slenderness
+      // λc = √(2π²E/σy) the critical stress it predicts exceeds yield, so the
+      // column squashes before it can buckle and the load reported here cannot
+      // physically be reached. Expressed as the ratio of Euler load to squash
+      // load, σy·A, so the threshold is a plain 1.
+      expression: "((pi^2*modulus*inertia)/(endCondition*length)^2)/(yieldStrength*area)",
+      max: 1,
+      message:
+        "The elastic critical load exceeds the squash load σy·A at this slenderness, so the column yields before it buckles and this number cannot be reached. Use an inelastic treatment — the Johnson parabolic formula — or compare against the squash load directly.",
+    },
+  ],
 };
 
 export function collectApplicabilityWarnings(

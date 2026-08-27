@@ -889,11 +889,16 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
       { id: "endCondition", label: "End condition", help: "The effective-length factor is part of the ideal model.", family: "dimensionless", defaultValue: 1, defaultUnit: "1" },
       { id: "length", label: "Unsupported length", symbol: "L", help: "Distance between lateral restraints.", family: "length", defaultValue: 1.5, defaultUnit: "m" },
       { id: "modulus", label: "Elastic modulus", symbol: "E", help: "Elastic material property used by the ideal model.", family: "stress", defaultValue: 200, defaultUnit: "GPa" },
-      { id: "inertia", label: "Least second moment", symbol: "I", help: "Use the smaller principal-axis value.", family: "secondMoment", defaultValue: 25, defaultUnit: "cm⁴" }
+      { id: "inertia", label: "Least second moment", symbol: "I", help: "Use the smaller principal-axis value.", family: "secondMoment", defaultValue: 25, defaultUnit: "cm⁴" },
+      { id: "area", label: "Cross-sectional area", symbol: "A", help: "Gross section area, used for slenderness and the squash-load comparison.", family: "area", defaultValue: 12, defaultUnit: "cm²" },
+      { id: "yieldStrength", label: "Yield strength", symbol: "σy", help: "Material yield used only to check that buckling governs before squashing.", family: "stress", defaultValue: 250, defaultUnit: "MPa" }
     ],
     outputs: [
       { id: "effectiveLength", label: "Effective length", family: "length", defaultUnit: "mm", expression: "endCondition*length" },
-      { id: "criticalLoad", label: "Ideal elastic critical load", family: "force", defaultUnit: "kN", expression: "(pi^2*((modulus/1000000000)*1e9)*((inertia/1e-8)*1e-8))/(endCondition*length)^2" }
+      { id: "criticalLoad", label: "Ideal elastic critical load", family: "force", defaultUnit: "kN", expression: "(pi^2*((modulus/1000000000)*1e9)*((inertia/1e-8)*1e-8))/(endCondition*length)^2" },
+      // The catalog has advertised "Critical load · slenderness" all along and
+      // the model never produced a slenderness. λ = KL/r with r = √(I/A).
+      { id: "slenderness", label: "Slenderness ratio", symbol: "λ", family: "dimensionless", defaultUnit: "1", expression: "(endCondition*length)/sqrt(inertia/area)" }
     ],
     formula: "Pcr = π²EI / (KL)²",
     warnings: ["This is an ideal elastic stability estimate. It excludes imperfections, residual stress, eccentricity, inelastic behavior, connection restraint, and code-required resistance checks."],

@@ -1132,6 +1132,13 @@
         "raw": 219324.54224643015,
         "display": "219.32",
         "unit": "kN"
+      },
+      {
+        "key": "slenderness",
+        "label": "Slenderness ratio",
+        "raw": 103.92304845413265,
+        "display": "103.92",
+        "unit": "1"
       }
     ],
     "warnings": [
