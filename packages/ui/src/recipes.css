@@ -197,3 +197,44 @@
     transform: translateX(0);
   }
 }
+
+/**
+ * The side tab: a label turned on its side, clinging to the right edge.
+ *
+ * `writing-mode` rather than `transform: rotate()`, because the tab has to
+ * reserve its own space. A rotated element keeps its unrotated box, so the
+ * button would be short and wide while its text ran tall — overlapping whatever
+ * sits below it. Vertical writing mode rotates the *layout*, so the box grows
+ * with the label and the next tab stacks under it correctly.
+ */
+.side-tab {
+  writing-mode: vertical-rl;
+  transition: background-color 120ms var(--ease-desk);
+}
+
+.side-tab-label {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.side-tab-panel {
+  animation: side-tab-in 140ms var(--ease-desk);
+}
+
+@keyframes side-tab-in {
+  from {
+    opacity: 0;
+    transform: translateX(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Someone who has asked for less motion still needs to see the panel arrive. */
+@media (prefers-reduced-motion: reduce) {
+  .side-tab-panel {
+    animation: none;
+  }
+}

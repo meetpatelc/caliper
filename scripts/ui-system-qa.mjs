@@ -302,6 +302,32 @@ try {
   // invisible to any check that clicks programmatically; it has to be asked as a
   // hit-test question, at the button's own centre.
 
+  // The favourites rail used to live in the viewport gutter behind
+  // `hidden min-[1440px]:block`, so on a 1366px laptop there was no way to
+  // reach a favourite at all. A tab needs 36px, not a 260px gutter.
+  await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const rail = await page.evaluate(() => {
+    const tabs = [...document.querySelectorAll(".side-tab")];
+    return { count: tabs.length, labels: tabs.map((t) => t.getAttribute("aria-label")) };
+  });
+  record("all three side tabs render", rail.count === 3, rail.labels.join(", "));
+
+  await page.getByRole("button", { name: "Convert" }).click();
+  await page.waitForTimeout(300);
+  const railOpen = await page.evaluate(() => {
+    const panel = document.querySelector('[role="region"][aria-label="Convert"]');
+    return {
+      open: Boolean(panel),
+      // The point of building this rather than reusing the modal drawer: the
+      // page behind stays live, unlocked and reachable.
+      inert: document.getElementById("main-content")?.hasAttribute("inert") ?? false,
+      locked: document.body.style.overflow === "hidden",
+      result: panel?.querySelector('[role="status"]')?.textContent ?? "",
+    };
+  });
+  record("a side tab opens without taking the page hostage", railOpen.open && !railOpen.inert && !railOpen.locked);
+  record("quick convert computes in the rail", /1000\s*mm/.test(railOpen.result), railOpen.result);
+
   // Two queries a machinist would actually type used to return an empty list:
   // "cv valve sizing" (no tool text contains "sizing") and "feeds and speeds"
   // (the text says "speed"). The filter scored 1 or 0, so one unmatched word

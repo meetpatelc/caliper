@@ -44,7 +44,14 @@ type DeskState = {
   calculations: SavedCalculation[];
   reviews: ReviewSnapshot[];
   activeProjectId: string | null;
+  /**
+   * Which side tabs the person chose to keep open. Persisted with the rest of
+   * the desk, because a pinned rail is a working preference — it should survive
+   * a reload the way a favourite does, not reset every visit.
+   */
+  pinnedTabs: string[];
   toggleFavorite: (id: ToolId) => void;
+  setTabPinned: (id: string, pinned: boolean) => void;
   touchRecent: (id: ToolId) => void;
   createProject: (name: string) => DeskProject;
   setActiveProject: (id: string | null) => void;
@@ -76,6 +83,11 @@ export const useDeskStore = create<DeskState>()(
       calculations: [],
       reviews: [],
       activeProjectId: null,
+      pinnedTabs: [],
+      setTabPinned: (id, pinned) =>
+        set((state) => ({
+          pinnedTabs: pinned ? [...new Set([...state.pinnedTabs, id])] : state.pinnedTabs.filter((item) => item !== id),
+        })),
       toggleFavorite: (id) => {
         const on = !get().favorites.includes(id);
         set((state) => ({

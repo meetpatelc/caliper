@@ -24,3 +24,4 @@ export { DataRow } from "./row";
 export { PageHeader, SectionHeader } from "./page";
 export { Menu, MenuItem } from "./menu";
 export { SearchTrigger } from "./search";
+export { SideTab } from "./side-tab";
