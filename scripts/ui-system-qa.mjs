@@ -175,6 +175,34 @@ try {
   await page.waitForTimeout(200);
   record("studio ConfirmDialog escape", !(await confirm.isVisible()));
 
+  // The unit is shown rather than offered until wanted: a second full select on
+  // every one of up to twelve rows paid a control's price for an edit that
+  // rarely happens. It has to stay a real control, so this drives the whole
+  // round trip rather than counting elements.
+  await page.goto(`${BASE}/studio`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /Start from a working example/ }).click();
+  await page.waitForURL(/\/studio\/[^/]+/);
+  await page.waitForTimeout(800);
+  const unitCell = page.getByRole("button", { name: /^Unit for / }).first();
+  record("engine collapses the unit control", (await unitCell.count()) === 1);
+  const unitBefore = (await unitCell.textContent())?.trim() ?? "";
+  await unitCell.click();
+  await page.waitForTimeout(300);
+  const swapped = await page.evaluate(() => document.activeElement?.tagName === "SELECT");
+  record("the collapsed unit opens focused", swapped);
+  if (swapped) {
+    await page.evaluate(() => {
+      const sel = document.activeElement;
+      const next = [...sel.options].map((o) => o.value).find((v) => v !== sel.value);
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set;
+      setter.call(sel, next);
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await page.waitForTimeout(500);
+    const unitAfter = (await page.getByRole("button", { name: /^Unit for / }).first().textContent())?.trim() ?? "";
+    record("changing the collapsed unit takes effect", unitAfter !== unitBefore, `${unitBefore} -> ${unitAfter}`);
+  }
+
   await page.goto(`${BASE}/review`, { waitUntil: "networkidle" });
   const reviewGroup = page.getByRole("group", { name: "Review area" });
   record("review SegmentedControl", (await reviewGroup.count()) === 1);

@@ -74,6 +74,73 @@ function QuantityKindOptions() {
 
 const OPS = ["+", "-", "*", "/", "^", "(", ")", "sqrt("] as const;
 
+/**
+ * The unit, shown rather than offered until someone wants it.
+ *
+ * Picking a quantity kind already chooses a sensible unit, and most fields
+ * never change it — so a second full select on every row was paying the price
+ * of a control for an edit that rarely happens. Twelve inputs meant twelve of
+ * them, which is most of what made this screen read as dense.
+ *
+ * It stays a real control: a button that reports the current unit and swaps to
+ * the select on click, focused, so a keyboard user reaches it in one more press
+ * rather than not at all.
+ */
+function UnitCell({
+  family,
+  unit,
+  label,
+  onChange,
+}: {
+  family: UnitFamilyId;
+  unit: string;
+  label: string;
+  onChange: (next: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const selectRef = useRef<HTMLSelectElement>(null);
+
+  useEffect(() => {
+    if (editing) selectRef.current?.focus();
+  }, [editing]);
+
+  const current = unitId(family, unit);
+  const options = unitsForFamily(family);
+  const shown = options.find((option) => option.id === current);
+
+  if (!editing) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        className="justify-between font-mono text-xs"
+        aria-label={`Unit for ${label || "this input"}: ${shown?.label ?? unit}. Change it.`}
+        onClick={() => setEditing(true)}
+      >
+        {shown?.label ?? unit}
+      </Button>
+    );
+  }
+  return (
+    <Select
+      ref={selectRef}
+      value={current}
+      aria-label={`Unit for ${label || "this input"}`}
+      onChange={(event) => {
+        onChange(event.target.value);
+        setEditing(false);
+      }}
+      onBlur={() => setEditing(false)}
+    >
+      {options.map((option) => (
+        <option key={option.id} value={option.id}>
+          {option.label}
+        </option>
+      ))}
+    </Select>
+  );
+}
+
 export function StudioEditor({ item }: { item: WorkshopCalculator }) {
   const navigate = useNavigate();
   const upsert = useWorkshop((state) => state.upsert);
@@ -349,17 +416,12 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         aria-label="Typical value"
                       />
                       {field.family ? (
-                        <Select
-                          value={unitId(field.family, field.defaultUnit)}
-                          onChange={(event) => patchField(index, retargetAuthoredField(field, event.target.value))}
-                          aria-label="Unit"
-                        >
-                          {unitsForFamily(field.family).map((unit) => (
-                            <option key={unit.id} value={unit.id}>
-                              {unit.label}
-                            </option>
-                          ))}
-                        </Select>
+                        <UnitCell
+                          family={field.family}
+                          unit={field.defaultUnit}
+                          label={field.label}
+                          onChange={(next) => patchField(index, retargetAuthoredField(field, next))}
+                        />
                       ) : (
                         <Input
                           value={field.defaultUnit}
