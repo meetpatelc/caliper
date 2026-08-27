@@ -43,6 +43,13 @@ const FAMILIES = [
   "thermalConductivity",
   "stiffness",
   "massFlow",
+  "momentOfInertia",
+  "angularSpeed",
+  "angularAcceleration",
+  "thermalResistance",
+  "specificVolume",
+  "heatFlux",
+  "specificEnergy",
 ] as const;
 
 const DOMAIN: Record<string, "foundation" | "mechanics" | "fluids" | "thermal" | "electrical"> = {
@@ -132,6 +139,13 @@ const MENU: Record<(typeof FAMILIES)[number], readonly string[]> = {
   thermalConductivity: ["thermalConductivity.W_m_K"],
   stiffness: ["stiffness.N_m", "stiffness.N_mm", "stiffness.lbf_in"],
   massFlow: ["massFlow.kg_s", "massFlow.kg_h"],
+  momentOfInertia: ["momentOfInertia.kg_m2", "momentOfInertia.kg_cm2"],
+  angularSpeed: ["angularSpeed.rad_s", "angularSpeed.rpm"],
+  angularAcceleration: ["angularAcceleration.rad_s2"],
+  thermalResistance: ["thermalResistance.K_W"],
+  specificVolume: ["specificVolume.m3_kg"],
+  heatFlux: ["heatFlux.W_m2"],
+  specificEnergy: ["specificEnergy.J_kg", "specificEnergy.kJ_kg"],
 };
 
 export type UnitFamilyId = (typeof FAMILIES)[number];

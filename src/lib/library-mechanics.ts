@@ -669,7 +669,7 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
       { id: "decelTime", label: "Deceleration segment time", symbol: "tdec", help: "Duration assigned to the declared deceleration torque.", defaultValue: 0.4, defaultUnit: "s", signed: true },
     ],
     outputs: [
-      { id: "angularAcceleration", label: "Angular acceleration", defaultUnit: "rad/s²", expression: "(endSpeed*2*pi/60-startSpeed*2*pi/60)/accelTime" },
+      { id: "angularAcceleration", label: "Angular acceleration", family: "angularAcceleration", defaultUnit: "rad/s²", expression: "(endSpeed*2*pi/60-startSpeed*2*pi/60)/accelTime" },
       { id: "inertiaTorque", label: "Inertia acceleration torque", family: "torque", defaultUnit: "N·m", expression: "reflectedInertia*((endSpeed*2*pi/60-startSpeed*2*pi/60)/accelTime)" },
       { id: "totalCycleTime", label: "Declared total cycle time", family: "time", defaultUnit: "s", expression: "accelTime+runningTime+decelTime" },
       { id: "rmsTorque", label: "Declared-duty RMS torque", family: "torque", defaultUnit: "N·m", expression: "sqrt(((reflectedInertia*((endSpeed*2*pi/60-startSpeed*2*pi/60)/accelTime))^2*accelTime+constantTorque^2*runningTime+declaredDecelTorque^2*decelTime)/(accelTime+runningTime+decelTime))" },
@@ -687,7 +687,7 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
     outputs: [
       { id: "payloadMass", label: "Declared total payload mass", family: "mass", defaultUnit: "kg", expression: "eoatMass+productMass" },
       { id: "cgMoment", label: "Payload mass × CG distance", defaultUnit: "kg·m", expression: "(eoatMass+productMass)*cgDistance" },
-      { id: "pointMassInertia", label: "Point-mass payload inertia", defaultUnit: "kg·m²", expression: "(eoatMass+productMass)*cgDistance^2" },
+      { id: "pointMassInertia", label: "Point-mass payload inertia", family: "momentOfInertia", defaultUnit: "kg·m²", expression: "(eoatMass+productMass)*cgDistance^2" },
     ],
     formula: "mpayload = me + mp · first moment = mpayload r · Ipoint = mpayload r²",
     warnings: ["This is a one-axis point-mass approximation using a single declared flange-to-CG distance. It does not calculate a full inertia tensor, model EOAT/product geometry, determine robot payload or axis limits, evaluate reach, motion, collision, capacity, safety, certification, or robot selection."],
@@ -954,7 +954,7 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
       { id: "availableTorque", label: "Stated available torque", symbol: "Tavail", help: "User-entered available torque at target speed; no motor curve is generated.", defaultValue: 2.5, defaultUnit: "N·m" },
     ],
     outputs: [
-      { id: "angularAcceleration", label: "Angular acceleration", defaultUnit: "rad/s²", expression: "((speedChange)*(2*pi/60)/(accelerationTime))" },
+      { id: "angularAcceleration", label: "Angular acceleration", family: "angularAcceleration", defaultUnit: "rad/s²", expression: "((speedChange)*(2*pi/60)/(accelerationTime))" },
       { id: "accelerationTorque", label: "Inertia acceleration torque", family: "torque", defaultUnit: "N·m", expression: "((inertia)*((speedChange)*(2*pi/60)/(accelerationTime)))" },
       { id: "requiredTorque", label: "Direct required acceleration torque", family: "torque", defaultUnit: "N·m", expression: "((loadTorque)+((inertia)*((speedChange)*(2*pi/60)/(accelerationTime))))" },
       { id: "shaftPower", label: "Duty-point shaft power", defaultUnit: "kW", expression: "(((loadTorque)+((inertia)*((speedChange)*(2*pi/60)/(accelerationTime))))*(targetSpeed)*2*pi/60/1000)" },

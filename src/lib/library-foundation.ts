@@ -10,7 +10,7 @@ export const foundationDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "density", label: "Average density", family: "density", defaultUnit: "kg/m³", expression: "mass/((volume/0.001)*1e-3)" },
-      { id: "specificVolume", label: "Specific volume", defaultUnit: "m³/kg", expression: "1/(mass/((volume/0.001)*1e-3))" },
+      { id: "specificVolume", label: "Specific volume", family: "specificVolume", defaultUnit: "m³/kg", expression: "1/(mass/((volume/0.001)*1e-3))" },
       { id: "specificGravity", label: "Specific gravity vs. water", family: "dimensionless", defaultUnit: "1", expression: "mass/((volume/0.001)*1e-3)/1000" }
     ],
     formula: "ρ = m / V · v = 1 / ρ",

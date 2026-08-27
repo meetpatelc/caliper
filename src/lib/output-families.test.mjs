@@ -38,7 +38,7 @@ test("a declared family actually owns the unit the output displays in", () => {
 test("output family coverage does not go backwards", () => {
   const declared = outputs.filter((output) => output.family).length;
   assert.ok(
-    declared >= 253,
-    `only ${declared} of ${outputs.length} outputs declare a family; this must not regress below 253`,
+    declared >= 275,
+    `only ${declared} of ${outputs.length} outputs declare a family; this must not regress below 275`,
   );
 });

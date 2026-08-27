@@ -30,8 +30,8 @@ export const dynamicsDocuments: Record<string, InstrumentDocument> = {
       { id: "finalSpeed", label: "Declared final speed", symbol: "n₂", help: "Final non-negative speed magnitude for the stated rigid body.", defaultValue: 1800, defaultUnit: "rpm", signed: true },
     ],
     outputs: [
-      { id: "initialAngularSpeed", label: "Initial angular speed", defaultUnit: "rad/s", expression: "initialSpeed*2*pi/60" },
-      { id: "finalAngularSpeed", label: "Final angular speed", defaultUnit: "rad/s", expression: "finalSpeed*2*pi/60" },
+      { id: "initialAngularSpeed", label: "Initial angular speed", family: "angularSpeed", defaultUnit: "rad/s", expression: "initialSpeed*2*pi/60" },
+      { id: "finalAngularSpeed", label: "Final angular speed", family: "angularSpeed", defaultUnit: "rad/s", expression: "finalSpeed*2*pi/60" },
       { id: "initialEnergy", label: "Initial rotational kinetic energy", defaultUnit: "kJ", expression: "0.5*inertia*(initialSpeed*2*pi/60)^2/1000" },
       { id: "finalEnergy", label: "Final rotational kinetic energy", defaultUnit: "kJ", expression: "0.5*inertia*(finalSpeed*2*pi/60)^2/1000" },
       { id: "energyChange", label: "Final minus initial energy", defaultUnit: "kJ", expression: "(0.5*inertia*(finalSpeed*2*pi/60)^2-0.5*inertia*(initialSpeed*2*pi/60)^2)/1000" },
@@ -61,7 +61,7 @@ export const dynamicsDocuments: Record<string, InstrumentDocument> = {
       { id: "referencePower", label: "Declared reference power", symbol: "Pref", help: "User-entered record-specific comparison reference; it is not validated against a motor rating.", defaultValue: 1.2, defaultUnit: "kW" },
     ],
     outputs: [
-      { id: "angularSpeed", label: "Declared shaft angular speed", defaultUnit: "rad/s", expression: "shaftSpeed*2*pi/60" },
+      { id: "angularSpeed", label: "Declared shaft angular speed", family: "angularSpeed", defaultUnit: "rad/s", expression: "shaftSpeed*2*pi/60" },
       { id: "shaftPower", label: "Literal mechanical shaft power", defaultUnit: "kW", expression: "shaftTorque*shaftSpeed*2*pi/60/1000" },
       { id: "torqueReferenceRatio", label: "Declared torque / reference-torque ratio", defaultUnit: "—", expression: "shaftTorque/referenceTorque" },
       { id: "powerReferenceRatio", label: "Literal shaft-power / reference-power ratio", defaultUnit: "—", expression: "(shaftTorque*shaftSpeed*2*pi/60)/(referencePower*1000)" },
@@ -108,7 +108,7 @@ export const dynamicsDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "indexAngleRad", label: "Declared index angle in radians", family: "angle", defaultUnit: "rad", expression: "indexAngle*pi/180" },
-      { id: "averageAngularSpeed", label: "Ideal average angular speed", defaultUnit: "rad/s", expression: "(indexAngle*pi/180)/moveTime" },
+      { id: "averageAngularSpeed", label: "Ideal average angular speed", family: "angularSpeed", defaultUnit: "rad/s", expression: "(indexAngle*pi/180)/moveTime" },
       { id: "indexesPerMinute", label: "Literal move-only index rate", defaultUnit: "indexes/min", expression: "60/moveTime" },
       { id: "kineticEnergy", label: "Rotational kinetic energy at average speed", family: "energy", defaultUnit: "J", expression: "0.5*systemInertia*((indexAngle*pi/180)/moveTime)^2" },
     ],
