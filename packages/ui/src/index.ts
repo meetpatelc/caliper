@@ -12,7 +12,7 @@ export {
   controlClass,
   useFieldA11y,
 } from "./field";
-export { fieldErrorId } from "./field-id";
+export { fieldErrorId, fieldHintId } from "./field-id";
 export { Panel, panelClass, panelHoverClass, instrumentClass } from "./panel";
 export { InstrumentSheet, QuantityName, ResultQuantity, ResultQuantity as ResultMetric } from "./sheet";
 export { OverlayDialog } from "./overlay";

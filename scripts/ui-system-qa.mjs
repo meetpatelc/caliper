@@ -301,6 +301,31 @@ try {
   // a reload as the only exit. `.click()` still fires the handler, so this is
   // invisible to any check that clicks programmatically; it has to be asked as a
   // hit-test question, at the button's own centre.
+  // Help text existed on every field and reached no screen reader: it had no id
+  // to point at, and sitting inside the wrapping <label> it was folded into the
+  // control's accessible name instead of its description.
+  await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const described = await page.evaluate(() => {
+    // Value fields only. The unit selects beside them are a separate control
+    // with no help text of their own, so counting them would make this assert
+    // something untrue.
+    const controls = [...document.querySelectorAll("#inputs input")];
+    const withHint = controls.filter((el) => (el.getAttribute("aria-describedby") ?? "").includes("-hint"));
+    const resolves = withHint.every((el) =>
+      (el.getAttribute("aria-describedby") ?? "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .every((id) => document.getElementById(id) !== null),
+    );
+    return { total: controls.length, withHint: withHint.length, resolves };
+  });
+  record(
+    "every input is described by its help text",
+    described.withHint > 0 && described.withHint === described.total,
+    `${described.withHint}/${described.total}`,
+  );
+  record("every aria-describedby points at an element that exists", described.resolves);
+
   // The catalog decides which models can hurt someone and then said nothing
   // about it. Tier C must announce itself; tier A must not, or the signal is
   // worth nothing.

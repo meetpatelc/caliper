@@ -23,7 +23,7 @@ import { ConfirmDialog } from "@/components/ui/confirm";
 import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
 import { PageHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
-import { Field as FormField, Input, Select, Textarea } from "@/components/ui/field";
+import { fieldErrorId, Field as FormField, Input, Select, Textarea } from "@/components/ui/field";
 import { ErrorState, SuccessState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
@@ -401,11 +401,11 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       onChange={(event) => patchOutput(index, { expression: event.target.value })}
                       aria-label="Expression"
                       aria-invalid={Boolean(formulaErrors[index])}
-                      aria-describedby={formulaErrors[index] ? `studio-expression-error-${index}` : undefined}
+                      aria-describedby={formulaErrors[index] ? fieldErrorId(`studio-expression-${index}`) : undefined}
                       placeholder="x * y / z"
                     />
                     {formulaErrors[index] ? (
-                      <ErrorState id={`studio-expression-error-${index}`}>{formulaErrors[index]}</ErrorState>
+                      <ErrorState id={fieldErrorId(`studio-expression-${index}`)}>{formulaErrors[index]}</ErrorState>
                     ) : null}
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_7rem]">
                       <Select
