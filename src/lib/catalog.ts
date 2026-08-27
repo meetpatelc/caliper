@@ -73,9 +73,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Straight prismatic beam", "Small deflection", "Documented boundary case"],
     outputLabel: "Reaction · moment · deflection",
     status: "ready",
-    sourceLabel: "MechaniCalc beam reference",
-    sourceUrl: "https://mechanicalc.com/reference/beam-analysis",
-    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "verified", prerequisites: ["load", "length", "elastic modulus", "second moment of area"], sourceIds: ["mech-beam"] },
+    sourceLabel: "Roark's Formulas for Stress and Strain — beam reactions and deflection cases",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "verified", prerequisites: ["load", "length", "elastic modulus", "second moment of area"], sourceIds: ["roark-beam"] },
   },
   {
     id: "stability",
@@ -89,9 +89,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Central loading", "Ideal geometry", "Elastic slender-member model"],
     outputLabel: "Critical load · slenderness",
     status: "ready",
-    sourceLabel: "MechaniCalc column-buckling reference",
-    sourceUrl: "https://mechanicalc.com/reference/column-buckling",
-    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "verified", prerequisites: ["effective length", "elastic modulus", "least second moment"], sourceIds: ["mech-buckling"] },
+    sourceLabel: "Shigley's Mechanical Engineering Design — Euler column buckling and effective length",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "verified", prerequisites: ["effective length", "elastic modulus", "least second moment"], sourceIds: ["shigley-buckling"] },
   },
   {
     id: "section",
@@ -812,9 +812,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Single rectangular key", "Known steady torque", "Full stated engagement", "Nominal direct stress"],
     outputLabel: "Tangential force · key shear · bearing stress",
     status: "ready",
-    sourceLabel: "FIRGELLI keyway engineering reference",
-    sourceUrl: "https://www.firgelliauto.com/blogs/engineering-calculators/keyway-and-key-size-calculator",
-    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["shaft diameter", "torque", "key width", "key height", "key length"], sourceIds: ["firgelli-keyway"] },
+    sourceLabel: "Shigley's Mechanical Engineering Design — keys, pins and shaft connections",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["shaft diameter", "torque", "key width", "key height", "key length"], sourceIds: ["shigley-keys"] },
   },
   {
     id: "cuttingParameters",
@@ -917,9 +917,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Solid circular shaft", "User-entered allowables", "Central point load", "Uniform simply-supported speed model"],
     outputLabel: "Diameter · stress · twist · deflection · speed",
     status: "ready",
-    sourceLabel: "FIRGELLI shaft design equations",
-    sourceUrl: "https://www.firgelliauto.com/blogs/engineering-calculators/shaft-size-calculator",
-    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["torque", "diameter", "allowable shear", "span", "moduli", "line mass"], sourceIds: ["firgelli-shaft-sizing"] },
+    sourceLabel: "Shigley's Mechanical Engineering Design — shaft design, deflection and critical speed",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["torque", "diameter", "allowable shear", "span", "moduli", "line mass"], sourceIds: ["shigley-shaft"] },
   },
   {
     id: "bearingLoad",
@@ -992,9 +992,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Equal-leg fillet geometry", "Direct static force only", "User-entered allowable", "Electrical heat-input arithmetic"],
     outputLabel: "Throat · area · stress · required leg · heat input",
     status: "ready",
-    sourceLabel: "FIRGELLI fillet-weld sizing equations",
-    sourceUrl: "https://www.firgelliauto.com/blogs/engineering-calculators/weld-strength-calculator-fillet-weld-sizing",
-    contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["weld leg/length/count", "direct force", "allowable", "voltage/current/travel speed"], sourceIds: ["firgelli-fillet-weld", "firgelli-weld-heat-input"] },
+    sourceLabel: "Shigley's Mechanical Engineering Design — fillet-weld throat and stress analysis",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["weld leg/length/count", "direct force", "allowable", "voltage/current/travel speed"], sourceIds: ["shigley-fillet-weld", "shigley-weld-heat"] },
   },
   {
     id: "threadDesign",
@@ -1007,9 +1007,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Metric major diameter and pitch", "User-stated engagement fraction", "Reviewed root-shear inputs", "Direct axial stripping screen only"],
     outputLabel: "Tap drill · engagement length · pull-out screening",
     status: "ready",
-    sourceLabel: "FIRGELLI tap-drill calculator",
-    sourceUrl: "https://www.firgelliauto.com/blogs/engineering-calculators/tap-drill-size-calculator-metric-imperial",
-    contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["major diameter", "pitch", "stated engagement", "root-shear diameters/TPI", "length", "allowable"], sourceIds: ["firgelli-tap-drill", "fastenal-thread-strength"] },
+    sourceLabel: "FED-STD-H28, Screw-Thread Standards for Federal Services (public domain)",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["major diameter", "pitch", "stated engagement", "root-shear diameters/TPI", "length", "allowable"], sourceIds: ["fed-std-h28", "fastenal-thread-strength"] },
   },
   {
     id: "orificeFlow",
@@ -1097,9 +1097,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Single elastic hub factor", "Uniform interface pressure", "User-entered friction", "No yield assessment"],
     outputLabel: "Interference · pressure · holding force · torque",
     status: "ready",
-    sourceLabel: "FIRGELLI press-fit calculation reference",
-    sourceUrl: "https://www.firgelliauto.com/blogs/engineering-calculators/press-fit-calculator-interference-and-force",
-    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["shaft/hole/hub diameters", "contact length", "elastic modulus", "friction"], sourceIds: ["firgelli-press-fit"] },
+    sourceLabel: "Shigley's Mechanical Engineering Design — interference fits, Lamé thick-wall relations",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["shaft/hole/hub diameters", "contact length", "elastic modulus", "friction"], sourceIds: ["shigley-press-fit"] },
   },
   {
     id: "jointSeparation",
@@ -1159,7 +1159,7 @@ export const tools: ToolDefinition[] = [
     status: "ready",
     sourceLabel: "Wilson hydraulic motor calculations",
     sourceUrl: "https://www.wilson-company.com/t-motor-calculations.aspx",
-    contract: { formulaVersion: "1.0.0", domain: "fluids", safetyTier: "B", validation: "source-reviewed", prerequisites: ["displacement", "pressure", "flow", "efficiencies"], sourceIds: ["wilson-hydraulic-motor", "firgelli-hydraulic-motor"] },
+    contract: { formulaVersion: "1.0.0", domain: "fluids", safetyTier: "B", validation: "source-reviewed", prerequisites: ["displacement", "pressure", "flow", "efficiencies"], sourceIds: ["wilson-hydraulic-motor", "shigley-hydraulic-motor"] },
   },
   {
     id: "hydraulicLine",
@@ -1577,9 +1577,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Equal bolts", "Concentric circular pattern", "In-plane shear only", "Scalar conservative superposition"],
     outputLabel: "Direct shear · torsional shear · conservative maximum",
     status: "ready",
-    sourceLabel: "MechaniCalc bolt-pattern force distribution",
-    sourceUrl: "https://mechanicalc.com/reference/bolt-pattern-force-distribution",
-    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["equal bolt count", "bolt-circle radius", "in-plane load", "load eccentricity"], sourceIds: ["mech-bolt-pattern"] },
+    sourceLabel: "Shigley's Mechanical Engineering Design — eccentrically loaded bolt groups",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["equal bolt count", "bolt-circle radius", "in-plane load", "load eccentricity"], sourceIds: ["shigley-bolt-group"] },
   },
   {
     id: "pinStress",
@@ -1609,7 +1609,7 @@ export const tools: ToolDefinition[] = [
     status: "ready",
     sourceLabel: "WM Berg Lewis-equation overview",
     sourceUrl: "https://www.wmberg.com/resources/blogs/measure-gear-tooth-strength",
-    contract: { formulaVersion: "1.1.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["spur or parallel-axis helical type", "tangential load", "face width", "module", "tooth count", "helix angle", "user-entered form factor"], sourceIds: ["wmberg-lewis-gear", "roymech-helical-gear"] },
+    contract: { formulaVersion: "1.1.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["spur or parallel-axis helical type", "tangential load", "face width", "module", "tooth count", "helix angle", "user-entered form factor"], sourceIds: ["wmberg-lewis-gear", "shigley-helical-gear"] },
   },
   {
     id: "vacuumEvacuation",
@@ -1637,9 +1637,9 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Symmetric planar two-link geometry", "Knee input perpendicular to link line", "Ideal frictionless pins", "Positive pre-dead-centre angle only"],
     outputLabel: "Ideal mechanical advantage · output force",
     status: "ready",
-    sourceLabel: "Firgelli toggle-mechanism reference",
-    sourceUrl: "https://www.firgelliauto.com/blogs/mechanisms/toggle-mechanism",
-    contract: { formulaVersion: "1.0.0", domain: "automation", safetyTier: "B", validation: "source-reviewed", prerequisites: ["declared knee input", "symmetric toggle geometry", "positive pre-dead-centre angle"], sourceIds: ["firgelli-toggle", "roymech-linkages", "engineeringtechnology-overcenter"] },
+    sourceLabel: "Shigley's Mechanical Engineering Design — linkage force transmission",
+    sourceUrl: "",
+    contract: { formulaVersion: "1.0.0", domain: "automation", safetyTier: "B", validation: "source-reviewed", prerequisites: ["declared knee input", "symmetric toggle geometry", "positive pre-dead-centre angle"], sourceIds: ["shigley-linkage", "shigley-linkage-force", "engineeringtechnology-overcenter"] },
   },
   {
     id: "wristInertia",
@@ -1732,7 +1732,7 @@ export const tools: ToolDefinition[] = [
   {
     id: "cuttingForce", title: "Cutting force & ideal power", kicker: "Declared uncut-chip arithmetic", description: "Calculate tangential cutting force and ideal cutting power from a user-entered specific cutting force, depth of cut, feed per revolution, and cutting speed.", category: "Manufacturing", icon: Gauge, accent: "amber", assumptions: ["User-entered specific cutting force", "Rectangular uncut-chip area ap·f", "Declared cutting speed", "Ideal mechanical power conversion"], outputLabel: "Uncut-chip area · cutting force · ideal power", status: "ready", sourceLabel: "Sandvik Coromant specific cutting force", sourceUrl: "https://www.sandvik.coromant.com/en-us/knowledge/materials/specific-cutting-force", contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["specific cutting force", "depth of cut", "feed per revolution", "cutting speed"], sourceIds: ["sandvik-specific-cutting-force"] } },
   {
-    id: "weldGroup", title: "Symmetric weld-group line load", kicker: "Two parallel line welds", description: "Calculate unit-throat direct shear flow and endpoint torsional line-load magnitude for a symmetric pair of parallel line welds under declared in-plane force and torsional moment.", category: "Manufacturing", icon: Gauge, accent: "amber", assumptions: ["Two equal parallel line welds", "Symmetric centroidal geometry", "Unit-throat line-property method", "Declared in-plane direct force and torsional moment"], outputLabel: "Line length · unit polar moment · direct/torsional line load", status: "ready", sourceLabel: "RoyMech weld-group calculation guidance", sourceUrl: "https://roymech.org/Useful_Tables/Form/Weld_strength.html", contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["equal line-weld length", "center spacing", "in-plane direct force", "torsional moment"], sourceIds: ["roymech-weld-group"] } },
+    id: "weldGroup", title: "Symmetric weld-group line load", kicker: "Two parallel line welds", description: "Calculate unit-throat direct shear flow and endpoint torsional line-load magnitude for a symmetric pair of parallel line welds under declared in-plane force and torsional moment.", category: "Manufacturing", icon: Gauge, accent: "amber", assumptions: ["Two equal parallel line welds", "Symmetric centroidal geometry", "Unit-throat line-property method", "Declared in-plane direct force and torsional moment"], outputLabel: "Line length · unit polar moment · direct/torsional line load", status: "ready", sourceLabel: "Shigley's Mechanical Engineering Design — weld groups by the unit-area method", sourceUrl: "", contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["equal line-weld length", "center spacing", "in-plane direct force", "torsional moment"], sourceIds: ["shigley-weld-group"] } },
   {
     id: "beamDiagram", title: "Simply supported beam diagram", kicker: "Reaction · shear · moment", description: "Calculate support reactions and selected shear/moment values for one simply supported span with one stated point load and/or full-span uniformly distributed load.", category: "Structural mechanics", icon: Activity, accent: "cyan", assumptions: ["One simply supported span", "One downward point load", "Optional full-span uniform load", "Static equilibrium only"], outputLabel: "Support reactions · shear values · peak moment", status: "ready", sourceLabel: "Engineering LibreTexts shear/moment diagrams", sourceUrl: "https://eng.libretexts.org/Bookshelves/Mechanical_Engineering/Engineering_Mechanics_-_Statics_(Osgood_Cameron_and_Christensen)/06%3A_Internal_Forces/6.02%3A_Shear_Moment_Diagrams", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["span", "point-load magnitude/location", "optional full-span uniform load"], sourceIds: ["libretexts-shear-moment"] } },
   {
@@ -1742,7 +1742,7 @@ export const tools: ToolDefinition[] = [
   {
     id: "fractureIntensity", title: "Mode-I fracture intensity", kicker: "Declared geometry-factor screen", description: "Calculate one declared Mode-I linear-elastic stress intensity and its ratio to a user-entered toughness reference without interpreting crack behavior.", category: "Structural mechanics", icon: Activity, accent: "amber", assumptions: ["Mode-I opening loading", "Declared geometry factor", "Linear-elastic fracture-mechanics arithmetic", "User-entered toughness reference"], outputLabel: "Stress intensity · toughness ratio · arithmetic margin", status: "ready", sourceLabel: "Applied Mechanics of Solids LEFM chapter", sourceUrl: "http://solidmechanics.org/Text/Chapter9_3/Chapter9_3.php", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "C", validation: "source-reviewed", prerequisites: ["geometry factor", "remote tensile stress", "crack half-length", "toughness reference"], sourceIds: ["bower-lefm"] } },
   {
-    id: "deflectionCheck", title: "Deflection comparison", kicker: "User-reference arithmetic", description: "Compare a declared deflection to a user-entered span/reference denominator and report the literal ratio and arithmetic difference without selecting a limit or judging adequacy.", category: "Structural mechanics", icon: Ruler, accent: "cyan", assumptions: ["Declared calculated deflection", "Declared span", "User-entered reference denominator", "Scalar comparison only"], outputLabel: "Reference deflection · ratio · arithmetic difference", status: "ready", sourceLabel: "MechaniCalc beam analysis reference", sourceUrl: "https://mechanicalc.com/reference/beam-analysis", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["declared deflection", "span", "reference denominator"], sourceIds: ["mech-beam"] } },
+    id: "deflectionCheck", title: "Deflection comparison", kicker: "User-reference arithmetic", description: "Compare a declared deflection to a user-entered span/reference denominator and report the literal ratio and arithmetic difference without selecting a limit or judging adequacy.", category: "Structural mechanics", icon: Ruler, accent: "cyan", assumptions: ["Declared calculated deflection", "Declared span", "User-entered reference denominator", "Scalar comparison only"], outputLabel: "Reference deflection · ratio · arithmetic difference", status: "ready", sourceLabel: "Roark's Formulas for Stress and Strain — beam deflection reference cases", sourceUrl: "", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["declared deflection", "span", "reference denominator"], sourceIds: ["roark-beam"] } },
   {
     id: "bearingAdjustedLife", title: "Adjusted bearing life", kicker: "Basic rating-life adjustment", description: "Calculate basic rating life and a stated-factor adjustment from user-entered dynamic rating, equivalent load, exponent, life factors, and speed.", category: "Machine elements", icon: CircleGauge, accent: "cyan", assumptions: ["Declared dynamic rating and equivalent load", "Declared life exponent", "User-entered reliability/material/other factors", "Constant speed"], outputLabel: "Basic life · adjusted life · operating hours", status: "ready", sourceLabel: "NHBB bearing load ratings and life", sourceUrl: "https://www.nhbb.com/knowledge-center/engineering-reference/ball-roller-bearings/load-ratings-bearing-life", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["dynamic rating", "equivalent load", "life exponent", "declared life factors", "speed"], sourceIds: ["nhbb-bearing-life"] } },
   {
@@ -1750,7 +1750,7 @@ export const tools: ToolDefinition[] = [
   {
     id: "frictionClutch", title: "Friction-interface torque", kicker: "Clutch / brake torque arithmetic", description: "Calculate stated friction-interface torque and its literal ratio to a user-entered torque demand from coefficient, clamp force, mean radius, and active surfaces.", category: "Machine elements", icon: Gauge, accent: "amber", assumptions: ["Uniform stated friction coefficient", "User-entered axial clamp force", "User-entered mean friction radius", "Declared active friction surfaces"], outputLabel: "Friction torque · demand ratio · arithmetic difference", status: "ready", sourceLabel: "x-engineer friction clutch torque relation", sourceUrl: "https://x-engineer.org/calculate-clutch-torque/", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["friction coefficient", "clamp force", "mean radius", "active surface count", "declared torque demand"], sourceIds: ["xengineer-clutch-torque"] } },
   {
-    id: "splineLoad", title: "Spline tooth load", kicker: "Nominal flank-pressure screen", description: "Calculate tangential torque force, force per stated effective tooth, and nominal flank pressure from declared spline geometry and visible load-share fraction.", category: "Machine elements", icon: Gauge, accent: "amber", assumptions: ["Declared pitch diameter and tooth count", "User-entered effective load-share fraction", "Equal stated effective tooth sharing", "Nominal flank-area arithmetic"], outputLabel: "Tangential force · effective-tooth force · nominal flank pressure", status: "ready", sourceLabel: "RoyMech key and spline strength guidance", sourceUrl: "https://www.roymech.co.uk/Useful_Tables/Keyways/key_strength.html", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["torque", "pitch diameter", "tooth count", "engagement length", "flank height", "load-share fraction"], sourceIds: ["roymech-spline-strength"] } },
+    id: "splineLoad", title: "Spline tooth load", kicker: "Nominal flank-pressure screen", description: "Calculate tangential torque force, force per stated effective tooth, and nominal flank pressure from declared spline geometry and visible load-share fraction.", category: "Machine elements", icon: Gauge, accent: "amber", assumptions: ["Declared pitch diameter and tooth count", "User-entered effective load-share fraction", "Equal stated effective tooth sharing", "Nominal flank-area arithmetic"], outputLabel: "Tangential force · effective-tooth force · nominal flank pressure", status: "ready", sourceLabel: "Shigley's Mechanical Engineering Design — splines and keys, bearing and shear area", sourceUrl: "", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["torque", "pitch diameter", "tooth count", "engagement length", "flank height", "load-share fraction"], sourceIds: ["shigley-splines"] } },
   {
     id: "gearMeshForce", title: "Gear mesh force", kicker: "Spur / helical force components", description: "Calculate pitch-line tangential, radial, axial, and resultant force components from declared torque, pitch diameter, transverse pressure angle, and helix angle.", category: "Machine elements", icon: Gauge, accent: "amber", assumptions: ["Parallel-axis spur or helical mesh", "Declared pitch diameter", "Declared transverse pressure and helix angles", "Static pitch-circle force approximation"], outputLabel: "Tangential · radial · axial · resultant force", status: "ready", sourceLabel: "Drivetrain Hub gear force analysis", sourceUrl: "https://drivetrainhub.com/notebooks/gears/strength/Chapter%201%20-%20Force%20Analysis.html", contract: { formulaVersion: "1.0.0", domain: "mechanics", safetyTier: "B", validation: "source-reviewed", prerequisites: ["torque", "pitch diameter", "transverse pressure angle", "helix angle"], sourceIds: ["drivetrainhub-gear-force"] } },
   {
@@ -1949,15 +1949,15 @@ export const sourceCards = [
   },
   {
     label: "Beam method",
-    title: "MechaniCalc: Beam Stress & Deflection",
+    title: "Roark's Formulas for Stress and Strain",
     note: "Boundary conditions, internal reactions, sign conventions, and common deflection cases.",
-    url: "https://mechanicalc.com/reference/beam-analysis",
+    url: "",
   },
   {
     label: "Stability method",
-    title: "MechaniCalc: Column Buckling",
+    title: "Shigley's Mechanical Engineering Design",
     note: "Effective length, slenderness, end conditions, and model distinctions.",
-    url: "https://mechanicalc.com/reference/column-buckling",
+    url: "",
   },
 ];
 
