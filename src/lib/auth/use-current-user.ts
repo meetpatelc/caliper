@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { authClient, authEnabled } from "./client";
 
 /** Normalized user shape used across the app, auth on or off. */
@@ -55,8 +56,21 @@ export type CurrentUserState = {
  * call keeps a stable hook order across every render of a given component.
  */
 export function useCurrentUserState(): CurrentUserState {
+  // The server has no session — it renders the pending branch — while the
+  // client resolves `useSession()` synchronously from its own store and would
+  // otherwise render the signed-in or signed-out branch on the very first pass.
+  // React then finds a different tree than the HTML it was given and throws
+  // "Hydration failed", discarding and re-rendering the whole page.
+  //
+  // Reporting pending until after mount makes that first client render agree
+  // with the markup already on screen. It costs one extra render and no visible
+  // delay: the pending state is what the visitor is already looking at.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+
   if (!authEnabled) return { user: DEV_USER, isPending: false };
   const { data, isPending } = authClient.useSession();
+  if (!hydrated) return { user: null, isPending: true };
   const user = data?.user;
   return {
     user: user

@@ -97,7 +97,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   page.setDefaultTimeout(20000);
   const errors = [];
-  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("pageerror", (error) => errors.push(`${page.url()} — ${error.message}`));
 
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
   const libraryText = await page.locator("body").innerText();
