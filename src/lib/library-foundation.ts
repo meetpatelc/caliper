@@ -9,9 +9,9 @@ export const foundationDocuments: Record<string, InstrumentDocument> = {
       { id: "volume", label: "Volume", symbol: "V", help: "User-entered occupied volume.", family: "volume", defaultValue: 1, defaultUnit: "L" }
     ],
     outputs: [
-      { id: "density", label: "Average density", family: "density", defaultUnit: "kg/m³", expression: "mass/((volume/0.001)*1e-3)" },
-      { id: "specificVolume", label: "Specific volume", family: "specificVolume", defaultUnit: "m³/kg", expression: "1/(mass/((volume/0.001)*1e-3))" },
-      { id: "specificGravity", label: "Specific gravity vs. water", family: "dimensionless", defaultUnit: "1", expression: "mass/((volume/0.001)*1e-3)/1000" }
+      { id: "density", label: "Average density", family: "density", defaultUnit: "kg/m³", expression: "mass/(volume)" },
+      { id: "specificVolume", label: "Specific volume", family: "specificVolume", defaultUnit: "m³/kg", expression: "1/(mass/(volume))" },
+      { id: "specificGravity", label: "Specific gravity vs. water", family: "dimensionless", defaultUnit: "1", expression: "mass/(volume)/1000" }
     ],
     formula: "ρ = m / V · v = 1 / ρ",
     warnings: ["Average density is derived only from the mass and volume entered here. It is not a condition-specific material-property lookup and should not be used as one."],

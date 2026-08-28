@@ -12,8 +12,8 @@ export const appliedDocuments: Record<string, InstrumentDocument> = {
       { id: "velocity", label: "Mean velocity", symbol: "v", help: "User-entered mean cross-section velocity.", family: "speed", defaultValue: 1.8, defaultUnit: "m/s" }
     ],
     outputs: [
-      { id: "pressureLoss", label: "Major friction pressure loss", family: "pressure", defaultUnit: "kPa", expression: "frictionFactor*(length/((diameter/0.001)/1000))*(density*velocity^2/2)" },
-      { id: "headLoss", label: "Head loss in flowing fluid", family: "length", defaultUnit: "m", expression: "(frictionFactor*(length/((diameter/0.001)/1000))*(density*velocity^2/2))/(density*9.80665)" },
+      { id: "pressureLoss", label: "Major friction pressure loss", family: "pressure", defaultUnit: "kPa", expression: "frictionFactor*(length/(diameter))*(density*velocity^2/2)" },
+      { id: "headLoss", label: "Head loss in flowing fluid", family: "length", defaultUnit: "m", expression: "(frictionFactor*(length/(diameter))*(density*velocity^2/2))/(density*9.80665)" },
       { id: "dynamicPressure", label: "Dynamic pressure", family: "pressure", defaultUnit: "Pa", expression: "density*velocity^2/2" }
     ],
     formula: "Δp = f(L/D)(ρv²/2) · hL = Δp/(ρg)",

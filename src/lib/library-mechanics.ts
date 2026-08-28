@@ -168,10 +168,10 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
       { id: "plateThickness", label: "Bearing thickness", symbol: "t", help: "Loaded plate or washer thickness used for projected bearing area.", family: "length", defaultValue: 8, defaultUnit: "mm" }
     ],
     outputs: [
-      { id: "tensileStress", label: "Nominal shank tensile stress", family: "stress", defaultUnit: "MPa", expression: "((tension/1000)*1000)/(pi*((diameter/0.001)/1000)^2/4)" },
-      { id: "shearStress", label: "Nominal shank shear stress", family: "stress", defaultUnit: "MPa", expression: "((shear/1000)*1000)/(pi*((diameter/0.001)/1000)^2/4)" },
-      { id: "bearingStress", label: "Projected bearing stress", family: "stress", defaultUnit: "MPa", expression: "((bearingLoad/1000)*1000)/(((diameter/0.001)/1000)*((plateThickness/0.001)/1000))" },
-      { id: "equivalentStress", label: "Plane-stress equivalent", family: "stress", defaultUnit: "MPa", expression: "sqrt((((tension/1000)*1000)/(pi*((diameter/0.001)/1000)^2/4))^2+3*(((shear/1000)*1000)/(pi*((diameter/0.001)/1000)^2/4))^2)" }
+      { id: "tensileStress", label: "Nominal shank tensile stress", family: "stress", defaultUnit: "MPa", expression: "(tension)/(pi*(diameter)^2/4)" },
+      { id: "shearStress", label: "Nominal shank shear stress", family: "stress", defaultUnit: "MPa", expression: "(shear)/(pi*(diameter)^2/4)" },
+      { id: "bearingStress", label: "Projected bearing stress", family: "stress", defaultUnit: "MPa", expression: "(bearingLoad)/((diameter)*(plateThickness))" },
+      { id: "equivalentStress", label: "Plane-stress equivalent", family: "stress", defaultUnit: "MPa", expression: "sqrt(((tension)/(pi*(diameter)^2/4))^2+3*((shear)/(pi*(diameter)^2/4))^2)" }
     ],
     formula: "σ = Ft/(πd²/4) · τ = Fs/(πd²/4) · σbearing = Fb/(dt)",
     warnings: ["This is a single-bolt, known-direct-load screen using nominal shank and projected bearing areas. It excludes threads/tensile-stress area, preload, joint stiffness, load distribution, eccentricity, friction, slip, prying, washer geometry, proof/yield allowables, fatigue, tear-out, thread stripping, and factor-of-safety conclusions."],
@@ -198,7 +198,7 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "baseShear", label: "Base shear magnitude", family: "force", defaultUnit: "N", expression: "lateralLoad" },
-      { id: "baseMoment", label: "Base couple-moment magnitude", family: "torque", defaultUnit: "N·m", expression: "lateralLoad*((columnHeight/0.001)/1000)" }
+      { id: "baseMoment", label: "Base couple-moment magnitude", family: "torque", defaultUnit: "N·m", expression: "lateralLoad*(columnHeight)" }
     ],
     formula: "Vbase = H · Mbase = Hh",
     warnings: ["This is one vertical cantilever-frame free-body equilibrium only: a single stated lateral top-load magnitude, base shear, and fixed-base couple moment. It excludes portal-frame redistribution, axial load, member stiffness, deflection, stress, connection behavior, second-order effects, stability, code requirements, safety factors, and approval."],
@@ -790,7 +790,7 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "gravityForce", label: "Literal payload gravity force", family: "force", defaultUnit: "N", expression: "payloadMass*9.80665" },
-      { id: "staticMoment", label: "Literal static weight moment", family: "torque", defaultUnit: "N·m", expression: "payloadMass*9.80665*((cogOffset/0.001)/1000)" },
+      { id: "staticMoment", label: "Literal static weight moment", family: "torque", defaultUnit: "N·m", expression: "payloadMass*9.80665*(cogOffset)" },
       { id: "cogOffset", label: "Declared flange-to-CoG offset", family: "length", defaultUnit: "mm", expression: "((cogOffset/0.001))*0.001" }
     ],
     formula: "Fg = m·g · Mstatic = Fg·e",
@@ -895,7 +895,7 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "effectiveLength", label: "Effective length", family: "length", defaultUnit: "mm", expression: "endCondition*length" },
-      { id: "criticalLoad", label: "Ideal elastic critical load", family: "force", defaultUnit: "kN", expression: "(pi^2*((modulus/1000000000)*1e9)*((inertia/1e-8)*1e-8))/(endCondition*length)^2" },
+      { id: "criticalLoad", label: "Ideal elastic critical load", family: "force", defaultUnit: "kN", expression: "(pi^2*((modulus/1000000000)*1e9)*(inertia))/(endCondition*length)^2" },
       // The catalog has advertised "Critical load · slenderness" all along and
       // the model never produced a slenderness. λ = KL/r with r = √(I/A).
       { id: "slenderness", label: "Slenderness ratio", symbol: "λ", family: "dimensionless", defaultUnit: "1", expression: "(endCondition*length)/sqrt(inertia/area)" }
@@ -937,9 +937,9 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
       { id: "modulus", label: "Declared elastic modulus", symbol: "E", help: "User-entered linear-elastic modulus for the stated cutter material.", family: "stress", defaultValue: 600, defaultUnit: "GPa" }
     ],
     outputs: [
-      { id: "inertia", label: "Circular core second moment", family: "secondMoment", defaultUnit: "m⁴", expression: "pi*((coreDiameter/0.001)/1000)^4/64" },
-      { id: "deflection", label: "Ideal tip deflection", family: "length", defaultUnit: "mm", expression: "(lateralForce*((overhang/0.001)/1000)^3/(3*((modulus/1000000000)*1e9)*(pi*((coreDiameter/0.001)/1000)^4/64))*1000)*0.001" },
-      { id: "stress", label: "Outer-fiber bending stress", family: "stress", defaultUnit: "MPa", expression: "(32*lateralForce*((overhang/0.001)/1000)/(pi*((coreDiameter/0.001)/1000)^3)/1e6)*1000000" }
+      { id: "inertia", label: "Circular core second moment", family: "secondMoment", defaultUnit: "m⁴", expression: "pi*(coreDiameter)^4/64" },
+      { id: "deflection", label: "Ideal tip deflection", family: "length", defaultUnit: "mm", expression: "(lateralForce*(overhang)^3/(3*((modulus/1000000000)*1e9)*(pi*(coreDiameter)^4/64))*1000)*0.001" },
+      { id: "stress", label: "Outer-fiber bending stress", family: "stress", defaultUnit: "MPa", expression: "(32*lateralForce*(overhang)/(pi*(coreDiameter)^3)/1e6)*1000000" }
     ],
     formula: "I = πd⁴/64 · δ = FL³/(3EI) · σ = 32FL/(πd³)",
     warnings: ["Elementary circular constant-section cantilever only; flutes, taper, holder/spindle/fixture compliance, contact distribution, runout, dynamics, chatter, fatigue, tool selection, safety, and production approval are excluded."],
@@ -972,10 +972,10 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
       { id: "rpm", label: "Rotational speed", symbol: "n", help: "Steady rotational speed for the power relationship.", family: "frequency", defaultValue: 1450, defaultUnit: "rpm", signed: true }
     ],
     outputs: [
-      { id: "shearStress", label: "Maximum torsional shear stress", family: "stress", defaultUnit: "MPa", expression: "torque*((diameter/0.001)/1000/2)/(pi*((diameter/0.001)/1000)^4/32)" },
-      { id: "twistDeg", label: "Elastic angle of twist", family: "angle", defaultUnit: "°", expression: "torque*((length/0.001)/1000)/(((shearModulus/1000000000)*1e9)*(pi*((diameter/0.001)/1000)^4/32))" },
+      { id: "shearStress", label: "Maximum torsional shear stress", family: "stress", defaultUnit: "MPa", expression: "torque*(diameter/2)/(pi*(diameter)^4/32)" },
+      { id: "twistDeg", label: "Elastic angle of twist", family: "angle", defaultUnit: "°", expression: "torque*(length)/(((shearModulus/1000000000)*1e9)*(pi*(diameter)^4/32))" },
       { id: "power", label: "Transmitted mechanical power", family: "power", defaultUnit: "kW", expression: "torque*(2*pi*(rpm/0.0166666666666667)/60)" },
-      { id: "polarMoment", label: "Polar second moment", family: "secondMoment", defaultUnit: "mm⁴", expression: "pi*((diameter/0.001)/1000)^4/32" }
+      { id: "polarMoment", label: "Polar second moment", family: "secondMoment", defaultUnit: "mm⁴", expression: "pi*(diameter)^4/32" }
     ],
     formula: "J = πD⁴/32 · τmax = Tc/J · φ = TL/GJ · P = Tω",
     warnings: ["This is a uniform solid circular elastic shaft under steady torque. It excludes stress concentration, combined bending, fatigue, keyways, bearings, critical speed, torsional vibration, material strength limits, and code or safety-factor decisions."],
@@ -1005,10 +1005,10 @@ export const mechanicsDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "diagonalLength", label: "Each diagonal member length", family: "length", defaultUnit: "m", expression: "sqrt((span/2)^2+rise^2)" },
-      { id: "leftReaction", label: "Left vertical support reaction", family: "force", defaultUnit: "kN", expression: "((apexLoad/1000)*1000)/2" },
-      { id: "rightReaction", label: "Right vertical support reaction", family: "force", defaultUnit: "kN", expression: "((apexLoad/1000)*1000)/2" },
-      { id: "diagonalCompression", label: "Each diagonal axial compression magnitude", family: "force", defaultUnit: "kN", expression: "(((apexLoad/1000)*1000)/2)/(rise/sqrt((span/2)^2+rise^2))" },
-      { id: "bottomChordTension", label: "Bottom-chord axial tension magnitude", family: "force", defaultUnit: "kN", expression: "(((apexLoad/1000)*1000)/2)/(rise/sqrt((span/2)^2+rise^2))*((span/2)/sqrt((span/2)^2+rise^2))" }
+      { id: "leftReaction", label: "Left vertical support reaction", family: "force", defaultUnit: "kN", expression: "(apexLoad)/2" },
+      { id: "rightReaction", label: "Right vertical support reaction", family: "force", defaultUnit: "kN", expression: "(apexLoad)/2" },
+      { id: "diagonalCompression", label: "Each diagonal axial compression magnitude", family: "force", defaultUnit: "kN", expression: "((apexLoad)/2)/(rise/sqrt((span/2)^2+rise^2))" },
+      { id: "bottomChordTension", label: "Bottom-chord axial tension magnitude", family: "force", defaultUnit: "kN", expression: "((apexLoad)/2)/(rise/sqrt((span/2)^2+rise^2))*((span/2)/sqrt((span/2)^2+rise^2))" }
     ],
     formula: "ΣFy = 0 · RA = RB = P/2 · Ndiagonal = (P/2)/sin θ · Nbottom = Ndiagonal cos θ",
     warnings: ["This is a symmetric three-member, pin-jointed, two-force-member equilibrium model with one vertical apex load. It excludes arbitrary truss topology, joint rigidity, member sizing, buckling, deflection, connection design, stability, code checks, and approval."],
