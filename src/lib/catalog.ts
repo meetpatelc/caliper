@@ -994,7 +994,7 @@ export const tools: ToolDefinition[] = [
     status: "ready",
     sourceLabel: "Shigley's Mechanical Engineering Design — fillet-weld throat and stress analysis",
     sourceUrl: "",
-    contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["weld leg/length/count", "direct force", "allowable", "voltage/current/travel speed"], sourceIds: ["shigley-fillet-weld", "shigley-weld-heat"] },
+    contract: { formulaVersion: "1.0.0", domain: "manufacturing", safetyTier: "B", validation: "source-reviewed", prerequisites: ["weld leg/length/count", "direct force", "allowable", "voltage/current/travel speed"], sourceIds: ["shigley-fillet-weld"] },
   },
   {
     id: "threadDesign",
@@ -1639,7 +1639,7 @@ export const tools: ToolDefinition[] = [
     status: "ready",
     sourceLabel: "Shigley's Mechanical Engineering Design — linkage force transmission",
     sourceUrl: "",
-    contract: { formulaVersion: "1.0.0", domain: "automation", safetyTier: "B", validation: "source-reviewed", prerequisites: ["declared knee input", "symmetric toggle geometry", "positive pre-dead-centre angle"], sourceIds: ["shigley-linkage", "shigley-linkage-force", "engineeringtechnology-overcenter"] },
+    contract: { formulaVersion: "1.0.0", domain: "automation", safetyTier: "B", validation: "source-reviewed", prerequisites: ["declared knee input", "symmetric toggle geometry", "positive pre-dead-centre angle"], sourceIds: ["shigley-linkage", "engineeringtechnology-overcenter"] },
   },
   {
     id: "wristInertia",
