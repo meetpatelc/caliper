@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { getTool } from "@/lib/catalog";
 import { PARENT_NAME } from "@/lib/instrument";
 import { CalculatorWorkspace } from "@/components/calculator-workspace";
@@ -7,11 +7,21 @@ import { toolSearchFromUnknown } from "@/lib/search-params";
 
 export const Route = createFileRoute("/tool/$toolId")({
   validateSearch: (search: Record<string, unknown>) => toolSearchFromUnknown(search),
+  // An unknown tool id answered 200 with a "not a released calculator" page.
+  // The page was right and the status was not: a search engine indexes it, a
+  // monitor reading status codes sees success, and a broken link in someone
+  // else's document looks alive. `notFound()` renders the same recovery page
+  // with the status the response actually means.
+  beforeLoad: ({ params }) => {
+    if (params.toolId !== "fits" && !getTool(params.toolId)) throw notFound();
+  },
   // Every page previously shared one <title>, so 169 calculators were
   // indistinguishable in tabs, history, bookmarks and search results.
   head: ({ params }) => {
     const tool = getTool(params.toolId);
-    if (!tool) return {};
+    // A missing calculator still deserves a name; it was inheriting the bare
+    // app title, so every dead link looked identical in a tab or a search result.
+    if (!tool) return { meta: [{ title: `Not found · ${PARENT_NAME}` }] };
     const title = `${tool.title} · ${PARENT_NAME}`;
     return {
       meta: [

@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { PARENT_NAME } from "@/lib/instrument";
 import { CalculatorFrame } from "@/studio/components/calculator-frame";
 import { findCalculator } from "@/studio/lib/resolve";
 import { useWorkshop } from "@/studio/lib/workshop-store";
@@ -29,6 +30,11 @@ export const Route = createFileRoute("/c/$slug")({
       throw redirect({ to: "/tool/$toolId", params: { toolId } });
     }
   },
+  // Deliberately not notFound(): this slug may name a Studio calculator that
+  // exists only in the visitor's browser, so the server cannot know whether the
+  // resource is real. 200 is the honest answer. A title is still owed — without
+  // one every short link, live or dead, showed the bare app name.
+  head: ({ params }) => ({ meta: [{ title: `${params.slug} · ${PARENT_NAME}` }] }),
   component: CalculatorPage,
 });
 

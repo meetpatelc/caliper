@@ -175,6 +175,55 @@ try {
   await page.waitForTimeout(200);
   record("studio ConfirmDialog escape", !(await confirm.isVisible()));
 
+  // Routes nothing covered: four aliases, an unknown tool, and the short-link
+  // slug. They all worked, and nothing pinned them — a redirect table is
+  // exactly the kind of thing that rots silently when a route is renamed.
+  const routeChecks = [
+    ["/atlas", "Library"],
+    ["/library", "Library"],
+    ["/projects", "Project"],
+    ["/c/axial-stress", "Axial response"],
+    ["/c/iso-286-fits", "ISO 286 fits"],
+  ];
+  const routeResults = [];
+  for (const [path, expected] of routeChecks) {
+    const response = await page.goto(`${BASE}${path}`, { waitUntil: "domcontentloaded" });
+    const title = await page.title();
+    routeResults.push(`${path} -> ${title.split(" ·")[0]}${title.includes(expected) ? "" : " (MISMATCH)"}`);
+    if (response && response.status() >= 400) routeResults.push(`${path} returned ${response.status()}`);
+  }
+  record("aliases and short links land on the right page", !routeResults.some((r) => /MISMATCH|returned/.test(r)), routeResults.join(", "));
+
+  // An unknown calculator answered 200 with a "not found" page — right page,
+  // wrong status, so a search engine indexed it and a monitor saw success.
+  const missing = await page.goto(`${BASE}/tool/definitely-not-a-tool`, { waitUntil: "domcontentloaded" });
+  const missingTitle = await page.title();
+  record("an unknown calculator answers 404", missing?.status() === 404, String(missing?.status()));
+  record("a missing page carries its own title", /Not found/i.test(missingTitle), missingTitle);
+
+  // The review export writes a file and had no coverage at all.
+  await page.goto(`${BASE}/review`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(600);
+  const exported = await page.evaluate(async () => {
+    let blob = null;
+    const realCreate = URL.createObjectURL;
+    URL.createObjectURL = function (b) { blob = b; return realCreate.call(URL, b); };
+    const realClick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () { if (this.download) return; return realClick.call(this); };
+    [...document.querySelectorAll("button")].find((b) => /Download markdown/i.test(b.innerText))?.click();
+    await new Promise((r) => setTimeout(r, 400));
+    URL.createObjectURL = realCreate;
+    HTMLAnchorElement.prototype.click = realClick;
+    if (!blob) return { ok: false };
+    const text = await blob.text();
+    return { ok: true, type: blob.type, bytes: text.length, hasHeading: text.startsWith("#"), hasBoundary: /boundary/i.test(text) };
+  });
+  record(
+    "the review export produces a real markdown file",
+    exported.ok && exported.type === "text/markdown" && exported.bytes > 200 && exported.hasHeading && exported.hasBoundary,
+    exported.ok ? `${exported.bytes} bytes` : "no blob",
+  );
+
   // The header is one control group and should read as one colour. It carried
   // two: the nav sat at `text-muted` from the ghost variant while the brand and
   // the controls were full strength, so the row looked like two systems bolted
