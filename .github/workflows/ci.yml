@@ -54,3 +54,46 @@ jobs:
           echo "preview never answered"; exit 1
       - run: npm run qa:ui
       - run: npm run qa:live
+
+      # The policy is issued per request and carries a nonce, so it can only
+      # be checked against the deployed artefact. `vite preview` serves the
+      # dev client entry and dev-mode dependencies, which behave differently
+      # under it — zod's dev build calls `new Function`, the minified one
+      # does not — so this serves .vercel/output the way the platform does.
+      - name: Check the Content-Security-Policy against the built function
+        run: |
+          node scripts/serve-build.mjs 8081 &
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://127.0.0.1:8081/; then break; fi
+            sleep 2
+          done
+          npm run qa:csp -- http://127.0.0.1:8081
+
+      # The auth invariant compares what the dev server resolves for
+      # VITE_AUTH_ENABLED against what the next build resolves. It can only be
+      # observed against a dev server — `/__app-env` is dev-only middleware —
+      # so running it against the preview above returns "could not observe" and
+      # exits 2. That is the honest answer, and it is why this gate had never
+      # actually run anywhere: it was written for a server nothing started.
+      #
+      # The preview from "Serve the build" is still holding 8080 at this point.
+      # This used to try `kill %1`, which cannot reach it: job control is
+      # per-shell and every step gets a new one, so that killed a preview it had
+      # just started and left the real one running. `npm run dev` then never
+      # bound the port, and the gate spent two minutes polling a server that
+      # could not answer before reporting "could not read".
+      - name: Check the auth invariant against a dev server
+        run: |
+          # On its own port, so the preview from "Serve the build" keeps 8080.
+          # Freeing that port instead meant killing a process another step
+          # started, which job control here cannot reach.
+          npm run dev -- --port 8090 >/tmp/dev.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://127.0.0.1:8090/__app-env; then break; fi
+            sleep 2
+          done
+          npm run check:auth -- --dev-url http://127.0.0.1:8090 || {
+            echo "--- dev server log ---"
+            tail -50 /tmp/dev.log
+            exit 1
+          }

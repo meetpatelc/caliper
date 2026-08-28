@@ -1,7 +1,9 @@
 {
   "name": "instrument",
   "private": true,
-  "sideEffects": false,
+  "sideEffects": [
+    "src/lib/zod-config.ts"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -20,10 +22,13 @@
     "qa:ui": "node scripts/ui-system-qa.mjs",
     "qa:live": "node scripts/caliper-live-qa.mjs",
     "brand-check": "node scripts/brand-check.mjs",
-    "test": "node --test \"scripts/**/*.test.mjs\" && node --experimental-strip-types --import ./scripts/alias-register.mjs --test src/lib/app-data/app-data.test.ts src/lib/auth/admin.test.ts src/lib/db-fallback.test.ts src/studio/test/unit-preserve.test.mjs src/studio/test/constraints.test.mjs src/studio/test/seed-identifiers.test.mjs src/lib/formula-corrections.test.mjs src/lib/formula-truth.test.mjs src/lib/library-formulas.test.mjs src/lib/theme-color.test.mjs src/lib/single-flight.test.mjs src/lib/applicability.test.mjs src/lib/record-version.test.mjs src/lib/fmea-severity.test.mjs src/studio/test/iso286-published.test.mjs src/lib/catalog-document-agreement.test.mjs src/lib/source-registry.test.mjs src/lib/output-families.test.mjs src/lib/ai/accept-draft.test.mjs src/lib/attachment.test.mjs src/lib/caliper-band1.test.mjs src/lib/caliper-pilot.test.mjs src/lib/caliper-wave2.test.mjs src/lib/caliper-near.test.mjs src/lib/caliper-migration.test.mjs src/lib/caliper-remaining.test.mjs packages/formula/test/formula.test.mjs packages/units/test/dimensions.test.mjs",
+    "test": "node --test \"scripts/**/*.test.mjs\" && node --experimental-strip-types --import ./scripts/alias-register.mjs --test src/lib/app-data/app-data.test.ts src/lib/auth/admin.test.ts src/lib/db-fallback.test.ts src/studio/test/unit-preserve.test.mjs src/studio/test/constraints.test.mjs src/studio/test/seed-identifiers.test.mjs src/lib/formula-corrections.test.mjs src/lib/formula-truth.test.mjs src/lib/library-formulas.test.mjs src/lib/theme-color.test.mjs src/lib/single-flight.test.mjs src/lib/applicability.test.mjs src/lib/record-version.test.mjs src/lib/fmea-severity.test.mjs src/studio/test/iso286-published.test.mjs src/lib/catalog-document-agreement.test.mjs src/lib/source-registry.test.mjs src/lib/output-families.test.mjs src/lib/ai/accept-draft.test.mjs src/lib/ai/json-schema.test.mjs src/lib/ai/provider-select.test.mjs src/lib/attachment.test.mjs src/lib/caliper-band1.test.mjs src/lib/caliper-pilot.test.mjs src/lib/caliper-wave2.test.mjs src/lib/caliper-near.test.mjs src/lib/caliper-migration.test.mjs src/lib/caliper-remaining.test.mjs packages/formula/test/formula.test.mjs packages/units/test/dimensions.test.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "qa:copy": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/duplicate-copy-audit.mjs"
+    "qa:copy": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/duplicate-copy-audit.mjs",
+    "qa:csp": "node scripts/csp-qa.mjs",
+    "serve:build": "node scripts/serve-build.mjs",
+    "draft:smoke": "node --experimental-strip-types scripts/draft-smoke.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.121.0",
@@ -67,6 +72,7 @@
     "jose": "6.2.9",
     "kysely": "^0.28.5",
     "lucide-react": "^0.510.0",
+    "openai": "^7.8.0",
     "pg": "^8.16.3",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",

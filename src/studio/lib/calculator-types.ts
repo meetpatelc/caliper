@@ -142,6 +142,16 @@ export const calculatorSchema = z.object({
   related: z.array(z.string()).max(6),
   warnings: z.array(z.string().min(1).max(800)).max(8).optional(),
   sketch: z.string().max(64).optional(),
+  /**
+   * How this calculator came to exist. Absent means a person wrote it.
+   *
+   * Assigned when a draft is accepted, never picked by the model — the
+   * drafting contract does not include this key, so generated output cannot
+   * claim to be anything. The whole product rests on being able to check the
+   * work, and the difference between "someone worked this out" and "a model
+   * proposed this and nobody has looked" is the one label that must survive.
+   */
+  provenance: z.enum(["assisted"]).optional(),
 });
 
 export type FieldDefinition = z.infer<typeof fieldSchema>;
@@ -190,6 +200,7 @@ export function asCalculatorDefinition(seed: InstrumentDocument | CalculatorDefi
       family: output.family && isUnitFamilyId(output.family) ? output.family : undefined,
     })),
     tables: "tables" in seed ? seed.tables : undefined,
+    constraints: "constraints" in seed ? seed.constraints : undefined,
     formula: seed.formula,
     purpose: seed.purpose,
     assumptions: seed.assumptions,
@@ -200,6 +211,7 @@ export function asCalculatorDefinition(seed: InstrumentDocument | CalculatorDefi
     related: seed.related,
     warnings: "warnings" in seed && Array.isArray(seed.warnings) ? seed.warnings : undefined,
     sketch: resolveSketchId(seed.slug, "sketch" in seed ? seed.sketch : undefined),
+    provenance: "provenance" in seed ? seed.provenance : undefined,
   };
 }
 

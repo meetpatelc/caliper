@@ -4,21 +4,21 @@
       {
         "key": "cycleAir",
         "label": "Ideal normalized free air per cycle",
-        "raw": 6.32245521534946,
+        "raw": 6.322455215349459,
         "display": "6.3225",
         "unit": "NL/cycle"
       },
       {
         "key": "minuteAir",
         "label": "Ideal normalized free-air rate",
-        "raw": 113.80419387629027,
+        "raw": 113.80419387629026,
         "display": "113.8",
         "unit": "NL/min"
       },
       {
         "key": "sweptVolume",
         "label": "Cylinder swept volume per cycle",
-        "raw": 0.0009032078879070656,
+        "raw": 0.0009032078879070655,
         "display": "0.90321",
         "unit": "L/cycle"
       }
@@ -64,7 +64,7 @@
       {
         "key": "deflection",
         "label": "Maximum elastic deflection",
-        "raw": 0.0024,
+        "raw": 0.0023999999999999994,
         "display": "2.4",
         "unit": "mm"
       }
@@ -168,7 +168,7 @@
       {
         "key": "peakPower",
         "label": "Declared peak braking power",
-        "raw": 5.5,
+        "raw": 5500,
         "display": "5.5",
         "unit": "kW"
       },
@@ -196,7 +196,7 @@
       {
         "key": "averageWattage",
         "label": "Source-relation average braking wattage",
-        "raw": 0.275,
+        "raw": 275,
         "display": "0.275",
         "unit": "kW"
       }
@@ -212,28 +212,28 @@
       {
         "key": "arc",
         "label": "Arc length",
-        "raw": 157.07963267948963,
+        "raw": 0.15707963267948966,
         "display": "157.08",
         "unit": "mm"
       },
       {
         "key": "chord",
         "label": "Chord length",
-        "raw": 129.9038105676658,
+        "raw": 0.1299038105676658,
         "display": "129.9",
         "unit": "mm"
       },
       {
         "key": "sector",
         "label": "Sector area",
-        "raw": 5890.486225480861,
+        "raw": 0.005890486225480861,
         "display": "5,890.5",
         "unit": "mm²"
       },
       {
         "key": "segment",
         "label": "Circular-segment area",
-        "raw": 3454.7897773371274,
+        "raw": 0.003454789777337127,
         "display": "3,454.8",
         "unit": "mm²"
       }
@@ -404,7 +404,7 @@
       {
         "key": "lineSpeed",
         "label": "Declared line speed",
-        "raw": 30,
+        "raw": 0.5,
         "display": "30",
         "unit": "m/min"
       },
@@ -434,28 +434,28 @@
       {
         "key": "feedRate",
         "label": "Table feed rate",
-        "raw": 299.99998533325515,
+        "raw": 0.004999999755554253,
         "display": "300",
         "unit": "mm/min"
       },
       {
         "key": "chipLoad",
         "label": "Feed per tooth",
-        "raw": 0.07500000000000001,
+        "raw": 0.075,
         "display": "0.075",
         "unit": "mm/tooth"
       },
       {
         "key": "mrr",
         "label": "Theoretical material removal rate",
-        "raw": 104.9999948666393,
+        "raw": 104.99999486663928,
         "display": "105",
         "unit": "cm³/min"
       },
       {
         "key": "power",
         "label": "Specific-force power estimate",
-        "raw": 3.937499807498974,
+        "raw": 3937.4998074989735,
         "display": "3.9375",
         "unit": "kW"
       }
@@ -603,14 +603,14 @@
       {
         "key": "cuttingSpeed",
         "label": "Peripheral cutting speed",
-        "raw": 47.1238898038469,
+        "raw": 0.7853981633974483,
         "display": "47.124",
         "unit": "m/min"
       },
       {
         "key": "feedRate",
         "label": "Spindle feed rate",
-        "raw": 150,
+        "raw": 0.0025,
         "display": "150",
         "unit": "mm/min"
       },
@@ -624,7 +624,7 @@
       {
         "key": "distance",
         "label": "Total programmed cutting depth",
-        "raw": 210,
+        "raw": 0.21,
         "display": "210",
         "unit": "mm"
       }
@@ -735,7 +735,7 @@
       {
         "key": "observedSpan",
         "label": "Observed flatness extrema span",
-        "raw": 0.044,
+        "raw": 0.000044,
         "display": "0.044",
         "unit": "mm"
       },
@@ -844,7 +844,7 @@
       {
         "key": "loadedSection",
         "label": "Lewis-type loaded section factor",
-        "raw": 30,
+        "raw": 0.000029999999999999997,
         "display": "30",
         "unit": "mm²"
       },
@@ -888,14 +888,14 @@
       {
         "key": "specificWork",
         "label": "Declared-efficiency compressor specific work input",
-        "raw": 220.02701505390436,
+        "raw": 220027.01505390435,
         "display": "220.03",
         "unit": "kJ/kg"
       },
       {
         "key": "power",
         "label": "Declared-efficiency compressor shaft power input",
-        "raw": 110.01350752695218,
+        "raw": 110013.50752695218,
         "display": "110.01",
         "unit": "kW"
       }
@@ -941,7 +941,7 @@
       {
         "key": "nominalLifeKm",
         "label": "Nominal travel life",
-        "raw": 3200,
+        "raw": 3200000,
         "display": "3,200",
         "unit": "km"
       },
@@ -1015,21 +1015,21 @@
       {
         "key": "bonus",
         "label": "Available bonus tolerance",
-        "raw": 0.15000000000000036,
+        "raw": 0.00015000000000000037,
         "display": "0.15",
         "unit": "mm"
       },
       {
         "key": "totalPosition",
         "label": "Total position tolerance",
-        "raw": 0.35000000000000037,
+        "raw": 0.0003500000000000004,
         "display": "0.35",
         "unit": "mm"
       },
       {
         "key": "virtualCondition",
         "label": "Simplified virtual condition",
-        "raw": 9.8,
+        "raw": 0.009800000000000001,
         "display": "9.8",
         "unit": "mm"
       }
@@ -1073,21 +1073,21 @@
       {
         "key": "principalAngle",
         "label": "One principal-plane orientation",
-        "raw": 26.56505117707799,
+        "raw": 0.4636476090008061,
         "display": "26.565",
         "unit": "°"
       },
       {
         "key": "doublePrincipalAngle",
         "label": "Mohr-circle double angle to principal plane",
-        "raw": 53.13010235415598,
+        "raw": 0.9272952180016122,
         "display": "53.13",
         "unit": "°"
       },
       {
         "key": "doubleMaxShearAngle",
         "label": "Mohr-circle double angle to max-shear plane",
-        "raw": 143.13010235415598,
+        "raw": 2.498091544796509,
         "display": "143.13",
         "unit": "°"
       }
@@ -1147,7 +1147,7 @@
       {
         "key": "shaftPower",
         "label": "Literal mechanical shaft power",
-        "raw": 0.7853981633974484,
+        "raw": 785.3981633974483,
         "display": "0.7854",
         "unit": "kW"
       },
@@ -1177,21 +1177,21 @@
       {
         "key": "variation",
         "label": "Observed orientation-reading variation",
-        "raw": 0.04,
+        "raw": 0.00004,
         "display": "0.04",
         "unit": "mm"
       },
       {
         "key": "ratio",
         "label": "Observed variation / stated tolerance",
-        "raw": 0.7999999999999999,
+        "raw": 0.8,
         "display": "80",
         "unit": "%"
       },
       {
         "key": "difference",
         "label": "Stated tolerance − observed variation",
-        "raw": 0.010000000000000002,
+        "raw": 0.000010000000000000003,
         "display": "0.01",
         "unit": "mm"
       }
@@ -1214,7 +1214,7 @@
       {
         "key": "shearArea",
         "label": "One nominal pin shear area",
-        "raw": 78.53981633974483,
+        "raw": 0.00007853981633974483,
         "display": "78.54",
         "unit": "mm²"
       },
@@ -1228,7 +1228,7 @@
       {
         "key": "projectedBearingArea",
         "label": "Projected plate bearing area per pin",
-        "raw": 80,
+        "raw": 0.00007999999999999999,
         "display": "80",
         "unit": "mm²"
       },
@@ -1258,7 +1258,7 @@
       {
         "key": "retract",
         "label": "Applied retract force",
-        "raw": 841.1614329986672,
+        "raw": 841.1614329986671,
         "display": "0.84116",
         "unit": "kN"
       },
@@ -1272,7 +1272,7 @@
       {
         "key": "retractArea",
         "label": "Retract-side area",
-        "raw": 0.0016493361431346417,
+        "raw": 0.0016493361431346412,
         "display": "1,649.3",
         "unit": "mm²"
       }
@@ -1370,21 +1370,21 @@
       {
         "key": "variation",
         "label": "Observed indicator variation",
-        "raw": 0.05,
+        "raw": 0.00005,
         "display": "0.05",
         "unit": "mm"
       },
       {
         "key": "ratio",
         "label": "Observed variation / stated tolerance",
-        "raw": 0.8333333333333334,
+        "raw": 0.8333333333333335,
         "display": "83.333",
         "unit": "%"
       },
       {
         "key": "difference",
         "label": "Stated tolerance − observed variation",
-        "raw": 0.009999999999999995,
+        "raw": 0.000009999999999999996,
         "display": "0.01",
         "unit": "mm"
       }
@@ -1400,7 +1400,7 @@
       {
         "key": "peakSpeed",
         "label": "Profile peak speed",
-        "raw": 100,
+        "raw": 0.1,
         "display": "100",
         "unit": "mm/s"
       },
@@ -1481,7 +1481,7 @@
       {
         "key": "cuttingSpeed",
         "label": "Declared cutting speed",
-        "raw": 150,
+        "raw": 2.5,
         "display": "150",
         "unit": "m/min"
       },
@@ -1620,28 +1620,28 @@
       {
         "key": "hypotenuse",
         "label": "Hypotenuse",
-        "raw": 500,
+        "raw": 0.5,
         "display": "500",
         "unit": "mm"
       },
       {
         "key": "area",
         "label": "Triangle area",
-        "raw": 60000,
+        "raw": 0.06,
         "display": "60,000",
         "unit": "mm²"
       },
       {
         "key": "alpha",
         "label": "Angle from horizontal",
-        "raw": 53.13010235415598,
+        "raw": 0.9272952180016122,
         "display": "53.13",
         "unit": "°"
       },
       {
         "key": "beta",
         "label": "Other acute angle",
-        "raw": 36.86989764584402,
+        "raw": 0.6435011087932844,
         "display": "36.87",
         "unit": "°"
       }

@@ -24,6 +24,8 @@ import {
   renderInstallPageHtml,
   renderWebManifest,
 } from "../../scripts/grok-pwa-shared.mjs";
+import { buildPolicy, createNonce } from "../../scripts/csp-policy.mjs";
+import { runWithNonce } from "../../scripts/csp-nonce.mjs";
 
 interface GrokPwaEvent {
   url: URL;
@@ -36,7 +38,7 @@ function requestHost(event: GrokPwaEvent): string {
   );
 }
 
-function injectHeadStreaming(response: Response, host: string): Response {
+function injectHeadStreaming(response: Response, host: string, nonce: string): Response {
   const injector = createHeadInjector({
     host,
     site: grokOgIdentity.site,
@@ -53,6 +55,7 @@ function injectHeadStreaming(response: Response, host: string): Response {
   );
   const headers = new Headers(response.headers);
   headers.delete("content-length");
+  headers.set("Content-Security-Policy", buildPolicy({ nonce }));
   return new Response(transformed, {
     status: response.status,
     statusText: response.statusText,
@@ -84,28 +87,45 @@ export default async function grokPwaMiddleware(
     isDocumentPath(path) &&
     acceptsHtml(event.req.headers.get("accept"))
   ) {
+    // Served from here rather than through the router, so it never sees the
+    // router's nonce — it gets its own, stamped onto its one inline script.
+    const nonce = createNonce();
     const html = renderInstallPageHtml(installPageTemplate, {
       host: requestHost(event),
       url: urlWithQuery,
-    });
+    }).replace("<script>", '<script nonce="' + nonce + '">');
     return new Response(html, {
       headers: {
         "content-type": "text/html; charset=utf-8",
         "cache-control": "no-cache",
+        "Content-Security-Policy": buildPolicy({ nonce }),
       },
     });
   }
 
   if (!isDocumentPath(path)) return next();
 
-  const result = await next();
+  // The nonce has to exist before the render starts: getRouter() reads it out
+  // of this store, and every inline script Start emits is stamped with
+  // whatever it finds there. Generating it after next() would be too late.
+  const nonce = createNonce();
+  const result = await runWithNonce(nonce, () => next());
   if (
     result instanceof Response &&
-    result.body &&
-    String(result.headers.get("content-type") ?? "").includes("text/html") &&
-    !result.headers.get("content-encoding")
+    String(result.headers.get("content-type") ?? "").includes("text/html")
   ) {
-    return injectHeadStreaming(result, requestHost(event));
+    if (result.body && !result.headers.get("content-encoding")) {
+      return injectHeadStreaming(result, requestHost(event), nonce);
+    }
+    // Compressed or bodyless, so not injectable — but it is still a document
+    // and still needs the policy matching the nonce it was rendered with.
+    const headers = new Headers(result.headers);
+    headers.set("Content-Security-Policy", buildPolicy({ nonce }));
+    return new Response(result.body, {
+      status: result.status,
+      statusText: result.statusText,
+      headers,
+    });
   }
   return result;
 }

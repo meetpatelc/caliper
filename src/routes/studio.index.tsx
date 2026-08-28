@@ -67,8 +67,10 @@ function StudioHome() {
         <DraftWithAI
           onAccept={(draft) => {
             // Lands in the editor as an unsaved draft, exactly like the other
-            // two starts. Nothing is published, and the title carries where it
-            // came from so it is never mistaken for a checked model.
+            // two starts. Nothing is published, and `provenance` rides along
+            // so the editor can say it was drafted rather than written — the
+            // slug and attribution are cleared because those are claims only
+            // a person gets to make.
             open(createFrom({ ...draft, slug: "", related: [], sourceLabel: "", sourceUrl: "", warnings: [] }));
           }}
         />

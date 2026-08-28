@@ -1,25 +1,35 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import test from "node:test";
-import { buildPolicy, themeScriptSource } from "./csp.mjs";
+import { buildPolicy, createNonce } from "./csp-policy.mjs";
 
 /**
  * The failure this guards against is quiet, which is why it is worth a test.
  *
- * The pre-paint theme script is inline and must be, so the policy carries its
- * SHA-256. If the header and the script drift apart, the browser blocks the
- * script and the page flashes the wrong theme on every load — in production
- * only, with nothing erroring and no request failing.
+ * Enforcement broke production once already. The policy has to permit exactly
+ * the inline scripts the app emits — via a nonce, since their content changes
+ * per request — and nothing else. A policy that quietly grows `unsafe-inline`
+ * would pass every other check in the repo while giving up the whole point.
  */
-test("the policy allows the inline theme script and nothing else inline", () => {
-  const policy = buildPolicy("sha256-EXAMPLE");
-  assert.match(policy, /script-src 'self' 'sha256-EXAMPLE'/);
-  assert.ok(!/script-src[^;]*unsafe-inline/.test(policy), "script-src must not permit arbitrary inline script");
+test("script-src carries the nonce and no blanket inline escape", () => {
+  const policy = buildPolicy({ nonce: "EXAMPLE" });
+  assert.match(policy, /script-src 'self' 'nonce-EXAMPLE'/);
+  assert.ok(
+    !/script-src[^;]*unsafe-inline/.test(policy),
+    "script-src must not permit arbitrary inline script",
+  );
   assert.ok(!/script-src[^;]*unsafe-eval/.test(policy), "nothing here needs eval");
 });
 
+test("without a nonce nothing inline is allowed", () => {
+  // The no-nonce shape is what a misconfigured caller would emit. It must fail
+  // closed — deny the scripts — rather than fall back to permitting them.
+  const policy = buildPolicy();
+  assert.match(policy, /script-src 'self'(;|$)/);
+  assert.ok(!/nonce-/.test(policy));
+});
+
 test("the policy names every origin the app actually loads from", () => {
-  const policy = buildPolicy("sha256-EXAMPLE");
+  const policy = buildPolicy({ nonce: "EXAMPLE" });
   assert.match(policy, /style-src[^;]*https:\/\/fonts\.googleapis\.com/);
   assert.match(policy, /font-src[^;]*https:\/\/fonts\.gstatic\.com/);
   assert.match(policy, /connect-src 'self'/);
@@ -27,15 +37,10 @@ test("the policy names every origin the app actually loads from", () => {
   assert.match(policy, /object-src 'none'/);
 });
 
-test("the hash is derived from the script the app actually renders", () => {
-  // Reads the same literal the route imports and substitutes the same theme
-  // constants, so a changed colour moves the hash rather than silently
-  // invalidating it. Reconstructed from source rather than imported, because
-  // this runner does not strip TypeScript.
-  const source = themeScriptSource();
-  assert.ok(source.includes("prefers-color-scheme"), "sanity: this is the theme script");
-  assert.ok(!source.includes("${"), "every interpolation must be resolved before hashing");
-  assert.match(source, /instrument-theme/, "the theme key must be substituted, not left as a placeholder");
-  const hash = `sha256-${createHash("sha256").update(source, "utf8").digest("base64")}`;
-  assert.match(hash, /^sha256-[A-Za-z0-9+/]+=*$/);
+test("each nonce is fresh and long enough to be worth having", () => {
+  const a = createNonce();
+  const b = createNonce();
+  assert.notEqual(a, b, "a reused nonce is no better than 'unsafe-inline'");
+  // 16 bytes base64. Anything shorter is guessable within a page's lifetime.
+  assert.ok(Buffer.from(a, "base64").length >= 16);
 });

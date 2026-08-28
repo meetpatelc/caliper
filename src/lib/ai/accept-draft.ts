@@ -1,5 +1,5 @@
 import { defaultFieldState, evaluateCalculator } from "@/studio/lib/evaluate";
-import { draftedCalculatorSchema, type DraftOutcome } from "@/lib/ai/draft-contract";
+import { ASSISTED_PROVENANCE, draftedCalculatorSchema, type DraftOutcome } from "@/lib/ai/draft-contract";
 
 /**
  * Decide whether a drafted calculator is fit to put in front of someone.
@@ -46,7 +46,10 @@ export function acceptDraft(value: unknown): DraftOutcome {
 
   return {
     ok: true,
-    draft,
+    // Stamped here rather than anywhere downstream. This is the last point
+    // that knows for certain the calculator came from a model, and a label
+    // applied later is a label that can be forgotten.
+    draft: { ...draft, provenance: ASSISTED_PROVENANCE },
     preview: evaluation.outputs.map((output) => ({
       label: output.label,
       display: output.display,

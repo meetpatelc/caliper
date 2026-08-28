@@ -72,18 +72,22 @@ if (!offenders.length) {
 /**
  * A ceiling, not a target.
  *
- * 42 assumptions were word-for-word a field label on the same page; those are
- * filtered where the field is visible beside them, and the count went 60 -> 28.
+ * Two rounds of filtering brought this from 60 to 12, both at render and only
+ * where the duplicate is visible on the same screen:
  *
- * What remains is a different thing: an assumption that is the *opening* of a
- * field hint — "Uniform solid circular shaft" against a hint reading "Uniform
- * solid circular shaft diameter." The reader does see the words twice, but the
- * two strings are not the same claim, and deleting either one loses something.
- * That wants one of them rewritten, which is authoring, not filtering.
+ *   42  assumptions that were word for word a field label
+ *   19  assumptions that a field's help text already opened with
  *
- * Lower this as they are rewritten. It only goes down.
+ * The 12 that remain are a different thing and are correct. They are a label
+ * appearing once under Inputs and once under Results — the value you entered,
+ * echoed beside the number it produced. "Declared Reynolds number" shows twice
+ * on darcyFrictionFactor because you supply it and the result reports it back.
+ * Removing that would make the result harder to read, not easier.
+ *
+ * So this number should not go to zero. Raise the alarm if it grows; do not
+ * chase it down.
  */
-const CEILING = 28;
+const CEILING = 12;
 if (offenders.length <= CEILING) {
   console.log(`${offenders.length} repeated phrases, at or under the ceiling of ${CEILING}`);
   for (const item of offenders) console.log(`  ${item.tool} x${item.count}  "${item.phrase}"`);

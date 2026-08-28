@@ -24,7 +24,7 @@ export const electricalDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "apparentPower", label: "Literal three-phase apparent power", defaultUnit: "kVA", expression: "(sqrt(3)*(lineVoltage)*(lineCurrent))/1000" },
-      { id: "realPower", label: "Literal three-phase real power", defaultUnit: "kW", expression: "((sqrt(3)*(lineVoltage)*(lineCurrent))*(powerFactor))/1000" },
+      { id: "realPower", label: "Literal three-phase real power", family: "power", defaultUnit: "kW", expression: "(((sqrt(3)*(lineVoltage)*(lineCurrent))*(powerFactor))/1000)*1000" },
       { id: "lineVoltage", label: "Declared line-to-line voltage", family: "voltage", defaultUnit: "V", expression: "(lineVoltage)" },
       { id: "lineCurrent", label: "Declared line current", family: "current", defaultUnit: "A", expression: "(lineCurrent)" },
     ],

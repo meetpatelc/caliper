@@ -265,7 +265,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
     <div className="page-wrap">
       <PageHeader
         size="page"
-        kicker="Studio"
+        kicker={draft.provenance === "assisted" ? "Studio · assisted draft" : "Studio"}
         title={draft.title}
         lede="Drafts autosave. Signed in, they live on your account. Method is only required to publish."
         actions={
@@ -280,6 +280,19 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
           )
         }
       />
+
+      {/*
+        Stays for the life of the calculator, not just the moment it arrived.
+        Someone opening this a week later has no other way to know a model
+        wrote it, and publishing it is a claim that it has been checked.
+      */}
+      {draft.provenance === "assisted" ? (
+        <p className="mt-6 border-l-2 border-danger pl-3 text-sm leading-6 text-muted">
+          <span className="font-medium text-fg">A model drafted this.</span> It computed with its own example
+          values, which is not the same as being right. Read the relation, the assumptions and the boundary before
+          you publish it — publishing says a person checked it.
+        </p>
+      ) : null}
 
       <SegmentedControl aria-label="Studio steps" className="mt-8 overflow-x-auto">
         {STEPS.map((entry) => (

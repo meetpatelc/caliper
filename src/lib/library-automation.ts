@@ -89,8 +89,8 @@ export const automationDocuments: Record<string, InstrumentDocument> = {
     outputs: [
       { id: "extendVolume", label: "Ideal extend volume", defaultUnit: "L", expression: "((pi*((bore))^(2)/4)*(stroke))/1e6" },
       { id: "retractVolume", label: "Ideal retract volume", defaultUnit: "L", expression: "(((pi*((bore))^(2)/4)-(pi*((rod))^(2)/4))*(stroke))/1e6" },
-      { id: "extendSpeed", label: "Ideal extend speed", defaultUnit: "mm/s", expression: "(((flow)*1e6/60)/(pi*((bore))^(2)/4))" },
-      { id: "retractSpeed", label: "Ideal retract speed", defaultUnit: "mm/s", expression: "(((flow)*1e6/60)/((pi*((bore))^(2)/4)-(pi*((rod))^(2)/4)))" },
+      { id: "extendSpeed", label: "Ideal extend speed", family: "speed", defaultUnit: "mm/s", expression: "((((flow)*1e6/60)/(pi*((bore))^(2)/4)))*0.001" },
+      { id: "retractSpeed", label: "Ideal retract speed", family: "speed", defaultUnit: "mm/s", expression: "((((flow)*1e6/60)/((pi*((bore))^(2)/4)-(pi*((rod))^(2)/4))))*0.001" },
       { id: "extendTime", label: "Ideal extend time", family: "time", defaultUnit: "s", expression: "(stroke)/(((flow)*1e6/60)/(pi*((bore))^(2)/4))" },
       { id: "retractTime", label: "Ideal retract time", family: "time", defaultUnit: "s", expression: "(stroke)/(((flow)*1e6/60)/((pi*((bore))^(2)/4)-(pi*((rod))^(2)/4)))" },
     ],

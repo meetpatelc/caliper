@@ -38,8 +38,11 @@ export const draftRequestSchema = z.object({
   brief: z.string().trim().min(20).max(4000),
 });
 
+/** A draft, with the provenance the model was never allowed to set itself. */
+export type AssistedDraft = DraftedCalculator & { provenance: typeof ASSISTED_PROVENANCE };
+
 export type DraftOutcome =
-  | { ok: true; draft: DraftedCalculator; preview: { label: string; display: string; unit: string }[] }
+  | { ok: true; draft: AssistedDraft; preview: { label: string; display: string; unit: string }[] }
   | { ok: false; reason: string };
 
 /**

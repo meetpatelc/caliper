@@ -14,11 +14,11 @@ export const dynamicsDocuments: Record<string, InstrumentDocument> = {
     ],
     lookups: { avgFactor: { normal: 0.5, overhauling: 1 } },
     outputs: [
-      { id: "peakPower", label: "Declared peak braking power", defaultUnit: "kW", expression: "drivePower*brakeTorqueMultiplier" },
+      { id: "peakPower", label: "Declared peak braking power", family: "power", defaultUnit: "kW", expression: "(drivePower*brakeTorqueMultiplier)*1000" },
       { id: "dutyRatio", label: "Declared braking-duty ratio", defaultUnit: "%", expression: "brakingTime/cycleTime*100" },
       { id: "derivedResistance", label: "Source-relation derived resistance", family: "resistance", defaultUnit: "Ω", expression: "dcBusVoltage^2/(drivePower*1000*brakeTorqueMultiplier)" },
       { id: "peakCurrent", label: "Source-relation peak braking current", family: "current", defaultUnit: "A", expression: "sqrt((drivePower*1000*brakeTorqueMultiplier)/(dcBusVoltage^2/(drivePower*1000*brakeTorqueMultiplier)))" },
-      { id: "averageWattage", label: "Source-relation average braking wattage", defaultUnit: "kW", expression: "drivePower*brakeTorqueMultiplier*(brakingTime/cycleTime)*lookup(avgFactor, regenerationType)" },
+      { id: "averageWattage", label: "Source-relation average braking wattage", family: "power", defaultUnit: "kW", expression: "(drivePower*brakeTorqueMultiplier*(brakingTime/cycleTime)*lookup(avgFactor, regenerationType))*1000" },
     ],
     formula: "PW = MW·BT · R = Vdc²/PW · DC = tb/tc · DBRW = PW·DC·(1/2 normal, 1 overhauling)",
     warnings: ["This applies the cited declared-power, brake-torque multiplier, DC-bus voltage, and time-duty relations for the selected source arithmetic mode. It does not select a drive, resistor, minimum resistance, current limit, braking torque, regeneration type, enclosure, protection, wiring, thermal rating, deceleration profile, energy recovery, safety, suitability, or approval."],
@@ -62,7 +62,7 @@ export const dynamicsDocuments: Record<string, InstrumentDocument> = {
     ],
     outputs: [
       { id: "angularSpeed", label: "Declared shaft angular speed", family: "angularSpeed", defaultUnit: "rad/s", expression: "shaftSpeed*2*pi/60" },
-      { id: "shaftPower", label: "Literal mechanical shaft power", defaultUnit: "kW", expression: "shaftTorque*shaftSpeed*2*pi/60/1000" },
+      { id: "shaftPower", label: "Literal mechanical shaft power", family: "power", defaultUnit: "kW", expression: "(shaftTorque*shaftSpeed*2*pi/60/1000)*1000" },
       { id: "torqueReferenceRatio", label: "Declared torque / reference-torque ratio", defaultUnit: "—", expression: "shaftTorque/referenceTorque" },
       { id: "powerReferenceRatio", label: "Literal shaft-power / reference-power ratio", defaultUnit: "—", expression: "(shaftTorque*shaftSpeed*2*pi/60)/(referencePower*1000)" },
     ],
