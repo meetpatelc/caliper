@@ -25,10 +25,10 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "volume", label: "Declared volume", symbol: "V", help: "User-entered fixed volume used only for ideal-gas amount arithmetic.", family: "volume", defaultValue: 1, defaultUnit: "m³" }
     ],
     outputs: [
-      { id: "density", label: "Ideal-gas density", family: "density", defaultUnit: "kg/m³", expression: "(((pressure/1000)*1000)*volume/(8.314462618*temperature))*(molarMass/1000)/volume" },
-      { id: "specificVolume", label: "Ideal-gas specific volume", family: "specificVolume", defaultUnit: "m³/kg", expression: "1/((((pressure/1000)*1000)*volume/(8.314462618*temperature))*(molarMass/1000)/volume)" },
-      { id: "amount", label: "Ideal-gas amount in declared volume", defaultUnit: "mol", expression: "((pressure/1000)*1000)*volume/(8.314462618*temperature)" },
-      { id: "mass", label: "Ideal-gas mass in declared volume", family: "mass", defaultUnit: "kg", expression: "(((pressure/1000)*1000)*volume/(8.314462618*temperature))*(molarMass/1000)" },
+      { id: "density", label: "Ideal-gas density", family: "density", defaultUnit: "kg/m³", expression: "((pressure)*volume/(8.314462618*temperature))*(molarMass/1000)/volume" },
+      { id: "specificVolume", label: "Ideal-gas specific volume", family: "specificVolume", defaultUnit: "m³/kg", expression: "1/(((pressure)*volume/(8.314462618*temperature))*(molarMass/1000)/volume)" },
+      { id: "amount", label: "Ideal-gas amount in declared volume", defaultUnit: "mol", expression: "(pressure)*volume/(8.314462618*temperature)" },
+      { id: "mass", label: "Ideal-gas mass in declared volume", family: "mass", defaultUnit: "kg", expression: "((pressure)*volume/(8.314462618*temperature))*(molarMass/1000)" },
       { id: "specificGasConstant", label: "Specific gas constant from declared molar mass", family: "specificHeat", defaultUnit: "J/(kg·K)", expression: "8.314462618/(molarMass/1000)" }
     ],
     formula: "pV = nRuT · ρ = pM/(RuT) = p/(RspecT)",
@@ -114,9 +114,9 @@ export const thermalDocuments: Record<string, InstrumentDocument> = {
       { id: "coldTemperature", label: "Cold-side surface", symbol: "T𝚌", help: "Surface temperature at the opposite named boundary.", family: "temperature", defaultValue: 20, defaultUnit: "°C", signed: true }
     ],
     outputs: [
-      { id: "heatRate", label: "Conductive heat rate hot → cold", family: "power", defaultUnit: "W", expression: "(hotTemperature-coldTemperature)/(((thickness/0.001)/1000)/(conductivity*area))" },
-      { id: "resistance", label: "Plane-wall thermal resistance", family: "thermalResistance", defaultUnit: "K/W", expression: "((thickness/0.001)/1000)/(conductivity*area)" },
-      { id: "heatFlux", label: "Heat flux hot → cold", family: "heatFlux", defaultUnit: "W/m²", expression: "((hotTemperature-coldTemperature)/(((thickness/0.001)/1000)/(conductivity*area)))/area" }
+      { id: "heatRate", label: "Conductive heat rate hot → cold", family: "power", defaultUnit: "W", expression: "(hotTemperature-coldTemperature)/((thickness)/(conductivity*area))" },
+      { id: "resistance", label: "Plane-wall thermal resistance", family: "thermalResistance", defaultUnit: "K/W", expression: "(thickness)/(conductivity*area)" },
+      { id: "heatFlux", label: "Heat flux hot → cold", family: "heatFlux", defaultUnit: "W/m²", expression: "((hotTemperature-coldTemperature)/((thickness)/(conductivity*area)))/area" }
     ],
     formula: "Q̇ = kA(Th − Tc)/L · Rth = L/(kA)",
     warnings: ["This is steady, one-dimensional plane-wall conduction using one user-entered conductivity. It excludes contact resistance, convection, radiation, thermal bridges, multilayer interfaces, temperature-dependent properties, phase change, transient response, and insulation selection."],
