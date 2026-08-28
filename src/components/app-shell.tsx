@@ -89,12 +89,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 const Icon = item.icon;
                 const active = item.match(pathname);
                 return (
-                  <Button key={item.href} asChild variant="ghost">
-                    <Link
-                      to={item.href}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(active && "bg-elevated text-fg")}
-                    >
+                  // `text-fg` goes on the Button, not the Link: the variant's
+                  // `text-muted` lands in the same merge, and tailwind-merge
+                  // resolves the className argument last. On the child it lost.
+                  <Button key={item.href} asChild variant="ghost" className={cn("text-fg", active && "bg-elevated")}>
+                    <Link to={item.href} aria-current={active ? "page" : undefined}>
                       <Icon size={ICON.base} />
                       {item.label}
                     </Link>
@@ -107,7 +106,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               onClick={() => setPaletteOpen(true)}
               aria-label="Search"
               shortcut={shortcut}
-              className="w-[min(28rem,32vw)]"
+              className="w-[min(28rem,32vw)] text-fg"
             >
               <Search size={ICON.base} className="shrink-0" aria-hidden="true" />
               <span className="flex-1 truncate text-left">Search…</span>

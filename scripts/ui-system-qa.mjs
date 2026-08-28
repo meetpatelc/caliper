@@ -175,6 +175,37 @@ try {
   await page.waitForTimeout(200);
   record("studio ConfirmDialog escape", !(await confirm.isVisible()));
 
+  // The header is one control group and should read as one colour. It carried
+  // two: the nav sat at `text-muted` from the ghost variant while the brand and
+  // the controls were full strength, so the row looked like two systems bolted
+  // together. Measured rather than eyeballed, because "close enough" is exactly
+  // the judgement that let it ship.
+  await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const headerColours = await page.evaluate(() => {
+    const header = document.querySelector("header");
+    const seen = new Set();
+    for (const el of header.querySelectorAll("a, button")) {
+      if (!el.getBoundingClientRect().width) continue;
+      const text = (el.innerText || el.getAttribute("aria-label") || "").trim();
+      if (!text) continue;
+      seen.add(getComputedStyle(el).color);
+    }
+    return [...seen];
+  });
+  record("the header uses one text colour", headerColours.length === 1, headerColours.join(" / "));
+
+  // Three buttons that all began with "Copy" read as three spellings of one
+  // verb. One menu, and labels that say what you get rather than how.
+  const copyTrigger = page.getByRole("button", { name: /^Copy$/ });
+  record("the copy actions are one control", (await copyTrigger.count()) === 1);
+  await copyTrigger.click();
+  await page.waitForTimeout(400);
+  const copyItems = await page.evaluate(() =>
+    [...document.querySelectorAll('[role="menu"] [role="menuitem"]')].map((n) => n.innerText.trim()),
+  );
+  record("the copy menu names what each one gives you", copyItems.length === 3, copyItems.join(" | "));
+  await page.keyboard.press("Escape");
+
   // A blank calculator has to agree with itself. It shipped labelled "Input"
   // with the identifier `x`, so the editor said "in the formula as x" while the
   // obvious expression failed with Unknown name — and renaming the field then
@@ -197,6 +228,33 @@ try {
     seed.formulaAs === seed.label.toLowerCase() && !seed.unknown,
     `${seed.label} -> ${seed.formulaAs}`,
   );
+
+  // Typing a whole word into the Engine, not one character.
+  //
+  // The row was keyed by `field.id`, which is derived from the label on every
+  // keystroke — so the key changed as you typed, React unmounted the row, and
+  // the input was destroyed mid-word. Reported as having to click back into the
+  // box after every single character. A single-character check would have
+  // passed, which is why this types six and asserts focus after each one.
+  await page.goto(`${BASE}/studio`, { waitUntil: "networkidle" });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /Start from a working example/ }).click();
+  await page.waitForURL(/\/studio\/[^/]+/);
+  await page.waitForTimeout(900);
+  await page.getByRole("button", { name: "Engine", exact: true }).click();
+  await page.waitForTimeout(900);
+  const nameField = page.getByLabel("Quantity name").first();
+  await nameField.click();
+  await nameField.fill("");
+  let heldFocus = true;
+  for (const ch of "Torque") {
+    await page.keyboard.type(ch, { delay: 40 });
+    const still = await page.evaluate(() => document.activeElement?.getAttribute("aria-label") === "Quantity name");
+    if (!still) { heldFocus = false; break; }
+  }
+  const typed = await page.getByLabel("Quantity name").first().inputValue();
+  record("the engine keeps focus while a word is typed", heldFocus && typed === "Torque", typed);
 
   // The unit is shown rather than offered until wanted: a second full select on
   // every one of up to twelve rows paid a control's price for an edit that

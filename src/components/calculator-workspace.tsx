@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ICON } from "@instrument/ui";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { CircleAlert, Copy, FileText, Link2, PenLine, Save } from "lucide-react";
+import { ChevronDown, CircleAlert, Copy, FileText, Link2, PenLine, Save } from "lucide-react";
 import { toast } from "sonner";
 import MechanicalDiagram from "@/components/MechanicalDiagram";
 import { InstrumentSheet, ResultQuantity } from "@/components/instrument-sheet";
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea, UnitBadge, UnitSelect } from "@/components/ui/field";
 import { MeasurementField } from "@/components/ui/measurement-field";
 import { ErrorState } from "@/components/ui/status";
+import { Menu, MenuItem } from "@/components/ui/menu";
 import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, conversionUnits, initialInputs, toolFields, type ConversionGroup } from "@/lib/engineering";
 import { groupResultValues } from "@/lib/resultPresentation";
@@ -45,6 +46,8 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     const canonical = { ...initialInputs[tool.id], ...pickKnown(search, tool.id) };
     return hydrateDisplayInputs(toolFields[tool.id], canonical, stored);
   });
+  const [copyOpen, setCopyOpen] = useState(false);
+  const copyTriggerRef = useRef<HTMLButtonElement>(null);
   const [displayUnit, setDisplayUnit] = useState<Record<string, string>>(() => {
     if (!tool) return {};
     const stored = loadStoredUnits(tool.id)?.display;
@@ -518,24 +521,50 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                 </div>
                 <GoverningRelation formula={result.method} className="text-sm" />
                 <ResultBoundary />
+                {/* One action and one menu, not four buttons.
+                    "Copy result", "Copy link" and "Copy record" read as three
+                    spellings of the same verb, and the two that differ most —
+                    a link that reopens the controls versus a link to the
+                    finished document — were the hardest to tell apart. The
+                    menu labels say what you get instead of repeating how. */}
                 <div className="flex flex-wrap gap-2">
                     <Button variant="accent" onClick={saveLocal}>
                       <Save size={ICON.inline} />
                       Save this check
                     </Button>
-                    <Button onClick={copySummary}>
-                      <Copy size={ICON.inline} />
-                      Copy result
-                    </Button>
-                    <Button onClick={copyLink}>
-                      <Link2 size={ICON.inline} />
-                      Copy link
-                    </Button>
-                    <Button onClick={copyRecordLink}>
-                      <FileText size={ICON.inline} />
-                      Copy record
-                    </Button>
-                  </div>
+                    <div className="relative">
+                      <Button
+                        ref={copyTriggerRef}
+                        aria-haspopup="menu"
+                        aria-expanded={copyOpen}
+                        onClick={() => setCopyOpen((current) => !current)}
+                      >
+                        <Copy size={ICON.inline} />
+                        Copy
+                        <ChevronDown size={ICON.inline} aria-hidden="true" />
+                      </Button>
+                      <Menu
+                        open={copyOpen}
+                        onClose={() => setCopyOpen(false)}
+                        label="Copy"
+                        restoreFocusTo={copyTriggerRef}
+                        className="left-0 mt-1 w-64"
+                      >
+                        <MenuItem onClick={() => { setCopyOpen(false); void copySummary(); }}>
+                          <Copy size={ICON.inline} aria-hidden="true" />
+                          The numbers and method
+                        </MenuItem>
+                        <MenuItem onClick={() => { setCopyOpen(false); void copyLink(); }}>
+                          <Link2 size={ICON.inline} aria-hidden="true" />
+                          A link that reopens this
+                        </MenuItem>
+                        <MenuItem onClick={() => { setCopyOpen(false); void copyRecordLink(); }}>
+                          <FileText size={ICON.inline} aria-hidden="true" />
+                          A link to the record
+                        </MenuItem>
+                      </Menu>
+                    </div>
+                </div>
               </>
             )}
             </div>

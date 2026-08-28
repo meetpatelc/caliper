@@ -29,7 +29,10 @@ export function ThemeToggle({ appearance = "icon" }: { appearance?: "icon" | "la
   return (
     <Button
       type="button"
-      variant="outline"
+      // Ghost like the nav, and `text-fg` so the whole header row is one
+      // colour rather than two.
+      variant="ghost"
+      className="text-fg"
       size="icon"
       aria-pressed={theme === "dark"}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
