@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { MessageSquare, Repeat, Star } from "lucide-react";
-import { ICON, SideTab } from "@instrument/ui";
+import { ICON, SideTabs } from "@instrument/ui";
 import { tools } from "@/lib/catalog";
 import { conversionUnits, type ConversionGroup } from "@/lib/engineering";
 import { convertQuantity, unitFamilies, unitSymbol, type UnitFamilyId } from "@/lib/units";
@@ -27,36 +27,44 @@ import { EmptyState, LoadingState } from "@/components/ui/status";
 export function SideRail() {
   const pinned = useDeskStore((state) => state.pinnedTabs);
   const setPinned = useDeskStore((state) => state.setTabPinned);
-  const isPinned = (id: string) => pinned.includes(id);
 
   return (
     <div className="no-print">
-      <SideTab
-        label="Favourites"
-        icon={<Star size={ICON.inline} aria-hidden="true" />}
-        offset={0}
-        pinned={isPinned("favourites")}
-        onPinnedChange={(next) => setPinned("favourites", next)}
-      >
-        <FavouriteList />
-      </SideTab>
-      <SideTab
-        label="Convert"
-        icon={<Repeat size={ICON.inline} aria-hidden="true" />}
-        offset={1}
-        pinned={isPinned("convert")}
-        onPinnedChange={(next) => setPinned("convert", next)}
-      >
-        <QuickConvert />
-      </SideTab>
-      <SideTab label="Feedback" icon={<MessageSquare size={ICON.inline} aria-hidden="true" />} offset={2}>
-        <p className="text-sm leading-6 text-muted">
-          Something wrong, or missing? A screenshot helps more than a description.
-        </p>
-        <Button asChild variant="outline" className="mt-3 w-full">
-          <Link to="/feedback">Report it</Link>
-        </Button>
-      </SideTab>
+      <SideTabs
+        pinned={pinned}
+        onPinnedChange={setPinned}
+        items={[
+          {
+            id: "favourites",
+            label: "Favourites",
+            icon: <Star size={ICON.inline} aria-hidden="true" />,
+            pinnable: true,
+            content: <FavouriteList />,
+          },
+          {
+            id: "convert",
+            label: "Convert",
+            icon: <Repeat size={ICON.inline} aria-hidden="true" />,
+            pinnable: true,
+            content: <QuickConvert />,
+          },
+          {
+            id: "feedback",
+            label: "Feedback",
+            icon: <MessageSquare size={ICON.inline} aria-hidden="true" />,
+            content: (
+              <>
+                <p className="text-sm leading-6 text-muted">
+                  Something wrong, or missing? A screenshot helps more than a description.
+                </p>
+                <Button asChild variant="outline" className="mt-3 w-full">
+                  <Link to="/feedback">Report it</Link>
+                </Button>
+              </>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }

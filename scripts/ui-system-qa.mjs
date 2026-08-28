@@ -375,6 +375,39 @@ try {
   record("side tabs add no mobile overflow", occlusion.overflow === 0, String(occlusion.overflow));
   await narrow.close();
 
+  // Two panels open at once: a pinned one plus a transient one. Panels are up
+  // to 28rem tall while the tabs are 9.5rem apart, so anchoring each panel to
+  // its own tab let them overlap — a pinned Favourites lost half its list
+  // behind Convert, and looked merely short rather than broken.
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("caliper-desk-v1") || '{"state":{}}');
+    const st = raw.state ?? raw;
+    st.favorites = ["isentropicMachine", "thermalResistance", "thermalRadiation", "planeConduction", "sensibleHeat", "lmtd"];
+    st.pinnedTabs = ["favourites"];
+    raw.state = st;
+    localStorage.setItem("caliper-desk-v1", JSON.stringify(raw));
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(1200);
+  const favBefore = await page.locator(String.raw`[role="region"][aria-label="Favourites"] li`).count();
+  await page.getByRole("button", { name: "Convert" }).click();
+  await page.waitForTimeout(500);
+  const stacked = await page.evaluate(() => {
+    const fav = document.querySelector('[role="region"][aria-label="Favourites"]');
+    const cvt = document.querySelector('[role="region"][aria-label="Convert"]');
+    if (!fav || !cvt) return { both: false };
+    const a = fav.getBoundingClientRect();
+    const b = cvt.getBoundingClientRect();
+    return {
+      both: true,
+      overlap: !(a.bottom <= b.top || b.bottom <= a.top || a.right <= b.left || b.right <= a.left),
+      favItems: fav.querySelectorAll("li").length,
+    };
+  });
+  record("a second panel does not overlap a pinned one", stacked.both && !stacked.overlap);
+  record("a pinned panel keeps its full list", stacked.favItems === favBefore, `${favBefore} -> ${stacked.favItems}`);
+  await page.evaluate(() => localStorage.removeItem("caliper-desk-v1"));
+
   record("quick convert computes in the rail", /1000\s*mm/.test(railOpen.result), railOpen.result);
 
   // Two queries a machinist would actually type used to return an empty list:
@@ -429,7 +462,14 @@ try {
   await page.goto(`${BASE}/tool/boltPreload`, { waitUntil: "networkidle" });
   const tierC = await page.locator("body").innerText();
   record("tier C model warns that a wrong number has consequences", /physical consequences/i.test(tierC));
-  record("boundary is stated at the result, not only on /about", /valid only within/i.test(tierC));
+  // The disclaimer, not the assumptions: those render in the method section
+  // below and were being printed twice on the same page.
+  record(
+    "the disclaimer is stated at the result, not only on /about",
+    /first-pass number, not a code check/i.test(tierC),
+  );
+  const assumptionEchoes = (tierC.match(/No phase change/gi) || []).length;
+  record("the result does not repeat the method's assumptions", assumptionEchoes <= 1, String(assumptionEchoes));
 
   await page.goto(`${BASE}/tool/ohm`, { waitUntil: "networkidle" });
   const tierA = await page.locator("body").innerText();

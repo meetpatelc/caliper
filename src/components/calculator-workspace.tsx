@@ -517,7 +517,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                     ))}
                 </div>
                 <GoverningRelation formula={result.method} className="text-sm" />
-                <ResultBoundary assumptions={tool.assumptions} />
+                <ResultBoundary />
                 <div className="flex flex-wrap gap-2">
                     <Button variant="accent" onClick={saveLocal}>
                       <Save size={ICON.inline} />
