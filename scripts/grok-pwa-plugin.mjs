@@ -17,6 +17,8 @@ import {
   renderWebManifest,
   snapshotOgIdentity,
 } from "./grok-pwa-shared.mjs";
+import { buildPolicy, createNonce } from "./csp-policy.mjs";
+import { runWithNonce } from "./csp-nonce.mjs";
 
 export const GROK_OG_IDENTITY_ID = "virtual:grok-og-identity";
 
@@ -33,10 +35,11 @@ export function renderInstallPage(hostHeader, url = "/") {
   return renderInstallPageHtml(template, { host: hostHeader, url });
 }
 
-function sendHtml(res, html) {
+function sendHtml(res, html, nonce) {
   const body = Buffer.from(html, "utf8");
   res.statusCode = 200;
   res.setHeader("content-type", "text/html; charset=utf-8");
+  if (nonce) res.setHeader("Content-Security-Policy", buildPolicy({ nonce }));
   res.setHeader("cache-control", "no-cache");
   res.setHeader("content-length", String(body.byteLength));
   res.end(body);
@@ -64,7 +67,14 @@ function serveGrokPwa(middlewares) {
 
     if (isInstallQuery(rawUrl) && isDocumentPath(pathOnly) && acceptsHtml(req.headers.accept)) {
       try {
-        sendHtml(res, renderInstallPage(requestHost(req), rawUrl));
+        // Served from here rather than through the router, so it never sees
+        // the router's nonce — it gets its own, on its one inline script.
+        const nonce = createNonce();
+        const html = renderInstallPage(requestHost(req), rawUrl).replace(
+          "<script>",
+          '<script nonce="' + nonce + '">',
+        );
+        sendHtml(res, html, nonce);
       } catch (err) {
         console.error("[app-builder] install page missing:", err);
         res.statusCode = 500;
@@ -98,6 +108,13 @@ function wrapHtmlResponses(middlewares, cwd) {
       next();
       return;
     }
+
+    // Set before anything downstream can flush headers, and generated here
+    // so the render below reads the same value out of the store. Dev and
+    // preview must issue the policy the deployed app issues, or CSP is only
+    // testable in production — which is how the last attempt reached users.
+    const nonce = createNonce();
+    if (!res.headersSent) res.setHeader("Content-Security-Policy", buildPolicy({ nonce }));
 
     const originalWrite = res.write.bind(res);
     const originalEnd = res.end.bind(res);
@@ -147,7 +164,7 @@ function wrapHtmlResponses(middlewares, cwd) {
       return originalEnd(undefined, undefined, done);
     };
 
-    next();
+    runWithNonce(nonce, next);
   });
 }
 

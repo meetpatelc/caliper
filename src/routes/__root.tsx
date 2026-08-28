@@ -1,4 +1,4 @@
-import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet, Scripts, useRouter } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { AppShell } from "@/components/app-shell";
 import { AppToaster } from "@/components/app-toaster";
@@ -32,11 +32,28 @@ export const Route = createRootRoute({
 });
 
 function RootDocument() {
+  // Set per request by the PWA middleware and stamped onto every script
+  // TanStack emits. This one is ours, so it has to ask for the value itself —
+  // without it the pre-paint theme script is the single thing CSP blocks, and
+  // the symptom is a wrong-theme flash in production only.
+  const nonce = useRouter().options.ssr?.nonce;
   return (
     <html lang="en" className="light antialiased" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
+        {/*
+          `suppressHydrationWarning` is for the nonce, not the script body.
+          Browsers hide a nonce once the document is parsed — the attribute
+          reads back as empty while the property keeps the value — so React
+          compares the server’s nonce against an empty string and reports a
+          mismatch on every load. The markup is identical; the browser is
+          deliberately concealing it.
+        */}
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeInitScript() }}
+        />
       </head>
       <body>
         <AuthProvider>

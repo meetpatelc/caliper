@@ -55,6 +55,20 @@ jobs:
       - run: npm run qa:ui
       - run: npm run qa:live
 
+      # The policy is issued per request and carries a nonce, so it can only
+      # be checked against the deployed artefact. `vite preview` serves the
+      # dev client entry and dev-mode dependencies, which behave differently
+      # under it — zod's dev build calls `new Function`, the minified one
+      # does not — so this serves .vercel/output the way the platform does.
+      - name: Check the Content-Security-Policy against the built function
+        run: |
+          node scripts/serve-build.mjs 8081 &
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://127.0.0.1:8081/; then break; fi
+            sleep 2
+          done
+          npm run qa:csp -- http://127.0.0.1:8081
+
       # The auth invariant compares what the dev server resolves for
       # VITE_AUTH_ENABLED against what the next build resolves. It can only be
       # observed against a dev server — `/__app-env` is dev-only middleware —
