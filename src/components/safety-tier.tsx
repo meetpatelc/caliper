@@ -39,29 +39,28 @@ export function SafetyTierNotice({ tier, className }: { tier: SafetyTier; classN
 }
 
 /**
- * The limits, at the result rather than only on /about.
+ * The disclaimer, at the result rather than only on /about.
  *
- * The disclaimer was well written and lived one click away, which is no use to
- * the person who arrived on this page from a search engine and will leave from
- * it. Kept to one line plus the model's own boundary so it reads as a
- * qualification of the number above it, not as boilerplate to scroll past.
+ * It was well written and lived one click away, which is no use to the person
+ * who arrived on this page from a search engine and will leave from it.
+ *
+ * Deliberately does NOT repeat the model's assumptions. It did at first, and
+ * they already render as the "When" column of the method section further down
+ * the same page — the identical three lines, twice, a screen apart. Saying a
+ * thing twice does not make it read as more important; it makes both copies
+ * read as boilerplate, which is the one thing a limits notice cannot afford.
+ * The assumptions stay where "Don't" explains them; this carries the one
+ * sentence that was genuinely missing.
  */
-export function ResultBoundary({ assumptions }: { assumptions: string[] }) {
+export function ResultBoundary() {
   return (
-    <div className="mt-2 border-t border-border pt-3 text-sm leading-6 text-muted">
-      <p className="eyebrow">Valid only within</p>
-      <ul className="mt-1.5 grid gap-1">
-        {assumptions.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-      <p className="mt-2">
-        A first-pass number, not a code check, certification, or approval.{" "}
-        <Link to="/about" className="link-accent">
-          What this is and is not
-        </Link>
-        .
-      </p>
-    </div>
+    <p className="mt-2 border-t border-border pt-3 text-sm leading-6 text-muted">
+      A first-pass number, not a code check, certification, or approval. Read the method and its
+      limits below.{" "}
+      <Link to="/about" className="link-accent">
+        What this is and is not
+      </Link>
+      .
+    </p>
   );
 }

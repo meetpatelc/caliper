@@ -175,6 +175,29 @@ try {
   await page.waitForTimeout(200);
   record("studio ConfirmDialog escape", !(await confirm.isVisible()));
 
+  // A blank calculator has to agree with itself. It shipped labelled "Input"
+  // with the identifier `x`, so the editor said "in the formula as x" while the
+  // obvious expression failed with Unknown name — and renaming the field then
+  // fixed it, which read as the first edit not having saved.
+  await page.goto(`${BASE}/studio`, { waitUntil: "networkidle" });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /Create from scratch/ }).click();
+  await page.waitForURL(/\/studio\/[^/]+/);
+  await page.waitForTimeout(900);
+  await page.getByRole("button", { name: "Engine", exact: true }).click();
+  await page.waitForTimeout(900);
+  const seed = await page.evaluate(() => ({
+    label: document.querySelector('input[aria-label="Quantity name"]')?.value ?? "",
+    formulaAs: (document.body.innerText.match(/in the formula as (\w+)/) || [])[1] ?? "",
+    unknown: /Unknown name/i.test(document.body.innerText),
+  }));
+  record(
+    "a blank calculator's label and identifier agree",
+    seed.formulaAs === seed.label.toLowerCase() && !seed.unknown,
+    `${seed.label} -> ${seed.formulaAs}`,
+  );
+
   // The unit is shown rather than offered until wanted: a second full select on
   // every one of up to twelve rows paid a control's price for an edit that
   // rarely happens. It has to stay a real control, so this drives the whole
@@ -373,7 +396,69 @@ try {
   });
   record("side tabs cover no control on mobile", occlusion.hit.length === 0, occlusion.hit.join(", "));
   record("side tabs add no mobile overflow", occlusion.overflow === 0, String(occlusion.overflow));
+
+  // Below `md` the tabs give way to the drawer: three rotated tabs down the
+  // edge of a 375px screen is most of a thumb's width of fixed furniture, and
+  // the drawer already existed for this content.
+  const mobileRail = await narrow.evaluate(() => ({
+    tabs: [...document.querySelectorAll(".side-tab")].filter((t) => t.getBoundingClientRect().width > 0).length,
+    reserved: getComputedStyle(document.querySelector(".page-wrap")).paddingRight,
+  }));
+  record("the rail gives way to the drawer on mobile", mobileRail.tabs === 0, `${mobileRail.tabs} tabs`);
+  record("no gutter is reserved where there are no tabs", mobileRail.reserved === "0px", mobileRail.reserved);
+
+  await narrow.getByRole("button", { name: /menu/i }).first().click();
+  await narrow.waitForTimeout(600);
+  const drawerSections = await narrow.evaluate(() => {
+    const sections = [...document.querySelectorAll("summary")].map((x) => x.textContent.trim());
+    const convert = [...document.querySelectorAll("summary")].find((x) => /Convert/.test(x.textContent));
+    convert?.click();
+    return { sections };
+  });
+  await narrow.waitForTimeout(500);
+  const drawerConvert = await narrow.evaluate(
+    () => [...document.querySelectorAll('[role="status"]')].map((n) => n.textContent.trim()).filter(Boolean),
+  );
+  record(
+    "favourites and convert move into the drawer",
+    drawerSections.sections.includes("Favourites") && drawerSections.sections.includes("Convert"),
+    drawerSections.sections.join(", "),
+  );
+  record("convert still computes inside the drawer", drawerConvert.some((t) => /1000\s*mm/.test(t)), drawerConvert.join(" "));
   await narrow.close();
+
+  // Two panels open at once: a pinned one plus a transient one. Panels are up
+  // to 28rem tall while the tabs are 9.5rem apart, so anchoring each panel to
+  // its own tab let them overlap — a pinned Favourites lost half its list
+  // behind Convert, and looked merely short rather than broken.
+  await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem("caliper-desk-v1") || '{"state":{}}');
+    const st = raw.state ?? raw;
+    st.favorites = ["isentropicMachine", "thermalResistance", "thermalRadiation", "planeConduction", "sensibleHeat", "lmtd"];
+    st.pinnedTabs = ["favourites"];
+    raw.state = st;
+    localStorage.setItem("caliper-desk-v1", JSON.stringify(raw));
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(1200);
+  const favBefore = await page.locator(String.raw`[role="region"][aria-label="Favourites"] li`).count();
+  await page.getByRole("button", { name: "Convert" }).click();
+  await page.waitForTimeout(500);
+  const stacked = await page.evaluate(() => {
+    const fav = document.querySelector('[role="region"][aria-label="Favourites"]');
+    const cvt = document.querySelector('[role="region"][aria-label="Convert"]');
+    if (!fav || !cvt) return { both: false };
+    const a = fav.getBoundingClientRect();
+    const b = cvt.getBoundingClientRect();
+    return {
+      both: true,
+      overlap: !(a.bottom <= b.top || b.bottom <= a.top || a.right <= b.left || b.right <= a.left),
+      favItems: fav.querySelectorAll("li").length,
+    };
+  });
+  record("a second panel does not overlap a pinned one", stacked.both && !stacked.overlap);
+  record("a pinned panel keeps its full list", stacked.favItems === favBefore, `${favBefore} -> ${stacked.favItems}`);
+  await page.evaluate(() => localStorage.removeItem("caliper-desk-v1"));
 
   record("quick convert computes in the rail", /1000\s*mm/.test(railOpen.result), railOpen.result);
 
@@ -429,7 +514,14 @@ try {
   await page.goto(`${BASE}/tool/boltPreload`, { waitUntil: "networkidle" });
   const tierC = await page.locator("body").innerText();
   record("tier C model warns that a wrong number has consequences", /physical consequences/i.test(tierC));
-  record("boundary is stated at the result, not only on /about", /valid only within/i.test(tierC));
+  // The disclaimer, not the assumptions: those render in the method section
+  // below and were being printed twice on the same page.
+  record(
+    "the disclaimer is stated at the result, not only on /about",
+    /first-pass number, not a code check/i.test(tierC),
+  );
+  const assumptionEchoes = (tierC.match(/No phase change/gi) || []).length;
+  record("the result does not repeat the method's assumptions", assumptionEchoes <= 1, String(assumptionEchoes));
 
   await page.goto(`${BASE}/tool/ohm`, { waitUntil: "networkidle" });
   const tierA = await page.locator("body").innerText();

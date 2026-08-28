@@ -213,14 +213,21 @@ export function emptyCalculator(): CalculatorDefinition {
     title: "Untitled calculator",
     description: "",
     domain: "mechanics",
-    fields: [{ id: "x", label: "Input", family: "dimensionless", defaultValue: 1, defaultUnit: "1" }],
+    // The identifier has to match what the label would produce. It shipped as
+    // `x` beside the label "Input", so a blank calculator told you "in the
+    // formula as x" while inviting you to write `input` — and writing the
+    // obvious thing produced `Unknown name "input"`. Renaming the field then
+    // derived the right identifier and rewrote the expression, so it looked
+    // like the first edit had failed to save rather than like the seed had
+    // never agreed with itself.
+    fields: [{ id: "input", label: "Input", family: "dimensionless", defaultValue: 1, defaultUnit: "1" }],
     outputs: [
       {
         id: "result",
         label: "Result",
         family: "dimensionless",
         defaultUnit: "1",
-        expression: "x",
+        expression: "input",
         precision: 4,
       },
     ],

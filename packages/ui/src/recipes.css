@@ -31,7 +31,10 @@
  * Padding rather than a narrower wrap so the reserved strip scrolls with the
  * page and nothing reflows when a panel opens.
  */
-@media (max-width: 1264px) {
+/* Only where the tabs actually are. Below `md` they are hidden in favour of the
+   drawer, so reserving their width there would be dead space on the narrowest
+   screens — the opposite of the problem this was added to fix. */
+@media (min-width: 768px) and (max-width: 1264px) {
   .page-wrap,
   .page-frame {
     padding-right: 2.75rem;

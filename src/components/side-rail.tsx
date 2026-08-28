@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { MessageSquare, Repeat, Star } from "lucide-react";
-import { ICON, SideTab } from "@instrument/ui";
+import { ICON, SideTabs } from "@instrument/ui";
 import { tools } from "@/lib/catalog";
 import { conversionUnits, type ConversionGroup } from "@/lib/engineering";
 import { convertQuantity, unitFamilies, unitSymbol, type UnitFamilyId } from "@/lib/units";
@@ -27,41 +27,53 @@ import { EmptyState, LoadingState } from "@/components/ui/status";
 export function SideRail() {
   const pinned = useDeskStore((state) => state.pinnedTabs);
   const setPinned = useDeskStore((state) => state.setTabPinned);
-  const isPinned = (id: string) => pinned.includes(id);
 
+  // Hidden below `md`, where the header collapses to the drawer. Three rotated
+  // tabs down the edge of a 375px screen is most of a thumb's width of fixed
+  // furniture, and the drawer already exists for exactly this content — so on
+  // mobile Favourites and Convert live there instead.
   return (
-    <div className="no-print">
-      <SideTab
-        label="Favourites"
-        icon={<Star size={ICON.inline} aria-hidden="true" />}
-        offset={0}
-        pinned={isPinned("favourites")}
-        onPinnedChange={(next) => setPinned("favourites", next)}
-      >
-        <FavouriteList />
-      </SideTab>
-      <SideTab
-        label="Convert"
-        icon={<Repeat size={ICON.inline} aria-hidden="true" />}
-        offset={1}
-        pinned={isPinned("convert")}
-        onPinnedChange={(next) => setPinned("convert", next)}
-      >
-        <QuickConvert />
-      </SideTab>
-      <SideTab label="Feedback" icon={<MessageSquare size={ICON.inline} aria-hidden="true" />} offset={2}>
-        <p className="text-sm leading-6 text-muted">
-          Something wrong, or missing? A screenshot helps more than a description.
-        </p>
-        <Button asChild variant="outline" className="mt-3 w-full">
-          <Link to="/feedback">Report it</Link>
-        </Button>
-      </SideTab>
+    <div className="no-print hidden md:block">
+      <SideTabs
+        pinned={pinned}
+        onPinnedChange={setPinned}
+        items={[
+          {
+            id: "favourites",
+            label: "Favourites",
+            icon: <Star size={ICON.inline} aria-hidden="true" />,
+            pinnable: true,
+            content: <FavouriteList />,
+          },
+          {
+            id: "convert",
+            label: "Convert",
+            icon: <Repeat size={ICON.inline} aria-hidden="true" />,
+            pinnable: true,
+            content: <QuickConvert />,
+          },
+          {
+            id: "feedback",
+            label: "Feedback",
+            icon: <MessageSquare size={ICON.inline} aria-hidden="true" />,
+            content: (
+              <>
+                <p className="text-sm leading-6 text-muted">
+                  Something wrong, or missing? A screenshot helps more than a description.
+                </p>
+                <Button asChild variant="outline" className="mt-3 w-full">
+                  <Link to="/feedback">Report it</Link>
+                </Button>
+              </>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }
 
-function FavouriteList() {
+export function FavouriteList({ onNavigate }: { onNavigate?: () => void } = {}) {
   const favorites = useDeskStore((state) => state.favorites);
   const { hydrating } = useDeskStatus();
   const { isPending } = useCurrentUserState();
@@ -78,7 +90,12 @@ function FavouriteList() {
     <ul className="grid gap-1">
       {favouriteTools.map((tool) => (
         <li key={tool!.id}>
-          <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="link-accent block py-1.5 text-sm">
+          <Link
+            to="/tool/$toolId"
+            params={{ toolId: tool!.id }}
+            onClick={onNavigate}
+            className="link-accent block py-1.5 text-sm"
+          >
             {tool!.title}
           </Link>
         </li>
@@ -94,7 +111,7 @@ function FavouriteList() {
  * so a unit that works in the tool works here and there is one place to add the
  * next one.
  */
-function QuickConvert() {
+export function QuickConvert() {
   const [family, setFamily] = useState<UnitFamilyId>("length");
   const units = conversionUnits(family as ConversionGroup);
   const [from, setFrom] = useState(units[0] ?? "");
