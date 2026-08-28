@@ -175,6 +175,29 @@ try {
   await page.waitForTimeout(200);
   record("studio ConfirmDialog escape", !(await confirm.isVisible()));
 
+  // A blank calculator has to agree with itself. It shipped labelled "Input"
+  // with the identifier `x`, so the editor said "in the formula as x" while the
+  // obvious expression failed with Unknown name — and renaming the field then
+  // fixed it, which read as the first edit not having saved.
+  await page.goto(`${BASE}/studio`, { waitUntil: "networkidle" });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /Create from scratch/ }).click();
+  await page.waitForURL(/\/studio\/[^/]+/);
+  await page.waitForTimeout(900);
+  await page.getByRole("button", { name: "Engine", exact: true }).click();
+  await page.waitForTimeout(900);
+  const seed = await page.evaluate(() => ({
+    label: document.querySelector('input[aria-label="Quantity name"]')?.value ?? "",
+    formulaAs: (document.body.innerText.match(/in the formula as (\w+)/) || [])[1] ?? "",
+    unknown: /Unknown name/i.test(document.body.innerText),
+  }));
+  record(
+    "a blank calculator's label and identifier agree",
+    seed.formulaAs === seed.label.toLowerCase() && !seed.unknown,
+    `${seed.label} -> ${seed.formulaAs}`,
+  );
+
   // The unit is shown rather than offered until wanted: a second full select on
   // every one of up to twelve rows paid a control's price for an edit that
   // rarely happens. It has to stay a real control, so this drives the whole
