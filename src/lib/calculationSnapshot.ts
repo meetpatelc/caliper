@@ -36,6 +36,32 @@ export const extractSnapshotInput = (payload: unknown, expectedToolId: string): 
   return Object.fromEntries(entries) as Record<string, string>;
 };
 
+/**
+ * Assumptions worth showing beside the inputs they qualify.
+ *
+ * 42 of the library's assumptions are, word for word, the label of one of that
+ * model's own input fields — "Declared bulk velocity" listed as a boundary on a
+ * page with a field called Declared bulk velocity. That is not a limit, it is
+ * the input's name a second time, and it renders a screen below the field it
+ * duplicates.
+ *
+ * Filtered at render rather than removed from the data: the assumption is not
+ * *wrong*, it just carries nothing the visible field does not already say, and
+ * the data is shared with the record, the print sheet and the clipboard
+ * summary. Where the field is on screen, the echo is noise; the rule is applied
+ * wherever both are shown together.
+ *
+ * Anything that says more than a label — including a phrase that merely opens
+ * one, like "Uniform solid circular shaft" against a hint reading "Uniform
+ * solid circular shaft diameter" — is kept. Those are shorter than the hint but
+ * not contained by it, and trimming on a prefix match would start deleting
+ * real qualifications.
+ */
+export function assumptionsBeside(assumptions: string[], fieldLabels: string[]): string[] {
+  const labels = new Set(fieldLabels.map((label) => label.trim().toLowerCase()));
+  return assumptions.filter((assumption) => !labels.has(assumption.trim().toLowerCase()));
+}
+
 export const buildCalculationPrintScope = (tool: SnapshotTool, input: Record<string, string>, result: CalculationState, inputLabels: Record<string, string>) => ({
   title: tool.title,
   formulaVersion: tool.contract.formulaVersion,
@@ -43,6 +69,6 @@ export const buildCalculationPrintScope = (tool: SnapshotTool, input: Record<str
   values: result.values.map(({ label, display, unit }) => ({ label, display, unit })),
   method: result.method,
   source: { label: tool.sourceLabel, url: tool.sourceUrl },
-  boundaries: tool.assumptions,
+  boundaries: assumptionsBeside(tool.assumptions, Object.keys(input).map((key) => inputLabels[key] ?? key)),
   boundary: "This printout is a record of displayed inputs and deterministic formula output. It is not an approval, certification, or engineering conclusion.",
 });

@@ -370,7 +370,14 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                   </Button>
                 </div>
                 {draft.fields.map((field, index) => (
-                  <div key={`${field.id}-${index}`} className={cn(panelClass, "grid gap-2 bg-elevated p-3")}>
+                  // Keyed by position, NOT by field.id. The id is derived from
+                  // the label on every keystroke, so keying by it changed the
+                  // key on every keystroke — React unmounted the row and
+                  // remounted it, destroying the input mid-word. The symptom
+                  // was having to click back into the box after every single
+                  // character. A key has to be stable across exactly the edits
+                  // the row survives, and a derived value never is.
+                  <div key={index} className={cn(panelClass, "grid gap-2 bg-elevated p-3")}>
                     <div className="flex items-center gap-2">
                       <Input
                         value={field.label}
@@ -464,7 +471,9 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                   )}
                 </div>
                 {draft.outputs.map((output, index) => (
-                  <div key={`${output.id}-${index}`} className={cn(panelClass, "grid gap-2 bg-elevated p-3")}>
+                  // Same reason as the inputs above: patchOutput re-derives
+                  // output.id from the label as it is typed.
+                  <div key={index} className={cn(panelClass, "grid gap-2 bg-elevated p-3")}>
                     <div className="flex items-center gap-2">
                       <Input
                         value={output.label}

@@ -22,7 +22,10 @@ export function AccountMenu() {
   }
   if (!user) {
     return (
-      <Button asChild variant="outline">
+      // Ghost like the rest of the header. Sign in is a destination, not the
+      // page's call to action — nothing here needs signing in to work, and
+      // giving it the only border in the row overstated it.
+      <Button asChild variant="ghost" className="text-fg">
         <Link to="/login">Sign in</Link>
       </Button>
     );
