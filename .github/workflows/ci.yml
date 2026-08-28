@@ -54,3 +54,20 @@ jobs:
           echo "preview never answered"; exit 1
       - run: npm run qa:ui
       - run: npm run qa:live
+
+      # The auth invariant compares what the dev server resolves for
+      # VITE_AUTH_ENABLED against what the next build resolves. It can only be
+      # observed against a dev server — `/__app-env` is dev-only middleware —
+      # so running it against the preview above returns "could not observe" and
+      # exits 2. That is the honest answer, and it is why this gate had never
+      # actually run anywhere: it was written for a server nothing started.
+      - name: Check the auth invariant against a dev server
+        run: |
+          npx vite preview --port 8080 --strictPort >/dev/null 2>&1 &
+          kill %1 2>/dev/null || true
+          npm run dev >/tmp/dev.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://127.0.0.1:8080/__app-env; then break; fi
+            sleep 2
+          done
+          npm run check:auth

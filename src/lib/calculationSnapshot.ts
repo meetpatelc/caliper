@@ -57,9 +57,28 @@ export const extractSnapshotInput = (payload: unknown, expectedToolId: string): 
  * not contained by it, and trimming on a prefix match would start deleting
  * real qualifications.
  */
-export function assumptionsBeside(assumptions: string[], fieldLabels: string[]): string[] {
+export function assumptionsBeside(
+  assumptions: string[],
+  fieldLabels: string[],
+  /**
+   * Help text rendered on the same screen. Optional, and only supplied where it
+   * is actually visible: the record and the print sheet list input *labels*, not
+   * their help text, so an assumption that a helper covers is still the only
+   * place that limit appears there.
+   */
+  fieldHelpers: string[] = [],
+): string[] {
   const labels = new Set(fieldLabels.map((label) => label.trim().toLowerCase()));
-  return assumptions.filter((assumption) => !labels.has(assumption.trim().toLowerCase()));
+  const helpers = fieldHelpers.map((helper) => helper.trim().toLowerCase()).filter(Boolean);
+  return assumptions.filter((assumption) => {
+    const value = assumption.trim().toLowerCase();
+    if (labels.has(value)) return false;
+    // A helper that opens with the assumption says the same thing and then says
+    // more — "Constant mass" against "Constant mass in the selected
+    // inertial-frame calculation." Printing both puts the identical opening
+    // words on screen twice, and the shorter one is the copy that adds nothing.
+    return !helpers.some((helper) => helper.startsWith(value));
+  });
 }
 
 export const buildCalculationPrintScope = (tool: SnapshotTool, input: Record<string, string>, result: CalculationState, inputLabels: Record<string, string>) => ({

@@ -356,7 +356,11 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           <InstrumentMethod
             description={tool.description}
             formula={result.method}
-            when={assumptionsBeside(tool.assumptions, fields.map((field) => field.label))}
+            when={assumptionsBeside(
+              tool.assumptions,
+              fields.map((field) => field.label),
+              fields.map((field) => field.helper ?? ""),
+            )}
             dont={result.warnings.length ? result.warnings : ["This is a first-pass number, not a code check or approval."]}
             sourceLabel={tool.sourceLabel}
             sourceUrl={tool.sourceUrl}
