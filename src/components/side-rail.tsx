@@ -3,7 +3,13 @@ import { Link } from "@tanstack/react-router";
 import { MessageSquare, Repeat, Star } from "lucide-react";
 import { ICON, SideTabs } from "@instrument/ui";
 import { tools } from "@/lib/catalog";
-import { conversionUnits, type ConversionGroup } from "@/lib/engineering";
+// Deliberately NOT `conversionUnits` from `@/lib/engineering`. That helper is a
+// one-line wrapper over `unitsForFamily`, but importing it drags in the
+// evaluator, which imports every library document — and this rail is rendered
+// by the app shell, so the whole 332 kB model catalog was being pulled into the
+// entry chunk and loaded on every page, including the landing page that needs
+// none of it.
+import { unitsForFamily } from "@/lib/units";
 import { convertQuantity, unitFamilies, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { useDeskStatus } from "@/lib/desk-mode";
@@ -113,7 +119,7 @@ export function FavouriteList({ onNavigate }: { onNavigate?: () => void } = {}) 
  */
 export function QuickConvert() {
   const [family, setFamily] = useState<UnitFamilyId>("length");
-  const units = conversionUnits(family as ConversionGroup);
+  const units = unitsForFamily(family).map((unit) => unit.value);
   const [from, setFrom] = useState(units[0] ?? "");
   const [to, setTo] = useState(units[1] ?? units[0] ?? "");
   const [value, setValue] = useState("1");
@@ -129,7 +135,7 @@ export function QuickConvert() {
   }
 
   const onFamily = (next: UnitFamilyId) => {
-    const nextUnits = conversionUnits(next as ConversionGroup);
+    const nextUnits = unitsForFamily(next).map((unit) => unit.value);
     setFamily(next);
     setFrom(nextUnits[0] ?? "");
     setTo(nextUnits[1] ?? nextUnits[0] ?? "");
