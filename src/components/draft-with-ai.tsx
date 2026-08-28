@@ -8,7 +8,7 @@ import { ConfirmDialog } from "@/components/ui/confirm";
 import { panelClass } from "@/components/ui/panel";
 import { SignedIn } from "@/lib/auth/gates";
 import { draftCalculatorFromBrief, draftingAvailable } from "@/lib/ai/draft";
-import type { DraftedCalculator } from "@/lib/ai/draft-contract";
+import type { AssistedDraft } from "@/lib/ai/draft-contract";
 import { cn } from "@/lib/utils";
 
 const MAX_BRIEF = 4000;
@@ -25,12 +25,12 @@ const MAX_BRIEF = 4000;
  * whether it computed something sensible, not a wall of prose asserting that it
  * did.
  */
-export function DraftWithAI({ onAccept }: { onAccept: (draft: DraftedCalculator) => void }) {
+export function DraftWithAI({ onAccept }: { onAccept: (draft: AssistedDraft) => void }) {
   const [available, setAvailable] = useState(false);
   const [open, setOpen] = useState(false);
   const [brief, setBrief] = useState("");
   const [pending, setPending] = useState(false);
-  const [result, setResult] = useState<{ draft: DraftedCalculator; preview: { label: string; display: string; unit: string }[] } | null>(null);
+  const [result, setResult] = useState<{ draft: AssistedDraft; preview: { label: string; display: string; unit: string }[] } | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {

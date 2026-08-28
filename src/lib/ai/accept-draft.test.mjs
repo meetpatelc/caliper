@@ -79,3 +79,20 @@ test("the schema handed to the model forbids invented keys", () => {
   assert.ok(Array.isArray(schema.required) && schema.required.includes("outputs"));
   assert.ok(!("$schema" in schema));
 });
+
+test("an accepted draft is stamped as drafted, and cannot stamp itself", () => {
+  const outcome = acceptDraft(sound);
+  assert.equal(outcome.ok, true, outcome.ok ? "" : outcome.reason);
+  assert.equal(outcome.draft.provenance, "assisted", "the label has to survive past the dialog that shows it");
+
+  // The contract does not include `provenance`, and is `.strict()`, so a model
+  // that tries to describe itself as hand-authored is rejected outright rather
+  // than quietly overriding the stamp.
+  const claiming = acceptDraft({ ...sound, provenance: undefined });
+  assert.equal(claiming.ok, false, "a key outside the contract must not be accepted");
+});
+
+test("the contract the model works to does not expose provenance", () => {
+  const schema = /** @type {any} */ (toJsonSchema(draftedCalculatorSchema));
+  assert.equal(schema.properties.provenance, undefined, "the model must not be able to author its own provenance");
+});

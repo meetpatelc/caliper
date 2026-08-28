@@ -83,3 +83,42 @@ test("a model with no constraints still evaluates and reports no warnings", () =
   assert.equal(result.outputs[0].display, "9");
   assert.deepEqual(result.warnings, []);
 });
+
+test("seeding a calculator keeps its constraints and its provenance", async () => {
+  const { asCalculatorDefinition } = await import("@/studio/lib/calculator-types");
+
+  // The bug this pins: `asCalculatorDefinition` whitelists the keys it copies,
+  // and `constraints` was not among them — so duplicating a calculator, seeding
+  // one from a document, or accepting a draft silently dropped every relational
+  // guard. Nothing failed; the guards were simply gone, which is the worst way
+  // for a safety feature to leave.
+  /** @type {import("@/studio/lib/calculator-types").CalculatorDefinition} */
+  const seed = {
+    slug: "hoop-stress",
+    title: "Hoop stress",
+    description: "Membrane hoop stress in a thin-walled cylinder under internal pressure.",
+    domain: "mechanics",
+    fields: [
+      { id: "pressure", label: "Internal pressure", family: "pressure", defaultValue: 1.2, defaultUnit: "MPa" },
+      { id: "thickness", label: "Wall thickness", family: "length", defaultValue: 12, defaultUnit: "mm" },
+    ],
+    outputs: [
+      { id: "hoop", label: "Hoop stress", family: "stress", defaultUnit: "MPa", expression: "pressure/thickness" },
+    ],
+    constraints: [{ expression: "thickness", message: "Wall must be positive.", gt: 0, severity: "error" }],
+    formula: "s = p / t",
+    purpose: "Screen a thin-walled cylinder.",
+    assumptions: ["Thin wall"],
+    boundary: "Not valid below a diameter-to-thickness ratio of 20.",
+    interpretation: "Hoop stress",
+    sourceLabel: "",
+    sourceUrl: "",
+    related: [],
+    provenance: "assisted",
+  };
+
+  const definition = asCalculatorDefinition(seed);
+  assert.equal(definition.constraints?.length, 1, "the guard must survive being seeded");
+  assert.equal(definition.constraints?.[0].message, "Wall must be positive.");
+  assert.equal(definition.provenance, "assisted", "a drafted calculator must stay labelled through a copy");
+});
