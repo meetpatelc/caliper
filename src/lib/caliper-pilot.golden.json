@@ -251,14 +251,14 @@
       {
         "key": "cuttingPower",
         "label": "Ideal cutting power",
-        "raw": 3.720000000000001,
+        "raw": 3720.000000000001,
         "display": "3.72",
         "unit": "kW"
       },
       {
         "key": "machinePower",
         "label": "Declared-efficiency machine input",
-        "raw": 4.650000000000001,
+        "raw": 4650.000000000001,
         "display": "4.65",
         "unit": "kW"
       }
@@ -274,14 +274,14 @@
       {
         "key": "pointDepth",
         "label": "Geometric drill-point depth",
-        "raw": 2.4852813742385704,
+        "raw": 0.0024852813742385705,
         "display": "2.4853",
         "unit": "mm"
       },
       {
         "key": "programmedDepth",
         "label": "Programmed depth for declared full diameter",
-        "raw": 27.48528137423857,
+        "raw": 0.02748528137423857,
         "display": "27.485",
         "unit": "mm"
       }

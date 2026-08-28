@@ -48,7 +48,7 @@
       {
         "key": "referenceDeflection",
         "label": "Declared-reference deflection",
-        "raw": 6.666666666666667,
+        "raw": 0.006666666666666667,
         "display": "6.6667",
         "unit": "mm"
       },
@@ -62,7 +62,7 @@
       {
         "key": "arithmeticDifference",
         "label": "Reference minus declared deflection",
-        "raw": 1.666666666666667,
+        "raw": 0.001666666666666667,
         "display": "1.6667",
         "unit": "mm"
       }
@@ -108,14 +108,14 @@
       {
         "key": "nominalLifeRevolutions",
         "label": "Nominal life",
-        "raw": 27000000,
+        "raw": 169646003.29384884,
         "display": "27,000,000",
         "unit": "rev"
       },
       {
         "key": "idealTravelDistance",
         "label": "Ideal travel distance",
-        "raw": 270,
+        "raw": 270000,
         "display": "270",
         "unit": "km"
       },
@@ -180,21 +180,21 @@
       {
         "key": "inputPower",
         "label": "Literal input power",
-        "raw": 2.261946710584651,
+        "raw": 2261.946710584651,
         "display": "2.2619",
         "unit": "kW"
       },
       {
         "key": "outputPower",
         "label": "Literal output power",
-        "raw": 2.084610088474814,
+        "raw": 2084.6100884748143,
         "display": "2.0846",
         "unit": "kW"
       },
       {
         "key": "arithmeticLoss",
         "label": "Declared-efficiency arithmetic loss",
-        "raw": 0.17733662210983675,
+        "raw": 177.33662210983675,
         "display": "0.17734",
         "unit": "kW"
       }
@@ -284,14 +284,14 @@
       {
         "key": "lossPower",
         "label": "Literal hydraulic pressure-drop power",
-        "raw": 2.5,
+        "raw": 2500,
         "display": "2.5",
         "unit": "kW"
       },
       {
         "key": "averageLossPower",
         "label": "Literal active-time-scaled loss power",
-        "raw": 1,
+        "raw": 1000,
         "display": "1",
         "unit": "kW"
       },
@@ -305,7 +305,7 @@
       {
         "key": "activeTimeFraction",
         "label": "Declared active-time fraction",
-        "raw": 40,
+        "raw": 0.4,
         "display": "40",
         "unit": "%"
       }
@@ -358,21 +358,21 @@
       {
         "key": "gasVolumeAtMaximum",
         "label": "Literal gas volume at declared maximum pressure",
-        "raw": 4.5,
+        "raw": 0.0045000000000000005,
         "display": "4.5",
         "unit": "L"
       },
       {
         "key": "gasVolumeAtMinimum",
         "label": "Literal gas volume at declared minimum pressure",
-        "raw": 7.5,
+        "raw": 0.0075,
         "display": "7.5",
         "unit": "L"
       },
       {
         "key": "usableFluidVolume",
         "label": "Literal usable fluid-volume difference",
-        "raw": 3,
+        "raw": 0.003,
         "display": "3",
         "unit": "L"
       },
@@ -416,7 +416,7 @@
       {
         "key": "flowPoint",
         "label": "Declared flow point",
-        "raw": 4,
+        "raw": 0.004,
         "display": "4",
         "unit": "L/s"
       }
@@ -550,7 +550,7 @@
       {
         "key": "realPower",
         "label": "Literal three-phase real power",
-        "raw": 21.200301884643054,
+        "raw": 21200.301884643053,
         "display": "21.2",
         "unit": "kW"
       },
@@ -580,28 +580,28 @@
       {
         "key": "bendAllowance",
         "label": "Literal single-bend allowance",
-        "raw": 2.356194490192345,
+        "raw": 0.002356194490192345,
         "display": "2.3562",
         "unit": "mm"
       },
       {
         "key": "bendDeduction",
         "label": "Literal single-bend deduction",
-        "raw": 1.6438055098076547,
+        "raw": 0.0016438055098076548,
         "display": "1.6438",
         "unit": "mm"
       },
       {
         "key": "neutralAxisRadius",
         "label": "Literal neutral-axis radius",
-        "raw": 1.5,
+        "raw": 0.0015,
         "display": "1.5",
         "unit": "mm"
       },
       {
         "key": "bendAngle",
         "label": "Declared bend angle",
-        "raw": 90,
+        "raw": 1.5707963267948966,
         "display": "90",
         "unit": "°"
       }
@@ -691,14 +691,14 @@
       {
         "key": "effectiveDiameter",
         "label": "Empirical tensile-area diameter",
-        "raw": 10.3581605,
+        "raw": 0.010358160500000001,
         "display": "10.358",
         "unit": "mm"
       },
       {
         "key": "tensileArea",
         "label": "External thread tensile stress area",
-        "raw": 84.2667354164293,
+        "raw": 0.0000842667354164293,
         "display": "84.267",
         "unit": "mm²"
       }
@@ -714,28 +714,28 @@
       {
         "key": "worstCase",
         "label": "Worst-case stack tolerance",
-        "raw": 0.18000000000000002,
+        "raw": 0.00018,
         "display": "0.18",
         "unit": "mm"
       },
       {
         "key": "rss",
         "label": "RSS stack tolerance",
-        "raw": 0.11575836902790226,
+        "raw": 0.00011575836902790227,
         "display": "0.11576",
         "unit": "mm"
       },
       {
         "key": "worstMin",
         "label": "Worst-case lower result",
-        "raw": 99.82,
+        "raw": 0.09981999999999999,
         "display": "99.82",
         "unit": "mm"
       },
       {
         "key": "worstMax",
         "label": "Worst-case upper result",
-        "raw": 100.18,
+        "raw": 0.10018,
         "display": "100.18",
         "unit": "mm"
       }
@@ -751,7 +751,7 @@
       {
         "key": "totalLineLength",
         "label": "Total effective line length",
-        "raw": 200,
+        "raw": 0.2,
         "display": "200",
         "unit": "mm"
       },
@@ -765,28 +765,28 @@
       {
         "key": "endpointRadius",
         "label": "Farthest endpoint radius",
-        "raw": 64.03124237432849,
+        "raw": 0.06403124237432849,
         "display": "64.031",
         "unit": "mm"
       },
       {
         "key": "directLineLoad",
         "label": "Direct shear line load",
-        "raw": 60,
+        "raw": 60000,
         "display": "60",
         "unit": "N/mm"
       },
       {
         "key": "torsionalEndpointLineLoad",
         "label": "Endpoint torsional line load",
-        "raw": 105.25683677971807,
+        "raw": 105256.83677971807,
         "display": "105.26",
         "unit": "N/mm"
       },
       {
         "key": "quadratureLineLoad",
         "label": "Quadrature line-load magnitude",
-        "raw": 121.15693000762363,
+        "raw": 121156.93000762362,
         "display": "121.16",
         "unit": "N/mm"
       }
@@ -802,14 +802,14 @@
       {
         "key": "targetTapDrill",
         "label": "Target tap drill at stated engagement",
-        "raw": 8.875,
+        "raw": 0.008875000000000001,
         "display": "8.875",
         "unit": "mm"
       },
       {
         "key": "fullEngagementTapDrill",
         "label": "Basic major-minus-pitch drill",
-        "raw": 8.5,
+        "raw": 0.0085,
         "display": "8.5",
         "unit": "mm"
       },
@@ -823,7 +823,7 @@
       {
         "key": "rootShearArea",
         "label": "Reviewed root-shear area",
-        "raw": 202.3716335382872,
+        "raw": 0.0002023716335382872,
         "display": "202.37",
         "unit": "mm²"
       },
@@ -985,7 +985,7 @@
       {
         "key": "shaftPower",
         "label": "Duty-point shaft power",
-        "raw": 0.2871916032262812,
+        "raw": 287.1916032262812,
         "display": "0.28719",
         "unit": "kW"
       },
@@ -1022,14 +1022,14 @@
       {
         "key": "extendSpeed",
         "label": "Ideal extend speed",
-        "raw": 254.64790894703253,
+        "raw": 0.25464790894703254,
         "display": "254.65",
         "unit": "mm/s"
       },
       {
         "key": "retractSpeed",
         "label": "Ideal retract speed",
-        "raw": 303.15227255599115,
+        "raw": 0.30315227255599114,
         "display": "303.15",
         "unit": "mm/s"
       },
@@ -1161,28 +1161,28 @@
       {
         "key": "radius",
         "label": "Pitch-circle radius",
-        "raw": 50,
+        "raw": 0.05,
         "display": "50",
         "unit": "mm"
       },
       {
         "key": "angularPitch",
         "label": "Equal angular pitch",
-        "raw": 60,
+        "raw": 1.0471975511965976,
         "display": "60",
         "unit": "°"
       },
       {
         "key": "adjacentChord",
         "label": "Adjacent-center chord",
-        "raw": 49.99999999999999,
+        "raw": 0.049999999999999996,
         "display": "50",
         "unit": "mm"
       },
       {
         "key": "firstX",
         "label": "First-hole nominal X",
-        "raw": 50,
+        "raw": 0.05,
         "display": "50",
         "unit": "mm"
       },
@@ -1196,7 +1196,7 @@
       {
         "key": "oppositeX",
         "label": "180° opposite nominal X",
-        "raw": -50,
+        "raw": -0.05,
         "display": "-50",
         "unit": "mm"
       },
@@ -1219,35 +1219,35 @@
       {
         "key": "perimeter",
         "label": "Perimeter",
-        "raw": 120,
+        "raw": 0.12,
         "display": "120",
         "unit": "mm"
       },
       {
         "key": "apothem",
         "label": "Apothem",
-        "raw": 17.320508075688775,
+        "raw": 0.017320508075688777,
         "display": "17.321",
         "unit": "mm"
       },
       {
         "key": "circumradius",
         "label": "Circumradius",
-        "raw": 20.000000000000004,
+        "raw": 0.020000000000000004,
         "display": "20",
         "unit": "mm"
       },
       {
         "key": "interiorAngle",
         "label": "Each interior angle",
-        "raw": 120,
+        "raw": 2.0943951023931953,
         "display": "120",
         "unit": "°"
       },
       {
         "key": "area",
         "label": "Regular-polygon area",
-        "raw": 1039.2304845413264,
+        "raw": 0.0010392304845413263,
         "display": "1,039.2",
         "unit": "mm²"
       }
@@ -1321,7 +1321,7 @@
       {
         "key": "requiredEffectiveSpeed",
         "label": "Effective speed for declared time target",
-        "raw": 11.51292546497023,
+        "raw": 0.011512925464970231,
         "display": "11.513",
         "unit": "L/s"
       },
@@ -1418,7 +1418,7 @@
       {
         "key": "mechanicalPower",
         "label": "Ideal mechanical spindle power",
-        "raw": 0.15707963267948966,
+        "raw": 157.07963267948966,
         "display": "0.15708",
         "unit": "kW"
       },
@@ -1441,7 +1441,7 @@
       {
         "key": "feedRate",
         "label": "Declared pitch-feed rate",
-        "raw": 750,
+        "raw": 0.0125,
         "display": "750",
         "unit": "mm/min"
       },
@@ -1610,7 +1610,7 @@
       {
         "key": "power",
         "label": "Mechanical drive power",
-        "raw": 0.5555555555555555,
+        "raw": 555.5555555555554,
         "display": "0.55556",
         "unit": "kW"
       }
@@ -1654,7 +1654,7 @@
       {
         "key": "power",
         "label": "Mechanical linear power",
-        "raw": 0.22176798,
+        "raw": 221.76798,
         "display": "0.22177",
         "unit": "kW"
       }
@@ -1691,7 +1691,7 @@
       {
         "key": "power",
         "label": "Mechanical linear power",
-        "raw": 0.008825985,
+        "raw": 8.825985,
         "display": "0.008826",
         "unit": "kW"
       }
@@ -1721,28 +1721,28 @@
       {
         "key": "extendVolume",
         "label": "Extension swept volume",
-        "raw": 2.513274122871835,
+        "raw": 0.002513274122871835,
         "display": "2.5133",
         "unit": "L"
       },
       {
         "key": "retractVolume",
         "label": "Retraction swept volume",
-        "raw": 1.718058482431918,
+        "raw": 0.0017180584824319182,
         "display": "1.7181",
         "unit": "L"
       },
       {
         "key": "extendSpeed",
         "label": "Ideal extension speed",
-        "raw": 99.47183943243458,
+        "raw": 0.09947183943243458,
         "display": "99.472",
         "unit": "mm/s"
       },
       {
         "key": "retractSpeed",
         "label": "Ideal retraction speed",
-        "raw": 145.51309082687573,
+        "raw": 0.14551309082687572,
         "display": "145.51",
         "unit": "mm/s"
       },
@@ -1772,28 +1772,28 @@
       {
         "key": "idealFlow",
         "label": "Ideal outlet flow",
-        "raw": 37.5,
+        "raw": 0.000625,
         "display": "37.5",
         "unit": "L/min"
       },
       {
         "key": "actualFlow",
         "label": "Declared-efficiency outlet flow",
-        "raw": 34.5,
+        "raw": 0.000575,
         "display": "34.5",
         "unit": "L/min"
       },
       {
         "key": "hydraulicPower",
         "label": "Hydraulic output power",
-        "raw": 10.35,
+        "raw": 10350,
         "display": "10.35",
         "unit": "kW"
       },
       {
         "key": "shaftPower",
         "label": "Declared-efficiency shaft input power",
-        "raw": 12.321428571428571,
+        "raw": 12321.42857142857,
         "display": "12.321",
         "unit": "kW"
       },
@@ -1844,14 +1844,14 @@
       {
         "key": "hydraulicPower",
         "label": "Hydraulic input power",
-        "raw": 12,
+        "raw": 12000,
         "display": "12",
         "unit": "kW"
       },
       {
         "key": "shaftPower",
         "label": "Declared-efficiency shaft output",
-        "raw": 9.715200000000001,
+        "raw": 9715.2,
         "display": "9.7152",
         "unit": "kW"
       }
@@ -1904,7 +1904,7 @@
       {
         "key": "interference",
         "label": "Diametral interference",
-        "raw": 0.02499999999999858,
+        "raw": 0.000024999999999998578,
         "display": "0.025",
         "unit": "mm"
       },

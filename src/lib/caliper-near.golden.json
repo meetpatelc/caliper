@@ -4,28 +4,28 @@
       {
         "key": "bendAllowance",
         "label": "Bend allowance",
-        "raw": 4.131194339470578,
+        "raw": 0.004131194339470578,
         "display": "4.1312",
         "unit": "mm"
       },
       {
         "key": "outsideSetback",
         "label": "Outside setback",
-        "raw": 3.4999999999999996,
+        "raw": 0.0034999999999999996,
         "display": "3.5",
         "unit": "mm"
       },
       {
         "key": "bendDeduction",
         "label": "Bend deduction",
-        "raw": 2.8688056605294214,
+        "raw": 0.0028688056605294214,
         "display": "2.8688",
         "unit": "mm"
       },
       {
         "key": "flatLength",
         "label": "One-bend flat-length estimate",
-        "raw": 87.13119433947058,
+        "raw": 0.08713119433947059,
         "display": "87.131",
         "unit": "mm"
       }
@@ -238,7 +238,7 @@
       {
         "key": "minimumDiameter",
         "label": "Minimum torsion-only diameter",
-        "raw": 23.350886498814717,
+        "raw": 0.023350886498814716,
         "display": "23.351",
         "unit": "mm"
       },
@@ -259,7 +259,7 @@
       {
         "key": "centralDeflection",
         "label": "Central-load deflection",
-        "raw": 0.586708782213963,
+        "raw": 0.0005867087822139631,
         "display": "0.58671",
         "unit": "mm"
       },
@@ -333,14 +333,14 @@
       {
         "key": "throat",
         "label": "Effective throat thickness",
-        "raw": 4.242,
+        "raw": 0.004242,
         "display": "4.242",
         "unit": "mm"
       },
       {
         "key": "effectiveArea",
         "label": "Effective throat area",
-        "raw": 848.4,
+        "raw": 0.0008483999999999999,
         "display": "848.4",
         "unit": "mm²"
       },
@@ -354,7 +354,7 @@
       {
         "key": "requiredLeg",
         "label": "Required leg at stated allowable",
-        "raw": 2.438667512071404,
+        "raw": 0.002438667512071404,
         "display": "2.4387",
         "unit": "mm"
       },

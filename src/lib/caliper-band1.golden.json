@@ -953,35 +953,35 @@
       {
         "key": "loadFraction",
         "label": "Bolt load fraction C",
-        "raw": 33.33333333333333,
+        "raw": 0.3333333333333333,
         "display": "33.333",
         "unit": "%"
       },
       {
         "key": "boltLoadIncrease",
         "label": "External-load share carried by bolt",
-        "raw": 6,
+        "raw": 6000,
         "display": "6",
         "unit": "kN"
       },
       {
         "key": "residualClamp",
         "label": "Residual clamp force",
-        "raw": 7.999999999999998,
+        "raw": 7999.999999999998,
         "display": "8",
         "unit": "kN"
       },
       {
         "key": "separationLoad",
         "label": "Ideal separation-load threshold",
-        "raw": 29.999999999999996,
+        "raw": 29999.999999999996,
         "display": "30",
         "unit": "kN"
       },
       {
         "key": "separationReserve",
         "label": "Threshold minus stated external load",
-        "raw": 11.999999999999996,
+        "raw": 11999.999999999996,
         "display": "12",
         "unit": "kN"
       }
@@ -1330,7 +1330,7 @@
       {
         "key": "heatRateKw",
         "label": "Declared convection heat rate",
-        "raw": 1.575,
+        "raw": 1575,
         "display": "1.575",
         "unit": "kW"
       },
