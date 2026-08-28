@@ -21,7 +21,7 @@ import { groupResultValues } from "@/lib/resultPresentation";
 import { convertShop, formatShop, hydrateDisplayInputs, parseShop, shopLabel, unitSwitchFor, unitSwitchForResult } from "@/lib/fieldUnits";
 import { coerceSearchValue, recordPath, sharePath, stringifySearchPlain } from "@/lib/search-params";
 import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
-import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
+import { assumptionsBeside, buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
 import { libraryDocuments, isStudioDocument } from "@/lib/document";
 import { resolveSketchId } from "@/lib/diagrams";
@@ -353,7 +353,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
           <InstrumentMethod
             description={tool.description}
             formula={result.method}
-            when={tool.assumptions}
+            when={assumptionsBeside(tool.assumptions, fields.map((field) => field.label))}
             dont={result.warnings.length ? result.warnings : ["This is a first-pass number, not a code check or approval."]}
             sourceLabel={tool.sourceLabel}
             sourceUrl={tool.sourceUrl}
