@@ -396,6 +396,35 @@ try {
   });
   record("side tabs cover no control on mobile", occlusion.hit.length === 0, occlusion.hit.join(", "));
   record("side tabs add no mobile overflow", occlusion.overflow === 0, String(occlusion.overflow));
+
+  // Below `md` the tabs give way to the drawer: three rotated tabs down the
+  // edge of a 375px screen is most of a thumb's width of fixed furniture, and
+  // the drawer already existed for this content.
+  const mobileRail = await narrow.evaluate(() => ({
+    tabs: [...document.querySelectorAll(".side-tab")].filter((t) => t.getBoundingClientRect().width > 0).length,
+    reserved: getComputedStyle(document.querySelector(".page-wrap")).paddingRight,
+  }));
+  record("the rail gives way to the drawer on mobile", mobileRail.tabs === 0, `${mobileRail.tabs} tabs`);
+  record("no gutter is reserved where there are no tabs", mobileRail.reserved === "0px", mobileRail.reserved);
+
+  await narrow.getByRole("button", { name: /menu/i }).first().click();
+  await narrow.waitForTimeout(600);
+  const drawerSections = await narrow.evaluate(() => {
+    const sections = [...document.querySelectorAll("summary")].map((x) => x.textContent.trim());
+    const convert = [...document.querySelectorAll("summary")].find((x) => /Convert/.test(x.textContent));
+    convert?.click();
+    return { sections };
+  });
+  await narrow.waitForTimeout(500);
+  const drawerConvert = await narrow.evaluate(
+    () => [...document.querySelectorAll('[role="status"]')].map((n) => n.textContent.trim()).filter(Boolean),
+  );
+  record(
+    "favourites and convert move into the drawer",
+    drawerSections.sections.includes("Favourites") && drawerSections.sections.includes("Convert"),
+    drawerSections.sections.join(", "),
+  );
+  record("convert still computes inside the drawer", drawerConvert.some((t) => /1000\s*mm/.test(t)), drawerConvert.join(" "));
   await narrow.close();
 
   // Two panels open at once: a pinned one plus a transient one. Panels are up

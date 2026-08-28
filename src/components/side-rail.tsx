@@ -28,8 +28,12 @@ export function SideRail() {
   const pinned = useDeskStore((state) => state.pinnedTabs);
   const setPinned = useDeskStore((state) => state.setTabPinned);
 
+  // Hidden below `md`, where the header collapses to the drawer. Three rotated
+  // tabs down the edge of a 375px screen is most of a thumb's width of fixed
+  // furniture, and the drawer already exists for exactly this content — so on
+  // mobile Favourites and Convert live there instead.
   return (
-    <div className="no-print">
+    <div className="no-print hidden md:block">
       <SideTabs
         pinned={pinned}
         onPinnedChange={setPinned}
@@ -69,7 +73,7 @@ export function SideRail() {
   );
 }
 
-function FavouriteList() {
+export function FavouriteList({ onNavigate }: { onNavigate?: () => void } = {}) {
   const favorites = useDeskStore((state) => state.favorites);
   const { hydrating } = useDeskStatus();
   const { isPending } = useCurrentUserState();
@@ -86,7 +90,12 @@ function FavouriteList() {
     <ul className="grid gap-1">
       {favouriteTools.map((tool) => (
         <li key={tool!.id}>
-          <Link to="/tool/$toolId" params={{ toolId: tool!.id }} className="link-accent block py-1.5 text-sm">
+          <Link
+            to="/tool/$toolId"
+            params={{ toolId: tool!.id }}
+            onClick={onNavigate}
+            className="link-accent block py-1.5 text-sm"
+          >
             {tool!.title}
           </Link>
         </li>
@@ -102,7 +111,7 @@ function FavouriteList() {
  * so a unit that works in the tool works here and there is one place to add the
  * next one.
  */
-function QuickConvert() {
+export function QuickConvert() {
   const [family, setFamily] = useState<UnitFamilyId>("length");
   const units = conversionUnits(family as ConversionGroup);
   const [from, setFrom] = useState(units[0] ?? "");

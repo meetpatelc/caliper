@@ -1,12 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ICON } from "@instrument/ui";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Repeat, Search, Star, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AccountMenu } from "@/components/account-menu";
 import { CommandPalette } from "@/components/command-palette";
 import { DeskSync } from "@/components/desk-sync";
 import { FamilySwitch } from "@/components/family-switch";
-import { SideRail } from "@/components/side-rail";
+import { FavouriteList, QuickConvert, SideRail } from "@/components/side-rail";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { SignOutButton } from "@/components/sign-out-button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -159,6 +159,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           ))}
           <DrawerAccount onClose={() => setMenuOpen(false)} />
         </nav>
+
+        {/* The side tabs' content, for the widths where the tabs are hidden.
+            Collapsed by default so the drawer stays a nav first — these are
+            things you reach for, not things you scroll past on the way to
+            Studio. */}
+        <div className="mt-4 grid gap-2 border-t border-border pt-4">
+          <details className="group">
+            <summary className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-elevated">
+              <Star size={ICON.base} aria-hidden="true" />
+              Favourites
+            </summary>
+            <div className="px-3 pb-2 pt-3">
+              <FavouriteList onNavigate={() => setMenuOpen(false)} />
+            </div>
+          </details>
+          <details className="group">
+            <summary className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-elevated">
+              <Repeat size={ICON.base} aria-hidden="true" />
+              Convert
+            </summary>
+            <div className="px-3 pb-2 pt-3">
+              <QuickConvert />
+            </div>
+          </details>
+        </div>
         <div className="mt-auto grid gap-3 border-t border-border pt-4">
           <ThemeToggle appearance="labeled" />
         </div>
