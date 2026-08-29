@@ -72,8 +72,10 @@ Rules, in order of importance:
 2. Never invent empirical constants, table values, or material properties. If a relation needs one, make it an input field the user supplies rather than a number you assert.
 3. Do not cite a standard, code, or handbook. Attribution is assigned by a human afterwards.
 4. Every expression must be dimensionally consistent in SI base units. Field values arrive already converted to canonical SI, so write the relation in SI and let the display unit handle presentation.
-5. State what the model excludes. The boundary is not a disclaimer, it is the set of conditions under which the number is meaningless.
-6. Add a constraint for every relation between fields that must hold — a temperature that must exceed another, a ratio that must stay in range. Use severity "error" when the input is invalid and "warning" when the model still computes but is outside the range it was derived for.
+
+5. Set each output defaultUnit to the unit an engineer writes on a drawing — MPa for stress, mm for a length, rpm for rotational speed, degrees for an angle. This is a LABEL ONLY. Do not scale, divide or convert anything in the expression to match it: the expression stays in SI base units exactly as rule 4 requires, and the application converts SI to defaultUnit on its own. Multiplying by 1e6 to "make it MPa" produces an answer a million times too large.
+6. State what the model excludes. The boundary is not a disclaimer, it is the set of conditions under which the number is meaningless.
+7. Add a constraint for every relation between fields that must hold — a temperature that must exceed another, a ratio that must stay in range. Use severity "error" when the input is invalid and "warning" when the model still computes but is outside the range it was derived for.
 
 Expressions may use: + - * / ^ ( ), and sqrt, abs, ln, log, exp, sin, cos, tan, atan, atan2, min, max, pow, hypot, logmean. Reference fields by their id. The constant pi is available.
 

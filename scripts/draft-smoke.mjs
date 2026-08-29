@@ -88,7 +88,12 @@ async function main() {
   console.log(`ACCEPTED in ${seconds}s`);
   console.log(`  title:       ${outcome.draft.title}`);
   console.log(`  provenance:  ${outcome.draft.provenance}`);
-  console.log(`  inputs:      ${outcome.draft.fields.map((field) => field.id).join(", ")}`);
+  // Values and units, not just ids: without them the worked example below
+  // cannot be checked, and checking it is the point of the exercise.
+  console.log("  inputs:");
+  for (const field of outcome.draft.fields) {
+    console.log(`    ${field.label} (${field.id}) = ${field.defaultValue} ${field.defaultUnit}`);
+  }
   console.log(`  constraints: ${outcome.draft.constraints?.length ?? 0}`);
   console.log("  worked example:");
   for (const item of outcome.preview) {
