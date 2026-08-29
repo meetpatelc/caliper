@@ -3,12 +3,15 @@ import test from "node:test";
 import { computeFit } from "@/studio/lib/iso286";
 
 /**
- * The comparison page at /lab/iso-286 prints the subtraction behind each
- * result. The risk it introduces is not a wrong tolerance — it imports the same
- * `computeFit` as the shipped page, so the deviations cannot differ — but a
- * wrong *sum*: operands displayed that do not produce the answer displayed
- * beside them. On a page whose entire argument is "check this yourself", that
- * is the worst available bug.
+ * The ISO 286 page prints the subtraction behind each result. The risk that
+ * introduces is not a wrong tolerance — the deviations come from the published
+ * table either way — but a wrong *sum*: operands displayed that do not produce
+ * the answer beside them. On a page whose argument is "check this yourself",
+ * that is the worst available bug.
+ *
+ * These identities were pinned while the page existed as a second view at
+ * /lab/iso-286 for comparison. That page is gone; the working now ships on
+ * /tool/fits and the guard travels with it.
  *
  * So this pins the four identities the page renders, across the range and both
  * ends of it, against the values `computeFit` returns.
@@ -45,20 +48,16 @@ test("the working shown reproduces the fit it is shown beside", () => {
   }
 });
 
-test("the two views cannot disagree, because they share the computation", () => {
-  // Not a tautology worth skipping: it fails the moment somebody "fixes" the
-  // comparison page by recomputing anything locally instead of reading the fit.
+test("the published widths are the ones the page prints", () => {
   const a = computeFit(100, "H", 9, "n", 8);
-  const b = computeFit(100, "H", 9, "n", 8);
-  assert.deepEqual(a, b);
   assert.equal(a.IT_hole, 87, "IT9 at ⌀100 is 87 µm in the published table");
   assert.equal(a.IT_shaft, 54, "IT8 at ⌀100 is 54 µm in the published table");
 });
 
 test("a clearance fit still has a meaningful smallest clearance", () => {
-  // The shipped page shows only the maxima, so a clearance fit reports a
-  // negative "maximum interference" and hides the number a reader wants. This
-  // is the case that motivated showing all four.
+  // The page used to show only the maxima, so a clearance fit reported a
+  // negative "maximum interference" and hid the number a reader wants. This is
+  // the case that motivated showing all four.
   const fit = computeFit(100, "H", 7, "g", 6);
   assert.equal(fit.kind, "clearance");
   assert.ok(um(fit.imax) < 0, "interference on a clearance fit is negative, which reads as a fault");

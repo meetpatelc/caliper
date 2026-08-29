@@ -41,6 +41,43 @@ function mm(value: number, kind: "limit" | "deviation" = "deviation") {
   return kind === "limit" ? formatLimitMm(value) : formatDeviationMm(value);
 }
 
+/** Deviations in µm. The published tables are µm, and "87 − 23 = 64" reads. */
+const um = (mmValue: number) => Math.round(mmValue * 1000);
+const signed = (value: number) => (value > 0 ? `+${value}` : String(value));
+
+/**
+ * An operand inside a subtraction rather than a value on its own: positives
+ * bare, negatives bracketed. "+87 − +23" is harder to read than the arithmetic
+ * it describes, and "35 − −34" is worse.
+ */
+const operand = (value: number) => (value < 0 ? `(${value})` : String(value));
+
+/**
+ * The four corners of a fit, each with the subtraction that produces it.
+ *
+ * Built from the fit object so the operands shown and the answer shown are the
+ * same arithmetic. Typing "87 − 23 = 64" into the markup would make this the
+ * one page on the site whose numbers nobody checks — which is the opposite of
+ * why it prints them.
+ *
+ * The page used to show only cmax and imax. On a clearance fit that meant
+ * "Maximum interference: −0.012 mm" — a negative tightness, which reads as a
+ * fault — while the number a reader wants, the smallest clearance, was
+ * computed on every render and thrown away.
+ */
+function workingRows(fit: { ES: number; EI: number; es: number; ei: number }) {
+  const ES = um(fit.ES);
+  const EI = um(fit.EI);
+  const es = um(fit.es);
+  const ei = um(fit.ei);
+  return [
+    { label: "Clearance, largest", terms: "ES − ei", a: ES, b: ei, value: ES - ei },
+    { label: "Clearance, smallest", terms: "EI − es", a: EI, b: es, value: EI - es },
+    { label: "Interference, largest", terms: "es − EI", a: es, b: EI, value: es - EI },
+    { label: "Interference, smallest", terms: "ei − ES", a: ei, b: ES, value: ei - ES },
+  ];
+}
+
 function FitDiagram({
   ES,
   EI,
@@ -108,8 +145,8 @@ export function Iso286Instrument() {
     const summary = [
       `${fitsTool().title} — ${f.holeClass}/${f.shaftClass} at ⌀${D} mm`,
       `Fit: ${fitLabel(f.kind)}`,
-      `Maximum clearance: ${mm(f.cmax)} mm`,
-      `Maximum interference: ${mm(f.imax)} mm`,
+      `Clearance: ${mm(f.cmin)} to ${mm(f.cmax)} mm`,
+      `Interference: ${mm(f.imin)} to ${mm(f.imax)} mm`,
       `Hole: ${mm(f.holeMin, "limit")} / ${mm(f.holeMax, "limit")} mm`,
       `Shaft: ${mm(f.shaftMin, "limit")} / ${mm(f.shaftMax, "limit")} mm`,
       `Method: ${fitsCalculator().formula}`,
@@ -264,18 +301,35 @@ export function Iso286Instrument() {
                   </p>
                 }
               />
-              <ResultQuantity
-                label="Maximum clearance"
-                symbol="cmax"
-                value={mm(result.fit.cmax)}
-                unit={<UnitBadge>mm</UnitBadge>}
-              />
-              <ResultQuantity
-                label="Maximum interference"
-                symbol="imax"
-                value={mm(result.fit.imax)}
-                unit={<UnitBadge>mm</UnitBadge>}
-              />
+              <div>
+                <p className="eyebrow">The working</p>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Deviations in µm from the nominal size. Each line is the sum, not a restatement of
+                  it.
+                </p>
+                <dl className="mt-3 grid gap-1.5">
+                  {workingRows(result.fit).map((row) => (
+                    <div
+                      key={row.label}
+                      className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
+                    >
+                      <dt className="text-sm text-muted">{row.label}</dt>
+                      <dd className="font-mono text-sm tabular-nums">
+                        <span className="text-muted">{row.terms} = </span>
+                        {operand(row.a)} − {operand(row.b)} ={" "}
+                        <span className="text-base font-medium">{signed(row.value)}</span>
+                        <span className="ml-1 text-muted">µm</span>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+
+              <dl className="grid grid-cols-2 gap-2 font-mono text-xs text-muted">
+                <div>Hole width IT{holeGrade} {result.fit.IT_hole} µm</div>
+                <div>Shaft width IT{shaftGrade} {result.fit.IT_shaft} µm</div>
+              </dl>
+
               <dl className="grid grid-cols-2 gap-2 font-mono text-xs text-muted">
                 <div>Hole max {mm(result.fit.holeMax, "limit")} mm</div>
                 <div>Shaft max {mm(result.fit.shaftMax, "limit")} mm</div>
