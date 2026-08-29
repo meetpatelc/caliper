@@ -1,4 +1,38 @@
-/** ISO 286-1/2:2010 — standard tolerances and fundamental deviations, ≤ 500 mm. Values in µm. */
+/**
+ * ISO 286-1/2:2010 — standard tolerances and fundamental deviations, ≤ 500 mm.
+ * Values in µm.
+ *
+ * These ~290 numbers are transcribed from a standard that is sold, which is
+ * reproduction rather than citation. Computing them instead was tried and does
+ * not work; recording the measurement so the next attempt starts from it.
+ *
+ * ISO defines the tolerance factor as i = 0.45·∛D + 0.001·D on the geometric
+ * mean of each size range, with IT5 and coarser as fixed multiples of i, and a
+ * closed form per deviation letter. Implemented and diffed against this table:
+ *
+ *   IT grades          71 of 104 exact, mean error 1.5%, worst 13%
+ *   deviations         c and u systematically wrong; p, r and s carry chosen
+ *                      offsets rather than any closed form
+ *   overall            ~64% of 234 values reproduced
+ *
+ * The residue is not noise to tune away. The published table carries rounding
+ * conventions and historical values the formulas do not describe, and the
+ * error is worst at the ends of the range — every value in 1–3 mm came out
+ * 13.3% low, and no choice of D for that range fixed it.
+ *
+ * What settles it is what a 1 µm error means here. ⌀100 H7 and ⌀25 H7 both
+ * derive correctly, but ⌀450 H7 gives 62 against a published 63 — and a fit
+ * sums hole and shaft tolerances, so the error compounds into a clearance
+ * somebody cuts metal to. An approximation is not a substitute for a
+ * published limit.
+ *
+ * So the table stays, and the exposure is a licensing question rather than an
+ * engineering one. Note that the answer differs by jurisdiction: the US treats
+ * facts and non-creative compilations as uncopyrightable, while the EU has a
+ * separate database right. Worth a lawyer's half hour if this ships
+ * commercially — it is cheaper than the workaround, and the workaround does
+ * not work.
+ */
 
 const SIZE_LIMITS = [3, 6, 10, 18, 30, 50, 80, 120, 180, 250, 315, 400, 500] as const;
 
