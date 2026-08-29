@@ -43,13 +43,18 @@ export function buildDemo() {
   return {
     toolId: TOOL_ID,
     title: tool.title,
+    // Symbols come from the document for inputs and from the evaluator for
+    // outputs, where `quantitySymbol` already resolves σ, ε and ΔL. Showing
+    // them makes the panel read as engineering rather than as a form.
     inputs: fields.map((field) => ({
       label: field.label,
+      symbol: document.fields?.find((item) => item.id === field.key)?.symbol ?? "",
       value: String(inputs[field.key] ?? ""),
       unit: field.unit ?? "",
     })),
     outputs: result.values.map((value) => ({
       label: value.label,
+      symbol: value.symbol ?? "",
       display: value.display,
       unit: value.unit,
     })),
@@ -76,8 +81,8 @@ export function renderDemoModule(demo) {
     "export type HomeDemo = {",
     "  toolId: string;",
     "  title: string;",
-    "  inputs: { label: string; value: string; unit: string }[];",
-    "  outputs: { label: string; display: string; unit: string }[];",
+    "  inputs: { label: string; symbol: string; value: string; unit: string }[];",
+    "  outputs: { label: string; symbol: string; display: string; unit: string }[];",
     "  formula: string;",
     "  assumptions: string[];",
     "  boundary: string;",

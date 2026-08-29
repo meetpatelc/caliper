@@ -7,8 +7,8 @@
 export type HomeDemo = {
   toolId: string;
   title: string;
-  inputs: { label: string; value: string; unit: string }[];
-  outputs: { label: string; display: string; unit: string }[];
+  inputs: { label: string; symbol: string; value: string; unit: string }[];
+  outputs: { label: string; symbol: string; display: string; unit: string }[];
   formula: string;
   assumptions: string[];
   boundary: string;
@@ -22,21 +22,25 @@ export const homeDemo: HomeDemo = {
   "inputs": [
     {
       "label": "Axial load",
+      "symbol": "F",
       "value": "10",
       "unit": "kN"
     },
     {
       "label": "Cross-sectional area",
+      "symbol": "A",
       "value": "1000",
       "unit": "mm²"
     },
     {
       "label": "Original length",
+      "symbol": "L",
       "value": "1000",
       "unit": "mm"
     },
     {
       "label": "Elastic modulus",
+      "symbol": "E",
       "value": "200",
       "unit": "GPa"
     }
@@ -44,16 +48,19 @@ export const homeDemo: HomeDemo = {
   "outputs": [
     {
       "label": "Average normal stress",
+      "symbol": "σ",
       "display": "10",
       "unit": "MPa"
     },
     {
       "label": "Elastic strain",
+      "symbol": "ε",
       "display": "50",
       "unit": "µε"
     },
     {
       "label": "Ideal length change",
+      "symbol": "ΔL",
       "display": "0.05",
       "unit": "mm"
     }

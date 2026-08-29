@@ -78,11 +78,95 @@ function Home() {
         checked. It survives beside the filter, where it scopes what you are
         about to narrow.
       */}
-      <PageHeader
-        kicker={PARENT_NAME}
-        title="Engineering models you can check."
-        lede="See exactly how a result is calculated. The method, the assumptions it rests on, the source, and the boundary where it stops being valid all stay next to the number."
-      />
+      {/*
+        Claim on the left, proof on the right, so the argument lands in one
+        beat. Stacked, the example sat below the fold on a laptop and the page
+        made its case twice — once in prose and again, later, in evidence.
+      */}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start lg:gap-10">
+        <PageHeader
+          className="lg:pt-1"
+          kicker={PARENT_NAME}
+          title="Engineering models you can check."
+          lede="See exactly how a result is calculated. The method, the assumptions it rests on, the source, and the boundary where it stops being valid all stay next to the number."
+        />
+
+        <div className={cn(panelClass, "p-5")}>
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="eyebrow">Worked example</p>
+            <Link to="/tool/$toolId" params={{ toolId: homeDemo.toolId }} className="link-accent text-sm">
+              Open this model
+            </Link>
+          </div>
+          <p className="mt-1 text-base font-medium">{homeDemo.title}</p>
+
+          {/* Inputs beside results: cause and effect in one glance. Stacked,
+              you read the inputs and then scrolled past them to find the
+              number they produced. */}
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            <div>
+              <p className="eyebrow">Inputs</p>
+              <dl className="mt-2 grid gap-1.5">
+                {homeDemo.inputs.map((input) => (
+                  <div key={input.label} className="flex items-baseline justify-between gap-3">
+                    <dt className="text-sm text-muted">
+                      {input.label}
+                      {input.symbol ? <span className="ml-1.5 font-mono text-xs">{input.symbol}</span> : null}
+                    </dt>
+                    <dd className="whitespace-nowrap font-mono text-sm tabular-nums">
+                      {input.value} {input.unit}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <div>
+              <p className="eyebrow">Results</p>
+              <dl className="mt-2 grid gap-1.5">
+                {homeDemo.outputs.map((output, index) => (
+                  <div key={output.label} className="flex items-baseline justify-between gap-3">
+                    <dt className={cn("text-sm", index === 0 ? "text-fg" : "text-muted")}>
+                      {output.label}
+                      {output.symbol ? <span className="ml-1.5 font-mono text-xs">{output.symbol}</span> : null}
+                    </dt>
+                    <dd
+                      className={cn(
+                        "whitespace-nowrap font-mono tabular-nums",
+                        index === 0 ? "text-base font-medium" : "text-sm text-muted",
+                      )}
+                    >
+                      {output.display} {output.unit}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 border-t border-border pt-4">
+            <div>
+              <p className="eyebrow">Relation</p>
+              <p className="mt-1 font-mono text-sm leading-6">{homeDemo.formula}</p>
+            </div>
+            <div>
+              <p className="eyebrow">Assumptions</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{homeDemo.assumptions.join(" · ")}</p>
+            </div>
+            <div>
+              <p className="eyebrow">Source</p>
+              <p className="mt-1 text-sm leading-6">
+                <a href={homeDemo.sourceUrl} target="_blank" rel="noreferrer" className="link-accent">
+                  {homeDemo.sourceLabel}
+                </a>
+              </p>
+            </div>
+            <div>
+              <p className="eyebrow">Where it stops</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{homeDemo.boundary}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {(saved.length > 0 || recentTools.length > 0) && (
         <section className="mt-12">
@@ -117,119 +201,31 @@ function Home() {
       )}
 
       {/*
-        The proof. Asserting that a number can be checked is weaker than
-        showing one, and this example is checkable in your head: 10 kN over
-        1000 mm² is 10 MPa.
-
-        Generated at build time from the model itself
-        (scripts/generate-home-demo.mjs), for two reasons. Hand-typing it would
-        make the front door the one place on the site whose numbers nobody
-        verifies. And importing the evaluator here would pull every library
-        document into the entry chunk — see the note in side-rail.tsx.
-      */}
-      <section className="mt-12">
-        <SectionHeader title="See it working." />
-        <div className={cn(panelClass, "mt-4 grid gap-6 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]")}>
-          <div>
-            <p className="eyebrow">{homeDemo.title}</p>
-            <dl className="mt-3 grid gap-1.5">
-              {homeDemo.inputs.map((input) => (
-                <div key={input.label} className="flex items-baseline justify-between gap-4">
-                  <dt className="text-sm text-muted">{input.label}</dt>
-                  <dd className="font-mono text-sm tabular-nums">
-                    {input.value} {input.unit}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <div className="mt-4 border-t border-border pt-4">
-              {homeDemo.outputs.map((output, index) => (
-                <div key={output.label} className="flex items-baseline justify-between gap-4 py-0.5">
-                  <span className={cn("text-sm", index === 0 ? "text-fg" : "text-muted")}>{output.label}</span>
-                  <span
-                    className={cn(
-                      "font-mono tabular-nums",
-                      index === 0 ? "text-lg font-medium" : "text-sm text-muted",
-                    )}
-                  >
-                    {output.display} {output.unit}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-4 lg:border-l lg:border-border lg:pl-6">
-            <div>
-              <p className="eyebrow">Relation</p>
-              <p className="mt-1 font-mono text-sm leading-6">{homeDemo.formula}</p>
-            </div>
-            <div>
-              <p className="eyebrow">Assumptions</p>
-              <p className="mt-1 text-sm leading-6 text-muted">{homeDemo.assumptions.join(" · ")}</p>
-            </div>
-            <div>
-              <p className="eyebrow">Source</p>
-              <p className="mt-1 text-sm leading-6">
-                <a
-                  href={homeDemo.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="link-accent"
-                >
-                  {homeDemo.sourceLabel}
-                </a>
-              </p>
-            </div>
-            <div>
-              <p className="eyebrow">Where it stops</p>
-              <p className="mt-1 text-sm leading-6 text-muted">{homeDemo.boundary}</p>
-            </div>
-            <Button asChild variant="outline" className="justify-self-start">
-              <Link to="/tool/$toolId" params={{ toolId: homeDemo.toolId }}>
-                Open this model
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/*
         Four rooms, named once. Without this the site reads as a calculator
         directory, because the front page was the directory — nothing said a
         result can be saved, extended, or reviewed.
+
+        A rule-bounded strip rather than cards: the worked example above is
+        what should hold the eye, and four bordered panels were competing
+        with it.
       */}
-      <section className="mt-12">
-        <SectionHeader title="Your workspace." />
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className={cn(panelClass, "p-4")}>
-            <p className="text-base font-medium">
-              Library <span className="text-sm font-normal text-muted">— you are here</span>
-            </p>
-            <p className="mt-1 text-sm leading-6 text-muted">Finished models, below. Open one and get a number.</p>
-          </div>
-          {[
-            { to: "/studio", label: "Build", note: "Write your own model, unit-aware, with its method attached." },
-            { to: "/review", label: "Review", note: "Evidence checklists, a trade study, and FMEA you control." },
-            { to: "/workshop", label: "Project", note: "Drafts and saved checks. On this device, or on your account." },
-          ].map((room) => (
-            <Link
-              key={room.label}
-              to={room.to}
-              className={cn(panelClass, "block p-4 transition-colors hover:bg-elevated")}
-            >
-              <p className="text-base font-medium">{room.label}</p>
-              <p className="mt-1 text-sm leading-6 text-muted">{room.note}</p>
-            </Link>
-          ))}
-        </div>
-        <p className="mt-3 text-sm text-muted">
-          Saving does not require an account.{" "}
-          <Link to="/about" className="link-accent">
-            What this is, and what it is not
-          </Link>
-          .
+      <section className="mt-12 grid gap-4 border-y border-border py-5 sm:grid-cols-2 lg:grid-cols-4">
+        <p className="text-sm leading-6">
+          <span className="font-medium">Library</span>
+          <span className="text-muted"> — finished models, below.</span>
         </p>
+        {[
+          { to: "/studio", label: "Build", note: "write a unit-aware check, method attached." },
+          { to: "/review", label: "Review", note: "evidence checklists and trade studies." },
+          { to: "/workshop", label: "Project", note: "drafts and saved checks." },
+        ].map((room) => (
+          <p key={room.label} className="text-sm leading-6">
+            <Link to={room.to} className="link-accent font-medium">
+              {room.label}
+            </Link>
+            <span className="text-muted"> — {room.note}</span>
+          </p>
+        ))}
       </section>
 
       {/* No "Browse" eyebrow: it repeated what the heading already said, which

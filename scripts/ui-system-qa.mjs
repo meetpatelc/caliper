@@ -108,11 +108,11 @@ try {
   // without this going red, but the order cannot silently collapse back.
   const homeParts = {
     claim: /models you can check/i.test(libraryText),
-    workedExample: /See it working/i.test(libraryText),
+    workedExample: /Worked example/i.test(libraryText),
     relation: /Relation/i.test(libraryText) && libraryText.includes("F / A"),
     boundary: /Where it stops/i.test(libraryText),
     source: /Source/i.test(libraryText),
-    rooms: /Your workspace/i.test(libraryText) && /Build/.test(libraryText) && /Review/.test(libraryText),
+    rooms: /finished models, below/i.test(libraryText) && /trade studies/i.test(libraryText),
     catalogue: /Pick a field/i.test(libraryText),
   };
   const missingParts = Object.entries(homeParts)
@@ -122,7 +122,7 @@ try {
 
   // The count invites the one comparison this product loses, so it is out of
   // the opening and kept beside the filter it scopes.
-  const openingLine = libraryText.split(/See it working/i)[0] ?? libraryText;
+  const openingLine = libraryText.split(/Worked example/i)[0] ?? libraryText;
   record("the model count is not part of the pitch", !/\d{3}\s*(finished|calculators|models)/i.test(openingLine), openingLine.slice(0, 70).replace(/\s+/g, " "));
   const domainGroup = page.getByRole("group", { name: "Domain filter" });
   record("library SegmentedControl", (await domainGroup.count()) === 1);
