@@ -23,14 +23,26 @@ Instrument is a **preliminary screening desk**, not a design approval, sealed ca
 
 ## Requirements
 
-- Node.js 22+
-- npm 10+
+- Node.js 22+ (see `.nvmrc`)
+- npm 10.x — **not** npm 11
+
+The npm major is pinned, and `engine-strict` in `.npmrc` makes npm refuse to
+install under the wrong one. This is not fussiness: npm 10 and 11 disagree
+about which entries a lockfile must carry, and a lockfile written by npm 11
+failed `npm ci` in CI with a missing-package error that did not reproduce on
+the machine that wrote it.
+
+`corepack enable` is a one-time command that makes the right npm automatic.
+The refusal has to happen at the engine check rather than in a `preinstall`
+script: npm rewrites the lockfile before lifecycle scripts run, so a script
+can report the mismatch but the damage is already on disk by then.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/meetpatelc/instrument.git
 cd instrument
+corepack enable
 npm install
 npm run dev
 ```

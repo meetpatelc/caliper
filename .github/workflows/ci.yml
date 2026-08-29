@@ -20,6 +20,11 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           cache: npm
+      # Uses the npm named in package.json's `packageManager`. The runner's
+      # Node image already ships a 10.x, so this pins the patch rather than
+      # rescuing the major — the preinstall guard is what enforces the major,
+      # on both sides.
+      - run: corepack enable
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
@@ -41,6 +46,11 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           cache: npm
+      # Uses the npm named in package.json's `packageManager`. The runner's
+      # Node image already ships a 10.x, so this pins the patch rather than
+      # rescuing the major — the preinstall guard is what enforces the major,
+      # on both sides.
+      - run: corepack enable
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run build
