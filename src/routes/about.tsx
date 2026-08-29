@@ -48,7 +48,7 @@ function AboutPage() {
               </Link>{" "}
               is {tools.length} finished models — open one and get a number.{" "}
               <Link to="/studio" className="link-accent">
-                Studio
+                Build
               </Link>{" "}
               is where you write a model.{" "}
               <Link to="/review" className="link-accent">
@@ -61,7 +61,7 @@ function AboutPage() {
               is drafts, saved checks, and review snapshots — on this device until you sign in, then on your account. Method, assumptions, and limits also sit on each model.
             </p>
             <p className="mt-4">
-              Saving a snapshot or a Studio draft does not require an account. Sign in and that work can follow you.
+              Saving a snapshot or a draft does not require an account. Sign in and that work can follow you.
             </p>
           </>
         }

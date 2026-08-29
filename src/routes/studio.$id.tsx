@@ -11,12 +11,12 @@ function StudioEdit() {
   const item = useWorkshop((state) => state.get(id));
 
   if (!hasHydrated && !item) {
-    return <PageLoading kicker="Studio" />;
+    return <PageLoading kicker="Build" />;
   }
 
   if (!item) {
     return (
-      <MissingPage kicker="Studio" title="That draft is not here." to="/workshop" backLabel="Back to Project" />
+      <MissingPage kicker="Build" title="That draft is not here." to="/workshop" backLabel="Back to Project" />
     );
   }
 

@@ -195,7 +195,7 @@ export function CommandPalette({
             </Command.Group>
           )}
           {workshop.length > 0 && (
-            <Command.Group heading="Studio drafts" className="px-1 py-1">
+            <Command.Group heading="Build drafts" className="px-1 py-1">
               {workshop.map((item) => (
                 <Command.Item
                   key={`draft-${item.id}`}

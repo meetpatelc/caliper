@@ -12,9 +12,9 @@ import { SelectableCard } from "@/components/ui/selection";
 
 export const Route = createFileRoute("/studio/")({   head: () => ({
     meta: [
-      { title: "Studio · Instrument" },
+      { title: "Build · Instrument" },
       { name: "description", content: "Author a unit-aware calculator and keep the method attached to it." },
-      { property: "og:title", content: "Studio · Instrument" },
+      { property: "og:title", content: "Build · Instrument" },
       { property: "og:description", content: "Author a unit-aware calculator and keep the method attached to it." },
     ],
   }),
@@ -35,7 +35,7 @@ function StudioHome() {
   return (
     <div className="page-wrap">
       <PageHeader
-        kicker="Studio"
+        kicker="Build"
         title="Name the quantities. Write the relation. Watch it compute."
         lede="Start blank, start from a working example, or fork a formula instrument. Method is for publishing — not for the first number."
       />
