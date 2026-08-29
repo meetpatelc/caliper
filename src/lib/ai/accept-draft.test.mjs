@@ -124,3 +124,36 @@ test("the prompt tells the model not to scale the expression to match the unit",
   );
   assert.match(DRAFT_SYSTEM_PROMPT, /SI base units/, "rule 4 must still require SI in the relation");
 });
+
+/**
+ * The mirror image of the rule above, and the one that actually reached a user.
+ *
+ * "Field values arrive already converted to canonical SI" was written to stop
+ * the model scaling inside an expression. It also read as an instruction about
+ * `defaultValue`, so the model wrote SI magnitudes under display labels: a
+ * compression spring with a free length of "0.05 mm" and a rate of
+ * "10000 N/mm" — the SI numbers, 0.05 m and 10000 N/m, wearing millimetre
+ * labels. It parsed, it computed, every output was finite, so `acceptDraft`
+ * passed it through; only a person reading a 50-micron spring could tell.
+ *
+ * `defaultValue` is paired with `defaultUnit` as a typed quantity
+ * (`defaultFieldState`, src/studio/lib/evaluate.ts), and the prompt now says
+ * so. Nothing downstream can check this, so this is where it is pinned.
+ */
+test("the prompt says which unit a field default is written in", () => {
+  assert.match(
+    DRAFT_SYSTEM_PROMPT,
+    /defaultValue is written in that field's own defaultUnit/,
+    "the prompt must state what a field default is expressed in",
+  );
+  assert.match(
+    DRAFT_SYSTEM_PROMPT,
+    /never 0\.05/,
+    "the prompt should name the failure it prevents, not just the rule",
+  );
+});
+
+/** A guard the draft trips on its own defaults is a draft that never opens. */
+test("the prompt requires the example to satisfy the model's own constraints", () => {
+  assert.match(DRAFT_SYSTEM_PROMPT, /must satisfy every constraint you write/i);
+});

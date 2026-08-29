@@ -35,7 +35,11 @@ export async function draftWithOpenAI(brief: string): Promise<DraftResult> {
       model: MODEL,
       instructions: DRAFT_SYSTEM_PROMPT,
       input: brief,
-      max_output_tokens: 16000,
+      // Covers reasoning *and* the answer on a reasoning model, which is why
+      // 16000 was not enough: a draft that reasoned for two minutes ran past
+      // it and came back truncated, reported as "ran past the length limit".
+      // The JSON itself is on the order of 1500 tokens; the rest is thinking.
+      max_output_tokens: 48000,
       text: {
         format: {
           type: "json_schema",
