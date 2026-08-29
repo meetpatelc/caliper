@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { libraryDocuments, isStudioDocument } from "@/lib/document";
-import { asCalculatorDefinition, calculatorSchema } from "@/studio/lib/calculator-types";
+import { asCalculatorDefinition, calculatorSchema, MAX_FIELDS, MAX_OUTPUTS } from "@/studio/lib/calculator-types";
 import { adoptDocument, adoptionLoss } from "@/studio/lib/adopt-document";
 import { uniqueSlug } from "@/studio/lib/workshop-store";
 import { defaultFieldState, evaluateCalculator } from "@/studio/lib/evaluate";
@@ -86,8 +86,24 @@ test("every model that offers a fork produces a calculator that computes", () =>
     const run = evaluateCalculator(parsed.data, defaultFieldState(parsed.data));
     if (!run.ok) broken.push(`${document.slug}: ${run.error}`);
   }
-  const lookupFailures = broken.filter((entry) => /Unknown table/.test(entry));
-  assert.deepEqual(lookupFailures, [], "no fork may lose the tables its expressions depend on");
+  // Not just the lookup failures: if the button is offered at all, the copy has
+  // to parse and compute. Anything that cannot must say why through
+  // `adoptionLoss` and withhold the button, rather than handing someone an
+  // editor full of errors about a model that works on its own page.
+  assert.deepEqual(broken, [], `forks offered but broken:\n  ${broken.join("\n  ")}`);
+});
+
+test("the schema caps fit what the Library actually ships", () => {
+  // Fourteen models were refused by limits chosen for hand-authoring, not by
+  // anything wrong with the models. Raising them is only correct while the
+  // Library stays inside the new numbers, so this is where that is checked.
+  const offered = Object.values(libraryDocuments).filter(
+    (document) => isStudioDocument(document) && !adoptionLoss(document),
+  );
+  const overFields = offered.filter((document) => document.fields.length > MAX_FIELDS);
+  const overOutputs = offered.filter((document) => document.outputs.length > MAX_OUTPUTS);
+  assert.deepEqual(overFields.map((d) => `${d.slug}:${d.fields.length}`), []);
+  assert.deepEqual(overOutputs.map((d) => `${d.slug}:${d.outputs.length}`), []);
 });
 
 test("a model whose results depend on a choice does not offer a fork", () => {

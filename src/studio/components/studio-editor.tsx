@@ -8,6 +8,8 @@ import { domains } from "@/studio/lib/brand";
 import {
   calculatorSchema,
   isBlankDraft,
+  MAX_FIELDS,
+  MAX_OUTPUTS,
   type FieldDefinition,
   type OutputDefinition,
   type WorkshopCalculator,
@@ -391,9 +393,15 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                     <p className="eyebrow">Inputs</p>
                     <p className="mt-1 text-sm text-muted">A name, a quantity kind, a typical value.</p>
                   </div>
+                  {/*
+                    Guarded like the results Add above it. Without this the
+                    button kept adding past the schema cap, and the only sign
+                    was Publish refusing with a message about an array.
+                  */}
                   <Button
                     variant="ghost"
                     className="text-accent"
+                    disabled={draft.fields.length >= MAX_FIELDS}
                     onClick={() => {
                       const taken = new Set(draft.fields.map((field) => field.id));
                       setDraft({
@@ -566,7 +574,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
               <fieldset className={cn(panelClass, "grid gap-3 p-4")}>
                 <div className="flex items-center justify-between gap-3">
                   <p className="eyebrow">Results</p>
-                  {draft.outputs.length < 6 && (
+                  {draft.outputs.length < MAX_OUTPUTS && (
                     <Button
                       variant="ghost"
                       className="text-accent"

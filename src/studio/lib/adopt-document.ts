@@ -132,5 +132,18 @@ export function adoptionLoss(document: InstrumentDocument): string | undefined {
   if (document.warningsBy || document.methods) {
     return "changes its warnings or its method text depending on a choice, which Build cannot express yet";
   }
+  // The one model the raised caps deliberately do not reach. `gageRr` carries a
+  // 5,459-character expression; the next longest in the whole library is 273.
+  // Every other cap moved to fit what the Library ships, because a limit that
+  // refuses a working model describes the editor's comfort rather than the
+  // model's validity. This one is different: the expression is not editable in
+  // a single-line input at any cap, so raising the number fourteenfold would
+  // buy a fork nobody could work with.
+  if (document.outputs.some((output) => output.expression.length > EXPRESSION_LIMIT)) {
+    return "is written as one very long expression that Build's editor cannot show usefully";
+  }
   return undefined;
 }
+
+/** Kept alongside `outputSchema.expression`; the two must agree. */
+const EXPRESSION_LIMIT = 400;

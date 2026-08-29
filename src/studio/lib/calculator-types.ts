@@ -10,6 +10,25 @@ import { adoptDocument } from "@/studio/lib/adopt-document";
 
 const DOMAIN_IDS = domains.map((domain) => domain.id) as [DomainId, ...DomainId[]];
 
+/**
+ * How large a calculator may get, set by what the Library already ships.
+ *
+ * These were picked for hand-authoring — six results and twelve inputs is a lot
+ * to write from scratch — and then "Fork in studio" started copying Library
+ * models into the same schema. Fourteen of them did not fit: `productionMetrics`
+ * has ten outputs, `dimensionCheck` fourteen inputs, `motionDuty` an output id
+ * of 34 characters, and four models cite a source in 86. Every one of those
+ * renders correctly on its own page, so a limit that refuses them is a limit
+ * describing the editor's comfort rather than the model's validity.
+ *
+ * Raising them does not loosen what a *model* may draft: `draftedCalculatorSchema`
+ * overrides both array caps with its own, deliberately smaller, numbers.
+ */
+export const MAX_FIELDS = 14;
+export const MAX_OUTPUTS = 10;
+/** `motionDuty` needs 34; the headroom is for the next one. */
+const MAX_IDENTIFIER = 40;
+
 const optionalFamily = z
   .string()
   .refine((value) => !value || isUnitFamilyId(value), "Unknown unit family.")
@@ -20,7 +39,7 @@ export const fieldSchema = z.object({
   id: z
     .string()
     .min(1)
-    .max(32)
+    .max(MAX_IDENTIFIER)
     .regex(/^[A-Za-z_][A-Za-z0-9_]*$/, "Use a letter-first identifier."),
   label: z.string().min(1).max(80),
   family: optionalFamily,
@@ -80,7 +99,7 @@ export const outputSchema = z.object({
   id: z
     .string()
     .min(1)
-    .max(32)
+    .max(MAX_IDENTIFIER)
     .regex(/^[A-Za-z_][A-Za-z0-9_]*$/, "Use a letter-first identifier."),
   label: z.string().min(1).max(80),
   symbol: z.string().max(12).optional(),
@@ -129,8 +148,8 @@ export const calculatorSchema = z.object({
   title: z.string().min(2).max(80),
   description: z.string().min(8).max(280),
   domain: z.enum(DOMAIN_IDS),
-  fields: z.array(fieldSchema).min(1).max(12),
-  outputs: z.array(outputSchema).min(1).max(6),
+  fields: z.array(fieldSchema).min(1).max(MAX_FIELDS),
+  outputs: z.array(outputSchema).min(1).max(MAX_OUTPUTS),
   constraints: z.array(constraintSchema).max(12).optional(),
   tables: z.array(tableSchema).max(6).optional(),
   formula: z.string().min(1).max(240),
@@ -138,7 +157,7 @@ export const calculatorSchema = z.object({
   assumptions: z.array(z.string().min(1).max(240)).min(1).max(8),
   boundary: z.string().min(8).max(400),
   interpretation: z.string().min(8).max(400),
-  sourceLabel: z.string().min(2).max(80),
+  sourceLabel: z.string().min(2).max(120),
   sourceUrl: z.string().max(240),
   related: z.array(z.string()).max(6),
   warnings: z.array(z.string().min(1).max(800)).max(8).optional(),
