@@ -23,14 +23,29 @@ Instrument is a **preliminary screening desk**, not a design approval, sealed ca
 
 ## Requirements
 
-- Node.js 22+
-- npm 10+
+- Node.js 22+ (see `.nvmrc`)
+- npm 10.x — `corepack enable` once and you get it automatically
+
+npm refuses to install under npm 11 here, by way of `engine-strict` in
+`.npmrc`. npm 10 and 11 disagree about which entries a lockfile must carry,
+and one written by npm 11 failed `npm ci` in CI with a missing-package error
+that did not reproduce on the machine that wrote it.
+
+Two weaker mechanisms were tried first. A `preinstall` guard cannot work: npm
+writes the lockfile before lifecycle scripts run, so it reports a mismatch
+already on disk. Leaving it as a convention does not work either — with the
+check removed, a single `npm install` under npm 11 stripped the entry again.
+
+Deployment installs opt out (`installCommand` in `vercel.json`). Nothing that
+only runs `npm ci` can corrupt a lockfile, so the guard buys nothing there,
+and it failed the Vercel build while it applied.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/meetpatelc/instrument.git
 cd instrument
+corepack enable
 npm install
 npm run dev
 ```
