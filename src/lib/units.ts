@@ -103,7 +103,12 @@ const MENU: Record<(typeof FAMILIES)[number], readonly string[]> = {
   mass: ["mass.kg", "mass.g", "mass.tonne", "mass.lbm", "mass.oz"],
   time: ["time.s", "time.min", "time.h", "time.day"],
   angle: ["angle.rad", "angle.degree", "angle.rev"],
-  force: ["force.N", "force.kN", "force.MN", "force.lbf"],
+  // kgf sits between the metric and imperial entries because that is where it
+  // belongs to a reader, not because of any ordering rule. It was the one unit
+  // the inventory defined and no picker offered — the engine has always
+  // converted it, so the omission showed up as a unit that exists everywhere
+  // except in the list you choose from.
+  force: ["force.N", "force.kN", "force.MN", "force.kgf", "force.lbf"],
   pressure: [
     "pressure.Pa",
     "pressure.kPa",

@@ -17,6 +17,7 @@ import { validateExpression } from "@instrument/formula";
 import { rewriteIdentifier, toIdentifier } from "@/studio/lib/identifiers";
 import { retargetAuthoredField } from "@/studio/lib/evaluate";
 import { publishProblem } from "@/studio/lib/publish-problem";
+import { TablesFieldset } from "@/studio/components/table-editor";
 import { unitFamilyOptions, unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { uniqueSlug, useWorkshop } from "@/studio/lib/workshop-store";
 import { Button } from "@/components/ui/button";
@@ -52,10 +53,33 @@ const FAMILY_GROUPS: { label: string; domain: string }[] = [
   { label: "Electrical", domain: "electrical" },
 ];
 
+/** The quantity-kind menu's entry for "this is a dropdown, not a number". */
+const CHOICE_KIND = "__choice";
+
+/**
+ * What a new list starts with.
+ *
+ * Not empty: a choice field with no options renders a dropdown that cannot be
+ * opened, and a table keyed on it refuses every lookup with "is not in" — an
+ * error about the table, pointing away from the field that actually caused it.
+ */
+const SEED_OPTIONS = [
+  { value: "first", label: "First option" },
+  { value: "second", label: "Second option" },
+];
+
 function QuantityKindOptions() {
   return (
     <>
       <option value="">Number — no conversion</option>
+      {/*
+        A dropdown is a kind of input, not a kind of quantity — but it sits in
+        this menu because that is the one control an author already looks at to
+        decide what a field *is*, and a separate toggle beside it was one more
+        thing to find. Choosing it turns the value and unit cells into a list of
+        options, which is the whole of what a choice field carries.
+      */}
+      <option value={CHOICE_KIND}>List — pick from options</option>
       {FAMILY_GROUPS.map((group) => {
         const options = unitFamilyOptions.filter((option) => option.domain === group.domain);
         if (!options.length) return null;
@@ -153,7 +177,14 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
   const [activeOutput, setActiveOutput] = useState(0);
   const expressionRef = useRef<HTMLInputElement>(null);
 
-  const names = draft.fields.map((field) => field.id);
+  // Table columns are names too. `resolveTables` puts every column into the
+  // same scope the fields are in, so leaving them out here made an expression
+  // that referenced a looked-up value read as "Unknown name As" — a formula
+  // error on a formula that computes, and one that blocks publishing.
+  const names = [
+    ...draft.fields.map((field) => field.id),
+    ...(draft.tables ?? []).flatMap((table) => table.columns.map((column) => column.id)),
+  ];
   const formulaErrors = draft.outputs.map((output) => validateExpression(output.expression, names));
   const formulaError = formulaErrors.find(Boolean);
   const parsed = calculatorSchema.safeParse(draft);
@@ -412,31 +443,75 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                     </div>
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_5.5rem_6rem]">
                       <Select
-                        value={field.family ?? ""}
+                        value={field.input === "choice" ? CHOICE_KIND : (field.family ?? "")}
                         onChange={(event) => {
                           const value = event.target.value;
+                          if (value === CHOICE_KIND) {
+                            // A choice field carries a string, so it has no unit
+                            // to convert and no typical value to keep. The seed
+                            // options exist so the row is usable immediately and
+                            // so the dropdown a table keys on is never empty.
+                            const options = field.options?.length ? field.options : SEED_OPTIONS;
+                            patchField(index, {
+                              input: "choice",
+                              family: "dimensionless",
+                              defaultUnit: "1",
+                              defaultValue: 0,
+                              options,
+                              defaultOption: field.defaultOption ?? options[0]?.value,
+                            });
+                            return;
+                          }
                           if (!value) {
-                            patchField(index, { family: undefined, defaultUnit: field.defaultUnit || "1" });
+                            patchField(index, {
+                              input: undefined,
+                              options: undefined,
+                              defaultOption: undefined,
+                              family: undefined,
+                              defaultUnit: field.defaultUnit || "1",
+                            });
                             return;
                           }
                           const family = value as UnitFamilyId;
                           const nextUnit = unitsForFamily(family)[0]?.id ?? field.defaultUnit;
-                          patchField(index, { family, ...retargetAuthoredField({ ...field, family }, nextUnit) });
+                          patchField(index, {
+                            input: undefined,
+                            options: undefined,
+                            defaultOption: undefined,
+                            family,
+                            ...retargetAuthoredField({ ...field, family }, nextUnit),
+                          });
                         }}
                         aria-label="Quantity kind"
                       >
                         <QuantityKindOptions />
                       </Select>
-                      <Input
-                        inputMode="decimal"
-                        value={Number.isFinite(field.defaultValue) ? String(field.defaultValue) : ""}
-                        onChange={(event) => {
-                          const value = Number(event.target.value);
-                          if (Number.isFinite(value)) patchField(index, { defaultValue: value });
-                        }}
-                        aria-label="Typical value"
-                      />
-                      {field.family ? (
+                      {field.input === "choice" ? (
+                        <Select
+                          value={field.defaultOption ?? field.options?.[0]?.value ?? ""}
+                          onChange={(event) => patchField(index, { defaultOption: event.target.value })}
+                          aria-label="Default choice"
+                        >
+                          {(field.options ?? []).map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </Select>
+                      ) : (
+                        <Input
+                          inputMode="decimal"
+                          value={Number.isFinite(field.defaultValue) ? String(field.defaultValue) : ""}
+                          onChange={(event) => {
+                            const value = Number(event.target.value);
+                            if (Number.isFinite(value)) patchField(index, { defaultValue: value });
+                          }}
+                          aria-label="Typical value"
+                        />
+                      )}
+                      {field.input === "choice" ? (
+                        <span className="self-center text-xs text-muted">{field.options?.length ?? 0} options</span>
+                      ) : field.family ? (
                         <UnitCell
                           family={field.family}
                           unit={field.defaultUnit}
@@ -451,10 +526,42 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         />
                       )}
                     </div>
+                    {field.input === "choice" && (
+                      <FormField
+                        htmlFor={`studio-options-${index}`}
+                        label="Options"
+                        hint="One per line. A table keyed on this input matches these exactly — paste the same column you paste into the table."
+                      >
+                        <Textarea
+                          id={`studio-options-${index}`}
+                          rows={3}
+                          spellCheck={false}
+                          className="font-mono text-xs"
+                          value={(field.options ?? []).map((option) => option.value).join("\n")}
+                          onChange={(event) => {
+                            const values = event.target.value
+                              .split(/\r?\n/)
+                              .map((line) => line.trim())
+                              .filter(Boolean)
+                              .slice(0, 48);
+                            const options = values.map((value) => ({ value, label: value }));
+                            patchField(index, {
+                              options,
+                              // Keep the default pointing at something that
+                              // still exists; a stale default is a dropdown
+                              // that opens on a blank row.
+                              defaultOption: values.includes(field.defaultOption ?? "") ? field.defaultOption : values[0],
+                            });
+                          }}
+                        />
+                      </FormField>
+                    )}
                     <p className="font-mono text-xs text-muted">in the formula as {field.id}</p>
                   </div>
                 ))}
               </fieldset>
+
+              <TablesFieldset draft={draft} setDraft={(next) => setDraft({ ...draft, ...next })} />
 
               <fieldset className={cn(panelClass, "grid gap-3 p-4")}>
                 <div className="flex items-center justify-between gap-3">
@@ -573,6 +680,26 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                       {field.id}
                     </Button>
                   ))}
+                  {/*
+                    Looked-up values, offered the same way as inputs because
+                    that is what they are once a row is matched. Tinted so the
+                    difference is visible: `As` is not something anyone typed,
+                    it is whatever the table returned for the chosen row.
+                  */}
+                  {(draft.tables ?? []).flatMap((table) =>
+                    table.columns.map((column) => (
+                      <Button
+                        key={`${table.id}.${column.id}`}
+                        size="sm"
+                        variant="outline"
+                        className="font-mono text-accent"
+                        title={`From ${table.name || "table"}`}
+                        onClick={() => insertIntoExpression(column.id)}
+                      >
+                        {column.id}
+                      </Button>
+                    )),
+                  )}
                   {OPS.map((op) => (
                     <Button
                       key={op}
