@@ -106,7 +106,14 @@ export function OverlayDialog({
         aria-labelledby={titleId}
         className={cn(
           variant === "drawer"
-            ? "overlay-drawer absolute inset-y-0 right-0 flex w-72 flex-col border-l border-border bg-bg p-5"
+            ? // `overflow-y-auto` is not optional here. The panel is pinned to
+              // both edges of the viewport and the body is scroll-locked while
+              // it is open, so without it everything below the fold is simply
+              // unreachable — on a short phone that was Favourites, Convert and
+              // the whole unit converter, visible but impossible to scroll to.
+              // `overscroll-contain` stops the gesture chaining to the locked
+              // body once the panel hits its end.
+              "overlay-drawer absolute inset-y-0 right-0 flex w-72 flex-col overflow-y-auto overscroll-contain border-l border-border bg-bg p-5"
             : cn(panelClass, "relative mx-auto mt-[12vh] w-[min(640px,calc(100%-1.5rem))] shadow-menu"),
         )}
       >

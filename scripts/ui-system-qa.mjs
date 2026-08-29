@@ -445,6 +445,42 @@ try {
   await mobile.getByRole("button", { name: "Open menu" }).click();
   const drawer = mobile.getByRole("dialog", { name: "Instrument" });
   record("mobile drawer OverlayDialog", await drawer.isVisible());
+
+  // The drawer is pinned to both edges of the viewport and the body is
+  // scroll-locked while it is open, so it has to scroll itself. It did not:
+  // with Favourites and Convert expanded the panel ran 253px past the fold
+  // on a 667px phone, and the converter at the bottom could not be reached
+  // by any gesture. Expand them here, because collapsed it fits and the bug
+  // is invisible.
+  for (const name of ["Favourites", "Convert"]) {
+    const summary = drawer.locator("summary").filter({ hasText: name });
+    if (await summary.count()) {
+      await summary.first().click();
+      await mobile.waitForTimeout(200);
+    }
+  }
+  const drawerScroll = await drawer.evaluate((el) => {
+    el.scrollTop = 0;
+    el.scrollTo(0, el.scrollHeight);
+    return { overflows: el.scrollHeight > el.clientHeight, scrolled: el.scrollTop };
+  });
+  record(
+    "mobile drawer scrolls to its own end",
+    !drawerScroll.overflows || drawerScroll.scrolled > 0,
+    `overflows=${drawerScroll.overflows} scrolled=${drawerScroll.scrolled}`,
+  );
+
+  // isVisible() is true for anything rendered and not hidden, including
+  // content below the fold — the y coordinate is what actually says whether
+  // a thumb can reach it.
+  const lastControl = drawer.locator("select, input").last();
+  const controlBox = (await lastControl.count()) ? await lastControl.boundingBox() : null;
+  record(
+    "the drawer's last control sits inside the viewport",
+    Boolean(controlBox) && controlBox.y + controlBox.height <= 844,
+    controlBox ? `bottom=${Math.round(controlBox.y + controlBox.height)} viewport=844` : "no control found",
+  );
+
   await mobile.keyboard.press("Escape");
   await mobile.waitForTimeout(200);
   record("mobile drawer escape", !(await drawer.isVisible()));
