@@ -1,4 +1,4 @@
-import { config } from "zod";
+import { config, locales } from "zod";
 
 /**
  * Stop zod probing for `Function` support.
@@ -26,4 +26,31 @@ import { config } from "zod";
  * and the violation kept firing, with nothing to show it had gone missing.
  * The field is now an allowlist naming this file.
  */
-config({ jitless: true });
+/**
+ * Re-register the English locale, which the bundler removes.
+ *
+ * zod's own entry point does this for us — `zod/v4/classic/external.js` ends
+ * with `config(en())` at module scope — and zod's `package.json` declares
+ * `"sideEffects": false`, so Rolldown is told that statement cannot matter and
+ * drops it. Nothing else references `en`, and the call returns a value nobody
+ * reads, so there is no import left to keep it alive.
+ *
+ * What survives is a zod whose `localeError` is unset, and every built-in
+ * message falls back to the core default — the literal string "Invalid input".
+ * Publish reported it verbatim, so a draft missing its source label said
+ * "Invalid input" and pointed at nothing. Custom messages were unaffected,
+ * which is why this hid for so long: `Use a lowercase slug.` and
+ * `Unknown unit family.` are ours and still shipped, so the validation
+ * *looked* wired up.
+ *
+ * It only breaks in a build. `npm test` imports zod through Node, where the
+ * side effect runs normally and every message is correct — so no test could
+ * see it. `scripts/zod-locale.mjs` greps the built client bundle instead,
+ * which is the only place the defect exists.
+ *
+ * This is the same trap as the `jitless` note above, one package over: a
+ * side-effecting module-scope call inside a tree marked side-effect-free. Here
+ * it is zod's declaration rather than ours, so the fix is to do the work again
+ * somewhere the bundler has been told to keep.
+ */
+config({ ...locales.en(), jitless: true });

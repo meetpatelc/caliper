@@ -16,6 +16,7 @@ import { OFFICIAL_SLUGS } from "@/studio/lib/catalog";
 import { validateExpression } from "@instrument/formula";
 import { rewriteIdentifier, toIdentifier } from "@/studio/lib/identifiers";
 import { retargetAuthoredField } from "@/studio/lib/evaluate";
+import { publishProblem } from "@/studio/lib/publish-problem";
 import { unitFamilyOptions, unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { uniqueSlug, useWorkshop } from "@/studio/lib/workshop-store";
 import { Button } from "@/components/ui/button";
@@ -243,7 +244,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
       if (path.startsWith("fields") || path.startsWith("outputs") || path === "formula") setStep("engine");
       else if (["title", "description", "domain", "slug"].includes(String(issue?.path[0]))) setStep("name");
       else setStep("method");
-      toast.error(issue?.message ?? "Finish the instrument before publishing.");
+      toast.error(publishProblem(issue, draft));
       return;
     }
     const published = { ...next, published: true };
