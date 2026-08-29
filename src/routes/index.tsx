@@ -5,10 +5,14 @@ import { tools, type ToolId } from "@/lib/catalog";
 // here pulls all ~123 of them into the entry chunk to render one line per card.
 import { libraryFormulas } from "@/lib/library-formulas";
 import { modelCount, releasedDomains, savedHeadline } from "@/lib/desk";
+import { homeDemo } from "@/lib/home-demo.generated";
+import { PARENT_NAME } from "@/lib/instrument";
+import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
 import { Button } from "@/components/ui/button";
 import { SegmentedControl, SegmentedItem } from "@/components/ui/choice";
 import { PageHeader, SectionHeader } from "@/components/ui/page";
+import { panelClass } from "@/components/ui/panel";
 import { SelectableCard } from "@/components/ui/selection";
 import { EmptyState } from "@/components/ui/status";
 import { FavouriteButton } from "@/components/favourite-button";
@@ -20,10 +24,10 @@ type LibrarySearch = { domain?: string };
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Library · Instrument" },
-      { name: "description", content: "Every released model — 169 finished engineering calculators with method, assumptions and source attached." },
-      { property: "og:title", content: "Library · Instrument" },
-      { property: "og:description", content: "Every released model — 169 finished engineering calculators with method, assumptions and source attached." },
+      { title: "Instrument · Engineering models you can check" },
+      { name: "description", content: "See exactly how a result is calculated — the method, assumptions, sources and limits stay visible next to the number." },
+      { property: "og:title", content: "Instrument · Engineering models you can check" },
+      { property: "og:description", content: "See exactly how a result is calculated — the method, assumptions, sources and limits stay visible next to the number." },
     ],
   }),
   validateSearch: (search: Record<string, unknown>): LibrarySearch => ({
@@ -59,18 +63,25 @@ function Home() {
 
   return (
     <div className="page-wrap">
+      {/*
+        Story, then proof, then the rooms, then the catalogue.
+
+        This page used to open with "Library — every released model" above the
+        filter and every card. That described the markup accurately and the
+        product poorly: a first-time visitor met an inventory and had to work
+        out what the thing was. The positioning already existed on /about,
+        where nobody arriving for the first time reads it.
+
+        The count is deliberately not in the opening line. It invites the one
+        comparison this product loses — somebody always has more calculators —
+        and reframes the page as a shelf when the claim is that the work can be
+        checked. It survives beside the filter, where it scopes what you are
+        about to narrow.
+      */}
       <PageHeader
-        kicker="Library"
-        title="Every released model."
-        lede={
-          <>
-            {modelCount()} finished calculators. Filter, search, open. To write your own, open{" "}
-            <Link to="/studio" className="link-accent">
-              Studio
-            </Link>
-            .
-          </>
-        }
+        kicker={PARENT_NAME}
+        title="Engineering models you can check."
+        lede="See exactly how a result is calculated. The method, the assumptions it rests on, the source, and the boundary where it stops being valid all stay next to the number."
       />
 
       {(saved.length > 0 || recentTools.length > 0) && (
@@ -105,9 +116,131 @@ function Home() {
         </section>
       )}
 
+      {/*
+        The proof. Asserting that a number can be checked is weaker than
+        showing one, and this example is checkable in your head: 10 kN over
+        1000 mm² is 10 MPa.
+
+        Generated at build time from the model itself
+        (scripts/generate-home-demo.mjs), for two reasons. Hand-typing it would
+        make the front door the one place on the site whose numbers nobody
+        verifies. And importing the evaluator here would pull every library
+        document into the entry chunk — see the note in side-rail.tsx.
+      */}
+      <section className="mt-12">
+        <SectionHeader title="See it working." />
+        <div className={cn(panelClass, "mt-4 grid gap-6 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]")}>
+          <div>
+            <p className="eyebrow">{homeDemo.title}</p>
+            <dl className="mt-3 grid gap-1.5">
+              {homeDemo.inputs.map((input) => (
+                <div key={input.label} className="flex items-baseline justify-between gap-4">
+                  <dt className="text-sm text-muted">{input.label}</dt>
+                  <dd className="font-mono text-sm tabular-nums">
+                    {input.value} {input.unit}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-4 border-t border-border pt-4">
+              {homeDemo.outputs.map((output, index) => (
+                <div key={output.label} className="flex items-baseline justify-between gap-4 py-0.5">
+                  <span className={cn("text-sm", index === 0 ? "text-fg" : "text-muted")}>{output.label}</span>
+                  <span
+                    className={cn(
+                      "font-mono tabular-nums",
+                      index === 0 ? "text-lg font-medium" : "text-sm text-muted",
+                    )}
+                  >
+                    {output.display} {output.unit}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:border-l lg:border-border lg:pl-6">
+            <div>
+              <p className="eyebrow">Relation</p>
+              <p className="mt-1 font-mono text-sm leading-6">{homeDemo.formula}</p>
+            </div>
+            <div>
+              <p className="eyebrow">Assumptions</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{homeDemo.assumptions.join(" · ")}</p>
+            </div>
+            <div>
+              <p className="eyebrow">Source</p>
+              <p className="mt-1 text-sm leading-6">
+                <a
+                  href={homeDemo.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="link-accent"
+                >
+                  {homeDemo.sourceLabel}
+                </a>
+              </p>
+            </div>
+            <div>
+              <p className="eyebrow">Where it stops</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{homeDemo.boundary}</p>
+            </div>
+            <Button asChild variant="outline" className="justify-self-start">
+              <Link to="/tool/$toolId" params={{ toolId: homeDemo.toolId }}>
+                Open this model
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/*
+        Four rooms, named once. Without this the site reads as a calculator
+        directory, because the front page was the directory — nothing said a
+        result can be saved, extended, or reviewed.
+      */}
+      <section className="mt-12">
+        <SectionHeader title="Your workspace." />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className={cn(panelClass, "p-4")}>
+            <p className="text-base font-medium">
+              Library <span className="text-sm font-normal text-muted">— you are here</span>
+            </p>
+            <p className="mt-1 text-sm leading-6 text-muted">Finished models, below. Open one and get a number.</p>
+          </div>
+          {[
+            { to: "/studio", label: "Build", note: "Write your own model, unit-aware, with its method attached." },
+            { to: "/review", label: "Review", note: "Evidence checklists, a trade study, and FMEA you control." },
+            { to: "/workshop", label: "Project", note: "Drafts and saved checks. On this device, or on your account." },
+          ].map((room) => (
+            <Link
+              key={room.label}
+              to={room.to}
+              className={cn(panelClass, "block p-4 transition-colors hover:bg-elevated")}
+            >
+              <p className="text-base font-medium">{room.label}</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{room.note}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-3 text-sm text-muted">
+          Saving does not require an account.{" "}
+          <Link to="/about" className="link-accent">
+            What this is, and what it is not
+          </Link>
+          .
+        </p>
+      </section>
+
       {/* No "Browse" eyebrow: it repeated what the heading already said, which
-          is clutter above the one control that actually narrows the library. */}
-      <SectionHeader className="mt-12" title="Pick a field." />
+          is clutter above the one control that actually narrows the library.
+          The count lives here rather than in the opening line — beside the
+          control it scopes, it is a fact; at the top it was a boast. */}
+      <SectionHeader
+        className="mt-12"
+        title="Pick a field."
+        aside={<span className="text-sm text-muted">{modelCount()} models</span>}
+      />
       <SegmentedControl aria-label="Domain filter" appearance="chip" className="mt-4">
         <SegmentedItem
           selected={domain === "all"}

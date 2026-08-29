@@ -95,7 +95,7 @@ export function DraftWithAI({ onAccept }: { onAccept: (draft: AssistedDraft) => 
           setResult(null);
         }}
         title="Draft from a description"
-        confirmLabel={result ? "Open in Studio" : pending ? "Drafting…" : "Draft it"}
+        confirmLabel={result ? "Open in Build" : pending ? "Drafting…" : "Draft it"}
         cancelLabel="Cancel"
         tone="accent"
         busy={pending}

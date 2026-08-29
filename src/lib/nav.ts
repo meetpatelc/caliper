@@ -7,7 +7,14 @@ export const PRIMARY_NAV = [
     icon: LayoutGrid,
     match: (path: string) => path === "/" || path.startsWith("/library") || path.startsWith("/tool/"),
   },
-  { href: "/studio", label: "Studio", icon: PenLine, match: (path: string) => path.startsWith("/studio") },
+  // "Build", not "Studio": the room is named for the job, not the venue, and
+  // the obvious alternatives are taken — "Workbench" is Ansys's word for a
+  // mechanical engineering environment, which is this catalogue's own aisle,
+  // and "desk" is already this product's furniture (see the desk store, the
+  // account sync, the 404). The URL stays /studio; renaming it would break
+  // every short link anyone has already shared, and the label is what a
+  // reader sees.
+  { href: "/studio", label: "Build", icon: PenLine, match: (path: string) => path.startsWith("/studio") },
   { href: "/review", label: "Review", icon: ClipboardList, match: (path: string) => path.startsWith("/review") },
   {
     href: "/workshop",

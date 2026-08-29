@@ -101,7 +101,29 @@ try {
 
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
   const libraryText = await page.locator("body").innerText();
-  record("library PageHeader", /Every released model/.test(libraryText) && /Library/.test(libraryText));
+  // The front page has a job beyond listing: introduce the product, prove the
+  // claim with a worked example, name the rooms, then show the catalogue. It
+  // used to open straight onto the filter and 169 cards, which read as a
+  // directory. Pinned as structure rather than wording so copy can change
+  // without this going red, but the order cannot silently collapse back.
+  const homeParts = {
+    claim: /models you can check/i.test(libraryText),
+    workedExample: /See it working/i.test(libraryText),
+    relation: /Relation/i.test(libraryText) && libraryText.includes("F / A"),
+    boundary: /Where it stops/i.test(libraryText),
+    source: /Source/i.test(libraryText),
+    rooms: /Your workspace/i.test(libraryText) && /Build/.test(libraryText) && /Review/.test(libraryText),
+    catalogue: /Pick a field/i.test(libraryText),
+  };
+  const missingParts = Object.entries(homeParts)
+    .filter(([, present]) => !present)
+    .map(([name]) => name);
+  record("the front page introduces the product before the catalogue", missingParts.length === 0, missingParts.join(", "));
+
+  // The count invites the one comparison this product loses, so it is out of
+  // the opening and kept beside the filter it scopes.
+  const openingLine = libraryText.split(/See it working/i)[0] ?? libraryText;
+  record("the model count is not part of the pitch", !/\d{3}\s*(finished|calculators|models)/i.test(openingLine), openingLine.slice(0, 70).replace(/\s+/g, " "));
   const domainGroup = page.getByRole("group", { name: "Domain filter" });
   record("library SegmentedControl", (await domainGroup.count()) === 1);
   const nestedFav = await page.locator('a[href*="/tool/"] button').count();
@@ -162,8 +184,8 @@ try {
   await shot(page, "qa-studio");
   await page.getByRole("button", { name: /Create from scratch/ }).click();
   await page.waitForURL(/\/studio\/[^/]+/);
-  await page.locator('[aria-label="Studio steps"]').waitFor();
-  const stepGroup = page.locator('[aria-label="Studio steps"]');
+  await page.locator('[aria-label="Build steps"]').waitFor();
+  const stepGroup = page.locator('[aria-label="Build steps"]');
   record("studio SegmentedControl steps", (await stepGroup.count()) === 1, `count=${await stepGroup.count()}`);
   await page.getByRole("button", { name: "Delete draft" }).click();
   const confirm = page.getByRole("dialog", { name: "Delete this draft?" });
@@ -179,8 +201,10 @@ try {
   // slug. They all worked, and nothing pinned them — a redirect table is
   // exactly the kind of thing that rots silently when a route is renamed.
   const routeChecks = [
-    ["/atlas", "Library"],
-    ["/library", "Library"],
+    // Both land on "/", whose title now leads with the product rather than
+    // the shelf — the page introduces itself before listing its contents.
+    ["/atlas", "Instrument"],
+    ["/library", "Instrument"],
     ["/projects", "Project"],
     ["/c/axial-stress", "Axial response"],
     ["/c/iso-286-fits", "ISO 286 fits"],

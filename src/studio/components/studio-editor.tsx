@@ -265,7 +265,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
     <div className="page-wrap">
       <PageHeader
         size="page"
-        kicker={draft.provenance === "assisted" ? "Studio · assisted draft" : "Studio"}
+        kicker={draft.provenance === "assisted" ? "Build · assisted draft" : "Build"}
         title={draft.title}
         lede="Drafts autosave. Signed in, they live on your account. Method is only required to publish."
         actions={
@@ -294,7 +294,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
         </p>
       ) : null}
 
-      <SegmentedControl aria-label="Studio steps" className="mt-8 overflow-x-auto">
+      <SegmentedControl aria-label="Build steps" className="mt-8 overflow-x-auto">
         {STEPS.map((entry) => (
           <SegmentedItem
             key={entry.id}
