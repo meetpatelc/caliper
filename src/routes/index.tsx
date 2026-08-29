@@ -84,12 +84,58 @@ function Home() {
         made its case twice — once in prose and again, later, in evidence.
       */}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start lg:gap-10">
-        <PageHeader
-          className="lg:pt-1"
-          kicker={PARENT_NAME}
-          title="Engineering models you can check."
-          lede="See exactly how a result is calculated. The method, the assumptions it rests on, the source, and the boundary where it stops being valid all stay next to the number."
-        />
+        {/*
+          One cell: the claim, then the rooms beneath it. Stacked on a phone this
+          reads claim, rooms, example — the rooms are four short lines, so the
+          proof still arrives early, and putting the example first would have
+          opened the page on a calculator before saying what the site is.
+        */}
+        <div className="grid content-start gap-8">
+          <PageHeader
+            className="lg:pt-1"
+            kicker={PARENT_NAME}
+            title="Engineering models you can check."
+            lede="See exactly how a result is calculated. The method, the assumptions it rests on, the source, and the boundary where it stops being valid all stay next to the number."
+          />
+
+        {/*
+          Four rooms, named once. Without this the site reads as a calculator
+          directory, because the front page was the directory — nothing said a
+          result can be saved, extended, or reviewed.
+
+          They sit here rather than in a band below because the claim column is
+          241px against a 484px example, and the resulting 242px of dead space
+          read as a missing element rather than as breathing room. Filling it
+          with the rooms puts the whole "what is this" argument — the claim, the
+          product, and the proof — on one screen, and removes a band from
+          further down, so the catalogue rises again.
+        */}
+          <div className="grid gap-2">
+            <p className="text-sm leading-6">
+              <span className="font-medium">Library</span>
+              <span className="text-muted"> — finished models, below.</span>
+              </p>
+            {[
+              { to: "/studio", label: "Build", note: "write a unit-aware check, method attached." },
+              { to: "/review", label: "Review", note: "evidence checklists and trade studies." },
+              { to: "/workshop", label: "Project", note: "drafts and saved checks." },
+            ].map((room) => (
+              <p key={room.label} className="text-sm leading-6">
+                <Link to={room.to} className="link-accent font-medium">
+                  {room.label}
+                </Link>
+                <span className="text-muted"> — {room.note}</span>
+            </p>
+            ))}
+            <p className="mt-1 text-sm text-muted">
+              Saving does not require an account.{" "}
+              <Link to="/about" className="link-accent">
+                What this is, and what it is not
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
 
         <div className={cn(panelClass, "p-5")}>
           <div className="flex items-baseline justify-between gap-3">
@@ -199,34 +245,6 @@ function Home() {
           </div>
         </section>
       )}
-
-      {/*
-        Four rooms, named once. Without this the site reads as a calculator
-        directory, because the front page was the directory — nothing said a
-        result can be saved, extended, or reviewed.
-
-        A rule-bounded strip rather than cards: the worked example above is
-        what should hold the eye, and four bordered panels were competing
-        with it.
-      */}
-      <section className="mt-12 grid gap-4 border-y border-border py-5 sm:grid-cols-2 lg:grid-cols-4">
-        <p className="text-sm leading-6">
-          <span className="font-medium">Library</span>
-          <span className="text-muted"> — finished models, below.</span>
-        </p>
-        {[
-          { to: "/studio", label: "Build", note: "write a unit-aware check, method attached." },
-          { to: "/review", label: "Review", note: "evidence checklists and trade studies." },
-          { to: "/workshop", label: "Project", note: "drafts and saved checks." },
-        ].map((room) => (
-          <p key={room.label} className="text-sm leading-6">
-            <Link to={room.to} className="link-accent font-medium">
-              {room.label}
-            </Link>
-            <span className="text-muted"> — {room.note}</span>
-          </p>
-        ))}
-      </section>
 
       {/* No "Browse" eyebrow: it repeated what the heading already said, which
           is clutter above the one control that actually narrows the library.
