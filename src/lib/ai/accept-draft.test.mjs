@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { acceptDraft } from "@/lib/ai/accept-draft";
 import { toJsonSchema } from "@/lib/ai/json-schema";
-import { draftedCalculatorSchema } from "@/lib/ai/draft-contract";
+import { DRAFT_SYSTEM_PROMPT, draftedCalculatorSchema } from "@/lib/ai/draft-contract";
 
 const sound = {
   title: "Hoop stress",
@@ -95,4 +95,32 @@ test("an accepted draft is stamped as drafted, and cannot stamp itself", () => {
 test("the contract the model works to does not expose provenance", () => {
   const schema = /** @type {any} */ (toJsonSchema(draftedCalculatorSchema));
   assert.equal(schema.properties.provenance, undefined, "the model must not be able to author its own provenance");
+});
+
+/**
+ * The drafting prompt is code in every way that matters, and this rule was
+ * learned by breaking it. Telling the model to "use MPa, not Pa" without
+ * forbidding it to scale the expression produced a draft reading
+ * 1,000,000 MPa — 10^12 Pa, off by a factor of a million — because the model
+ * converted in the expression *and* the application converted again for
+ * display. Before that instruction existed the same brief gave 5.000e+7 Pa:
+ * right number, unreadable unit.
+ *
+ * `acceptDraft` did not catch it. It parses, computes and checks the result is
+ * finite; it has no opinion about whether a stress of 10^12 Pa is plausible. So
+ * the guard has to live in the prompt, and this pins it there.
+ */
+test("the prompt tells the model not to scale the expression to match the unit", () => {
+  assert.match(DRAFT_SYSTEM_PROMPT, /LABEL ONLY/, "the display unit must be described as a label");
+  assert.match(
+    DRAFT_SYSTEM_PROMPT,
+    /Do not scale, divide or convert/i,
+    "the prompt must forbid converting inside the expression",
+  );
+  assert.match(
+    DRAFT_SYSTEM_PROMPT,
+    /1e6/,
+    "the prompt should name the failure it prevents, not just the rule",
+  );
+  assert.match(DRAFT_SYSTEM_PROMPT, /SI base units/, "rule 4 must still require SI in the relation");
 });
