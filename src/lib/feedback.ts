@@ -87,15 +87,11 @@ export const submitFeedback = createServerFn({ method: "POST" })
     const { getSql } = await import("@/lib/db");
     assertSameSiteRequest();
 
-    // Vercel sets these at its own edge; locally there is no proxy and every
-    // sender collapses to one key, which is correct for one machine.
-    const { getRequestHeader } = await import("@tanstack/react-start/server");
-    const sender =
-      getRequestHeader("x-vercel-forwarded-for") ??
-      getRequestHeader("x-real-ip") ??
-      getRequestHeader("x-forwarded-for") ??
-      "local";
-    if (!withinSenderRate(sender)) throw new Error("That is a lot of messages. Try again later.");
+    // Through a .server module, never a dynamic import of the package: that
+    // form is bundled into a namespace hop the SSR patch rebinds, and it
+    // failed every submission in production. See request-sender.server.ts.
+    const { senderKey } = await import("@/lib/request-sender.server");
+    if (!withinSenderRate(senderKey())) throw new Error("That is a lot of messages. Try again later.");
 
     const sql = await getSql();
     const recent = await sql<{ n: number }>`
