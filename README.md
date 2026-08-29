@@ -24,18 +24,21 @@ Instrument is a **preliminary screening desk**, not a design approval, sealed ca
 ## Requirements
 
 - Node.js 22+ (see `.nvmrc`)
-- npm 10.x — **not** npm 11
+- npm 10.x — `corepack enable` once and you get it automatically
 
-The npm major is pinned, and `engine-strict` in `.npmrc` makes npm refuse to
-install under the wrong one. This is not fussiness: npm 10 and 11 disagree
-about which entries a lockfile must carry, and a lockfile written by npm 11
-failed `npm ci` in CI with a missing-package error that did not reproduce on
-the machine that wrote it.
+npm refuses to install under npm 11 here, by way of `engine-strict` in
+`.npmrc`. npm 10 and 11 disagree about which entries a lockfile must carry,
+and one written by npm 11 failed `npm ci` in CI with a missing-package error
+that did not reproduce on the machine that wrote it.
 
-`corepack enable` is a one-time command that makes the right npm automatic.
-The refusal has to happen at the engine check rather than in a `preinstall`
-script: npm rewrites the lockfile before lifecycle scripts run, so a script
-can report the mismatch but the damage is already on disk by then.
+Two weaker mechanisms were tried first. A `preinstall` guard cannot work: npm
+writes the lockfile before lifecycle scripts run, so it reports a mismatch
+already on disk. Leaving it as a convention does not work either — with the
+check removed, a single `npm install` under npm 11 stripped the entry again.
+
+Deployment installs opt out (`installCommand` in `vercel.json`). Nothing that
+only runs `npm ci` can corrupt a lockfile, so the guard buys nothing there,
+and it failed the Vercel build while it applied.
 
 ## Quick start
 
