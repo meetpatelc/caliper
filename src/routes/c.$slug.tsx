@@ -30,11 +30,25 @@ export const Route = createFileRoute("/c/$slug")({
       throw redirect({ to: "/tool/$toolId", params: { toolId } });
     }
   },
-  // Deliberately not notFound(): this slug may name a Studio calculator that
-  // exists only in the visitor's browser, so the server cannot know whether the
-  // resource is real. 200 is the honest answer. A title is still owed — without
-  // one every short link, live or dead, showed the bare app name.
-  head: ({ params }) => ({ meta: [{ title: `${params.slug} · ${PARENT_NAME}` }] }),
+  // Deliberately not notFound(): `findCalculator` falls back to the visitor's
+  // own Studio calculators, which live in their browser, so the server cannot
+  // know whether the resource is real. Answering 404 would break someone
+  // opening their own work from a short link. 200 is the honest answer.
+  //
+  // What 200 costs is indexing: a dead short link renders "That instrument is
+  // not here" under a 200 and a crawler files it as a thin page. `noindex`
+  // settles that without lying about the status, and applies to every short
+  // link rather than only the dead ones — these address one person's saved
+  // work, and none of them are content anyone should reach from a search.
+  //
+  // A title is still owed. Without one every short link, live or dead, showed
+  // the bare app name.
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.slug} · ${PARENT_NAME}` },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: CalculatorPage,
 });
 

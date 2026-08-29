@@ -201,6 +201,16 @@ try {
   record("an unknown calculator answers 404", missing?.status() === 404, String(missing?.status()));
   record("a missing page carries its own title", /Not found/i.test(missingTitle), missingTitle);
 
+  // A short link is the opposite case and must NOT become a 404: the slug may
+  // name a calculator that exists only in the visitor's browser, which the
+  // server cannot see. It stays 200 and is kept out of the index instead.
+  const shortLink = await page.goto(`${BASE}/c/definitely-not-a-calculator`, { waitUntil: "domcontentloaded" });
+  const shortLinkRobots = await page.evaluate(
+    () => document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? "",
+  );
+  record("a short link stays 200, because only the browser knows", shortLink?.status() === 200, String(shortLink?.status()));
+  record("a short link is not indexable", /noindex/.test(shortLinkRobots), shortLinkRobots || "no robots meta");
+
   // The review export writes a file and had no coverage at all.
   await page.goto(`${BASE}/review`, { waitUntil: "networkidle" });
   await page.waitForTimeout(600);
