@@ -25,6 +25,7 @@ import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { assumptionsBeside, buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
 import { libraryDocuments, isStudioDocument } from "@/lib/document";
+import { adoptionLoss } from "@/studio/lib/adopt-document";
 import { resolveSketchId } from "@/lib/diagrams";
 import { quantitySymbol } from "@/lib/quantity-symbols";
 import { inlineRelations } from "@/lib/formula-display";
@@ -322,7 +323,15 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       title={tool.title}
       actions={
         <>
-          {libraryDocument && isStudioDocument(libraryDocument) ? (
+          {/*
+            `adoptionLoss` withholds the button where the copy would quietly
+            differ from the original — a model whose results appear, vanish or
+            change name with a choice. Build shows every result always, so
+            forking one of those produces a calculator that computes and
+            displays the answer belonging to the mode you did not pick. It does
+            not error, which is what makes it the worse failure.
+          */}
+          {libraryDocument && isStudioDocument(libraryDocument) && !adoptionLoss(libraryDocument) ? (
             <Button
               variant="outline"
               onClick={() => {

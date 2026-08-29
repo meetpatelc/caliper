@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ICON } from "@instrument/ui";
-import { Plus, Trash2, Upload } from "lucide-react";
+import { Plus, Trash2, Undo2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { panelClass } from "@/components/ui/panel";
 import { Field as FormField, Input, Select, Textarea } from "@/components/ui/field";
@@ -137,6 +137,20 @@ function TableRow({
   const [pasted, setPasted] = useState("");
   const [issues, setIssues] = useState<string[]>([]);
   const [readError, setReadError] = useState<string | null>(null);
+  /**
+   * The table as it was before the last paste.
+   *
+   * Nothing in the editor is undoable — every edit autosaves 400ms after a
+   * keystroke and a `WorkshopCalculator` keeps `updatedAt` and no revisions.
+   * That was survivable while the destructive gestures were keystroke-sized.
+   * A paste is not: it replaces every row and column in one action, so
+   * correcting a table and pasting the wrong column order over a good one
+   * destroyed three hundred values with nothing to go back to.
+   *
+   * Held in component state on purpose. It is a guard against the gesture that
+   * just happened, not a history feature, and it should not outlive the panel.
+   */
+  const [replaced, setReplaced] = useState<Pick<TableDefinition, "columns" | "rows"> | null>(null);
 
   const eligible = table.kind === "keyed" ? choiceFields : numericFields;
 
@@ -156,6 +170,9 @@ function TableRow({
     if (parsed.rows.length > MAX_ROWS) {
       setIssues([...parsed.issues, `Only the first ${MAX_ROWS} rows were kept.`]);
     }
+
+    // Only worth keeping if there was something to lose.
+    if (table.rows.length) setReplaced({ columns: table.columns, rows: table.rows });
 
     const taken = takenNames(draft, table.id);
     const columns = parsed.headers.map((header, position) => {
@@ -306,6 +323,21 @@ function TableRow({
           <p className="text-xs text-muted">
             {table.rows.length} rows × {table.columns.length} columns · {cellCount} values
           </p>
+        )}
+        {replaced && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-accent"
+            onClick={() => {
+              onPatch(replaced);
+              setReplaced(null);
+              setPasted("");
+              setIssues([]);
+            }}
+          >
+            <Undo2 size={ICON.inline} /> Undo paste ({replaced.rows.length} rows)
+          </Button>
         )}
       </div>
 

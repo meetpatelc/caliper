@@ -6,6 +6,7 @@ import { isUnitFamilyId, type UnitFamilyId } from "@/lib/units";
 import { axialDocument } from "@/lib/document-axial";
 import type { InstrumentDocument } from "@/lib/document";
 import { resolveSketchId } from "@/lib/diagrams";
+import { adoptDocument } from "@/studio/lib/adopt-document";
 
 const DOMAIN_IDS = domains.map((domain) => domain.id) as [DomainId, ...DomainId[]];
 
@@ -186,20 +187,29 @@ export function normalizeDomain(value: string): DomainId {
 }
 
 export function asCalculatorDefinition(seed: InstrumentDocument | CalculatorDefinition): CalculatorDefinition {
+  // A library document keeps its lookups in a shape Studio cannot read, and
+  // reads them with a `lookup(table, field)` call. Converting is what makes a
+  // fork of beam or lmtd open on a working calculator rather than on
+  // `Unknown table "reactionDenom"`.
+  const adopted =
+    "lookups" in seed || seed.fields.some((field) => "choice" in field)
+      ? adoptDocument(seed as InstrumentDocument)
+      : undefined;
   return {
     slug: seed.slug,
     title: seed.title,
     description: seed.description,
     domain: normalizeDomain(String(seed.domain)),
-    fields: seed.fields.map((field) => ({
+    fields: (adopted?.fields ?? seed.fields).map((field) => ({
       ...field,
       family: field.family && isUnitFamilyId(field.family) ? field.family : undefined,
     })),
     outputs: seed.outputs.map((output) => ({
       ...output,
+      expression: adopted ? adopted.rewrite(output.expression) : output.expression,
       family: output.family && isUnitFamilyId(output.family) ? output.family : undefined,
     })),
-    tables: "tables" in seed ? seed.tables : undefined,
+    tables: "tables" in seed ? seed.tables : adopted?.tables,
     constraints: "constraints" in seed ? seed.constraints : undefined,
     formula: seed.formula,
     purpose: seed.purpose,
