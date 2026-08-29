@@ -53,6 +53,25 @@ test("a declared family actually owns the unit the output displays in", () => {
  * drift notice tells the reader their number moved.
  *
  * Raise this number when more are done. It only goes up.
+ *
+ * ── One more thing, found the hard way ──────────────────────────────────
+ *
+ * This count is taken over `libraryDocuments`, and for 43 tools that is not
+ * what anybody sees. `calculateTool` dispatches those to hand-written
+ * evaluators in `engineering.ts` — `if (toolId === "clampForce") return
+ * calculateClampForce(input)` and 42 more — which never read the document's
+ * outputs at all. Declaring a family on one of those changes this number and
+ * changes nothing on the page.
+ *
+ * `clampForce` is the clearest case. Its document declares no family, yet its
+ * golden shows raw 1948.56 displayed as "1.9486 kN" — a conversion the
+ * no-family branch of `document.ts` cannot perform, because the hand-written
+ * evaluator produced it instead.
+ *
+ * So any future batch has to be scoped to document-driven tools first. A
+ * scope taken from `libraryDocuments` alone looked like 44 clean candidates
+ * and included at least `clampForce`, `motionProfile`, `pneumatic`,
+ * `cuttingParameters` and `beam`, all of them inert.
  */
 test("output family coverage does not go backwards", () => {
   const declared = outputs.filter((output) => output.family).length;
