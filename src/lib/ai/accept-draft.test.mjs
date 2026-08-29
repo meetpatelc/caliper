@@ -9,12 +9,12 @@ const sound = {
   description: "Membrane hoop stress in a thin-walled cylinder under internal pressure.",
   domain: "mechanics",
   fields: [
-    { id: "pressure", label: "Internal pressure", family: "pressure", defaultValue: 1.2, defaultUnit: "MPa" },
-    { id: "diameter", label: "Inside diameter", family: "length", defaultValue: 600, defaultUnit: "mm" },
-    { id: "thickness", label: "Wall thickness", family: "length", defaultValue: 12, defaultUnit: "mm" },
+    { id: "pressure", label: "Internal pressure", unit: "pressure.MPa", defaultValue: 1.2 },
+    { id: "diameter", label: "Inside diameter", unit: "length.mm", defaultValue: 600 },
+    { id: "thickness", label: "Wall thickness", unit: "length.mm", defaultValue: 12 },
   ],
   outputs: [
-    { id: "hoop", label: "Hoop stress", family: "stress", defaultUnit: "MPa", expression: "pressure*diameter/(2*thickness)" },
+    { id: "hoop", label: "Hoop stress", unit: "stress.MPa", expression: "pressure*diameter/(2*thickness)" },
   ],
   formula: "σ = pD / 2t",
   purpose: "Screen a thin-walled cylinder for membrane hoop stress.",
@@ -136,14 +136,14 @@ test("the prompt tells the model not to scale the expression to match the unit",
  * labels. It parsed, it computed, every output was finite, so `acceptDraft`
  * passed it through; only a person reading a 50-micron spring could tell.
  *
- * `defaultValue` is paired with `defaultUnit` as a typed quantity
+ * `defaultValue` is paired with the declared unit as a typed quantity
  * (`defaultFieldState`, src/studio/lib/evaluate.ts), and the prompt now says
  * so. Nothing downstream can check this, so this is where it is pinned.
  */
 test("the prompt says which unit a field default is written in", () => {
   assert.match(
     DRAFT_SYSTEM_PROMPT,
-    /defaultValue is written in that field's own defaultUnit/,
+    /defaultValue is written in the unit that field declares/,
     "the prompt must state what a field default is expressed in",
   );
   assert.match(
@@ -156,4 +156,16 @@ test("the prompt says which unit a field default is written in", () => {
 /** A guard the draft trips on its own defaults is a draft that never opens. */
 test("the prompt requires the example to satisfy the model's own constraints", () => {
   assert.match(DRAFT_SYSTEM_PROMPT, /must satisfy every constraint you write/i);
+});
+
+/**
+ * `evaluateCalculator` builds one scope from the fields and table columns and
+ * evaluates every output against it; no output is ever added to that scope, so
+ * results are independent by construction. Nothing said so, and the natural
+ * thing for a model to do with "how much does a steel bar weigh" is to work out
+ * a volume and then multiply it by density. That draft was refused with
+ * `Unknown name "V"` after a minute.
+ */
+test("the prompt says results cannot reference other results", () => {
+  assert.match(DRAFT_SYSTEM_PROMPT, /one result cannot use another/i);
 });

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { z } from "zod";
 import { stripNulls, toJsonSchema, toStrictJsonSchema } from "@/lib/ai/json-schema";
+import { UNIT_IDS } from "@/lib/units";
 import { draftedCalculatorSchema } from "@/lib/ai/draft-contract";
 
 /**
@@ -80,4 +81,36 @@ test("stripping keeps falsy values that are not null", () => {
   // The bug this pins: a filter written as `if (!value) continue` would delete
   // a zero default, an empty string, and false — all legitimate here.
   assert.deepEqual(stripNulls({ a: 0, b: "", c: false, d: null }), { a: 0, b: "", c: false });
+});
+
+/**
+ * Found by using the button, not by reading the code.
+ *
+ * The brief was "how much does a steel bar weigh", and it failed three times on
+ * this one property. `Unknown unit family.` when `family` went out as a bare
+ * string. `Select compatible units (area: mm^2)` once the family was an enum
+ * but the unit was not. Then family `massFlow` with unit `kg/m3` — two enums,
+ * each satisfied, describing a pair that does not exist.
+ *
+ * The third one is why the contract asks once, for a `family.unit` id. Two
+ * independent enums cannot express a dependency, and strict structured outputs
+ * have no `if`/`then` to add one, so the only way to make the pair valid is to
+ * stop treating it as a pair.
+ */
+test("the unit is one closed identifier naming both family and unit", () => {
+  const plain = /** @type {any} */ (toJsonSchema(draftedCalculatorSchema));
+  for (const where of ["fields", "outputs"]) {
+    const properties = plain.properties[where].items.properties;
+    assert.deepEqual(properties.unit.enum, [...UNIT_IDS], `${where} must offer every known unit`);
+    assert.equal(properties.family, undefined, `${where} must not ask for the family separately`);
+    assert.equal(properties.defaultUnit, undefined, `${where} must not ask for the unit separately`);
+  }
+  // The pair that failed: both halves legal, the combination not.
+  assert.ok(UNIT_IDS.includes("density.kg_m3"));
+  assert.ok(!UNIT_IDS.includes("massFlow.kg_m3"), "the id form is what makes the mismatch unrepresentable");
+
+  const strict = /** @type {any} */ (toStrictJsonSchema(draftedCalculatorSchema));
+  const node = strict.properties.fields.items.properties.unit;
+  const enumerated = node.enum ?? (node.anyOf ?? []).find((/** @type {any} */ e) => Array.isArray(e.enum))?.enum;
+  assert.deepEqual(enumerated, [...UNIT_IDS], "the enum must survive the strict transform");
 });

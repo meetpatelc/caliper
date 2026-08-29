@@ -9,7 +9,15 @@ import {
   unitFamilyOptions as kitOptions,
 } from "@instrument/units";
 
-const FAMILIES = [
+/**
+ * Every unit family the app knows, in one place.
+ *
+ * Exported because the drafting contract turns this into a JSON Schema enum:
+ * a model asked for a "family" as a bare string has to guess which forty words
+ * are legal, and a wrong guess throws away the whole draft after a minute of
+ * work. As an enum, structured output cannot emit one that does not exist.
+ */
+export const FAMILIES = [
   "length",
   "area",
   "volume",
@@ -149,6 +157,46 @@ const MENU: Record<(typeof FAMILIES)[number], readonly string[]> = {
 };
 
 export type UnitFamilyId = (typeof FAMILIES)[number];
+
+/**
+ * Every unit symbol the app will accept, across all families.
+ *
+ * The same reason `FAMILIES` is exported: the drafting contract sends this to
+ * the provider as an enum. `defaultUnit` went out as a bare string, and a draft
+ * for "how much does a steel bar weigh" came back with an area in `mm^2` — a
+ * spelling `resolveUnit` does not know, because it matches on the full id, the
+ * symbol, or a listed alias, and `mm^2` is none of the three. The draft was
+ * discarded after a minute of work over a caret.
+ *
+ * Symbols rather than ids, because that is what the editor's unit select emits
+ * and therefore what every saved model already stores: the id `area.mm2` is
+ * accepted too, but nothing in the app writes it that way.
+ *
+ * Deliberately not per-family. JSON Schema cannot make one property's enum
+ * depend on another's value without `if`/`then`, which strict structured
+ * outputs do not support, so pairing a symbol with the wrong family stays
+ * possible — and stays caught by evaluation. Misspelling one does not.
+ */
+/**
+ * Every unit the app knows, as `family.unit` — one identifier naming both.
+ *
+ * `family` and `defaultUnit` were sent to the provider as two independent
+ * enums, which makes each value legal and says nothing about the pair. A draft
+ * came back with family `massFlow` and unit `kg/m³`: both real, together
+ * meaningless, and `resolveUnit` threw, so the draft was discarded. JSON Schema
+ * cannot make one property's enum depend on another's value without `if`/`then`,
+ * which strict structured outputs do not support — so the two questions are
+ * asked as one, and the drafting contract splits the answer back apart.
+ *
+ * A mismatch stops being caught and starts being unrepresentable.
+ */
+export const UNIT_IDS = inventory.families
+  .flatMap((family) => family.units.map((unit) => unit.id))
+  .sort() as [string, ...string[]];
+
+export const UNIT_SYMBOLS = [
+  ...new Set(inventory.families.flatMap((family) => family.units.map((unit) => unit.symbol))),
+].sort() as [string, ...string[]];
 
 export const isUnitFamilyId = (value: string): value is UnitFamilyId => (FAMILIES as readonly string[]).includes(value);
 
