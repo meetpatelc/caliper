@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { computeFit } from "@/studio/lib/iso286";
+import { outcomes } from "@/studio/lib/iso286-outcomes";
 
 /**
  * The ISO 286 page prints the subtraction behind each result. The risk that
@@ -63,4 +64,35 @@ test("a clearance fit still has a meaningful smallest clearance", () => {
   assert.ok(um(fit.imax) < 0, "interference on a clearance fit is negative, which reads as a fault");
   assert.equal(um(fit.cmin), 12, "the useful number is the smallest clearance");
   assert.equal(um(fit.cmax), 69);
+});
+
+/**
+ * The caption under each result prints the subtraction that produced it. The
+ * bug this pins was live for one build: naming the outcome by its sign but
+ * keeping the original terms, so a clearance fit rendered
+ *
+ *   Tightest — clearance   0.012 mm   es − EI = (-12) − 0 = 12 µm
+ *
+ * which does not add up. Both halves have to flip together — on a clearance
+ * fit the tightest outcome is EI − es, not the negation of es − EI. Arithmetic
+ * that fails on inspection is the worst possible defect on the one page whose
+ * argument is that you can inspect it.
+ */
+test("every caption's subtraction produces the number beside it", () => {
+  for (const [D, hl, hg, sl, sg] of CASES) {
+    const fit = computeFit(D, hl, hg, sl, sg);
+    for (const outcome of outcomes(fit)) {
+      // "ES − ei = 35 − (-34)" -> the operands actually shown
+      const shown = outcome.working.split(" = ")[1];
+      const [left, right] = shown.split(" − ").map((/** @type {string} */ part) => Number(part.replace(/[()]/g, "")));
+      const where = `⌀${D} ${hl}${hg}/${sl}${sg} ${outcome.label}`;
+      assert.equal(
+        left - right,
+        outcome.magnitude,
+        `${where}: "${shown}" must equal the ${outcome.magnitude} µm printed beside it`,
+      );
+      assert.ok(outcome.magnitude >= 0, `${where}: a printed gap or squeeze is never negative`);
+      assert.equal(um(outcome.mmValue), outcome.magnitude, `${where}: mm and µm must agree`);
+    }
+  }
 });
