@@ -27,12 +27,12 @@ import {
 import { buildPolicy, createNonce } from "../../scripts/csp-policy.mjs";
 import { runWithNonce } from "../../scripts/csp-nonce.mjs";
 
-interface GrokPwaEvent {
+interface PwaEvent {
   url: URL;
   req: { method: string; headers: Headers };
 }
 
-function requestHost(event: GrokPwaEvent): string {
+function requestHost(event: PwaEvent): string {
   return (
     event.req.headers.get("x-forwarded-host") ?? event.req.headers.get("host") ?? event.url.host
   );
@@ -63,8 +63,8 @@ function injectHeadStreaming(response: Response, host: string, nonce: string): R
   });
 }
 
-export default async function grokPwaMiddleware(
-  event: GrokPwaEvent,
+export default async function pwaMiddleware(
+  event: PwaEvent,
   next: () => unknown | Promise<unknown>,
 ): Promise<unknown> {
   const method = (event.req.method ?? "GET").toUpperCase();

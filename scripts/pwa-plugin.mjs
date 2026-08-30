@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import {
   acceptsHtml,
   createHeadInjector,
-  injectGrokPwaHead,
+  injectPwaHead,
   isDocumentPath,
   isInstallQuery,
   renderInstallPageHtml,
@@ -45,7 +45,7 @@ function sendHtml(res, html, nonce) {
   res.end(body);
 }
 
-function serveGrokPwa(middlewares) {
+function servePwa(middlewares) {
   middlewares.use((req, res, next) => {
     const rawUrl = req.url ?? "";
     const pathOnly = rawUrl.split("?", 1)[0] ?? "";
@@ -183,7 +183,7 @@ export function pwaPlugin() {
       return `export const ogIdentity = ${JSON.stringify(snapshotOgIdentity(root))};`;
     },
     transformIndexHtml(html) {
-      return injectGrokPwaHead(html, {
+      return injectPwaHead(html, {
         host: process.env.VITE_PUBLIC_HOSTNAME ?? "",
         cwd: root,
       });
@@ -191,11 +191,11 @@ export function pwaPlugin() {
     configureServer(server) {
       // Registered directly (not in a returned post-hook) so both run BEFORE
       // TanStack Start's SSR middleware, like the auth-popup plugin.
-      serveGrokPwa(server.middlewares);
+      servePwa(server.middlewares);
       wrapHtmlResponses(server.middlewares, root);
     },
     configurePreviewServer(server) {
-      serveGrokPwa(server.middlewares);
+      servePwa(server.middlewares);
       // Post-hook: preview registers compression between the direct hooks and
       // the post-hooks, and the injector must wrap AFTER compression so it
       // sees plaintext HTML (compression then compresses the injected output).

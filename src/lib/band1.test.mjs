@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { libraryDocuments } from "./document.ts";
 import { calculateTool, initialInputs } from "./engineering.ts";
 
-const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "caliper-band1.golden.json"), "utf8"));
+const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "band1.golden.json"), "utf8"));
 
 test("Band-1 declarative models match golden defaults", () => {
   const ids = Object.keys(golden);

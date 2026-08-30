@@ -95,7 +95,7 @@ const DOMAIN: Record<string, "foundation" | "mechanics" | "fluids" | "thermal" |
   charge: "electrical",
 };
 
-/** Original Caliper units as stable ids. */
+/** The original unit set, as stable ids. */
 const MENU: Record<(typeof FAMILIES)[number], readonly string[]> = {
   length: ["length.m", "length.mm", "length.cm", "length.km", "length.um", "length.in", "length.ft", "length.yd"],
   area: ["area.m2", "area.mm2", "area.cm2", "area.in2", "area.ft2"],

@@ -7,7 +7,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const DEFAULT_APP_NAME = "Instrument";
-export const OG_SERVICE_URL_DEFAULT = "https://og.grok.me";
 export const OG_SITE_REL_PATH = "src/lib/og/site.json";
 
 const SHARE_META_KEYS = new Set([
@@ -47,41 +46,13 @@ function unescapeHtml(value) {
     .replaceAll("&amp;", "&");
 }
 
-/** 6-digit hex for the og.grok.me placeholder, or "" if site.color is missing/invalid. */
-function placeholderCardColor(site = {}) {
-  const raw = String(site.color ?? "").trim();
-  const hex = raw.startsWith("#") ? raw.slice(1) : raw;
-  return /^[0-9a-fA-F]{6}$/.test(hex) ? hex : "";
-}
-
 /**
- * "wild-race.grok.me" → "Wild Race". Only published app hosts encode the
- * display name in the first label. Preview / guest hosts are image origins
- * only — slugifying them produced internal names like "Hds Abc 3000 Xy".
+ * Vercel's own preview and system hostnames.
+ *
+ * They are real, resolvable hosts, so they pass every other check here — and
+ * they are the wrong origin for a share card, because the URL changes on every
+ * deployment and stops resolving when that preview is cleaned up.
  */
-export function appNameFromHost(hostHeader) {
-  const host = String(hostHeader ?? "")
-    .split(",")[0]
-    .trim()
-    .split(":")[0]
-    .toLowerCase();
-  if (!host.endsWith(".grok.me")) {
-    return DEFAULT_APP_NAME;
-  }
-  const slug = host.split(".")[0] ?? "";
-  if (!slug || slug === "www" || !/^[a-z0-9-]{1,63}$/.test(slug)) {
-    return DEFAULT_APP_NAME;
-  }
-  return (
-    slug
-      .split("-")
-      .filter(Boolean)
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(" ") || DEFAULT_APP_NAME
-  );
-}
-
-/** True for Vercel system domains. Envoy rewrites origin Host to these; they SSO-protect `/og.jpg`. */
 function isVercelSystemHost(host) {
   return (
     host === "vercel.app" ||
@@ -91,7 +62,6 @@ function isVercelSystemHost(host) {
   );
 }
 
-/** Hostname suitable for absolute og:image URLs. Preview guests (X-Forwarded-Host) are allowed. */
 export function publicAppHost(hostHeader) {
   const host = String(hostHeader ?? "")
     .split(",")[0]
@@ -105,10 +75,8 @@ export function publicAppHost(hostHeader) {
 }
 
 /**
- * Published apps always use `VITE_PUBLIC_HOSTNAME` (the grok.me host the
- * deployer injects). Live preview has no such env, so fall back to the
- * request host / X-Forwarded-Host. Never prefer request Host on a published
- * app — Envoy rewrites it to `*.vercel.app`.
+ * `VITE_PUBLIC_HOSTNAME` when the deployment sets one, otherwise the request
+ * host / X-Forwarded-Host. The env wins because a proxy may rewrite Host.
  */
 export function resolvePublicHost(hostHeader) {
   return (
@@ -151,14 +119,16 @@ export function stripInstallParams(url) {
   return rest ? `${path}?${rest}` : path;
 }
 
-export function renderInstallPageHtml(template, { host, url } = {}) {
+// `host` is accepted and ignored: callers pass it, and the app name no longer
+// depends on where it is served from.
+export function renderInstallPageHtml(template, { host: _host, url } = {}) {
   return String(template)
-    .replaceAll("{{APP_NAME}}", escapeHtml(appNameFromHost(host)))
+    .replaceAll("{{APP_NAME}}", escapeHtml(DEFAULT_APP_NAME))
     .replaceAll("{{APP_URL}}", escapeHtml(stripInstallParams(url)));
 }
 
-export function renderWebManifest(hostHeader) {
-  const name = appNameFromHost(hostHeader);
+export function renderWebManifest(_hostHeader) {
+  const name = DEFAULT_APP_NAME;
   return JSON.stringify(
     {
       name,
@@ -198,11 +168,6 @@ export function pwaHeadTags(appName = DEFAULT_APP_NAME) {
     ],
     ["theme-color", '<meta name="theme-color" content="#000000">'],
   ];
-}
-
-export function readGrokProjectId() {
-  const fromProcess = typeof process !== "undefined" ? process.env?.VITE_PROJECT_ID : "";
-  return String(fromProcess ?? "").trim();
 }
 
 export function readXCreator() {
@@ -270,11 +235,6 @@ export function customOgAssetPath(cwd = process.cwd()) {
   return ogCardPublicPath(cwd) || "/og.jpg";
 }
 
-export function ogServiceUrl() {
-  const fromEnv = String(process.env?.VITE_OG_SERVICE_URL ?? "").trim();
-  return (fromEnv || OG_SERVICE_URL_DEFAULT).replace(/\/+$/, "");
-}
-
 export function titleFromDocument(html) {
   const match = String(html ?? "").match(/<title\b[^>]*>([^<]*)<\/title>/i);
   return match ? unescapeHtml(match[1]).trim() : "";
@@ -301,15 +261,13 @@ export function descriptionFromDocument(html) {
 export function resolveOgTitle(
   site = {},
   appName = DEFAULT_APP_NAME,
-  host = "",
+  _host = "",
   documentTitle = "",
 ) {
   const fromSite = String(site.title ?? "").trim();
   if (fromSite) return fromSite;
   const fromDoc = String(documentTitle ?? "").trim();
   if (fromDoc) return fromDoc;
-  const fromHost = appNameFromHost(host);
-  if (fromHost && fromHost !== DEFAULT_APP_NAME) return fromHost;
   const fromArg = String(appName ?? "").trim();
   return fromArg || DEFAULT_APP_NAME;
 }
@@ -321,7 +279,7 @@ export function siteHasCustomCard(site = {}) {
 /**
  * Preview: public/og.jpg|png on disk.
  * Vercel: the bake (`card=custom` / `image`) because the function cannot stat public/.
- * Otherwise empty — caller emits the og.grok.me placeholder.
+ * Otherwise empty, and no og:image is emitted at all.
  */
 export function resolveOgCardAsset(site = {}, cwd = process.cwd()) {
   return ogCardPublicPath(cwd) || (detectCustomOgCard(cwd, site) ? String(site.image ?? "").trim() || "/og.jpg" : "");
@@ -360,14 +318,9 @@ export function ogHeadTags({
   if (String(site.type ?? "").toLowerCase() === "x:game") {
     tags.push(`<meta property="og:type" content="x:game">`);
   }
-  if (publicHost) {
-    const asset = resolveOgCardAsset(site, cwd);
-    const custom = Boolean(asset);
-    let image = custom
-      ? `https://${publicHost}${asset.startsWith("/") ? asset : `/${asset}`}`
-      : `${ogServiceUrl()}/v1/card.png?host=${encodeURIComponent(publicHost)}&title=${encodeURIComponent(title)}`;
-    const color = !custom ? placeholderCardColor(site) : "";
-    if (color) image += `&color=${encodeURIComponent(color)}`;
+  const asset = publicHost ? resolveOgCardAsset(site, cwd) : "";
+  if (publicHost && asset) {
+    const image = `https://${publicHost}${asset.startsWith("/") ? asset : `/${asset}`}`;
     tags.push(`<meta property="og:image" content="${escapeHtml(image)}">`);
     tags.push(`<meta property="og:image:width" content="1200">`);
     tags.push(`<meta property="og:image:height" content="630">`);
@@ -410,9 +363,9 @@ function insertBeforeHeadClose(html, snippet) {
 export function normalizeHeadContext(ctx = {}) {
   const cwd = ctx.cwd ?? process.cwd();
   // Middleware passes a baked `site`. Still consult the workspace so a
-  // public/og.jpg generated after that snapshot (or missed by a wrong cwd)
-  // wins over the og.grok.me placeholder. Vercel has no public/ to read, so
-  // a correct bake is unchanged.
+  // public/og.jpg generated after that snapshot, or missed by a wrong cwd, is
+  // still found — without it the page ships with no share card at all. Vercel
+  // has no public/ to read, so a correct bake is unchanged.
   const site = applyCustomCardFromFs(
     ctx.site !== undefined ? ctx.site : snapshotOgIdentity(cwd).site,
     cwd,
@@ -420,7 +373,6 @@ export function normalizeHeadContext(ctx = {}) {
   const appName = resolveOgTitle(site, ctx.appName ?? DEFAULT_APP_NAME, ctx.host ?? "");
   return {
     appName,
-    projectId: ctx.projectId ?? readGrokProjectId(),
     creator: ctx.creator ?? readXCreator(),
     creatorId: ctx.creatorId ?? readXCreatorId(),
     host: ctx.host ?? "",
@@ -429,9 +381,9 @@ export function normalizeHeadContext(ctx = {}) {
   };
 }
 
-export function injectGrokPwaHead(html, ctx = {}) {
+export function injectPwaHead(html, ctx = {}) {
   if (typeof html !== "string") return html;
-  const { site, projectId, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
+  const { site, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
   const documentTitle = titleFromDocument(html);
   // Read before the strip, which deletes the route's own share meta.
   const documentDescription = descriptionFromDocument(html);
@@ -456,19 +408,7 @@ export function injectGrokPwaHead(html, ctx = {}) {
     ogHeadTags({ host, appName, site, documentTitle, documentDescription, cwd }).join(""),
   );
 
-  // No platform script is injected — the page stays first-party. The two
-  // project-id metas below are inert attribution, present only when the
-  // deployer sets VITE_PROJECT_ID.
-  if (projectId && !next.includes('name="grok-project-id"')) {
-    missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);
-  }
-  if (
-    projectId &&
-    !next.includes('property="grok:app_id"') &&
-    !next.includes("property='grok:app_id'")
-  ) {
-    missing.push(`<meta property="grok:app_id" content="${escapeHtml(projectId)}">`);
-  }
+  // No platform script and no platform attribution: the page is first-party.
   const creatorTags = xCreatorHeadTags(creator, creatorId);
   if (creatorTags.length > 0) {
     const hasCreator =
@@ -500,9 +440,8 @@ export function createHeadInjector(ctx = {}) {
   let done = false;
 
   const apply = (html) =>
-    injectGrokPwaHead(html, {
+    injectPwaHead(html, {
       appName: normalized.appName,
-      projectId: normalized.projectId,
       creator: normalized.creator,
       creatorId: normalized.creatorId,
       host: normalized.host,

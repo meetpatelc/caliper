@@ -34,7 +34,7 @@ screenshots/
 artifacts/
 
 # Workspace-only (not part of the product)
-.grok/
+.app-env.json
 AGENTS.md
 AGENTS.project.md
 startup.sh

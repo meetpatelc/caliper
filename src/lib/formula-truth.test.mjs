@@ -2,7 +2,7 @@
 /**
  * Closed-form truth checks.
  *
- * The `caliper-*.golden.json` suites pin each model against ITS OWN output at
+ * The `*.golden.json` suites pin each model against ITS OWN output at
  * capture time. That catches drift, which is what they are for — but it cannot
  * catch a formula that was wrong when captured, because the wrong value becomes
  * the expectation and the suite reports green forever.

@@ -26,12 +26,12 @@ import { calculateTool, initialInputs } from "../src/lib/engineering.ts";
 const WRITE = process.argv.includes("--write");
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const FILES = [
-  "caliper-atlas.golden.json",
-  "caliper-band1.golden.json",
-  "caliper-near.golden.json",
-  "caliper-pilot.golden.json",
-  "caliper-remaining.golden.json",
-  "caliper-wave2.golden.json",
+  "atlas.golden.json",
+  "band1.golden.json",
+  "near.golden.json",
+  "pilot.golden.json",
+  "remaining.golden.json",
+  "wave2.golden.json",
 ];
 
 let rawMoved = 0;

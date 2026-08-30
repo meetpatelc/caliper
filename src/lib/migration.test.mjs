@@ -11,12 +11,12 @@ import { outputRawScale } from "./document-constraints.ts";
 const here = dirname(fileURLToPath(import.meta.url));
 const loadGolden = (name) => JSON.parse(readFileSync(join(here, name), "utf8"));
 const golden = {
-  ...loadGolden("caliper-band1.golden.json"),
-  ...loadGolden("caliper-pilot.golden.json"),
-  ...loadGolden("caliper-wave2.golden.json"),
-  ...loadGolden("caliper-near.golden.json"),
-  ...loadGolden("caliper-atlas.golden.json"),
-  ...loadGolden("caliper-remaining.golden.json"),
+  ...loadGolden("band1.golden.json"),
+  ...loadGolden("pilot.golden.json"),
+  ...loadGolden("wave2.golden.json"),
+  ...loadGolden("near.golden.json"),
+  ...loadGolden("atlas.golden.json"),
+  ...loadGolden("remaining.golden.json"),
 };
 
 const PROBE_VALUE = { negativeOne: "-1", zero: "0" };

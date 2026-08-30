@@ -32,7 +32,9 @@ function linkDir(target, path) {
 function makeWorkspace(appEnvJson) {
   const root = mkdtempSync(join(tmpdir(), "app-env-"));
   if (appEnvJson !== undefined) {
-    mkdirSync(join(root, ".grok"), { recursive: true });
+    // The override used to live inside a platform-named directory, which is why
+    // this created one first. It is a file at the workspace root now, so the
+    // fixture only has to write it.
     writeFileSync(join(root, APP_ENV_REL_PATH), appEnvJson);
   }
   return root;
@@ -72,7 +74,7 @@ test("an explicit process-env override wins over the file", () => {
 });
 
 test("a clone ships no app-env override (auth defaults on)", () => {
-  // .grok/ is gitignored (workspace-only), so a fresh clone must resolve an
+  // The override file is gitignored (workspace-only), so a fresh clone must resolve an
   // empty app env — VITE_AUTH_ENABLED unset means sign-in is on by default,
   // matching .env.example.
   assert.deepEqual(readAppEnv(projectRoot()), {});
@@ -148,8 +150,8 @@ test("the CLI still runs when invoked through a symlinked path", async () => {
   // Hermetic, like the other app-env tests: the wrapper resolves its app env
   // relative to its own REAL location, so symlink to a temp workspace that
   // ships one. Pointing at this repo's own scripts/ asserted a value that comes
-  // from `.grok/app-env.json` — gitignored, so absent in a fresh clone and in
-  // CI, where the wrapper correctly printed "undefined".
+  // from `.app-env.json` — gitignored, so absent in a fresh clone and in CI,
+  // where the wrapper correctly printed "undefined".
   const root = makeWorkspace('{"VITE_AUTH_ENABLED":"false"}');
   mkdirSync(join(root, "scripts"), { recursive: true });
   copyFileSync(WRAPPER, join(root, "scripts", "with-app-env.mjs"));

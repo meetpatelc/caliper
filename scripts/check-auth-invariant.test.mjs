@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -91,14 +91,13 @@ test("only a divergence warns the smoke verdict", () => {
 });
 
 test("the build side resolves the app env from a workspace root", () => {
-  // No app-env file (this repo's shipped state — .grok/ is gitignored): unset
-  // means sign-in on. A workspace file flips it off; explicit env still wins.
+  // No app-env file (this repo's shipped state — it is gitignored): unset means
+  // sign-in on. A workspace file flips it off; explicit env still wins.
   const bare = mkdtempSync(join(tmpdir(), "auth-invariant-env-"));
   assert.equal(buildAuthEnabled(bare, {}), true);
 
   const overridden = mkdtempSync(join(tmpdir(), "auth-invariant-env-"));
-  mkdirSync(join(overridden, ".grok"), { recursive: true });
-  writeFileSync(join(overridden, ".grok/app-env.json"), '{"VITE_AUTH_ENABLED":"false"}');
+  writeFileSync(join(overridden, ".app-env.json"), '{"VITE_AUTH_ENABLED":"false"}');
   assert.equal(buildAuthEnabled(overridden, {}), false);
   assert.equal(buildAuthEnabled(overridden, { VITE_AUTH_ENABLED: "true" }), true);
 });

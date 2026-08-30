@@ -20,7 +20,7 @@ for (const id of remaining) {
 }
 
 writeFileSync(
-  new URL("../src/lib/caliper-remaining.golden.json", import.meta.url),
+  new URL("../src/lib/remaining.golden.json", import.meta.url),
   JSON.stringify(golden, null, 2) + "\n",
 );
 

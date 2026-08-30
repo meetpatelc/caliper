@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { calculateTool, initialInputs } from "../src/lib/engineering.ts";
 import { remainingDocuments } from "../src/lib/library-remaining.ts";
 
-const golden = JSON.parse(readFileSync(new URL("../src/lib/caliper-remaining.golden.json", import.meta.url), "utf8"));
+const golden = JSON.parse(readFileSync(new URL("../src/lib/remaining.golden.json", import.meta.url), "utf8"));
 const relClose = (a, b) => Math.abs(a - b) <= 1e-8 || Math.abs(a - b) / Math.max(1e-12, Math.abs(b)) <= 1e-8;
 const failed = [];
 for (const id of Object.keys(remainingDocuments).sort()) {

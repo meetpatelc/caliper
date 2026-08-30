@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { libraryDocuments } from "./document.ts";
 import { calculateTool, initialInputs } from "./engineering.ts";
 
-const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "caliper-remaining.golden.json"), "utf8"));
+const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "remaining.golden.json"), "utf8"));
 /**
  * The golden covers two kinds of model: those that became library documents,
  * and those that stayed hand-written TypeScript. This used to read the id list

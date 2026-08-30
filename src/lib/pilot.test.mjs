@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { libraryDocuments } from "./document.ts";
 import { calculateTool, initialInputs } from "./engineering.ts";
 
-const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "caliper-pilot.golden.json"), "utf8"));
+const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "pilot.golden.json"), "utf8"));
 const PILOT_IDS = [
   "boltPreload",
   "thinVessel",

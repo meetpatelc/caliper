@@ -5,16 +5,12 @@
  */
 
 import type { ToolId } from "@/lib/catalog";
-import { convertQuantity, isUnitFamilyId, unitFamilyOptions, unitSymbol, unitsForFamily, type UnitFamilyId } from "@/lib/units";
+import { convertQuantity, isUnitFamilyId, unitSymbol, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { libraryDocuments, runLibraryDocument } from "@/lib/document";
 
 export type { FieldKind, FieldDefinition } from "@/lib/engineering-types";
 export { toolFields } from "@/lib/engineering-fields";
 export { initialInputs } from "@/lib/engineering-defaults";
-
-import type { FieldDefinition } from "@/lib/engineering-types";
-import { toolFields } from "@/lib/engineering-fields";
-import { initialInputs } from "@/lib/engineering-defaults";
 
 export type CalculationValue = { key: string; label: string; raw: number; display: string; unit: string; symbol?: string };
 export type CalculationState = {
