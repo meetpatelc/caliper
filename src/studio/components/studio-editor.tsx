@@ -243,6 +243,46 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
     setDraft({ ...draft, outputs });
   };
 
+  /**
+   * Remove a row, and offer it back.
+   *
+   * Everything else destructive in this editor is either recoverable or
+   * guarded: a text input keeps the browser's own undo, deleting the whole
+   * draft asks first, and a table paste holds the table it replaced. Removing
+   * an input or a result was the one gesture that was a single click and gone —
+   * taking the row, its unit, and any expression written against it, with
+   * autosave committing the loss 400ms later.
+   *
+   * A toast rather than a confirmation dialog, deliberately. Deleting a row is
+   * usually what someone meant; asking every time taxes the common case to
+   * guard the rare one, and an undo does the reverse.
+   */
+  const removeAt = <T,>(
+    kind: "fields" | "outputs",
+    list: T[],
+    index: number,
+    label: string,
+    after?: () => void,
+  ) => {
+    const removed = list[index];
+    setDraft({ ...draft, [kind]: list.filter((_, position) => position !== index) } as WorkshopCalculator);
+    after?.();
+    toast(`${label} removed.`, {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          // Restored where it was: putting an input back at the end reorders
+          // the panel under someone who was only undoing a misclick.
+          setDraft((current) => {
+            const restored = [...(current[kind] as T[])];
+            restored.splice(index, 0, removed);
+            return { ...current, [kind]: restored } as WorkshopCalculator;
+          });
+        },
+      },
+    });
+  };
+
   const insertIntoExpression = (token: string) => {
     const index = Math.min(activeOutput, draft.outputs.length - 1);
     const output = draft.outputs[index];
@@ -444,7 +484,7 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                         disabled={draft.fields.length <= 1}
                         className="text-muted hover:text-danger"
                         aria-label={`Remove ${field.label || "input"}`}
-                        onClick={() => setDraft({ ...draft, fields: draft.fields.filter((_, i) => i !== index) })}
+                        onClick={() => removeAt("fields", draft.fields, index, field.label || "Input")}
                       >
                         <Trash2 size={ICON.base} />
                       </Button>
@@ -616,10 +656,11 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
                           size="icon"
                           className="text-muted hover:text-danger"
                           aria-label="Remove result"
-                          onClick={() => {
-                            setDraft({ ...draft, outputs: draft.outputs.filter((_, i) => i !== index) });
-                            setActiveOutput(0);
-                          }}
+                          onClick={() =>
+                            removeAt("outputs", draft.outputs, index, output.label || "Result", () =>
+                              setActiveOutput(0),
+                            )
+                          }
                         >
                           <Trash2 size={ICON.base} />
                         </Button>
