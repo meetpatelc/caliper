@@ -13,6 +13,7 @@ import type { InstrumentDocument } from "@/lib/document";
 import { deleteDraftAccount, upsertDraftAccount } from "@/lib/desk-account";
 import { accountGuardedStorage, enqueueAccountWrite } from "@/lib/desk-mode";
 import { slugify } from "@/lib/utils";
+import { nextRevision } from "@/studio/lib/model-revision";
 
 type WorkshopState = {
   hasHydrated: boolean;
@@ -77,7 +78,16 @@ export const useWorkshop = create<WorkshopState>()(
       items: [],
       setHasHydrated: (value) => set({ hasHydrated: value }),
       upsert: (item) => {
-        const next = { ...item, updatedAt: new Date().toISOString() };
+        // Derived on every save rather than typed by the author. A version
+        // somebody has to remember to bump is wrong exactly when it matters —
+        // after a hurried fix — and this is the number a record link relies on
+        // to say whether the model moved underneath it.
+        const stored = get().items.find((entry) => entry.id === item.id);
+        const next = {
+          ...item,
+          ...nextRevision(stored, item),
+          updatedAt: new Date().toISOString(),
+        };
         set((state) => {
           const rest = state.items.filter((entry) => entry.id !== item.id);
           return { items: [next, ...rest] };

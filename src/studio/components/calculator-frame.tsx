@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ICON } from "@instrument/ui";
-import { PenLine } from "lucide-react";
+import { FileText, PenLine } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { AnyCalculator, WorkshopCalculator } from "@/studio/lib/calculator-types";
 import { isPackedCalculator } from "@/studio/lib/calculator-types";
 import { relatedCalculators } from "@/studio/lib/catalog";
 import { defaultFieldState, evaluateCalculator, retargetField, type FieldState } from "@/studio/lib/evaluate";
 import { useWorkshop } from "@/studio/lib/workshop-store";
+import { revisionOf } from "@/studio/lib/model-revision";
+import { RECORD_VERSION_KEY } from "@/lib/search-params";
 import { unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { resolveSketchId } from "@/lib/diagrams";
 import { libraryDocuments } from "@/lib/document";
@@ -235,13 +237,39 @@ export function CalculatorFrame({
       actions={
         <>
           {workshopItem ? (
-            <Button
-              variant="outline"
-              onClick={() => void navigate({ to: "/studio/$id", params: { id: workshopItem.id } })}
-            >
-              <PenLine size={ICON.inline} />
-              Edit in studio
-            </Button>
+            <>
+              {/*
+                The record, which Library models have had and Build models have
+                not. It stamps the revision, so reopening the link after the
+                model changes says so instead of quietly showing a different
+                number under the same conditions.
+              */}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  for (const field of calculator.fields) {
+                    const state = fieldState[field.id];
+                    if (!state) continue;
+                    params.set(field.id, state.value);
+                    if (field.input !== "choice") params.set(`${field.id}_u`, state.unit);
+                  }
+                  params.set(RECORD_VERSION_KEY, String(revisionOf(workshopItem)));
+                  const path = `/record/c/${workshopItem.slug}?${params.toString()}`;
+                  void navigate({ to: path });
+                }}
+              >
+                <FileText size={ICON.inline} />
+                Record this check
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => void navigate({ to: "/studio/$id", params: { id: workshopItem.id } })}
+              >
+                <PenLine size={ICON.inline} />
+                Edit in studio
+              </Button>
+            </>
           ) : !isPackedCalculator(calculator) ? (
             <Button
               variant="outline"

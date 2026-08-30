@@ -184,6 +184,10 @@ export type WorkshopCalculator = CalculatorDefinition & {
   origin: "workshop";
   updatedAt: string;
   published: boolean;
+  /** Advances when an edit can change the answer. See model-revision.ts. */
+  revision?: number;
+  /** The computational shape that produced `revision`. */
+  fingerprint?: string;
 };
 
 export type OfficialCalculator = CalculatorDefinition & {

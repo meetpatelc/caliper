@@ -28,6 +28,7 @@ import { Route as StudioIndexRouteImport } from './routes/studio.index'
 import { Route as StudioIdRouteImport } from './routes/studio.$id'
 import { Route as ToolToolIdRouteImport } from './routes/tool/$toolId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as RecordCSlugRouteImport } from './routes/record.c.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -124,6 +125,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecordCSlugRoute = RecordCSlugRouteImport.update({
+  id: '/record/c/$slug',
+  path: '/record/c/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/tool/$toolId': typeof ToolToolIdRoute
   '/studio/': typeof StudioIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/record/c/$slug': typeof RecordCSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/tool/$toolId': typeof ToolToolIdRoute
   '/studio': typeof StudioIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/record/c/$slug': typeof RecordCSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/tool/$toolId': typeof ToolToolIdRoute
   '/studio/': typeof StudioIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/record/c/$slug': typeof RecordCSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/tool/$toolId'
     | '/studio/'
     | '/api/auth/$'
+    | '/record/c/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/tool/$toolId'
     | '/studio'
     | '/api/auth/$'
+    | '/record/c/$slug'
   id:
     | '__root__'
     | '/'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/tool/$toolId'
     | '/studio/'
     | '/api/auth/$'
+    | '/record/c/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -271,6 +283,7 @@ export interface RootRouteChildren {
   RecordToolIdRoute: typeof RecordToolIdRoute
   ToolToolIdRoute: typeof ToolToolIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  RecordCSlugRoute: typeof RecordCSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -408,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/record/c/$slug': {
+      id: '/record/c/$slug'
+      path: '/record/c/$slug'
+      fullPath: '/record/c/$slug'
+      preLoaderRoute: typeof RecordCSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -442,6 +462,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecordToolIdRoute: RecordToolIdRoute,
   ToolToolIdRoute: ToolToolIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  RecordCSlugRoute: RecordCSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
