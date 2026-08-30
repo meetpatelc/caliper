@@ -51,7 +51,10 @@ const AWAITING_INDEPENDENT_CHECK = [
   "valveCv",
 ];
 
-const truthSource = readFileSync("src/lib/formula-truth.test.mjs", "utf8");
+// Resolved from this file, not from the caller's cwd. A relative path here
+// passes locally and fails wherever the runner starts somewhere else — the same
+// shape of assumption that kept browser-smoke pinned to /workspace.
+const truthSource = readFileSync(new URL("./formula-truth.test.mjs", import.meta.url), "utf8");
 /** @param {string} id */
 const hasIndependentCheck = (id) => new RegExp(`["']${id}["']`).test(truthSource);
 
