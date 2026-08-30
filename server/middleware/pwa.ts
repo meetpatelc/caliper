@@ -9,13 +9,13 @@
  * - `/__pwa/manifest.webmanifest` → per-app-named manifest (kept out of
  *   public/ so this dynamic response is the only one).
  * - Other HTML documents → stream-inject PWA + OG head tags at `</head>`.
- *   OG identity is baked via `virtual:grok-og-identity` at `vite build`
+ *   OG identity is baked via `virtual:og-identity` at `vite build`
  *   (this function cannot read `src/lib/og/site.json` or `public/og.jpg`).
  *   This must be a middleware transforming `next()`: h3 discards the `response`
  *   runtime hook's return value, and `render:html` does not exist in Nitro v3.
  */
 import installPageTemplate from "../../scripts/install-page.html?raw";
-import { grokOgIdentity } from "virtual:grok-og-identity";
+import { ogIdentity } from "virtual:og-identity";
 import {
   acceptsHtml,
   createHeadInjector,
@@ -23,7 +23,7 @@ import {
   isInstallQuery,
   renderInstallPageHtml,
   renderWebManifest,
-} from "../../scripts/grok-pwa-shared.mjs";
+} from "../../scripts/pwa-shared.mjs";
 import { buildPolicy, createNonce } from "../../scripts/csp-policy.mjs";
 import { runWithNonce } from "../../scripts/csp-nonce.mjs";
 
@@ -41,7 +41,7 @@ function requestHost(event: GrokPwaEvent): string {
 function injectHeadStreaming(response: Response, host: string, nonce: string): Response {
   const injector = createHeadInjector({
     host,
-    site: grokOgIdentity.site,
+    site: ogIdentity.site,
   });
   const transformed = response.body!.pipeThrough(
     new TransformStream<Uint8Array, Uint8Array>({

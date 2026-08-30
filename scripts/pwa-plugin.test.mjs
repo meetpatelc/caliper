@@ -7,7 +7,7 @@ import test from "node:test";
 import {
   appNameFromHost,
   createHeadInjector,
-  grokXCreatorHeadTags,
+  xCreatorHeadTags,
   injectGrokPwaHead,
   isDocumentPath,
   isInstallQuery,
@@ -16,8 +16,8 @@ import {
   resolveOgCardAsset,
   snapshotOgIdentity,
   stripInstallParams,
-} from "./grok-pwa-shared.mjs";
-import { renderInstallPage } from "./grok-pwa-plugin.mjs";
+} from "./pwa-shared.mjs";
+import { renderInstallPage } from "./pwa-plugin.mjs";
 
 const TEMPLATE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -77,8 +77,8 @@ test("does not duplicate grok:app_id", () => {
 });
 
 test("omits x:creator tags without both creator values", () => {
-  assert.deepEqual(grokXCreatorHeadTags("", "42"), []);
-  assert.deepEqual(grokXCreatorHeadTags("@alice", ""), []);
+  assert.deepEqual(xCreatorHeadTags("", "42"), []);
+  assert.deepEqual(xCreatorHeadTags("@alice", ""), []);
   const out = injectGrokPwaHead("<html><head></head></html>", {
     appName: "Demo",
     projectId: "",
@@ -100,7 +100,7 @@ test("injects x:creator tags when both creator values are set", () => {
 });
 
 test("escapes x:creator values", () => {
-  const tags = grokXCreatorHeadTags('"><script>', '1" onclick="alert(1)');
+  const tags = xCreatorHeadTags('"><script>', '1" onclick="alert(1)');
   assert.equal(
     tags[0],
     '<meta property="x:creator" content="&quot;&gt;&lt;script&gt;">',
@@ -512,21 +512,21 @@ test("renders the manifest with the per-app name", () => {
 test("vite config keeps the nitro serverDir wiring", () => {
   const viteConfig = readFileSync(join(TEMPLATE_ROOT, "vite.config.ts"), "utf8");
   assert.match(viteConfig, /serverDir:\s*"\.\/server"/);
-  assert.match(viteConfig, /grokPwaPlugin\(\)/);
+  assert.match(viteConfig, /pwaPlugin\(\)/);
 });
 
 test("nitro middleware and its bundled assets exist", () => {
-  const middleware = readFileSync(join(TEMPLATE_ROOT, "server/middleware/grok-pwa.ts"), "utf8");
+  const middleware = readFileSync(join(TEMPLATE_ROOT, "server/middleware/pwa.ts"), "utf8");
   assert.match(middleware, /install-page\.html\?raw/);
-  assert.match(middleware, /virtual:grok-og-identity/);
+  assert.match(middleware, /virtual:og-identity/);
   readFileSync(join(TEMPLATE_ROOT, "scripts/install-page.html"));
   readFileSync(join(TEMPLATE_ROOT, "public/__pwa/icon-180.png"));
   readFileSync(join(TEMPLATE_ROOT, "public/__pwa/install/styles.css"));
 });
 
 test("vite plugin bakes og identity as a virtual module", () => {
-  const plugin = readFileSync(join(TEMPLATE_ROOT, "scripts/grok-pwa-plugin.mjs"), "utf8");
-  assert.match(plugin, /virtual:grok-og-identity/);
+  const plugin = readFileSync(join(TEMPLATE_ROOT, "scripts/pwa-plugin.mjs"), "utf8");
+  assert.match(plugin, /virtual:og-identity/);
   assert.match(plugin, /snapshotOgIdentity/);
 });
 

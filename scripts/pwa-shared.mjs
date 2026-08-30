@@ -182,7 +182,7 @@ export function renderWebManifest(hostHeader) {
   );
 }
 
-export function grokPwaHeadTags(appName = DEFAULT_APP_NAME) {
+export function pwaHeadTags(appName = DEFAULT_APP_NAME) {
   return [
     // Standalone display comes from the manifest ("display": "standalone");
     // the legacy *-web-app-capable metas it replaces are deliberately absent.
@@ -215,7 +215,7 @@ export function readXCreatorId() {
   return String(fromProcess ?? "").trim();
 }
 
-export function grokXCreatorHeadTags(creator = readXCreator(), creatorId = readXCreatorId()) {
+export function xCreatorHeadTags(creator = readXCreator(), creatorId = readXCreatorId()) {
   const name = String(creator ?? "").trim();
   const id = String(creatorId ?? "").trim();
   if (!name || !id) return [];
@@ -334,7 +334,7 @@ function applyCustomCardFromFs(site, cwd) {
   return { ...site, card: "custom", image: disk };
 }
 
-export function grokOgHeadTags({
+export function ogHeadTags({
   host = "",
   appName = DEFAULT_APP_NAME,
   site = {},
@@ -443,7 +443,7 @@ export function injectGrokPwaHead(html, ctx = {}) {
   );
   let next = stripShareMetaTags(html);
 
-  const missing = grokPwaHeadTags(appName)
+  const missing = pwaHeadTags(appName)
     .filter(([key]) => {
       if (key === "manifest") return !next.includes('href="/__pwa/manifest.webmanifest"');
       if (key === "apple-touch-icon") return !next.includes('href="/__pwa/icon-180.png"');
@@ -453,7 +453,7 @@ export function injectGrokPwaHead(html, ctx = {}) {
 
   next = insertAfterHeadOpen(
     next,
-    grokOgHeadTags({ host, appName, site, documentTitle, documentDescription, cwd }).join(""),
+    ogHeadTags({ host, appName, site, documentTitle, documentDescription, cwd }).join(""),
   );
 
   // No platform script is injected — the page stays first-party. The two
@@ -469,7 +469,7 @@ export function injectGrokPwaHead(html, ctx = {}) {
   ) {
     missing.push(`<meta property="grok:app_id" content="${escapeHtml(projectId)}">`);
   }
-  const creatorTags = grokXCreatorHeadTags(creator, creatorId);
+  const creatorTags = xCreatorHeadTags(creator, creatorId);
   if (creatorTags.length > 0) {
     const hasCreator =
       next.includes('property="x:creator" content=') ||

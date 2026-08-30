@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
  * The Content-Security-Policy, in one place.
  *
  * Shared deliberately: the policy is now issued per request by the PWA
- * middleware (`server/middleware/grok-pwa.ts`) because it carries a per-request
+ * middleware (`server/middleware/pwa.ts`) because it carries a per-request
  * nonce, while `scripts/csp.mjs` still needs the same directive list at build
  * time to keep the generated output honest. Two copies of a header this
  * fiddly would drift, and the failure mode of a drifted CSP is a silently

@@ -3,7 +3,7 @@
  * Check that nothing in the build output issues a second CSP.
  *
  * The policy itself is no longer written here. It is issued per request by
- * `server/middleware/grok-pwa.ts`, because it carries a per-request nonce and
+ * `server/middleware/pwa.ts`, because it carries a per-request nonce and
  * a nonce cannot live in a static header. What this script now guards is the
  * hazard that change introduced: a browser given two CSP headers enforces
  * *both*, so a leftover static rule in `.vercel/output/config.json` would
@@ -56,7 +56,7 @@ function main() {
   if (offenders.length) {
     console.error(
       `[csp] ${offenders.length} static CSP route rule(s) in ${CONFIG}.\n` +
-        "The policy is issued per request by server/middleware/grok-pwa.ts. A second\n" +
+        "The policy is issued per request by server/middleware/pwa.ts. A second\n" +
         "header here would be enforced alongside it and block every nonced script.",
     );
     process.exitCode = 1;
