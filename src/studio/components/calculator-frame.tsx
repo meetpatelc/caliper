@@ -267,7 +267,7 @@ export function CalculatorFrame({
                 onClick={() => void navigate({ to: "/studio/$id", params: { id: workshopItem.id } })}
               >
                 <PenLine size={ICON.inline} />
-                Edit in studio
+                Edit in Build
               </Button>
             </>
           ) : !isPackedCalculator(calculator) ? (
@@ -279,7 +279,7 @@ export function CalculatorFrame({
               }}
             >
               <PenLine size={ICON.inline} />
-              Fork in studio
+              Fork in Build
             </Button>
           ) : null}
           {actions}

@@ -14,7 +14,7 @@ const DOMAIN_IDS = domains.map((domain) => domain.id) as [DomainId, ...DomainId[
  * How large a calculator may get, set by what the Library already ships.
  *
  * These were picked for hand-authoring — six results and twelve inputs is a lot
- * to write from scratch — and then "Fork in studio" started copying Library
+ * to write from scratch — and then "Fork in Build" started copying Library
  * models into the same schema. Fourteen of them did not fit: `productionMetrics`
  * has ten outputs, `dimensionCheck` fourteen inputs, `motionDuty` an output id
  * of 34 characters, and four models cite a source in 86. Every one of those

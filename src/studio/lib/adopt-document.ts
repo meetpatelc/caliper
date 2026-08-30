@@ -4,7 +4,7 @@ import type { FieldDefinition, TableDefinition } from "@/studio/lib/calculator-t
 /**
  * Translate a library document's lookups into the tables Studio understands.
  *
- * "Fork in studio" copies a shipped model into the editor so it can be fixed by
+ * "Fork in Build" copies a shipped model into the editor so it can be fixed by
  * the person who found the fault rather than by whoever owns the repository.
  * For a plain formula model that worked. For the thirteen models that look a
  * value up — beam, lmtd, mmc, the bearing lives — it produced a calculator

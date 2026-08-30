@@ -341,7 +341,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
               }}
             >
               <PenLine size={ICON.inline} />
-              Fork in studio
+              Fork in Build
             </Button>
           ) : null}
           <FavouriteButton favourited={favourited} onToggle={() => toggleFavorite(tool.id)} />

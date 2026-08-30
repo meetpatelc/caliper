@@ -149,7 +149,7 @@ function ProjectPage() {
             </Link>
           }
         >
-          Nothing here yet. Open a model and save a check, write one in Studio, or start a review.
+          Nothing here yet. Open a model and save a check, write one in Build, or start a review.
         </EmptyState>
       ) : null}
 
