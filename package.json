@@ -23,6 +23,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "qa:copy": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/duplicate-copy-audit.mjs",
+    "qa:console": "node scripts/build-console-qa.mjs",
     "qa:csp": "node scripts/csp-qa.mjs",
     "serve:build": "node scripts/serve-build.mjs",
     "draft:smoke": "node --experimental-strip-types scripts/draft-smoke.mjs",

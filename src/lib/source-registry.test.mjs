@@ -90,6 +90,7 @@ const COMPETITOR_HOSTS = [
 ];
 
 /** The host of a url, or empty. Hosts are matched as hosts, never as substrings. */
+/** @param {unknown} url */
 const hostOf = (url) => { try { return new URL(String(url)).host.replace(/^www./, "").toLowerCase(); } catch { return ""; } };
 
 /**
@@ -118,7 +119,13 @@ const COMPETITOR_BRANDS = [
   "amesweb",
 ];
 
+/**
+ * @param {unknown} url
+ * @param {unknown} label
+ * @returns {string[]}
+ */
 const mentions = (url, label) => {
+  /** @type {string[]} */
   const hits = [];
   const host = hostOf(url);
   if (host && COMPETITOR_HOSTS.includes(host)) hits.push(host);
