@@ -53,3 +53,93 @@ test("a tool cites the same source at most once", () => {
   }
   assert.deepEqual(repeats, []);
 });
+
+/**
+ * Attribution may not point at another calculator site.
+ *
+ * Thirty-nine of the 169 tools cited one — Engineering ToolBox, Engineers Edge,
+ * GD&T Basics and a dozen others — on a product whose whole claim is that the
+ * work can be checked. A calculator page is not where a relation comes from; it
+ * is somewhere the same relation is also stated, which is a different thing and
+ * a weaker one.
+ *
+ * The replacements name a document instead, and carry no URL. That is already
+ * how Roark and Shigley are cited, `instrument-page.tsx` renders a label with
+ * no link as plain text, and a precise title cannot rot the way a guessed link
+ * can.
+ *
+ * The list is hosts, not a judgement about quality. Several of these are useful
+ * sites. They are simply not sources.
+ */
+const COMPETITOR_HOSTS = [
+  "engineeringtoolbox.com",
+  "engineersedge.com",
+  "engineeringlibrary.org",
+  "amesweb.info",
+  "katmarsoftware.com",
+  "x-engineer.org",
+  "mathwords.com",
+  "gdandtbasics.com",
+  "accendoreliability.com",
+  "6sigma.us",
+  "oee.com",
+  "drivetrainhub.com",
+  "khkgears.net",
+  "abbottaerospace.com",
+  "epi-eng.com",
+];
+
+/** The host of a url, or empty. Hosts are matched as hosts, never as substrings. */
+const hostOf = (url) => { try { return new URL(String(url)).host.replace(/^www./, "").toLowerCase(); } catch { return ""; } };
+
+/**
+ * Brand names as they are written, not fragments.
+ *
+ * The first version of this test stripped the TLD and matched the remainder
+ * anywhere in the label, so "oee.com" became "oee" and flagged "Nakajima,
+ * Introduction to TPM — OEE definition" — a correct citation reported as a
+ * competitor. A guard that cries wolf on the fix it was written to protect is
+ * worse than no guard.
+ */
+const COMPETITOR_BRANDS = [
+  "engineering toolbox",
+  "engineers edge",
+  "engineeringlibrary",
+  "gd&t basics",
+  "mathwords",
+  "katmar",
+  "accendo",
+  "sixsigma.us",
+  "oee.com",
+  "drivetrain hub",
+  "khk ",
+  "abbott aerospace",
+  "x-engineer",
+  "amesweb",
+];
+
+const mentions = (url, label) => {
+  const hits = [];
+  const host = hostOf(url);
+  if (host && COMPETITOR_HOSTS.includes(host)) hits.push(host);
+  const text = String(label ?? "").toLowerCase();
+  for (const brand of COMPETITOR_BRANDS) if (text.includes(brand)) hits.push(brand);
+  return hits;
+};
+test("no tool cites another calculator site as its source", () => {
+  const offenders = [];
+  for (const tool of tools) {
+    const hits = mentions(tool.sourceUrl, tool.sourceLabel);
+    if (hits.length) offenders.push(`${tool.id} — ${tool.sourceLabel} (${hits.join(", ")})`);
+  }
+  assert.deepEqual(offenders, [], `attribution pointing at a competitor:\n  ${offenders.join("\n  ")}`);
+});
+
+test("no registry record cites another calculator site", () => {
+  const offenders = [];
+  for (const record of sourceRegistry) {
+    const hits = mentions(record.url, record.label);
+    if (hits.length) offenders.push(`${record.id} — ${record.label}`);
+  }
+  assert.deepEqual(offenders, [], `registry records pointing at a competitor:\n  ${offenders.join("\n  ")}`);
+});
