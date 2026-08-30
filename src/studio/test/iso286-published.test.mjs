@@ -62,3 +62,44 @@ test("clearance letters are unaffected by the delta rule", () => {
   const f8 = computeFit(100, "F", 8, "h", 6);
   assert.equal(Math.round(f8.EI * 1000), 36);
 });
+
+/**
+ * R, S and U stop at 50 mm, because above it the table cannot be right.
+ *
+ * `SIZE_LIMITS` has one band from 50 to 80 and `FD` carries one value per band.
+ * ISO 286 splits the ranges for r, s and u above 50 mm — 50–65, 65–80, 80–100,
+ * and so on — so a single figure cannot serve both halves of a split, and there
+ * is no way to tell from inside the table which half it belongs to.
+ *
+ * Nothing exercised these letters at all, so the table answered confidently for
+ * sizes it has no entry for. A fit is something somebody presses a bearing
+ * onto; refusing is the only honest answer until the sub-divided rows are
+ * transcribed from ISO 286-2 and checked.
+ */
+test("R, S and U refuse above 50 mm rather than answer from a coarse band", () => {
+  for (const letter of /** @type {const} */ (["r", "s", "u"])) {
+    assert.doesNotThrow(
+      () => computeFit(40, "H", 7, letter, 6),
+      `${letter} at 40 mm is inside the tabulated range`,
+    );
+    assert.throws(
+      () => computeFit(100, "H", 7, letter, 6),
+      /only tabulated here up to 50 mm/,
+      `${letter} at 100 mm must refuse`,
+    );
+    // The hole letter routes through the same table by mirroring the shaft.
+    assert.throws(
+      () => computeFit(100, /** @type {any} */ (letter.toUpperCase()), 7, "h", 6),
+      /only tabulated here up to 50 mm/,
+      `${letter.toUpperCase()} as a hole must refuse too`,
+    );
+  }
+});
+
+test("the letters ISO 286 does not sub-divide are unaffected", () => {
+  // The guard must be narrow: p, n and the clearance letters have one value per
+  // coarse band in the standard as well, so refusing them would be wrong.
+  for (const letter of /** @type {const} */ (["c", "d", "e", "f", "g", "h", "k", "m", "n", "p"])) {
+    assert.doesNotThrow(() => computeFit(400, "H", 7, letter, 6), `${letter} at 400 mm must still answer`);
+  }
+});

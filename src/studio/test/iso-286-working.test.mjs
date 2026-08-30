@@ -28,9 +28,14 @@ const CASES = [
   [100, "H", 7, "g", 6],
   [100, "N", 7, "h", 6],
   [2, "H", 8, "f", 7],
-  [450, "H", 7, "s", 6],
+  // These two were ⌀450 H7/s6 and ⌀500 H12/u8, chosen to exercise the
+  // interference side at the top of the range. R, S and U now refuse above
+  // 50 mm — the table has one value per coarse band and ISO 286 splits theirs
+  // there — so the interference cases move to a size s6 is tabulated for, and
+  // to p6, which the standard does not sub-divide.
+  [40, "H", 7, "s", 6],
   [3, "H", 11, "c", 11],
-  [500, "H", 12, "u", 8],
+  [450, "H", 7, "p", 6],
 ];
 
 test("the working shown reproduces the fit it is shown beside", () => {

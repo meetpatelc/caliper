@@ -109,11 +109,37 @@ function itValue(grade: number, index: number) {
   return row[index];
 }
 
+/**
+ * Letters whose size ranges ISO 286 sub-divides above 50 mm.
+ *
+ * `SIZE_LIMITS` has one band from 50 to 80, and `FD` carries one value per band
+ * — thirteen values per letter. For c through p that matches the standard. For
+ * r, s and u it does not: above 50 mm the standard splits each band (50–65,
+ * 65–80, 80–100, 100–120, and so on), and a single figure cannot be right for
+ * both halves of a split.
+ *
+ * So at most one of each pair is correct here, and there is no way to tell
+ * which from inside the table. Refusing is the only honest answer: a fit is
+ * something somebody presses a bearing onto, and a number that is confidently
+ * wrong is worse than a tool that says it does not know.
+ *
+ * Lifting this means transcribing the sub-divided rows from ISO 286-2 — and
+ * checking them, which is the part that matters.
+ */
+const SUBDIVIDED_ABOVE_50 = new Set(["r", "s", "u"]);
+/** Index of the last band at or below 50 mm in `SIZE_LIMITS`. */
+const BAND_50_MM = 5;
+
 function fdValue(letter: string, index: number) {
   const key = letter.toLowerCase();
   if (key === "js") return 0;
   const row = FD[key];
   if (!row) throw new Error(`Deviation ${letter} is not in this table.`);
+  if (SUBDIVIDED_ABOVE_50.has(key) && index > BAND_50_MM) {
+    throw new Error(
+      `${letter.toUpperCase()} is only tabulated here up to 50 mm. Above that ISO 286 splits the size ranges for R, S and U, and this table carries one value per coarse band — so it cannot answer for ${letter.toUpperCase()} at this size.`,
+    );
+  }
   return row[index];
 }
 
