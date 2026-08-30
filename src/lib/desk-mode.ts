@@ -2,8 +2,17 @@ import { useSyncExternalStore } from "react";
 import type { StateStorage } from "zustand/middleware";
 import { toast } from "sonner";
 import { createSingleFlight } from "@/lib/single-flight";
+import { DESK_KEY, readKey, WORKSHOP_STORAGE_KEY, type StorageKey } from "@/lib/storage-keys";
 
-export const DESK_STORAGE_KEY = "caliper-desk-v1";
+// The name and its history live in storage-keys.ts, so renaming it again is
+// one line there and nobody loses their favourites over a word.
+export const DESK_STORAGE_KEY = DESK_KEY.name;
+
+/** The persisted stores that route through {@link accountGuardedStorage}. */
+const KEYS_BY_NAME: Record<string, StorageKey> = {
+  [DESK_KEY.name]: DESK_KEY,
+  [WORKSHOP_STORAGE_KEY.name]: WORKSHOP_STORAGE_KEY,
+};
 
 export type DeskStatus = {
   accountMode: boolean;
@@ -180,7 +189,11 @@ export function accountGuardedStorage(): StateStorage {
   return {
     getItem: (name) => {
       try {
-        return localStorage.getItem(name);
+        // Both persisted stores read through here, so this is the one place a
+        // renamed key has to pick up what the old name was holding. `readKey`
+        // moves it once and then gets out of the way.
+        const key = KEYS_BY_NAME[name];
+        return key ? readKey(localStorage, key) : localStorage.getItem(name);
       } catch {
         return null;
       }

@@ -1,4 +1,5 @@
 import { THEME_COLOR, THEME_KEY } from "@/lib/instrument";
+import { inlineAdoptSource, THEME_STORAGE_KEY } from "@/lib/storage-keys";
 
 /**
  * The pre-paint theme script, built on call.
@@ -21,5 +22,8 @@ import { THEME_COLOR, THEME_KEY } from "@/lib/instrument";
  * a colour changes, with the theme silently flashing in production only.
  */
 export function themeInitScript() {
-  return `try{var t=localStorage.getItem('${THEME_KEY}');var r=document.documentElement;var d=t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){r.classList.add('dark');r.classList.remove('light')}else{r.classList.add('light');r.classList.remove('dark')}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'${THEME_COLOR.dark}':'${THEME_COLOR.light}')}catch(e){}`;
+  // The migration runs first, inline, because this script is the very first
+  // thing that reads the theme — anything later would paint the wrong one once
+  // for anybody whose choice is still under the old key.
+  return `${inlineAdoptSource(THEME_STORAGE_KEY)}try{var t=localStorage.getItem('${THEME_KEY}');var r=document.documentElement;var d=t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){r.classList.add('dark');r.classList.remove('light')}else{r.classList.add('light');r.classList.remove('dark')}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d?'${THEME_COLOR.dark}':'${THEME_COLOR.light}')}catch(e){}`;
 }

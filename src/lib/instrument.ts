@@ -1,6 +1,7 @@
+import { THEME_STORAGE_KEY } from "@/lib/storage-keys";
 export const PARENT_NAME = "Instrument";
 export const PARENT_WORDMARK = "INSTRUMENT";
-export const THEME_KEY = "instrument-theme";
+export const THEME_KEY = THEME_STORAGE_KEY.name;
 /**
  * Browser chrome colour for `<meta name="theme-color">`, which is emitted
  * during SSR and cannot reference a CSS custom property — so these must be

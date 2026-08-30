@@ -101,8 +101,28 @@ const database = databaseUrl
   ? new Pool({ connectionString: databaseUrl })
   : { dialect: pgliteDialect(() => getPglite()), type: "postgres" as const };
 
+/**
+ * Auth cookie names, in one place and carrying no product name.
+ *
+ * They were `__Host-grok-auth.*`, after a platform this no longer runs on. The
+ * prefix is now generic on purpose: a rebrand should not touch this file, and
+ * it should certainly not be the reason these names stay wrong.
+ *
+ * Unlike the browser-storage keys in `storage-keys.ts`, a rename here cannot be
+ * migrated away. The cookie is the session; changing its name signs everybody
+ * out, and nothing client-side can adopt the old one because `__Host-` cookies
+ * are not readable by script. If these ever change again, the cost is a forced
+ * sign-out unless the server is taught to read the previous name once and
+ * re-issue under the new one.
+ *
+ * `__Host-` is load-bearing and not cosmetic: it forces Secure, path=/ and no
+ * Domain attribute, which is what stops a sibling app on a shared parent domain
+ * from tossing a session cookie onto this one.
+ */
+const COOKIE_PREFIX = "__Host-auth";
+
 /** Session token cookie name. */
-export const SESSION_TOKEN_COOKIE = "__Host-grok-auth.session_token";
+export const SESSION_TOKEN_COOKIE = `${COOKIE_PREFIX}.session_token`;
 
 export const auth = betterAuth({
   baseURL,
@@ -165,9 +185,9 @@ export const auth = betterAuth({
     defaultCookieAttributes: { secure: true, sameSite: "lax", path: "/" },
     cookies: {
       session_token: { name: SESSION_TOKEN_COOKIE },
-      session_data: { name: "__Host-grok-auth.session_data" },
-      account_data: { name: "__Host-grok-auth.account_data" },
-      dont_remember: { name: "__Host-grok-auth.dont_remember" },
+      session_data: { name: `${COOKIE_PREFIX}.session_data` },
+      account_data: { name: `${COOKIE_PREFIX}.account_data` },
+      dont_remember: { name: `${COOKIE_PREFIX}.dont_remember` },
     },
   },
 

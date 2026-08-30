@@ -22,6 +22,7 @@ import { groupResultValues } from "@/lib/resultPresentation";
 import { convertShop, formatShop, hydrateDisplayInputs, parseShop, shopLabel, unitSwitchFor, unitSwitchForResult } from "@/lib/fieldUnits";
 import { coerceSearchValue, recordPath, sharePath, stringifySearchPlain } from "@/lib/search-params";
 import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
+import { readKey, unitsKey } from "@/lib/storage-keys";
 import { assumptionsBeside, buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
 import { libraryDocuments, isStudioDocument } from "@/lib/document";
@@ -652,13 +653,14 @@ function pickKnown(search: Record<string, string>, toolId: ToolId) {
 type StoredUnits = { display: Record<string, string>; result: Record<string, string> };
 
 function unitStorageKey(toolId: string) {
-  return `instrument-caliper-units:${toolId}`;
+  return unitsKey(toolId).name;
 }
 
 function loadStoredUnits(toolId?: string): StoredUnits | null {
   if (!toolId || typeof sessionStorage === "undefined") return null;
   try {
-    const raw = sessionStorage.getItem(unitStorageKey(toolId));
+    // readKey adopts whatever the old name held before returning it.
+    const raw = readKey(sessionStorage, unitsKey(toolId));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as StoredUnits;
     if (!parsed || typeof parsed !== "object") return null;
