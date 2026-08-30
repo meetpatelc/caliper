@@ -8,9 +8,9 @@ import { ErrorState } from "@/components/ui/status";
 export const Route = createFileRoute("/login")({   head: () => ({
     meta: [
       { title: "Sign in · Instrument" },
-      { name: "description", content: "Sign in to keep favourites, projects and Studio drafts on your account." },
+      { name: "description", content: "Sign in to keep favourites, projects and Build drafts on your account." },
       { property: "og:title", content: "Sign in · Instrument" },
-      { property: "og:description", content: "Sign in to keep favourites, projects and Studio drafts on your account." },
+      { property: "og:description", content: "Sign in to keep favourites, projects and Build drafts on your account." },
     ],
   }),
   component: Login });
@@ -53,7 +53,7 @@ function Login() {
         </Link>
         <h1 className="page-title mt-8">{mode === "up" ? "Create an account" : "Sign in"}</h1>
         <p className="lede">
-          Email and a password. No Google or X. Sign in and Favourites, Project, and Studio drafts follow the account. Without an account they stay on this device.
+          Email and a password. No Google or X. Sign in and Favourites, Project, and Build drafts follow the account. Without an account they stay on this device.
         </p>
         {authEnabled ? (
           <form className="mt-8 grid gap-4" onSubmit={onSubmit}>

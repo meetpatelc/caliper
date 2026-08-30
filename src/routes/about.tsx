@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ICON } from "@instrument/ui";
 import { CheckCircle2, CircleAlert } from "lucide-react";
-import { tools } from "@/lib/catalog";
 import { PARENT_NAME } from "@/lib/instrument";
 import { panelClass } from "@/components/ui/panel";
 import { PageHeader } from "@/components/ui/page";
@@ -46,7 +45,7 @@ function AboutPage() {
               <Link to="/" className="link-accent">
                 Library
               </Link>{" "}
-              is {tools.length} finished models — open one and get a number.{" "}
+              is the finished models — open one and get a number.{" "}
               <Link to="/studio" className="link-accent">
                 Build
               </Link>{" "}

@@ -155,7 +155,7 @@ function SettingsBody({ email }: { email: string }) {
       <section className={cn(panelClass, "mt-4 p-5")}>
         <p className="eyebrow">Delete account</p>
         <p className="mt-2 text-sm leading-6 text-muted">
-          Removes the email account and the Favourites, Project, and Studio drafts on it. Work that never left this browser stays.
+          Removes the email account and the Favourites, Project, and Build drafts on it. Work that never left this browser stays.
         </p>
         <form className="mt-4 grid gap-4" onSubmit={removeAccount}>
           <Field htmlFor="settings-delete" label="Password to confirm" error={deleteMessage || undefined}>

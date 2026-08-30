@@ -16,7 +16,13 @@ export const Route = createRootRoute({
       { name: "theme-color", content: THEME_COLOR.light },
     ],
     links: [
+      // SVG first for browsers that take one, then a real PNG for the several
+      // that do not use an SVG as a tab icon at all. `/favicon.ico` is not
+      // listed because it does not need to be — browsers request that path
+      // regardless — but it has to exist, and it did not, so the tab fell back
+      // to nothing.
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__pwa/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__pwa/icon-180.png" },

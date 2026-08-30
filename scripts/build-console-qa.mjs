@@ -64,9 +64,12 @@ const ROUTES = [
 const IGNORED = [
   // React's dev-only warning about extensions injecting into the tree.
   /Extra attributes from the server/i,
-  // Chrome emits this for any page without a favicon route in some versions.
-  /favicon\.ico/i,
 ];
+// There was a `/favicon\.ico/` rule here, written when that path 404'd. It did
+// not silence noise, it silenced a defect: browsers request /favicon.ico
+// whatever the document declares, the file did not exist, and the tab rendered
+// empty. An ignore rule added to make a check pass is the check being taught to
+// accept the thing it was supposed to catch.
 
 /** Things that must fail loudly wherever they appear. */
 const FATAL = [

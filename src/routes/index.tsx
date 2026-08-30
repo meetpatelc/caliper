@@ -4,7 +4,7 @@ import { tools, type ToolId } from "@/lib/catalog";
 // The generated relation index, NOT `@/lib/document` — importing the documents
 // here pulls all ~123 of them into the entry chunk to render one line per card.
 import { libraryFormulas } from "@/lib/library-formulas";
-import { modelCount, releasedDomains, savedHeadline } from "@/lib/desk";
+import { releasedDomains, savedHeadline } from "@/lib/desk";
 import { homeDemo } from "@/lib/home-demo.generated";
 import { PARENT_NAME } from "@/lib/instrument";
 import { cn } from "@/lib/utils";
@@ -250,11 +250,12 @@ function Home() {
           is clutter above the one control that actually narrows the library.
           The count lives here rather than in the opening line — beside the
           control it scopes, it is a fact; at the top it was a boast. */}
-      <SectionHeader
-        className="mt-12"
-        title="Pick a field."
-        aside={<span className="text-sm text-muted">{modelCount()} models</span>}
-      />
+      {/*
+        No count here. It was a number that has to be maintained to stay true,
+        and the list immediately below it is better evidence than the number
+        ever was — a reader can see how many there are by looking.
+      */}
+      <SectionHeader className="mt-12" title="Pick a field." />
       <SegmentedControl aria-label="Domain filter" appearance="chip" className="mt-4">
         <SegmentedItem
           selected={domain === "all"}
