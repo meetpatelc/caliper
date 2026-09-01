@@ -36,6 +36,21 @@ export function AxialSketch() {
   );
 }
 
+/*
+ * Load arrows point the way the load acts: the head sits on the thing being
+ * loaded, and the tail is out in the space the label lives in.
+ *
+ * Six of them were drawn the other way round, head outward, which reads as the
+ * load pulling away from the body. The clearest tell was inside a single
+ * drawing: BeamDiagramSketch renders the distributed load w correctly pointing
+ * down onto the span, and the point load P beside it pointing up off it. The
+ * column labelled "central compression" had both arrows pulling outward, which
+ * is tension -- on the buckling model. And the cylinder had its supply pressure
+ * pointing away from the bore it acts on.
+ *
+ * SpringSketch and the tension bar were already right, and are the convention
+ * the rest now follow.
+ */
 export function BeamDiagramSketch() {
   return (
     <Plate label="Simply supported span with point load and uniform load">
@@ -46,7 +61,7 @@ export function BeamDiagramSketch() {
       <path d="M110 44 V56 M150 44 V56 M190 44 V56 M230 44 V56 M270 44 V56 M310 44 V56" className="text-accent" {...ink} />
       <path d="M110 56 L104 50 M110 56 L116 50 M190 56 L184 50 M190 56 L196 50 M270 56 L264 50 M270 56 L276 50" className="text-accent" {...ink} />
       <path d="M186 88 V62" className="text-accent" {...ink} />
-      <path d="M186 62 L178 74 M186 62 L194 74" className="text-accent" {...ink} />
+      <path d="M186 88 L178 76 M186 88 L194 76" className="text-accent" {...ink} />
       <T x="200" y="56" accent>P</T>
       <T x="220" y="38" accent>w</T>
       <path d="M90 132 H350" {...dim} />
@@ -67,7 +82,7 @@ export function BeamSketch({ cantilever }: { cantilever?: boolean }) {
           <path d="M82 58 H98 M82 70 H98 M82 82 H98 M82 94 H98 M82 106 H98" {...ink} />
           <path d="M90 84 H340" {...ink} />
           <path d="M340 84 V52" className="text-accent" {...ink} />
-          <path d="M340 52 L332 64 M340 52 L348 64" className="text-accent" {...ink} />
+          <path d="M340 84 L332 72 M340 84 L348 72" className="text-accent" {...ink} />
           <T x="352" y="48" accent>P</T>
           <path d="M90 130 H340" {...dim} />
           <T x="215" y="148">L</T>
@@ -78,7 +93,7 @@ export function BeamSketch({ cantilever }: { cantilever?: boolean }) {
           <path d="M100 84 L88 108 H112 Z" {...ink} />
           <path d="M340 84 L328 108 H352 Z" {...ink} />
           <path d="M220 84 V52" className="text-accent" {...ink} />
-          <path d="M220 52 L212 64 M220 52 L228 64" className="text-accent" {...ink} />
+          <path d="M220 84 L212 72 M220 84 L228 72" className="text-accent" {...ink} />
           <T x="232" y="48" accent>P</T>
           <path d="M100 130 H340" {...dim} />
           <T x="220" y="148">L</T>
@@ -93,9 +108,9 @@ export function ColumnSketch() {
     <Plate label="Slender column, central compression">
       <rect x="196" y="36" width="48" height="100" className="fill-surface" {...ink} />
       <path d="M220 36 V18" className="text-accent" {...ink} />
-      <path d="M220 18 L212 28 M220 18 L228 28" className="text-accent" {...ink} />
+      <path d="M220 36 L212 26 M220 36 L228 26" className="text-accent" {...ink} />
       <path d="M220 136 V154" className="text-accent" {...ink} />
-      <path d="M220 154 L212 144 M220 154 L228 144" className="text-accent" {...ink} />
+      <path d="M220 136 L212 146 M220 136 L228 146" className="text-accent" {...ink} />
       <T x="246" y="24" accent>P</T>
       <path d="M260 36 V136" {...dim} />
       <T x="274" y="92">KL</T>
@@ -127,8 +142,8 @@ export function ActuatorSketch({ family }: { family: "air" | "oil" }) {
       <rect x="168" y="58" width="14" height="52" className="fill-bg text-accent" stroke="currentColor" strokeWidth="1.75" />
       <rect x="182" y="78" width="168" height="12" className="fill-surface" {...ink} />
       <path d="M52 68 H72 M52 100 H72" className="text-accent" {...ink} />
-      <path d="M62 68 L72 62 M62 68 L72 74" className="text-accent" {...ink} />
-      <path d="M62 100 L72 94 M62 100 L72 106" className="text-accent" {...ink} />
+      <path d="M72 68 L62 62 M72 68 L62 74" className="text-accent" {...ink} />
+      <path d="M72 100 L62 94 M72 100 L62 106" className="text-accent" {...ink} />
       <T x="40" y="88" accent>P</T>
       <path d="M86 128 V148 M278 128 V148 M86 148 H278" {...dim} />
       <T x="182" y="164">L</T>
