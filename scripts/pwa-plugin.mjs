@@ -49,8 +49,10 @@ function servePwa(middlewares) {
   middlewares.use((req, res, next) => {
     const rawUrl = req.url ?? "";
     const pathOnly = rawUrl.split("?", 1)[0] ?? "";
+    // HEAD reads, like GET — see the note in server/middleware/pwa.ts. Kept
+    // in step with it so dev and production answer the same thing.
     const method = (req.method ?? "GET").toUpperCase();
-    if (method !== "GET") {
+    if (method !== "GET" && method !== "HEAD") {
       next();
       return;
     }
@@ -61,7 +63,12 @@ function servePwa(middlewares) {
       res.setHeader("content-type", "application/manifest+json; charset=utf-8");
       res.setHeader("cache-control", "no-cache");
       res.setHeader("content-length", String(body.byteLength));
-      res.end(body);
+      res.end(method === "HEAD" ? undefined : body);
+      return;
+    }
+
+    if (method === "HEAD") {
+      next();
       return;
     }
 

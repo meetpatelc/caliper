@@ -98,6 +98,31 @@ async function main() {
     });
     page.on("pageerror", (error) => problems.push(`[uncaught] ${error.message}`));
 
+    /*
+     * Name the asset that failed, rather than leaving it as console noise.
+     *
+     * Chromium does log "Failed to load resource: the server responded with a
+     * status of 404" for a dead stylesheet, so the console rule above already
+     * fails the run. What it does not say is *which* file, or that the file
+     * was a stylesheet — and that is the whole diagnosis. The case this is
+     * for: `vite preview` keeps serving the HTML it loaded at start-up, so
+     * after a rebuild it hands out asset hashes that no longer exist and the
+     * page renders as unstyled SSR markup with a dead client. Told "a resource
+     * 404'd" you go looking at your last edit. Told "stylesheet
+     * /assets/styles-Du2mbz1M.css" you restart the server.
+     *
+     * Only same-origin, and only the three types whose absence changes what
+     * the page is: a third-party beacon failing is not this build being broken.
+     */
+    page.on("response", (response) => {
+      const url = response.url();
+      if (!url.startsWith(BASE)) return;
+      if (response.status() < 400) return;
+      const kind = response.request().resourceType();
+      if (kind !== "stylesheet" && kind !== "script" && kind !== "font") return;
+      problems.push(`[asset ${response.status()}] ${kind} ${url.slice(BASE.length)}`);
+    });
+
     let status = 0;
     try {
       const response = await page.goto(`${BASE}${route.path}`, { waitUntil: "networkidle", timeout: 30000 });

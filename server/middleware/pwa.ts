@@ -67,20 +67,37 @@ export default async function pwaMiddleware(
   event: PwaEvent,
   next: () => unknown | Promise<unknown>,
 ): Promise<unknown> {
+  /*
+   * HEAD reads, like GET.
+   *
+   * This gate was `method !== "GET"`, so a HEAD for the manifest fell through
+   * to the router, which has no route by that name and answered 404 — for a
+   * file that returns 200 to GET from the very next line. Link checkers,
+   * uptime monitors and some crawlers ask with HEAD before they ask with GET,
+   * and what they were told is that the manifest is not there.
+   */
   const method = (event.req.method ?? "GET").toUpperCase();
-  if (method !== "GET") return next();
+  if (method !== "GET" && method !== "HEAD") return next();
 
   const path = event.url.pathname;
   const urlWithQuery = path + event.url.search;
 
   if (path === "/__pwa/manifest.webmanifest" || path === "/__pwa/manifest.json") {
-    return new Response(renderWebManifest(requestHost(event)), {
+    const body = renderWebManifest(requestHost(event));
+    return new Response(method === "HEAD" ? null : body, {
       headers: {
         "content-type": "application/manifest+json; charset=utf-8",
         "cache-control": "no-cache",
+        // Same headers as the GET, which is what makes a HEAD worth asking.
+        "content-length": String(new TextEncoder().encode(body).byteLength),
       },
     });
   }
+
+  // Everything past here renders a document. The router answers HEAD for its
+  // own routes, and rendering a whole page to throw the body away is work
+  // nobody asked for.
+  if (method === "HEAD") return next();
 
   if (
     isInstallQuery(urlWithQuery) &&
