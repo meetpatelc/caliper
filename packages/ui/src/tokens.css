@@ -49,15 +49,36 @@
   color-scheme: light;
 }
 
+/*
+ * Dark is not light with the values flipped.
+ *
+ * The first dark palette kept the light theme's shape — a mid red, white on
+ * it, a grey a little lighter than the light theme's grey — and measured
+ * below the WCAG minimum in eleven distinct colour pairs. The formula strip on
+ * a home-page card was the worst at 3.12:1, and the muted description under
+ * every one of the 169 cards sat at 4.12:1 against 4.5 required.
+ *
+ * The accent could not be fixed by nudging it, because it does two opposite
+ * jobs. As text it sits on a dark ground and has to be light enough to read
+ * against #2d3037; as a fill it sits behind text and has to be dark enough for
+ * that text to read against it. One value cannot do both: at 4.5:1 as text it
+ * gives 2.82:1 as a fill. So the two roles part company here, using the token
+ * pair that already existed for exactly this — a lighter red for text, and
+ * near-black rather than white for the label on a filled accent. That is a
+ * visible change on the primary button in dark mode, and a deliberate one.
+ *
+ * `danger` and `ok` were measured too and already clear the bar at 4.62:1 and
+ * 4.58:1, so they are left alone. `npm run qa:contrast` re-measures all of it.
+ */
 html.dark {
   --color-bg: #14161a;
   --color-surface: #1c1f26;
   --color-elevated: #262a33;
   --color-fg: #e8eaed;
-  --color-muted: #8b909a;
-  --color-accent: #e23b4c;
-  --color-accent-fg: #ffffff;
-  --color-mark: #e23b4c;
+  --color-muted: #9ba0aa;
+  --color-accent: #f4707c;
+  --color-accent-fg: #14161a;
+  --color-mark: #f4707c;
   --color-border: #2e333d;
   --color-danger: #f07178;
   --color-ok: #5ea86a;

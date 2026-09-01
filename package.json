@@ -28,7 +28,8 @@
     "serve:build": "node scripts/serve-build.mjs",
     "draft:smoke": "node --experimental-strip-types scripts/draft-smoke.mjs",
     "goldens": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/regenerate-goldens.mjs",
-    "home-demo": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/generate-home-demo.mjs"
+    "home-demo": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/generate-home-demo.mjs",
+    "qa:contrast": "node scripts/contrast-audit.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.121.0",

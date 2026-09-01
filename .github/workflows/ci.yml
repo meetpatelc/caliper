@@ -63,6 +63,7 @@ jobs:
           done
           echo "preview never answered"; exit 1
       - run: npm run qa:ui
+      - run: npm run qa:contrast
       - run: npm run qa:live
 
       # The policy is issued per request and carries a nonce, so it can only
