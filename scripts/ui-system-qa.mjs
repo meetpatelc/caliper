@@ -879,6 +879,33 @@ try {
   // throws away the server markup and re-renders the whole tree — and the app
   // is clean on a fresh load of every route this script visits, so they are
   // now reported like any other page error rather than swallowed.
+  // ISO 286 is the one bespoke model page, and it had drifted: no Save, no
+  // shareable link, and no state in the URL — which is why it had no Save, a
+  // saved check that cannot reopen being worse than no button.
+  await page.goto(`${BASE}/tool/fits?d=63&hole=H&holeIt=7&shaft=p&shaftIt=6`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(500);
+  const fitsRestored = await page.evaluate(() => ({
+    d: document.querySelector("#iso-D")?.value,
+    hole: document.querySelector('[aria-label="Hole letter"]')?.value,
+    holeIt: document.querySelector('[aria-label="Hole IT grade"]')?.value,
+    shaft: document.querySelector('[aria-label="Shaft letter"]')?.value,
+    shaftIt: document.querySelector('[aria-label="Shaft IT grade"]')?.value,
+  }));
+  record(
+    "a fits link opens on the classes it names",
+    fitsRestored.d === "63" && fitsRestored.hole === "H" && fitsRestored.holeIt === "7" && fitsRestored.shaft === "p" && fitsRestored.shaftIt === "6",
+    JSON.stringify(fitsRestored),
+  );
+  record("fits offers Save this check", (await page.getByRole("button", { name: /save this check/i }).count()) === 1);
+
+  // Query strings are shared into messages, drawing notes and emails. The
+  // router's default stringifier JSON-encodes values, so this read
+  // `?d=%2263%22&holeIt=%227%22` on every model in the library.
+  await page.selectOption('[aria-label="Hole IT grade"]', "8");
+  await page.waitForTimeout(500);
+  const fitsQuery = new URL(page.url()).search;
+  record("a shared link is readable, not JSON-quoted", !fitsQuery.includes("%22"), fitsQuery);
+
   // Three keyboard and screen-reader defects that all looked fine from the
   // outside, driven rather than inspected.
   const keyboard = await browser.newPage({ viewport: { width: 390, height: 844 } });

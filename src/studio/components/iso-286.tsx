@@ -14,6 +14,8 @@ import { outcomes } from "@/studio/lib/iso286-outcomes";
 import { tools } from "@/lib/catalog";
 import { relatedTools } from "@/lib/desk";
 import { useDeskStore } from "@/lib/workspace-store";
+import { useDeskStatus } from "@/lib/desk-mode";
+import { FITS_DEFAULT, fitsFromSearch, fitsToSearch, type FitsState } from "@/studio/lib/fits-url";
 import { InstrumentMethod, InstrumentNearby, InstrumentPage } from "@/components/instrument-page";
 import { InstrumentSheet, QuantityName, ResultQuantity } from "@/components/instrument-sheet";
 import { GoverningRelation } from "@/components/governing-relation";
@@ -21,12 +23,12 @@ import { ExampleButton } from "@/components/example-button";
 import { FavouriteButton } from "@/components/favourite-button";
 import { Button } from "@/components/ui/button";
 import { ICON } from "@instrument/ui";
-import { Copy } from "lucide-react";
+import { Copy, Link as LinkIcon, Save } from "lucide-react";
 import { toast } from "sonner";
 import { MeasurementField } from "@/components/ui/measurement-field";
 import { Field, Input, Select, UnitBadge } from "@/components/ui/field";
 import { ErrorState } from "@/components/ui/status";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 
 // Resolved on use rather than at module evaluation. Read at module scope, these
 // two make the whole site's SSR depend on chunk initialisation order: if this
@@ -89,20 +91,48 @@ function FitDiagram({
 }
 
 export function Iso286Instrument() {
-  const [D, setD] = useState("100");
-  const [holeLetter, setHoleLetter] = useState<HoleLetter>("H");
-  const [holeGrade, setHoleGrade] = useState(9);
-  const [shaftLetter, setShaftLetter] = useState<ShaftLetter>("n");
-  const [shaftGrade, setShaftGrade] = useState(8);
+  /*
+   * State lives in the URL, like every other model's does.
+   *
+   * It did not, and that is why this page had no "Save this check" and no
+   * shareable link: both need the page to round trip, and a saved check that
+   * cannot reopen is worse than no button. So the buttons were left off rather
+   * than made to lie — an honest gap, but still a gap, on the model people
+   * arrive at most often from a search engine.
+   *
+   * `replace` on every change: picking through IT grades is browsing, not
+   * navigating, and each step would otherwise be a Back-button stop.
+   */
+  const search = useSearch({ from: "/tool/$toolId" });
+  const navigate = useNavigate();
+  const initial = fitsFromSearch(search, { hole: HOLE_LETTERS, shaft: SHAFT_LETTERS, grades: IT_GRADES });
+  const [D, setD] = useState(initial.diameter);
+  const [holeLetter, setHoleLetter] = useState<HoleLetter>(initial.holeLetter as HoleLetter);
+  const [holeGrade, setHoleGrade] = useState(initial.holeGrade);
+  const [shaftLetter, setShaftLetter] = useState<ShaftLetter>(initial.shaftLetter as ShaftLetter);
+  const [shaftGrade, setShaftGrade] = useState(initial.shaftGrade);
   const favorites = useDeskStore((state) => state.favorites);
   const toggleFavorite = useDeskStore((state) => state.toggleFavorite);
+  const saveCalculation = useDeskStore((state) => state.saveCalculation);
+  const createProject = useDeskStore((state) => state.createProject);
+  const setActiveProject = useDeskStore((state) => state.setActiveProject);
+  const activeProjectId = useDeskStore((state) => state.activeProjectId);
+  const projects = useDeskStore((state) => state.projects);
+  const { accountMode } = useDeskStatus();
   const favourited = favorites.includes("fits");
   const nearby = relatedTools("fits");
 
-  // The other 168 models offer Copy result; this one is a bespoke page and was
-  // left without it. Save and Copy link still are: both need the page to round
-  // trip its state through the URL, and it currently reads none — a saved check
-  // that cannot reopen is worse than no button.
+  const publishState = (next: Partial<FitsState>) => {
+    const merged = fitsToSearch({
+      diameter: next.diameter ?? D,
+      holeLetter: next.holeLetter ?? holeLetter,
+      holeGrade: next.holeGrade ?? holeGrade,
+      shaftLetter: next.shaftLetter ?? shaftLetter,
+      shaftGrade: next.shaftGrade ?? shaftGrade,
+    });
+    void navigate({ to: "/tool/$toolId", params: { toolId: "fits" }, search: merged, replace: true, resetScroll: false });
+  };
+
   const copyResult = async () => {
     if (!result.ok) return;
     const f = result.fit;
@@ -133,15 +163,55 @@ export function Iso286Instrument() {
     }
   }, [D, holeLetter, holeGrade, shaftLetter, shaftGrade]);
 
+  const copyLink = async () => {
+    const query = new URLSearchParams(fitsToSearch({ diameter: D, holeLetter, holeGrade, shaftLetter, shaftGrade }));
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/tool/fits?${query}`);
+      toast.success("Link copied. It opens this fit with these classes.");
+    } catch {
+      toast.error("Clipboard unavailable. Copy the address bar instead.");
+    }
+  };
+
+  // Mirrors the shared workspace's save, including the part that matters: it
+  // makes a project if there is not one, rather than refusing.
+  const saveLocal = () => {
+    if (!result.ok) {
+      toast.error("Resolve the input state before saving.");
+      return;
+    }
+    let projectId = activeProjectId ?? projects[0]?.id;
+    if (!projectId) projectId = createProject("Saved").id;
+    else setActiveProject(projectId);
+    const fit = result.fit;
+    saveCalculation({
+      projectId,
+      toolId: "fits",
+      title: `${fitsTool().title} · ${fit.holeClass}/${fit.shaftClass} ⌀${D} mm`,
+      input: fitsToSearch({ diameter: D, holeLetter, holeGrade, shaftLetter, shaftGrade }),
+      method: fitsCalculator().formula,
+      resultJson: JSON.stringify({ fit }),
+    });
+    toast.success(accountMode ? "Saved on this account. Reopen it from Project." : "Saved on this device. Reopen it from Project.");
+  };
+
   return (
     <InstrumentPage
       kicker={fitsTool().kicker}
       title={fitsTool().title}
       actions={
         <>
+          <Button variant="accent" onClick={saveLocal} disabled={!result.ok}>
+            <Save size={ICON.inline} />
+            Save this check
+          </Button>
           <Button onClick={copyResult} disabled={!result.ok}>
             <Copy size={ICON.inline} />
             Copy result
+          </Button>
+          <Button variant="outline" onClick={copyLink}>
+            <LinkIcon size={ICON.inline} />
+            Copy link
           </Button>
           <FavouriteButton favourited={favourited} onToggle={() => toggleFavorite("fits")} />
         </>
@@ -177,11 +247,12 @@ export function Iso286Instrument() {
         example={
           <ExampleButton
             onRestore={() => {
-              setD("100");
-              setHoleLetter("H");
-              setHoleGrade(9);
-              setShaftLetter("n");
-              setShaftGrade(8);
+              setD(FITS_DEFAULT.diameter);
+              setHoleLetter(FITS_DEFAULT.holeLetter as HoleLetter);
+              setHoleGrade(FITS_DEFAULT.holeGrade);
+              setShaftLetter(FITS_DEFAULT.shaftLetter as ShaftLetter);
+              setShaftGrade(FITS_DEFAULT.shaftGrade);
+              publishState(FITS_DEFAULT);
             }}
           />
         }
@@ -189,21 +260,21 @@ export function Iso286Instrument() {
           <>
             <Field htmlFor="iso-D" label="Nominal size" symbol="D">
               <MeasurementField>
-                <Input id="iso-D" inputMode="decimal" value={D} onChange={(event) => setD(event.target.value)} />
+                <Input id="iso-D" inputMode="decimal" value={D} onChange={(event) => { setD(event.target.value); publishState({ diameter: event.target.value }); }} />
                 <UnitBadge>mm</UnitBadge>
               </MeasurementField>
             </Field>
             <div className="grid gap-2">
               <QuantityName label="Hole class" symbol={`${holeLetter}${holeGrade}`} />
               <div className="grid grid-cols-2 gap-2">
-                <Select aria-label="Hole letter" value={holeLetter} onChange={(event) => setHoleLetter(event.target.value as HoleLetter)}>
+                <Select aria-label="Hole letter" value={holeLetter} onChange={(event) => { setHoleLetter(event.target.value as HoleLetter); publishState({ holeLetter: event.target.value }); }}>
                   {HOLE_LETTERS.map((letter) => (
                     <option key={letter} value={letter}>
                       {letter}
                     </option>
                   ))}
                 </Select>
-                <Select aria-label="Hole IT grade" value={String(holeGrade)} onChange={(event) => setHoleGrade(Number(event.target.value))}>
+                <Select aria-label="Hole IT grade" value={String(holeGrade)} onChange={(event) => { setHoleGrade(Number(event.target.value)); publishState({ holeGrade: Number(event.target.value) }); }}>
                   {IT_GRADES.map((grade) => (
                     <option key={grade} value={grade}>
                       {grade}
@@ -225,14 +296,14 @@ export function Iso286Instrument() {
             <div className="grid gap-2">
               <QuantityName label="Shaft class" symbol={`${shaftLetter}${shaftGrade}`} />
               <div className="grid grid-cols-2 gap-2">
-                <Select aria-label="Shaft letter" value={shaftLetter} onChange={(event) => setShaftLetter(event.target.value as ShaftLetter)}>
+                <Select aria-label="Shaft letter" value={shaftLetter} onChange={(event) => { setShaftLetter(event.target.value as ShaftLetter); publishState({ shaftLetter: event.target.value }); }}>
                   {SHAFT_LETTERS.map((letter) => (
                     <option key={letter} value={letter}>
                       {letter}
                     </option>
                   ))}
                 </Select>
-                <Select aria-label="Shaft IT grade" value={String(shaftGrade)} onChange={(event) => setShaftGrade(Number(event.target.value))}>
+                <Select aria-label="Shaft IT grade" value={String(shaftGrade)} onChange={(event) => { setShaftGrade(Number(event.target.value)); publishState({ shaftGrade: Number(event.target.value) }); }}>
                   {IT_GRADES.map((grade) => (
                     <option key={grade} value={grade}>
                       {grade}

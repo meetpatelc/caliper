@@ -132,12 +132,8 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   useEffect(() => {
     if (!tool) return;
     const handle = window.setTimeout(() => {
-      const desired = stringifySearchPlain(pickKnown(input, tool.id));
-      lastWrittenSearch.current = desired;
+      lastWrittenSearch.current = stringifySearchPlain(pickKnown(input, tool.id));
       void navigate({ to: "/tool/$toolId", params: { toolId: tool.id }, search: input, replace: true, resetScroll: false });
-      if (desired && window.location.search !== desired) {
-        window.history.replaceState(window.history.state, "", `${window.location.pathname}${desired}`);
-      }
     }, 280);
     return () => window.clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- persist the live input map; tool object identity is not the trigger
@@ -210,7 +206,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
     if (!spec || !Number.isFinite(engineValue)) return;
     try {
       const before = displayInput[key] ?? "";
-      const beforeUnit = displayUnit[key] || engineUnit;
+      const beforeUnit = displayUnit[key] || engineUnit || spec.engine;
       const after = formatShop(convertShop(spec.family, engineValue, spec.engine, nextUnit));
       setDisplayInput((current) => ({ ...current, [key]: after }));
       // Switching the unit converts the number and leaves the quantity alone —
@@ -222,8 +218,13 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
       // to explain it, which is what prompted "not sure best for user wanting
       // switch units". So say what happened. One toast id, so holding down the
       // menu replaces rather than stacks.
+      // `shopLabel`, because these are family-qualified ids, not symbols. The
+      // dropdown they were picked from says "kN" and "N"; this message said
+      // "10 force.kN = 10000 force.N" — the app's internal naming, quoted back
+      // at someone in the one place that exists to reassure them nothing odd
+      // just happened.
       if (before && after !== before) {
-        toast(`${before} ${beforeUnit} = ${after} ${nextUnit}`, {
+        toast(`${before} ${shopLabel(spec.family, beforeUnit)} = ${after} ${shopLabel(spec.family, nextUnit)}`, {
           id: "unit-switch",
           description: "Same quantity, different unit — the result is unchanged.",
         });
