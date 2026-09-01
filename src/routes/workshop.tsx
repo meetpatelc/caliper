@@ -108,7 +108,7 @@ function ProjectPage() {
                   ? "The account desk could not be loaded. Write in "
                   : "Drafts, saved checks, and reviews stay on this device until you sign in. Write in "}
               <Link to="/studio" className="link-accent">
-                Studio
+                Build
               </Link>{" "}
               or open{" "}
               <Link to="/review" className="link-accent">
@@ -169,12 +169,12 @@ function ProjectPage() {
                   actions={
                     <>
                       <Button asChild>
-                        <Link to="/c/$slug" params={{ slug: item.slug }}>
+                        <Link to="/c/$slug" params={{ slug: item.slug }} aria-label={`Open ${item.title}`}>
                           Open
                         </Link>
                       </Button>
                       <Button asChild variant="accent">
-                        <Link to="/studio/$id" params={{ id: item.id }}>
+                        <Link to="/studio/$id" params={{ id: item.id }} aria-label={`Edit ${item.title}`}>
                           Edit
                         </Link>
                       </Button>
@@ -281,7 +281,7 @@ function ProjectPage() {
                         variant="ghost"
                         size="icon"
                         className="size-10 text-muted hover:text-danger"
-                        aria-label="Delete snapshot"
+                        aria-label={`Delete ${record.title}`}
                         onClick={() => setPending({ kind: "check", id: record.id, title: record.title })}
                       >
                         <Trash2 size={ICON.base} />
@@ -317,7 +317,7 @@ function ProjectPage() {
                       variant="ghost"
                       size="icon"
                       className="size-10 text-muted hover:text-danger"
-                      aria-label="Delete review"
+                      aria-label={`Delete ${record.title}`}
                       onClick={() => setPending({ kind: "review", id: record.id, title: record.title })}
                     >
                       <Trash2 size={ICON.base} />

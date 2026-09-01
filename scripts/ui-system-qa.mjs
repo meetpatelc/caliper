@@ -879,6 +879,78 @@ try {
   // throws away the server markup and re-renders the whole tree — and the app
   // is clean on a fresh load of every route this script visits, so they are
   // now reported like any other page error rather than swallowed.
+  /*
+   * Two controls that do different things must not read the same.
+   *
+   * A list page gives every row the same delete button, and if its name says
+   * only "Delete snapshot" then a screen reader announces the identical thing
+   * for all of them — on the one control where picking the wrong row cannot be
+   * undone. Rows are told apart by what they contain, so the row's own title
+   * has to be in the name.
+   *
+   * `rowContext` is the check that matters: names are compared within their
+   * row, so two buttons in the *same* row legitimately sharing a name are not
+   * flagged, while the same name repeated down a list is. An earlier version
+   * of this compared hrefs, which made every button look identical to every
+   * other button and found nothing at all.
+   */
+  // Start from an empty desk. Saving the same check twice is a legitimate thing
+  // to do and produces two rows with the same title, which would trip the
+  // check below for a reason that is not a defect.
+  // Drafts too: earlier checks in this suite fork models into Build, and two
+  // drafts of the same model legitimately share a title.
+  const workshopKey = (readFileSync(join(repoRoot, "src/lib/storage-keys.ts"), "utf8").match(
+    /WORKSHOP_STORAGE_KEY:\s*StorageKey\s*=\s*\{\s*name:\s*"([^"]+)"/,
+  ) ?? [])[1];
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  await page.evaluate(
+    (keys) => keys.forEach((key) => key && localStorage.removeItem(key)),
+    [deskKey, workshopKey],
+  );
+  await page.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /save this check/i }).click();
+  await page.waitForTimeout(300);
+  await page.goto(`${BASE}/tool/fits?d=63&hole=H&holeIt=7&shaft=p&shaftIt=6`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /save this check/i }).click();
+  await page.waitForTimeout(500);
+  await page.goto(`${BASE}/workshop`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(900);
+  const nameClashes = await page.evaluate(() => {
+    const rows = new Map();
+    for (const el of document.querySelectorAll("main a, main button")) {
+      const box = el.getBoundingClientRect();
+      if (!box.width || !box.height) continue;
+      const name = (el.getAttribute("aria-label") || el.innerText || "").trim().replace(/\s+/g, " ");
+      if (!name) continue;
+      const row = el.closest("li, tr") ?? el.closest("main");
+      const seen = rows.get(name) ?? new Set();
+      seen.add(row);
+      rows.set(name, seen);
+    }
+    return [...rows.entries()].filter(([, seen]) => seen.size > 1).map(([name]) => name);
+  });
+  record("no two rows offer the same-sounding control", nameClashes.length === 0, nameClashes.join(", "));
+
+  // Selection was carried by a border colour and a data attribute nothing
+  // assistive reads, so the review checklist announced every rule identically
+  // whether or not it had been ticked.
+  await page.goto(`${BASE}/review`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(400);
+  // The rule cards, not the area filter beside them — that is also a pressed
+  // control, and it is already on when the page loads.
+  const firstRule = page.locator('main button[aria-pressed]').filter({ hasText: "Evidence:" }).first();
+  const pressedBefore = await firstRule.getAttribute("aria-pressed").catch(() => null);
+  await firstRule.click();
+  await page.waitForTimeout(250);
+  const pressedAfter = await firstRule.getAttribute("aria-pressed").catch(() => null);
+  record(
+    "ticking a review rule announces itself",
+    pressedBefore === "false" && pressedAfter === "true",
+    `${pressedBefore} -> ${pressedAfter}`,
+  );
+
   // ISO 286 is the one bespoke model page, and it had drifted: no Save, no
   // shareable link, and no state in the URL — which is why it had no Save, a
   // saved check that cannot reopen being worse than no button.
