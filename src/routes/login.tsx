@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { authClient, authEnabled } from "@/lib/auth/client";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { ErrorState } from "@/components/ui/status";
@@ -17,12 +18,28 @@ export const Route = createFileRoute("/login")({   head: () => ({
 
 function Login() {
   const navigate = useNavigate();
+  const { user, isPending } = useCurrentUserState();
+
+  /*
+   * A signed-in visitor asking for /login is almost always navigating, not
+   * trying to sign in again -- and the full form invited them to type
+   * credentials they had already given. Wait for isPending so a slow session
+   * check does not bounce somebody who really is signed out.
+   */
+  useEffect(() => {
+    if (!isPending && user) void navigate({ to: "/", replace: true });
+  }, [isPending, user, navigate]);
+
   const [mode, setMode] = useState<"in" | "up">("in");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // After every hook, never before — an early return above the `useState` calls
+  // changes the hook order between the signed-in and signed-out renders.
+  const alreadySignedIn = !isPending && Boolean(user);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -44,6 +61,8 @@ function Login() {
       setBusy(false);
     }
   }
+
+  if (alreadySignedIn) return null;
 
   return (
     <main className="grid min-h-dvh place-items-center bg-bg px-6 text-fg">

@@ -323,14 +323,19 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
     const published = { ...next, published: true };
     setDraft(published);
     upsert(published);
-    toast.success("Published.");
+    // Not "Published." on its own. Nothing in the app can show this model to
+    // anybody else -- findCalculator only ever reads the official set and the
+    // viewer's own workshop -- so the bare word promises distribution that does
+    // not happen, and an outside reviewer read the follow-on 404 as data loss.
+    toast.success("Published. Only you can open it — this app cannot share models yet.");
   };
 
   const retract = () => {
     const next = { ...draft, published: false };
     setDraft(next);
     upsert(next);
-    toast.success("Removed from the atlas.");
+    // There is no atlas to be removed from.
+    toast.success("Back to a draft.");
   };
 
   const preview = useMemo(() => draft, [draft]);
