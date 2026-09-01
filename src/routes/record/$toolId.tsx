@@ -162,9 +162,13 @@ function RecordPage() {
 
       <p className="mt-8 text-sm text-muted">
         Source:{" "}
-        <a href={record.source.url} target="_blank" rel="noreferrer" className="link-accent">
-          {record.source.label}
-        </a>
+        {record.source.url ? (
+          <a href={record.source.url} target="_blank" rel="noreferrer" className="link-accent">
+            {record.source.label}
+          </a>
+        ) : (
+          record.source.label
+        )}
       </p>
     </div>
   );

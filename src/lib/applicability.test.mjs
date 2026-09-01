@@ -42,3 +42,38 @@ test("stability reports the slenderness the catalog advertises", () => {
   assert.ok(lambda, "outputLabel promises 'Critical load · slenderness'");
   assert.equal(lambda.display, "103.92");
 });
+
+/**
+ * An orifice wider than its pipe is a mistake with a name.
+ *
+ * Without a guard, β > 1 reached the velocity-of-approach term and the page
+ * reported "sqrt is undefined below zero." — the evaluator's own words, about a
+ * state the reader caused and could fix in one edit. The message now says which
+ * two fields disagree.
+ */
+test("orifice flow refuses an orifice at or wider than the pipe", () => {
+  const base = {
+    dischargeCoefficient: "0.61",
+    orificeDiameter: "25",
+    pipeDiameter: "50",
+    upstreamPressure: "200",
+    downstreamPressure: "100",
+    density: "998",
+  };
+  /** @param {Record<string, string>} patch */
+  const message = (patch) => {
+    try {
+      const out = calculateTool("orificeFlow", { ...base, ...patch });
+      return out.errors[0] ?? null;
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+  };
+
+  assert.equal(message({}), null, "a valid orifice still computes");
+  for (const diameter of ["50", "60"]) {
+    const said = message({ orificeDiameter: diameter });
+    assert.match(said ?? "", /smaller than the pipe/i, `orifice ${diameter} vs pipe 50`);
+    assert.doesNotMatch(said ?? "", /sqrt|undefined below zero/i, "never the raw math error");
+  }
+});

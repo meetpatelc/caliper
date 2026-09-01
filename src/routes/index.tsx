@@ -201,9 +201,13 @@ function Home() {
             <div>
               <p className="eyebrow">Source</p>
               <p className="mt-1 text-sm leading-6">
-                <a href={homeDemo.sourceUrl} target="_blank" rel="noreferrer" className="link-accent">
-                  {homeDemo.sourceLabel}
-                </a>
+                {homeDemo.sourceUrl ? (
+                  <a href={homeDemo.sourceUrl} target="_blank" rel="noreferrer" className="link-accent">
+                    {homeDemo.sourceLabel}
+                  </a>
+                ) : (
+                  homeDemo.sourceLabel
+                )}
               </p>
             </div>
             <div>

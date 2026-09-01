@@ -57,9 +57,11 @@ function ReferencePage() {
                     title={<>{dataset.title}</>}
                   />
                 </div>
-                <a href={dataset.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Open ${dataset.sourceLabel}`}>
-                  <ArrowUpRight size={ICON.base} />
-                </a>
+                {dataset.sourceUrl ? (
+                  <a href={dataset.sourceUrl} target="_blank" rel="noreferrer" aria-label={`Open ${dataset.sourceLabel}`}>
+                    <ArrowUpRight size={ICON.base} />
+                  </a>
+                ) : null}
               </div>
               <dl className="mt-4 grid grid-cols-2 gap-2 text-xs text-muted">
                 <div>
@@ -116,9 +118,22 @@ function ReferencePage() {
                       <Link to="/tool/$toolId" params={{ toolId: tool.id }} className="link-row">
                         {tool.title}
                       </Link>
-                      <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="meta link-quiet inline-flex items-center gap-1">
-                        {tool.sourceLabel} <ArrowUpRight size={ICON.inline} />
-                      </a>
+                      {/*
+                        A source with no URL is named, not linked. Most of the
+                        library now cites a document rather than a page — Roark,
+                        Shigley, NASA RP-1228, ISO 1101 — and this rendered every
+                        one as `<a href="">`, which reloads /reference. Fifty-one
+                        citations that looked clickable and went nowhere, on the
+                        page whose whole job is letting someone check the source.
+                        `instrument-page.tsx` already got this right; this did not.
+                      */}
+                      {tool.sourceUrl ? (
+                        <a href={tool.sourceUrl} target="_blank" rel="noreferrer" className="meta link-quiet inline-flex items-center gap-1">
+                          {tool.sourceLabel} <ArrowUpRight size={ICON.inline} />
+                        </a>
+                      ) : (
+                        <span className="meta text-muted">{tool.sourceLabel}</span>
+                      )}
                     </div>
                   ))}
                 </div>

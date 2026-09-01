@@ -270,6 +270,16 @@ export const documentBounds: Record<string, DocumentBound[]> = {
       min: 0,
       message: "Upstream pressure must exceed downstream pressure.",
     },
+    {
+      // Without this, an orifice wider than the pipe reached the velocity-of-
+      // approach term with β > 1, and the page reported "sqrt is undefined
+      // below zero." — the evaluator's own words, about a state the reader
+      // caused and could have fixed in one edit. A guard says which two fields
+      // disagree; a math error says the tool broke.
+      expression: "pipeDiameter-orificeDiameter",
+      gt: 0,
+      message: "Orifice diameter must be smaller than the pipe internal diameter.",
+    },
   ],
   gearToothStress: [
     {
