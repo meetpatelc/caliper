@@ -95,7 +95,7 @@ async function shot(page, name) {
 }
 
 try {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, acceptDownloads: true });
   page.setDefaultTimeout(20000);
   const errors = [];
   page.on("pageerror", (error) => errors.push(`${page.url()} — ${error.message}`));
@@ -375,6 +375,30 @@ try {
   await page.getByRole("button", { name: "Drawing review" }).click();
   await page.waitForTimeout(200);
   record("review area switch", (await page.getByRole("button", { name: "Drawing review" }).getAttribute("aria-pressed")) === "true");
+
+  // Download the markdown and read the bytes back. This failed silently in
+  // exactly the way a download does: the button depressed, no file appeared,
+  // nothing was logged. The object URL was revoked on the line after `click()`,
+  // before the browser had fetched it, and the anchor was never in the document
+  // — which Chrome tolerates and Firefox does not. Asserting the button exists
+  // would have passed throughout, so this waits for the download event and
+  // checks what came out of it.
+  const downloadEvent = await Promise.all([
+    page.waitForEvent("download", { timeout: 15000 }).catch(() => null),
+    page.getByRole("button", { name: /download/i }).first().click(),
+  ]).then(([event]) => event);
+  if (!downloadEvent) {
+    record("review markdown download produces a file", false, "no download event");
+  } else {
+    const saved = join(outDir, "qa-review-download.md");
+    await downloadEvent.saveAs(saved);
+    const body = readFileSync(saved, "utf8");
+    record(
+      "review markdown download produces a file",
+      body.length > 200 && /^#\s/.test(body),
+      `${downloadEvent.suggestedFilename()} — ${body.length} bytes`,
+    );
+  }
   await shot(page, "qa-review");
 
   await page.goto(`${BASE}/workshop`, { waitUntil: "networkidle" });

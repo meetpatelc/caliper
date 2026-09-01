@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ICON } from "@instrument/ui";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Download, Minus, Plus, Save } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -24,6 +24,8 @@ import { ErrorState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
 import { useDeskStatus } from "@/lib/desk-mode";
+import { decideReviewRestore } from "@/lib/review-restore";
+import { downloadTextFile, fileSlug } from "@/lib/download";
 
 type ReviewSearch = { id?: string };
 
@@ -54,7 +56,7 @@ function ReviewPage() {
   const { id: restoreId } = Route.useSearch();
   const saveReview = useDeskStore((state) => state.saveReview);
   const reviews = useDeskStore((state) => state.reviews);
-  const { accountMode } = useDeskStatus();
+  const { accountMode, hydrating } = useDeskStatus();
   const [area, setArea] = useState<ReviewArea>("engineering");
   const [complete, setComplete] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
@@ -69,10 +71,34 @@ function ReviewPage() {
   const [title, setTitle] = useState("Evidence review");
   const [templateKind, setTemplateKind] = useState<DocumentTemplateKind>("report");
 
+  /*
+   * Restoring from a link has to survive the desk arriving late.
+   *
+   * This read the store once, on mount, and depended only on the id. Signed
+   * out that is fine, because localStorage rehydrates synchronously. Signed in
+   * it is not: the account view is blanked immediately and refilled when the
+   * server answers, so the snapshot is genuinely absent for the first few
+   * hundred milliseconds. The effect saw an empty list, said "no longer here"
+   * about a snapshot that was on its way, and never looked again — a link to
+   * your own saved review reported it deleted.
+   *
+   * So it watches `reviews` as well, treats an empty desk as "not yet" while
+   * `hydrating` is set, and uses a ref rather than state to fire once: the
+   * restore writes to eleven pieces of state, and re-running it would stamp
+   * over edits made since.
+   */
+  const restoredRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!restoreId) return;
-    const record = useDeskStore.getState().reviews.find((item) => item.id === restoreId);
-    if (!record) {
+    const record = restoreId ? reviews.find((item) => item.id === restoreId) : undefined;
+    const decision = decideReviewRestore({
+      requestedId: restoreId,
+      restoredId: restoredRef.current,
+      hasRecord: Boolean(record),
+      hydrating,
+    });
+    if (decision === "idle" || decision === "wait") return;
+    restoredRef.current = restoreId ?? null;
+    if (decision === "missing" || !record) {
       toast.error("That review snapshot is no longer here.");
       return;
     }
@@ -105,7 +131,7 @@ function ReviewPage() {
     } catch {
       toast.error("Review snapshot could not be read.");
     }
-  }, [restoreId]);
+  }, [restoreId, reviews, hydrating]);
 
   const activeRules = reviewRules.filter((rule) => rule.area === area);
   const activeWorkflow = selectionWorkflows.find((item) => item.id === workflowId) ?? selectionWorkflows[0];
@@ -158,12 +184,7 @@ function ReviewPage() {
   };
 
   const download = () => {
-    const href = URL.createObjectURL(new Blob([template], { type: "text/markdown" }));
-    const anchor = document.createElement("a");
-    anchor.href = href;
-    anchor.download = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "review"}-${templateKind}.md`;
-    anchor.click();
-    URL.revokeObjectURL(href);
+    downloadTextFile(`${fileSlug(title, "review")}-${templateKind}.md`, template, "text/markdown");
   };
 
   return (
