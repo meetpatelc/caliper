@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         Skip to content
       </a>
       <header className="no-print sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-xl">
-        <div className="flex h-14 items-center gap-2 px-3 md:hidden">
+        <div className="flex h-14 items-center gap-2 px-3 xl:hidden">
           <FamilySwitch />
           <SearchTrigger
             ref={searchTriggerRef}
@@ -79,7 +79,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Menu size={ICON.lead} aria-hidden="true" />
           </Button>
         </div>
-        <div className="relative hidden h-14 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:px-5">
+        {/*
+          xl, not md. The three columns sum wider than the viewport below about
+          1024px -- at 768 they measure 128 + 716 + 6, so the right-hand column
+          is crushed to six pixels and its contents land on top of the centre
+          nav. Signed in it is worse, because the account control is wider than
+          "Sign in", which is why an outside review saw it break as far up as
+          1180. The mobile header is a complete header, so a tablet loses
+          nothing by keeping it.
+        */}
+        <div className="relative hidden h-14 xl:grid xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center xl:px-5">
           <div className="justify-self-start">
             <FamilySwitch />
           </div>

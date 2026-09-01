@@ -14,11 +14,12 @@
  * which does not exist outside the original sandbox — so the script could not
  * run anywhere else and drifted out of use.
  */
-import { existsSync, mkdirSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { get as httpGet } from "node:http";
 import { chromium } from "playwright";
+import { HEADER_FIT_WIDTHS, headerFitFaults, measureHeaderFit } from "./header-fit.mjs";
 
 const BASE = process.argv[2] || process.env.UI_QA_BASE_URL || "http://127.0.0.1:8080";
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -608,17 +609,30 @@ try {
   // to 28rem tall while the tabs are 9.5rem apart, so anchoring each panel to
   // its own tab let them overlap — a pinned Favourites lost half its list
   // behind Convert, and looked merely short rather than broken.
-  await page.evaluate(() => {
-    const raw = JSON.parse(localStorage.getItem("caliper-desk-v1") || '{"state":{}}');
+  // Seeded under the key the app writes today, read out of the registry rather
+  // than spelled here. This said "caliper-desk-v1" — the name before the
+  // brand-free rename — and `adopt` discards a legacy value when the current
+  // name already exists, which by this point it does. So the seed evaporated,
+  // the panel had nothing to show, and both checks below reported an
+  // overlapping-panel layout bug that did not exist. A test that sets up state
+  // has to prove the setup landed, or its failures are about itself.
+  const deskKey = (readFileSync(join(repoRoot, "src/lib/storage-keys.ts"), "utf8").match(
+    /DESK_KEY:\s*StorageKey\s*=\s*\{\s*name:\s*"([^"]+)"/,
+  ) ?? [])[1];
+  record("the desk storage key is still readable from the registry", Boolean(deskKey), deskKey ?? "not found");
+
+  await page.evaluate((key) => {
+    const raw = JSON.parse(localStorage.getItem(key) || '{"state":{}}');
     const st = raw.state ?? raw;
     st.favorites = ["isentropicMachine", "thermalResistance", "thermalRadiation", "planeConduction", "sensibleHeat", "lmtd"];
     st.pinnedTabs = ["favourites"];
     raw.state = st;
-    localStorage.setItem("caliper-desk-v1", JSON.stringify(raw));
-  });
+    localStorage.setItem(key, JSON.stringify(raw));
+  }, deskKey);
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForTimeout(1200);
   const favBefore = await page.locator(String.raw`[role="region"][aria-label="Favourites"] li`).count();
+  record("seeded favourites reached the pinned panel", favBefore === 6, `${favBefore} of 6`);
   await page.getByRole("button", { name: "Convert" }).click();
   await page.waitForTimeout(500);
   const stacked = await page.evaluate(() => {
@@ -635,7 +649,7 @@ try {
   });
   record("a second panel does not overlap a pinned one", stacked.both && !stacked.overlap);
   record("a pinned panel keeps its full list", stacked.favItems === favBefore, `${favBefore} -> ${stacked.favItems}`);
-  await page.evaluate(() => localStorage.removeItem("caliper-desk-v1"));
+  await page.evaluate((key) => localStorage.removeItem(key), deskKey);
 
   record("quick convert computes in the rail", /1000\s*mm/.test(railOpen.result), railOpen.result);
 
@@ -841,6 +855,20 @@ try {
   // throws away the server markup and re-renders the whole tree — and the app
   // is clean on a fresh load of every route this script visits, so they are
   // now reported like any other page error rather than swallowed.
+  // The header at every width, not just the two this script already visits.
+  // It switches from the stacked mobile bar to the three-column desktop one,
+  // and the widths on either side of that switch are where it broke: the
+  // desktop grid does not fit until 1280, so at md it overflowed for half a
+  // laptop's worth of widths. See scripts/header-fit.mjs for the geometry.
+  const fit = await browser.newPage();
+  for (const width of HEADER_FIT_WIDTHS) {
+    await fit.setViewportSize({ width, height: 900 });
+    await fit.goto(`${BASE}/`, { waitUntil: "networkidle" });
+    const faults = headerFitFaults(await measureHeaderFit(fit));
+    record(`header fits at ${width}px`, faults.length === 0, faults.join("; "));
+  }
+  await fit.close();
+
   record("no unexpected page errors", errors.length === 0, errors.join(" | "));
 } finally {
   await browser.close();
