@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ICON } from "@instrument/ui";
 import { Menu, Repeat, Search, Star, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AccountMenu } from "@/components/account-menu";
 import { CommandPalette } from "@/components/command-palette";
 import { DeskSync } from "@/components/desk-sync";
@@ -15,14 +15,41 @@ import { Button } from "@/components/ui/button";
 import { SearchTrigger } from "@/components/ui/search";
 import { LoadingState } from "@/components/ui/status";
 import { PARENT_NAME, SEARCH_EVENT } from "@/lib/instrument";
-import { ACCOUNT_NAV, PAGE_NAV, PRIMARY_NAV, SECONDARY_NAV } from "@/lib/nav";
+import { ACCOUNT_NAV, navCurrent, PAGE_NAV, PRIMARY_NAV, SECONDARY_NAV } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const searchTriggerRef = useRef<HTMLButtonElement>(null);
+  /*
+   * Two search triggers, one ref, and closing the palette lost the keyboard.
+   *
+   * The mobile and desktop headers each render a trigger, and the breakpoint
+   * hides one with `display: none` rather than unmounting it — so both were
+   * always in the DOM, both wrote to the same ref, and the later one won.
+   * Restoring focus to a `display: none` button silently does nothing, so on a
+   * phone Escape dropped focus to <body> and the next Tab started again from
+   * the skip link. On a desktop it worked, which is where it was tested.
+   *
+   * A ref that resolves at read time to whichever trigger is actually on
+   * screen. Kept as a ref rather than a callback because OverlayDialog's
+   * `restoreFocusTo` reads `.current` after the dialog has closed, which is
+   * exactly when this needs to be re-evaluated.
+   */
+  const mobileSearchRef = useRef<HTMLButtonElement>(null);
+  const desktopSearchRef = useRef<HTMLButtonElement>(null);
+  const searchTriggerRef = useMemo(
+    () => ({
+      get current() {
+        const onScreen = (el: HTMLButtonElement | null) => Boolean(el && el.getBoundingClientRect().width > 0);
+        if (onScreen(mobileSearchRef.current)) return mobileSearchRef.current;
+        if (onScreen(desktopSearchRef.current)) return desktopSearchRef.current;
+        return mobileSearchRef.current ?? desktopSearchRef.current;
+      },
+    }),
+    [],
+  );
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -59,7 +86,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex h-14 items-center gap-2 px-3 xl:hidden">
           <FamilySwitch />
           <SearchTrigger
-            ref={searchTriggerRef}
+            ref={mobileSearchRef}
             onClick={() => setPaletteOpen(true)}
             aria-label="Search"
             className="min-w-0 flex-1"
@@ -102,7 +129,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   // `text-muted` lands in the same merge, and tailwind-merge
                   // resolves the className argument last. On the child it lost.
                   <Button key={item.href} asChild variant="ghost" className={cn("text-fg", active && "bg-elevated")}>
-                    <Link to={item.href} aria-current={active ? "page" : undefined}>
+                    <Link to={item.href} aria-current={navCurrent(item, pathname)}>
                       <Icon size={ICON.base} />
                       {item.label}
                     </Link>
@@ -111,7 +138,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               })}
             </nav>
             <SearchTrigger
-              ref={searchTriggerRef}
+              ref={desktopSearchRef}
               onClick={() => setPaletteOpen(true)}
               aria-label="Search"
               shortcut={shortcut}
@@ -149,7 +176,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   to={item.href}
                   onClick={() => setMenuOpen(false)}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={navCurrent(item, pathname)}
                   className={cn("w-full justify-start", active && "bg-elevated text-fg")}
                 >
                   <Icon size={ICON.base} />
@@ -199,7 +226,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} restoreFocusTo={searchTriggerRef} />
       <DeskSync />
-      <main id="main-content">{children}</main>
+      {/*
+         * tabIndex -1 so the skip link actually moves focus. Chromium alone
+         * implements the sequential-navigation start point, so the link
+         * appeared to work here while landing focus on <body>: nothing was
+         * announced, and in Safari the next Tab went back to the header.
+         * scroll-mt keeps the sticky header off the landing point.
+         */}
+      <main id="main-content" tabIndex={-1} className="scroll-mt-16 outline-none">
+        {children}
+      </main>
       <SideRail />
       <footer className="no-print border-t border-border py-6 text-sm text-muted">
         <div className="page-frame flex flex-wrap items-center justify-between gap-3">

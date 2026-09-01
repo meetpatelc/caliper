@@ -39,3 +39,25 @@ export const PAGE_NAV = [
   ...PRIMARY_NAV.map(({ href, label }) => ({ href, label })),
   ...SECONDARY_NAV,
 ] as const;
+
+/**
+ * What `aria-current` a primary nav link should carry.
+ *
+ * `match` is deliberately broad — Library covers every `/tool/…` page, Build
+ * covers every draft — because the highlight marks the section you are in. But
+ * that same flag was being spelled `aria-current="page"`, which does not mean
+ * "in this section": it means this link points at the page you are on. So on
+ * /tool/axial a screen reader announced "Library, current page" while the
+ * reader was on Axial response, naming the wrong page as the current one.
+ *
+ * `page` when the link really is this page, `true` when it is the section
+ * containing it — which is what `aria-current="true"` is for — and nothing at
+ * all otherwise.
+ */
+export function navCurrent(
+  item: { href: string; match: (path: string) => boolean },
+  pathname: string,
+): "page" | "true" | undefined {
+  if (item.href === pathname) return "page";
+  return item.match(pathname) ? "true" : undefined;
+}

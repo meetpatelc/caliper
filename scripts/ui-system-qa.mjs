@@ -879,6 +879,48 @@ try {
   // throws away the server markup and re-renders the whole tree — and the app
   // is clean on a fresh load of every route this script visits, so they are
   // now reported like any other page error rather than swallowed.
+  // Three keyboard and screen-reader defects that all looked fine from the
+  // outside, driven rather than inspected.
+  const keyboard = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await keyboard.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+
+  // The skip link moved the scroll but not the focus: <main> had no tabIndex,
+  // and only Chromium implements the sequential-navigation start point that
+  // papered over it. Focus landed on <body>, so nothing was announced.
+  await keyboard.keyboard.press("Tab");
+  await keyboard.keyboard.press("Enter");
+  await keyboard.waitForTimeout(200);
+  const skipLanding = await keyboard.evaluate(() => document.activeElement?.id ?? document.activeElement?.tagName);
+  record("the skip link moves focus into the content", skipLanding === "main-content", String(skipLanding));
+
+  // Both headers render a search trigger and the breakpoint hides one with
+  // display:none rather than unmounting it, so one shared ref pointed at the
+  // hidden one. Restoring focus to it silently did nothing — on a phone only,
+  // which is not where it was tested.
+  await keyboard.keyboard.press("Control+k");
+  await keyboard.waitForTimeout(400);
+  await keyboard.keyboard.press("Escape");
+  await keyboard.waitForTimeout(400);
+  const restored = await keyboard.evaluate(() => {
+    const el = document.activeElement;
+    return { tag: el?.tagName ?? "", onScreen: el instanceof HTMLElement && el.getBoundingClientRect().width > 0 };
+  });
+  record("closing search returns focus to a trigger you can see", restored.tag === "BUTTON" && restored.onScreen, `${restored.tag} onScreen=${restored.onScreen}`);
+  await keyboard.close();
+
+  // `aria-current="page"` means this link points at the page you are on, not
+  // "you are somewhere in this section". On /tool/axial the Library link
+  // claimed it while pointing at /, so a screen reader named the wrong page.
+  const wide = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await wide.goto(`${BASE}/tool/axial`, { waitUntil: "networkidle" });
+  const claims = await wide.evaluate(() =>
+    [...document.querySelectorAll('nav[aria-label="Primary"] a')]
+      .filter((a) => a.getAttribute("aria-current") === "page")
+      .map((a) => a.getAttribute("href")),
+  );
+  record("no nav link claims to be a page it does not point at", claims.length === 0, claims.join(", "));
+  await wide.close();
+
   // The header at every width, not just the two this script already visits.
   // It switches from the stacked mobile bar to the three-column desktop one,
   // and the widths on either side of that switch are where it broke: the
