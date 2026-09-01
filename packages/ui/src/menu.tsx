@@ -81,7 +81,19 @@ export function Menu({
       ref={panelRef}
       role="menu"
       aria-labelledby={labelId}
-      className={cn(panelClass, "absolute right-0 top-full z-40 mt-1 w-56 p-2", className)}
+      /*
+       * `max-w-[calc(100vw-1.5rem)]` is the part that cannot be got wrong from
+       * a call site. A caller passing a wider `w-*`, or anchoring the panel to
+       * the wrong edge, used to push it off a narrow screen with nothing to
+       * stop it — the Copy menu on a tool page hung about 60px off a 375px
+       * viewport. The cap does not fix the anchoring, it just means the worst
+       * case is a cramped menu rather than an unreachable one.
+       */
+      className={cn(
+        panelClass,
+        "absolute right-0 top-full z-40 mt-1 w-56 max-w-[calc(100vw-1.5rem)] p-2",
+        className,
+      )}
     >
       <span id={labelId} className="sr-only">
         {label}

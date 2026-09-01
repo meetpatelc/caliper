@@ -562,7 +562,14 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
                         onClose={() => setCopyOpen(false)}
                         label="Copy"
                         restoreFocusTo={copyTriggerRef}
-                        className="left-0 mt-1 w-64"
+                        // No `left-0`. The base class is `right-0`, and the two
+                        // are not a tailwind-merge conflict pair — so adding it
+                        // left both on, and with an explicit width `left-0`
+                        // won. The 256px menu then ran rightward from a button
+                        // starting near x=180 and hung ~60px off a 375px
+                        // screen. Anchored to the trigger's right edge it opens
+                        // leftward and fits.
+                        className="mt-1 w-64"
                       >
                         <MenuItem onClick={() => { setCopyOpen(false); void copySummary(); }}>
                           <Copy size={ICON.inline} aria-hidden="true" />
