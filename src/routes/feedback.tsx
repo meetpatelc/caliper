@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { ICON } from "@instrument/ui";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Bug, MessageSquareText, Send } from "lucide-react";
@@ -15,12 +16,8 @@ import { EmptyState, LoadingState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/feedback")({   head: () => ({
-    meta: [
-      { title: "Feedback · Instrument" },
-      { name: "description", content: "Send a bug report or a message to the product desk." },
-      { property: "og:title", content: "Feedback · Instrument" },
-      { property: "og:description", content: "Send a bug report or a message to the product desk." },
-    ],
+    meta: seoMeta({ title: "Feedback · Instrument", description: "Send a bug report or a message to the product desk.", path: "/feedback" }),
+    links: seoLinks("/feedback"),
   }),
   component: FeedbackPage });
 

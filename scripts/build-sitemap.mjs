@@ -14,6 +14,10 @@ import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Kept identical to SITE_ORIGIN in src/lib/seo.ts, which the canonical tags
+// use. A sitemap that names a different origin than the canonical tag is worse
+// than either alone -- the crawler is told two different things about the same
+// page. scripts/seo-origin.test.mjs asserts they still agree.
 const ORIGIN = process.env.SITE_ORIGIN || "https://instrument-eta.vercel.app";
 const STATIC = ["/", "/studio", "/review", "/workshop", "/about", "/reference", "/feedback"];
 

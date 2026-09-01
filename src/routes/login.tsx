@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { useEffect, useState, type FormEvent } from "react";
 import { authClient, authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
@@ -7,12 +8,8 @@ import { Field, Input } from "@/components/ui/field";
 import { ErrorState } from "@/components/ui/status";
 
 export const Route = createFileRoute("/login")({   head: () => ({
-    meta: [
-      { title: "Sign in · Instrument" },
-      { name: "description", content: "Sign in to keep favourites, projects and Build drafts on your account." },
-      { property: "og:title", content: "Sign in · Instrument" },
-      { property: "og:description", content: "Sign in to keep favourites, projects and Build drafts on your account." },
-    ],
+    meta: seoMeta({ title: "Sign in · Instrument", description: "Sign in to keep favourites, projects and Build drafts on your account.", path: "/login" }),
+    links: seoLinks("/login"),
   }),
   component: Login });
 

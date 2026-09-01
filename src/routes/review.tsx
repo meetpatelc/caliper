@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { ICON } from "@instrument/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Download, Minus, Plus, Save } from "lucide-react";
@@ -31,12 +32,8 @@ type ReviewSearch = { id?: string };
 
 export const Route = createFileRoute("/review")({
   head: () => ({
-    meta: [
-      { title: "Review · Instrument" },
-      { name: "description", content: "Engineering review: checklists, weighted trade study, and FMEA arithmetic." },
-      { property: "og:title", content: "Review · Instrument" },
-      { property: "og:description", content: "Engineering review: checklists, weighted trade study, and FMEA arithmetic." },
-    ],
+    meta: seoMeta({ title: "Review · Instrument", description: "Engineering review: checklists, weighted trade study, and FMEA arithmetic.", path: "/review" }),
+    links: seoLinks("/review"),
   }),
   validateSearch: (search: Record<string, unknown>): ReviewSearch => ({
     id: typeof search.id === "string" ? search.id : undefined,

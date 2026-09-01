@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { useState, type FormEvent } from "react";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { authClient } from "@/lib/auth/client";
@@ -15,12 +16,8 @@ import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/profile")({   head: () => ({
-    meta: [
-      { title: "Profile · Instrument" },
-      { name: "description", content: "Your account and saved work." },
-      { property: "og:title", content: "Profile · Instrument" },
-      { property: "og:description", content: "Your account and saved work." },
-    ],
+    meta: seoMeta({ title: "Profile · Instrument", description: "Your account and saved work.", path: "/profile" }),
+    links: seoLinks("/profile"),
   }),
   component: ProfilePage });
 

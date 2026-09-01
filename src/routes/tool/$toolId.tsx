@@ -4,6 +4,7 @@ import { PARENT_NAME } from "@/lib/instrument";
 import { CalculatorWorkspace } from "@/components/calculator-workspace";
 import { Iso286Instrument } from "@/studio/components/iso-286";
 import { toolSearchFromUnknown } from "@/lib/search-params";
+import { seoLinks, seoMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/tool/$toolId")({
   validateSearch: (search: Record<string, unknown>) => toolSearchFromUnknown(search),
@@ -23,13 +24,21 @@ export const Route = createFileRoute("/tool/$toolId")({
     // app title, so every dead link looked identical in a tab or a search result.
     if (!tool) return { meta: [{ title: `Not found · ${PARENT_NAME}` }] };
     const title = `${tool.title} · ${PARENT_NAME}`;
+    /*
+     * The canonical points at the bare path, deliberately dropping the query.
+     *
+     * Every model takes its inputs from the query string and writes them back
+     * as they change, so one model page has an unbounded number of URLs —
+     * `?force=25&area=1000`, the same values in another order, a colleague's
+     * numbers, a link from a record. Left alone a crawler treats each as its
+     * own page, splits whatever authority the model has between them, and
+     * indexes whichever it happened to find. There are 169 of these, and they
+     * are the reason the site is worth finding at all.
+     */
+    const path = `/tool/${params.toolId}`;
     return {
-      meta: [
-        { title },
-        { name: "description", content: tool.description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: tool.description },
-      ],
+      meta: seoMeta({ title, description: tool.description, path }),
+      links: seoLinks(path),
     };
   },
   component: ToolRoute,

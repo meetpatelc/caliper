@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { useState, type FormEvent } from "react";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { authClient, signOut } from "@/lib/auth/client";
@@ -14,12 +15,8 @@ import { panelClass } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/settings")({   head: () => ({
-    meta: [
-      { title: "Account settings · Instrument" },
-      { name: "description", content: "Manage your account." },
-      { property: "og:title", content: "Account settings · Instrument" },
-      { property: "og:description", content: "Manage your account." },
-    ],
+    meta: seoMeta({ title: "Account settings · Instrument", description: "Manage your account.", path: "/settings" }),
+    links: seoLinks("/settings"),
   }),
   component: SettingsPage });
 

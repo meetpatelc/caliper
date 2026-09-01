@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { ICON } from "@instrument/ui";
 import { useState } from "react";
 import { ClipboardList, FolderPlus, PenLine, Trash2 } from "lucide-react";
@@ -20,12 +21,8 @@ import { useDeskStore } from "@/lib/workspace-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/workshop")({   head: () => ({
-    meta: [
-      { title: "Project · Instrument" },
-      { name: "description", content: "Project snapshots and saved checks, with the inputs that produced them." },
-      { property: "og:title", content: "Project · Instrument" },
-      { property: "og:description", content: "Project snapshots and saved checks, with the inputs that produced them." },
-    ],
+    meta: seoMeta({ title: "Project · Instrument", description: "Project snapshots and saved checks, with the inputs that produced them.", path: "/workshop" }),
+    links: seoLinks("/workshop"),
   }),
   component: ProjectPage });
 

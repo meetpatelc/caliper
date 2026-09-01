@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { ICON } from "@instrument/ui";
 import { Copy, FilePlus, PenLine } from "lucide-react";
 import { DraftWithAI } from "@/components/draft-with-ai";
@@ -11,12 +12,8 @@ import { LoadingState } from "@/components/ui/status";
 import { SelectableCard } from "@/components/ui/selection";
 
 export const Route = createFileRoute("/studio/")({   head: () => ({
-    meta: [
-      { title: "Build · Instrument" },
-      { name: "description", content: "Author a unit-aware calculator and keep the method attached to it." },
-      { property: "og:title", content: "Build · Instrument" },
-      { property: "og:description", content: "Author a unit-aware calculator and keep the method attached to it." },
-    ],
+    meta: seoMeta({ title: "Build · Instrument", description: "Author a unit-aware calculator and keep the method attached to it.", path: "/studio" }),
+    links: seoLinks("/studio"),
   }),
   component: StudioHome });
 

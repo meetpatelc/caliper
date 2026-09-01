@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { ICON } from "@instrument/ui";
 import { ArrowUpRight } from "lucide-react";
 import { tools } from "@/lib/catalog";
@@ -9,12 +10,8 @@ import { governedReferenceData } from "@/lib/referenceData";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/reference")({   head: () => ({
-    meta: [
-      { title: "Method library · Instrument" },
-      { name: "description", content: "Version, range and source for every released method." },
-      { property: "og:title", content: "Method library · Instrument" },
-      { property: "og:description", content: "Version, range and source for every released method." },
-    ],
+    meta: seoMeta({ title: "Method library · Instrument", description: "Version, range and source for every released method.", path: "/reference" }),
+    links: seoLinks("/reference"),
   }),
   component: ReferencePage });
 

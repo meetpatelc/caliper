@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seoLinks, seoMeta } from "@/lib/seo";
 import { useMemo, useState } from "react";
 import { tools, type ToolId } from "@/lib/catalog";
 // The generated relation index, NOT `@/lib/document` — importing the documents
@@ -23,12 +24,8 @@ type LibrarySearch = { domain?: string };
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "Instrument · Engineering models you can check" },
-      { name: "description", content: "See exactly how a result is calculated — the method, assumptions, sources and limits stay visible next to the number." },
-      { property: "og:title", content: "Instrument · Engineering models you can check" },
-      { property: "og:description", content: "See exactly how a result is calculated — the method, assumptions, sources and limits stay visible next to the number." },
-    ],
+    meta: seoMeta({ title: "Instrument · Engineering models you can check", description: "See exactly how a result is calculated — the method, assumptions, sources and limits stay visible next to the number.", path: "/" }),
+    links: seoLinks("/"),
   }),
   validateSearch: (search: Record<string, unknown>): LibrarySearch => ({
     domain: typeof search.domain === "string" ? search.domain : undefined,
