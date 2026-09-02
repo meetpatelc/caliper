@@ -62,19 +62,67 @@ async function sampleRoute(page) {
   });
 }
 
+/**
+ * Wait until the page has stopped changing colour.
+ *
+ * Switching the theme starts over a thousand transitions at once — the base
+ * stylesheet transitions `all` on everything — and they take a beat to flush
+ * even with reduced motion, which shortens them rather than removing them.
+ * Read during that flush and `getComputedStyle` returns a value on its way
+ * somewhere: the footer's paragraph reports the light theme's muted grey while
+ * its own parent already reports the dark one, which is impossible in a
+ * settled page and is exactly what a half-applied inherit looks like.
+ *
+ * This cost three false findings and a real scare. A fixed timeout is what
+ * produced them — 250ms was enough most of the time, so the check passed about
+ * five runs in six and failed the rest with plausible-looking contrast
+ * numbers. The dangerous half is the other direction: the same race can land
+ * on a passing ratio and hide a genuine failure, and a check that
+ * intermittently cannot see the defect looks exactly like a passing one.
+ *
+ * So poll for quiet rather than guess at it. The cap is a safety net, not a
+ * timeout to rely on: a page that still has animations after a second is
+ * either genuinely animated or broken, and either way the numbers below are
+ * not to be trusted, which is what the returned flag says.
+ */
+async function settle(page, cap = 2000) {
+  const deadline = Date.now() + cap;
+  while (Date.now() < deadline) {
+    const running = await page.evaluate(() => document.getAnimations().length);
+    if (running === 0) {
+      // One more frame, so the last transition's final value is committed.
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      return true;
+    }
+    await page.waitForTimeout(50);
+  }
+  return false;
+}
+
 const browser = await chromium.launch();
 const failures = new Map();
 let checked = 0;
+let unsettled = 0;
 
 try {
   for (const theme of ["light", "dark"]) {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    /*
+     * `reducedMotion` shortens the theme transition, using the app's own
+     * `prefers-reduced-motion` rule in base.css rather than an injected
+     * stylesheet, so this still measures the real page. It shortens rather
+     * than removes, which is why `settle` below is the thing that actually
+     * makes the reading trustworthy.
+     */
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
     for (const route of ROUTES) {
       await page.goto(BASE + route, { waitUntil: "networkidle" });
+      // Both classes, the way src/lib/theme.ts paints it. Toggling only "dark"
+      // leaves "light" on and produces a state the app itself never has.
       await page.evaluate((wanted) => {
         document.documentElement.classList.toggle("dark", wanted === "dark");
+        document.documentElement.classList.toggle("light", wanted !== "dark");
       }, theme);
-      await page.waitForTimeout(150);
+      if (!(await settle(page))) unsettled += 1;
       for (const sample of await sampleRoute(page)) {
         const verdict = judge(sample);
         if (!verdict) continue;
@@ -98,6 +146,11 @@ try {
 
 const ranked = [...failures.values()].sort((a, b) => a.ratio - b.ratio);
 console.log(`${checked} text runs measured across ${ROUTES.length} routes in both themes\n`);
+if (unsettled) {
+  // Say it rather than quietly reporting numbers taken mid-transition, which
+  // is the failure mode this whole settle mechanism exists to remove.
+  console.log(`WARNING: ${unsettled} page view(s) never stopped animating; those readings are not reliable.\n`);
+}
 for (const item of ranked) {
   console.log(`${item.ratio.toFixed(2)}:1 (needs ${item.required}:1)  ×${item.count}  ${item.key}`);
   console.log(`    ${item.where} — "${item.sample}"  [${item.routes.join(" ")}]`);
