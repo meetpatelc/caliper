@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { decideReviewRestore } from "./review-restore.ts";
+import { decideReviewRestore, reviewFingerprint } from "./review-restore.ts";
 
 const base = { requestedId: "rev-1", restoredId: null, hasRecord: false, hydrating: false };
 
@@ -45,4 +45,21 @@ test("waiting resolves once the records land", () => {
 test("a snapshot deleted while the page is open does not re-announce itself", () => {
   const afterRestore = { ...base, restoredId: "rev-1", hasRecord: false, hydrating: false };
   assert.equal(decideReviewRestore(afterRestore), "idle");
+});
+
+test("the same snapshot fingerprints the same, a changed one does not", () => {
+  const base = { title: "Evidence review", area: "engineering", payloadJson: '{"notes":"a"}' };
+  assert.equal(reviewFingerprint(base), reviewFingerprint({ ...base }));
+  assert.notEqual(reviewFingerprint(base), reviewFingerprint({ ...base, title: "Second pass" }));
+  assert.notEqual(reviewFingerprint(base), reviewFingerprint({ ...base, area: "drawing" }));
+  assert.notEqual(reviewFingerprint(base), reviewFingerprint({ ...base, payloadJson: '{"notes":"b"}' }));
+});
+
+test("fields cannot be smuggled across the separator", () => {
+  // Joining on a character the JSON can contain would let a title ending in
+  // the separator impersonate a different area, and two genuinely different
+  // snapshots would count as one and silently fail to save.
+  const a = reviewFingerprint({ title: "x", area: "y", payloadJson: "z" });
+  const b = reviewFingerprint({ title: "x\u0000y", area: "", payloadJson: "z" });
+  assert.notEqual(a, b);
 });

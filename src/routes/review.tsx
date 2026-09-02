@@ -25,7 +25,7 @@ import { ErrorState } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 import { useDeskStore } from "@/lib/workspace-store";
 import { useDeskStatus } from "@/lib/desk-mode";
-import { decideReviewRestore } from "@/lib/review-restore";
+import { decideReviewRestore, reviewFingerprint } from "@/lib/review-restore";
 import { downloadTextFile, fileSlug } from "@/lib/download";
 
 type ReviewSearch = { id?: string };
@@ -84,6 +84,18 @@ function ReviewPage() {
    * restore writes to eleven pieces of state, and re-running it would stamp
    * over edits made since.
    */
+  /*
+   * Saving twice with nothing changed made a second identical snapshot.
+   *
+   * Three presses gave three rows in Project, all titled "Evidence review",
+   * all with the same payload, tellable apart only by their timestamp. And the
+   * likeliest reason to press twice is that the first press gave no sign of
+   * having worked — so the interaction punished exactly the person it confused.
+   *
+   * Say so instead, and name the two ways out.
+   */
+  const savedFingerprintRef = useRef<string | null>(null);
+
   const restoredRef = useRef<string | null>(null);
   useEffect(() => {
     const record = restoreId ? reviews.find((item) => item.id === restoreId) : undefined;
@@ -124,6 +136,13 @@ function ReviewPage() {
       setSeverity(payload.severity ?? "6");
       setOccurrence(payload.occurrence ?? "4");
       setDetection(payload.detection ?? "5");
+      // What was just restored is, by definition, already saved. Without this,
+      // opening a snapshot and pressing Save made a copy of it.
+      savedFingerprintRef.current = reviewFingerprint({
+        title: record.title,
+        area: record.area,
+        payloadJson: record.payloadJson,
+      });
       toast.success("Review snapshot restored.");
     } catch {
       toast.error("Review snapshot could not be read.");
@@ -172,11 +191,20 @@ function ReviewPage() {
   );
 
   const persist = () => {
-    saveReview({
+    const snapshot = {
       title: title.trim() || "Evidence review",
       area,
       payloadJson: JSON.stringify({ complete, workflowId, workflowChecks, notes, criteria, optionAName, optionBName, severity, occurrence, detection }),
-    });
+    };
+    const fingerprint = reviewFingerprint(snapshot);
+    if (savedFingerprintRef.current === fingerprint) {
+      toast("Already saved — nothing has changed since.", {
+        description: "Edit the review, or give it a different title to keep a second copy.",
+      });
+      return;
+    }
+    saveReview(snapshot);
+    savedFingerprintRef.current = fingerprint;
     toast.success(accountMode ? "Review snapshot saved on this account." : "Review snapshot saved on this device.");
   };
 

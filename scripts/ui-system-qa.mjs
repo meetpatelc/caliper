@@ -938,6 +938,43 @@ try {
   // whether or not it had been ticked.
   await page.goto(`${BASE}/review`, { waitUntil: "networkidle" });
   await page.waitForTimeout(400);
+
+  /*
+   * Save twice with nothing changed, then once with something changed.
+   *
+   * Pressing Save again used to add a second identical snapshot, so three
+   * presses gave three rows in Project all reading "Evidence review" — and the
+   * likeliest reason to press twice is that the first press looked like it had
+   * not worked. The fix must not overshoot: a real edit still has to save.
+   */
+  await page.evaluate((key) => localStorage.removeItem(key), deskKey);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(500);
+  const savedCount = () =>
+    page.evaluate((key) => {
+      const raw = JSON.parse(localStorage.getItem(key) || '{"state":{}}');
+      return (raw.state ?? raw).reviews?.length ?? 0;
+    }, deskKey);
+  const saveSnapshot = page.getByRole("button", { name: /save snapshot/i });
+  await saveSnapshot.click();
+  await page.waitForTimeout(600);
+  const afterFirst = await savedCount();
+  await saveSnapshot.click();
+  await page.waitForTimeout(600);
+  const afterSecond = await savedCount();
+  await page.locator("#review-notes").fill("a real edit");
+  await page.waitForTimeout(250);
+  await saveSnapshot.click();
+  await page.waitForTimeout(600);
+  const afterEdit = await savedCount();
+  record(
+    "saving twice unchanged does not make a duplicate, and an edit still saves",
+    afterFirst === 1 && afterSecond === 1 && afterEdit === 2,
+    `${afterFirst} -> ${afterSecond} -> ${afterEdit}`,
+  );
+  await page.evaluate((key) => localStorage.removeItem(key), deskKey);
+  await page.goto(`${BASE}/review`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(400);
   // The rule cards, not the area filter beside them — that is also a pressed
   // control, and it is already on when the page loads.
   const firstRule = page.locator('main button[aria-pressed]').filter({ hasText: "Evidence:" }).first();

@@ -143,6 +143,7 @@ test("no issue at all still says something useful", () => {
 test("publishing reports every problem, not just the first", () => {
   // It reported issues[0] and stopped, so a draft missing three things took
   // three attempts to discover them -- fix one, press Publish, meet the next.
+  /** @type {any[]} */
   const issues = [
     { path: ["title"], message: "Too small: expected string to have >=1 characters", code: "too_small" },
     { path: ["fields", 0, "unit"], message: "Required", code: "invalid_type" },
@@ -153,6 +154,7 @@ test("publishing reports every problem, not just the first", () => {
 });
 
 test("the same complaint about four fields is said once", () => {
+  /** @type {any[]} */
   const issues = [0, 1, 2, 3].map((index) => ({
     path: ["fields", index, "unit"],
     message: "Required",
@@ -173,8 +175,8 @@ test("an empty issue list still says something", () => {
 test("the first problem leads and the rest are counted", () => {
   const summary = publishProblemSummary(["A missing.", "B missing.", "C missing."]);
   assert.equal(summary.title, "A missing.");
-  assert.match(summary.description, /^2 more to fix\./);
-  assert.match(summary.description, /B missing\./);
+  assert.match(String(summary.description), /^2 more to fix\./);
+  assert.match(String(summary.description), /B missing\./);
 });
 
 test("one problem has no description at all", () => {
@@ -186,7 +188,7 @@ test("one problem has no description at all", () => {
 test("a long list is trimmed rather than filling the screen", () => {
   const many = ["1.", "2.", "3.", "4.", "5.", "6."];
   const summary = publishProblemSummary(many);
-  assert.match(summary.description, /5 more to fix\./);
-  assert.match(summary.description, /And 2 more\./);
-  assert.ok(!summary.description.includes("6."), "listed every problem instead of trimming");
+  assert.match(String(summary.description), /5 more to fix\./);
+  assert.match(String(summary.description), /And 2 more\./);
+  assert.ok(!String(summary.description).includes("6."), "listed every problem instead of trimming");
 });

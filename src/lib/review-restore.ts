@@ -38,3 +38,22 @@ export function decideReviewRestore({
   if (hasRecord) return "restore";
   return hydrating ? "wait" : "missing";
 }
+
+/**
+ * What a snapshot is, for the purpose of deciding whether it is a new one.
+ *
+ * Pressing Save with nothing changed added another row. Three presses gave
+ * three snapshots with the same title, the same area and the same payload,
+ * distinguishable only by their timestamp — and Project lists them by title,
+ * so what you got back was "Evidence review" three times and no way to tell
+ * which was which. The likeliest way to end up there is pressing Save twice
+ * because the first press gave no visible sign of having worked.
+ *
+ * Fingerprinting what a snapshot actually is, rather than diffing eleven
+ * pieces of state at the call site, keeps the decision in one place and
+ * testable. The separator is a character the JSON cannot contain, so two
+ * different snapshots cannot collide by concatenation.
+ */
+export function reviewFingerprint(snapshot: { title: string; area: string; payloadJson: string }): string {
+  return [snapshot.title, snapshot.area, snapshot.payloadJson].join("\u0000");
+}
