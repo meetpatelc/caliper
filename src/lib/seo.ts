@@ -19,9 +19,6 @@
  */
 export const SITE_ORIGIN = "https://instrument-eta.vercel.app";
 
-/** The social preview, shipped in `public/` and until now never referenced. */
-const OG_IMAGE = `${SITE_ORIGIN}/og.jpg`;
-
 export type SeoInput = {
   title: string;
   description: string;
@@ -30,28 +27,28 @@ export type SeoInput = {
 };
 
 /**
- * Meta tags for a route `head`, including the ones it already set.
+ * Meta tags for a route `head`.
  *
- * Returned as one array rather than merged into an existing one, so a route
- * cannot end up with two og:title tags disagreeing with each other.
+ * Deliberately just the title and the description, because the share tags are
+ * not this file's to emit. `scripts/pwa-shared.mjs` strips every `og:*` and
+ * `twitter:*` meta out of the rendered HTML and re-injects its own — it owns
+ * the share card, so that one page cannot end up with two og:titles from two
+ * places disagreeing.
+ *
+ * An earlier version of this function emitted the full set. They rendered, the
+ * middleware deleted them, and production served three share tags out of
+ * twelve. It looked correct in `vite preview`, which is the trap
+ * `scripts/serve-build.mjs` exists for.
+ *
+ * What this file does own is the title, the description and the canonical —
+ * and the canonical is now how the share card learns the page's URL, because
+ * `<link>` survives the strip and the middleware knows the host but not the
+ * path. So `seoLinks` is load-bearing for `og:url`, not decoration.
  */
-export function seoMeta({ title, description, path }: SeoInput) {
-  const url = canonicalUrl(path);
+export function seoMeta({ title, description }: SeoInput) {
   return [
     { title },
     { name: "description", content: description },
-    { property: "og:type", content: "website" },
-    { property: "og:site_name", content: "Instrument" },
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:url", content: url },
-    { property: "og:image", content: OG_IMAGE },
-    // `summary_large_image` because og.jpg is a wide card. With `summary` the
-    // same file is cropped to a square and the wordmark loses its edges.
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: OG_IMAGE },
   ];
 }
 

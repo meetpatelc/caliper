@@ -10,7 +10,11 @@ import {
   injectPwaHead,
   isDocumentPath,
   isInstallQuery,
+  canonicalFromDocument,
+  ogHeadTags,
   publicAppHost,
+  resolvePublicHost,
+  stripShareMetaTags,
   renderWebManifest,
   resolveOgCardAsset,
   snapshotOgIdentity,
@@ -535,4 +539,76 @@ test("a page that names nothing still falls back to the app name", () => {
     host: "example.test",
   });
   assert.match(html, /<meta property="og:title" content="Instrument">/);
+});
+
+test("the site's own production host is public, a preview's is not", () => {
+  // `publicAppHost` rejects every *.vercel.app name, which is right for a
+  // preview -- its URL is a throwaway and baking it into a share card outlives
+  // the deployment. But this app's production domain is also a .vercel.app
+  // name, so the rule rejected that too: publicHost was always empty and
+  // og:image was never emitted on any deployment.
+  const site = { host: "instrument-eta.vercel.app" };
+  assert.equal(resolvePublicHost("instrument-eta.vercel.app", site), "instrument-eta.vercel.app");
+  assert.equal(resolvePublicHost("instrument-eta.vercel.app:443", site), "instrument-eta.vercel.app");
+  assert.equal(resolvePublicHost("instrument-abc123-preview.vercel.app", site), "");
+  assert.equal(resolvePublicHost("instrument-eta.vercel.app", {}), "");
+});
+
+test("og:url comes from the page's own canonical link", () => {
+  // ogHeadTags is handed the host but never the path, so it cannot build the
+  // URL itself -- and og:url is the tag that stops a crawler treating one
+  // model's query-string variants as separate pages.
+  const html = '<head><link rel="canonical" href="https://example.com/tool/beam"/></head>';
+  assert.equal(canonicalFromDocument(html), "https://example.com/tool/beam");
+  assert.equal(
+    canonicalFromDocument('<link href="https://example.com/x" rel="canonical">'),
+    "https://example.com/x",
+    "attribute order is not guaranteed",
+  );
+  assert.equal(canonicalFromDocument("<head></head>"), "");
+});
+
+test("a share card carries url, site name, type and both twitter fields", () => {
+  const tags = ogHeadTags({
+    host: "instrument-eta.vercel.app",
+    appName: "Instrument",
+    site: { host: "instrument-eta.vercel.app" },
+    documentTitle: "Axial response · Instrument",
+    documentDescription: "Average stress for a prismatic member.",
+    documentCanonical: "https://instrument-eta.vercel.app/tool/axial",
+    cwd: "/nonexistent",
+  }).join("");
+  assert.match(tags, /property="og:url" content="https:\/\/instrument-eta\.vercel\.app\/tool\/axial"/);
+  assert.match(tags, /property="og:site_name" content="Instrument"/);
+  assert.match(tags, /property="og:type" content="website"/);
+  assert.match(tags, /name="twitter:title" content="Axial response · Instrument"/);
+  assert.match(tags, /name="twitter:description"/);
+});
+
+test("no canonical means no og:url, rather than a wrong one", () => {
+  const tags = ogHeadTags({
+    host: "instrument-eta.vercel.app",
+    site: { host: "instrument-eta.vercel.app" },
+    documentTitle: "T",
+    cwd: "/nonexistent",
+  }).join("");
+  assert.doesNotMatch(tags, /og:url/);
+});
+
+test("every share meta this emits is one the strip list owns", () => {
+  // The two lists have to agree. A tag emitted here but absent from
+  // SHARE_META_KEYS survives a second injection and the page ends up with two
+  // of it; a key in the list but never emitted is the state og:image was in.
+  const tags = ogHeadTags({
+    host: "instrument-eta.vercel.app",
+    site: { host: "instrument-eta.vercel.app", card: "custom", image: "/og.jpg" },
+    documentTitle: "T",
+    documentDescription: "D",
+    documentCanonical: "https://instrument-eta.vercel.app/",
+    cwd: "/nonexistent",
+  });
+  const emitted = tags.map((tag) => tag.match(/(?:property|name)="([^"]+)"/)?.[1]).filter(Boolean);
+  assert.ok(emitted.length >= 9, `only emitted ${emitted.length}: ${emitted.join(", ")}`);
+  const stripped = stripShareMetaTags(tags.join(""));
+  assert.equal(stripped.trim(), "", `these survived the strip: ${stripped}`);
 });

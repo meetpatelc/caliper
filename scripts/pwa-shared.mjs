@@ -77,11 +77,30 @@ export function publicAppHost(hostHeader) {
 /**
  * `VITE_PUBLIC_HOSTNAME` when the deployment sets one, otherwise the request
  * host / X-Forwarded-Host. The env wins because a proxy may rewrite Host.
+ *
+ * `site.host` is the third source, and it is the one that made share images
+ * work. `publicAppHost` rejects every `*.vercel.app` name, which is right for
+ * a preview deployment — its URL is a throwaway and baking it into a share
+ * card outlives the deployment. But this app's *production* domain is also a
+ * `.vercel.app` name, so the rule rejected it too: `publicHost` was always
+ * empty, and `og:image` was therefore never emitted on any deployment. The
+ * share card has never had a picture.
+ *
+ * So a `.vercel.app` host passes when it is the one the site declares as its
+ * own in `src/lib/og/site.json`. Previews still get nothing, because their
+ * host is not that one.
  */
-export function resolvePublicHost(hostHeader) {
-  return (
-    publicAppHost(process.env?.VITE_PUBLIC_HOSTNAME) || publicAppHost(hostHeader)
-  );
+export function resolvePublicHost(hostHeader, site = {}) {
+  const fromEnv = publicAppHost(process.env?.VITE_PUBLIC_HOSTNAME);
+  if (fromEnv) return fromEnv;
+  const declared = String(site.host ?? "").trim().toLowerCase();
+  const requested = String(hostHeader ?? "")
+    .split(",")[0]
+    .trim()
+    .split(":")[0]
+    .toLowerCase();
+  if (declared && requested === declared) return declared;
+  return publicAppHost(hostHeader);
 }
 
 export function isInstallQuery(url) {
@@ -258,6 +277,28 @@ export function descriptionFromDocument(html) {
   return plain ? unescapeHtml(plain[1]).trim() : "";
 }
 
+/**
+ * The page's canonical URL, for `og:url`.
+ *
+ * Read out of the document rather than built here, because this file is given
+ * the host but never the path. `<link rel="canonical">` survives
+ * `stripShareMetaTags` — that only removes `<meta>` — so unlike the title and
+ * the description this one does not have to be read before the strip. It is
+ * read alongside them anyway, so the three stay in one place.
+ */
+export function canonicalFromDocument(html) {
+  const match = String(html ?? "").match(
+    /<link\b[^>]*\brel\s*=\s*["']canonical["'][^>]*\bhref\s*=\s*["']([^"']*)["'][^>]*>/i,
+  );
+  if (match) return unescapeHtml(match[1]).trim();
+  // Attribute order is not guaranteed: TanStack emits rel first today, but a
+  // href-first tag is the same tag and this should not depend on that.
+  const reversed = String(html ?? "").match(
+    /<link\b[^>]*\bhref\s*=\s*["']([^"']*)["'][^>]*\brel\s*=\s*["']canonical["'][^>]*>/i,
+  );
+  return reversed ? unescapeHtml(reversed[1]).trim() : "";
+}
+
 export function resolveOgTitle(
   site = {},
   appName = DEFAULT_APP_NAME,
@@ -298,6 +339,7 @@ export function ogHeadTags({
   site = {},
   documentTitle = "",
   documentDescription = "",
+  documentCanonical = "",
   cwd = process.cwd(),
 } = {}) {
   // The page wins. `site.title` is the app's name, which is the right answer
@@ -305,15 +347,38 @@ export function ogHeadTags({
   // shared link is worth nothing if every one of them previews as "Instrument".
   const title =
     String(documentTitle ?? "").trim() || resolveOgTitle(site, appName, host);
-  const publicHost = resolvePublicHost(host);
+  const publicHost = resolvePublicHost(host, site);
   const tags = [
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta property="og:title" content="${escapeHtml(title)}">`,
+    `<meta property="og:site_name" content="${escapeHtml(appName)}">`,
+    // Every route here is a page, not an article or a profile, and a card with
+    // no type at all is treated as `website` by some readers and skipped by
+    // others. Saying it is cheaper than finding out which.
+    `<meta property="og:type" content="website">`,
   ];
   const description =
     String(documentDescription ?? "").trim() || String(site.description ?? "").trim();
   if (description) {
     tags.push(`<meta property="og:description" content="${escapeHtml(description)}">`);
+  }
+  /*
+   * `og:url` comes from the page's own canonical link.
+   *
+   * This function is handed the host but not the path, so it could not build
+   * the URL itself — and og:url is the tag that stops a crawler treating
+   * `?force=25&area=1000` and the same values in another order as two pages.
+   * The canonical is already in the document, survives `stripShareMetaTags`
+   * because it is a <link> rather than a <meta>, and is by definition the
+   * answer. Read it the way the title and description are read.
+   */
+  const canonical = String(documentCanonical ?? "").trim();
+  if (canonical) tags.push(`<meta property="og:url" content="${escapeHtml(canonical)}">`);
+  // Twitter reads og:title and og:description when its own are absent, but not
+  // reliably once a twitter:card is declared — and one is, on the line above.
+  tags.push(`<meta name="twitter:title" content="${escapeHtml(title)}">`);
+  if (description) {
+    tags.push(`<meta name="twitter:description" content="${escapeHtml(description)}">`);
   }
   if (String(site.type ?? "").toLowerCase() === "x:game") {
     tags.push(`<meta property="og:type" content="x:game">`);
@@ -324,6 +389,10 @@ export function ogHeadTags({
     tags.push(`<meta property="og:image" content="${escapeHtml(image)}">`);
     tags.push(`<meta property="og:image:width" content="1200">`);
     tags.push(`<meta property="og:image:height" content="630">`);
+    // A summary_large_image card with no twitter:image falls back to og:image
+    // in most readers and to nothing in some. The card was declared large on
+    // the first line of this list, so give it the picture it promises.
+    tags.push(`<meta name="twitter:image" content="${escapeHtml(image)}">`);
     const banner = String(site.banner ?? "").trim();
     if (banner) {
       const bannerUrl = `https://${publicHost}${banner.startsWith("/") ? banner : `/${banner}`}`;
@@ -387,6 +456,7 @@ export function injectPwaHead(html, ctx = {}) {
   const documentTitle = titleFromDocument(html);
   // Read before the strip, which deletes the route's own share meta.
   const documentDescription = descriptionFromDocument(html);
+  const documentCanonical = canonicalFromDocument(html);
   const appName = resolveOgTitle(
     site,
     ctx.appName ?? DEFAULT_APP_NAME,
@@ -405,7 +475,7 @@ export function injectPwaHead(html, ctx = {}) {
 
   next = insertAfterHeadOpen(
     next,
-    ogHeadTags({ host, appName, site, documentTitle, documentDescription, cwd }).join(""),
+    ogHeadTags({ host, appName, site, documentTitle, documentDescription, documentCanonical, cwd }).join(""),
   );
 
   // No platform script and no platform attribution: the page is first-party.

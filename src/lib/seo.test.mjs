@@ -26,27 +26,35 @@ test("the root keeps its slash", () => {
 
 test("a route gets exactly one of each tag", () => {
   const meta = seoMeta({ title: "T", description: "D", path: "/about" });
-  const names = meta.map((tag) => tag.property ?? tag.name ?? "title");
-  assert.equal(new Set(names).size, names.length, `duplicate tags: ${names.join(", ")}`);
-  assert.ok(names.includes("og:url"));
-  assert.ok(names.includes("og:image"));
-  assert.ok(names.includes("twitter:card"));
+  const names = meta.map((tag) => ("title" in tag ? "title" : tag.name));
+  assert.deepEqual(names, ["title", "description"]);
 });
 
-test("og:url and the canonical link agree", () => {
-  // Two tags making the same claim in two places, which is exactly how they
-  // drift apart.
-  const path = "/tool/beam";
-  const ogUrl = seoMeta({ title: "T", description: "D", path }).find((tag) => tag.property === "og:url")?.content;
-  assert.equal(ogUrl, seoLinks(path)[0].href);
+test("this file does not emit share tags, because it does not own them", () => {
+  /*
+   * scripts/pwa-shared.mjs strips every og:* and twitter:* meta out of the
+   * rendered HTML and re-injects its own. An earlier version of seoMeta
+   * emitted the full set: they rendered, the middleware deleted them, and
+   * production served three share tags out of twelve. It looked right in
+   * `vite preview`, which is the trap scripts/serve-build.mjs exists for.
+   *
+   * So this is not a style rule. Anything added here matching og:/twitter:
+   * will be silently discarded in production and nowhere else.
+   */
+  const serialised = JSON.stringify(seoMeta({ title: "T", description: "D", path: "/about" }));
+  assert.doesNotMatch(serialised, /og:/);
+  assert.doesNotMatch(serialised, /twitter:/);
 });
 
-test("every URL it produces is absolute", () => {
-  const meta = seoMeta({ title: "T", description: "D", path: "/reference" });
-  for (const tag of meta) {
-    const value = tag.content ?? "";
-    if (/^(og:url|og:image|twitter:image)$/.test(tag.property ?? tag.name ?? "")) {
-      assert.match(value, /^https:\/\//, `${tag.property ?? tag.name} was ${value}`);
-    }
-  }
+test("the canonical link is what carries the page's URL into the share card", () => {
+  // pwa-shared reads og:url out of this link, because it is handed the host
+  // but never the path. A <link> survives the meta strip; a <meta> would not.
+  const links = seoLinks("/tool/beam");
+  assert.deepEqual(links, [{ rel: "canonical", href: `${SITE_ORIGIN}/tool/beam` }]);
+});
+
+test("the canonical is absolute", () => {
+  // A relative canonical resolves against whatever host served the page, which
+  // on a preview deployment is the preview's throwaway URL.
+  assert.match(seoLinks("/reference")[0].href, /^https:\/\//);
 });

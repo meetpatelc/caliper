@@ -1,5 +1,6 @@
 {
   "title": "Instrument",
+  "host": "instrument-eta.vercel.app",
   "card": "custom",
   "color": "C8102E"
 }
