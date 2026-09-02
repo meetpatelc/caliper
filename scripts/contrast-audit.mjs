@@ -65,13 +65,20 @@ async function sampleRoute(page) {
 /**
  * Wait until the page has stopped changing colour.
  *
- * Switching the theme starts over a thousand transitions at once — the base
- * stylesheet transitions `all` on everything — and they take a beat to flush
- * even with reduced motion, which shortens them rather than removing them.
- * Read during that flush and `getComputedStyle` returns a value on its way
- * somewhere: the footer's paragraph reports the light theme's muted grey while
- * its own parent already reports the dark one, which is impossible in a
- * settled page and is exactly what a half-applied inherit looks like.
+ * Switching the theme starts hundreds of transitions at once, and they take a
+ * beat to flush. Read during that flush and `getComputedStyle` returns a value
+ * on its way somewhere: the footer's paragraph reports the light theme's muted
+ * grey while its own parent already reports the dark one, which is impossible
+ * in a settled page and is exactly what a half-applied inherit looks like.
+ *
+ * Measured, because the first guess was wrong and worth recording as such: the
+ * app has no global `transition: all`. `transition-colors` is scoped to the
+ * properties it names, and roughly 580 elements carry it, which is the real
+ * count on a theme switch. Under `prefers-reduced-motion` it roughly doubles,
+ * to about 1220 — the standard reduced-motion reset sets a 0.01ms duration on
+ * `*`, and `transition-property` defaults to `all`, so every element on the
+ * page briefly transitions everything. Both numbers need waiting out; neither
+ * is a defect.
  *
  * This cost three false findings and a real scare. A fixed timeout is what
  * produced them — 250ms was enough most of the time, so the check passed about
