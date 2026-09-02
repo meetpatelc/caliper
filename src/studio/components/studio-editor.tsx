@@ -18,7 +18,7 @@ import { OFFICIAL_SLUGS } from "@/studio/lib/catalog";
 import { validateExpression } from "@instrument/formula";
 import { rewriteIdentifier, toIdentifier } from "@/studio/lib/identifiers";
 import { retargetAuthoredField } from "@/studio/lib/evaluate";
-import { publishProblem } from "@/studio/lib/publish-problem";
+import { publishProblems, publishProblemSummary } from "@/studio/lib/publish-problem";
 import { TablesFieldset } from "@/studio/components/table-editor";
 import { unitFamilyOptions, unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { uniqueSlug, useWorkshop } from "@/studio/lib/workshop-store";
@@ -317,7 +317,12 @@ export function StudioEditor({ item }: { item: WorkshopCalculator }) {
       if (path.startsWith("fields") || path.startsWith("outputs") || path === "formula") setStep("engine");
       else if (["title", "description", "domain", "slug"].includes(String(issue?.path[0]))) setStep("name");
       else setStep("method");
-      toast.error(publishProblem(issue, draft));
+      // Every problem, not just the first. This reported issues[0] and
+      // stopped, so a draft missing three things took three attempts to find
+      // out -- fix one, press Publish, meet the next. The validator has known
+      // all of them since the first press.
+      const { title, description } = publishProblemSummary(publishProblems(parsed.error.issues, draft));
+      toast.error(title, description ? { description } : undefined);
       return;
     }
     const published = { ...next, published: true };

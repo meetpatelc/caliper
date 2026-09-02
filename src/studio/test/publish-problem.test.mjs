@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
 import { calculatorSchema } from "@/studio/lib/calculator-types.ts";
-import { publishProblem } from "@/studio/lib/publish-problem.ts";
+import { publishProblem, publishProblems, publishProblemSummary } from "@/studio/lib/publish-problem.ts";
 
 /**
  * A model that publishes cleanly, so each case can break exactly one thing.
@@ -138,4 +138,55 @@ test("a missing key says so", () => {
 
 test("no issue at all still says something useful", () => {
   assert.equal(publishProblem(undefined), "Finish the instrument before publishing.");
+});
+
+test("publishing reports every problem, not just the first", () => {
+  // It reported issues[0] and stopped, so a draft missing three things took
+  // three attempts to discover them -- fix one, press Publish, meet the next.
+  const issues = [
+    { path: ["title"], message: "Too small: expected string to have >=1 characters", code: "too_small" },
+    { path: ["fields", 0, "unit"], message: "Required", code: "invalid_type" },
+    { path: ["formula"], message: "Required", code: "invalid_type" },
+  ];
+  const problems = publishProblems(issues, {});
+  assert.equal(problems.length, 3);
+});
+
+test("the same complaint about four fields is said once", () => {
+  const issues = [0, 1, 2, 3].map((index) => ({
+    path: ["fields", index, "unit"],
+    message: "Required",
+    code: "invalid_type",
+  }));
+  const problems = publishProblems(issues, {});
+  assert.equal(new Set(problems).size, problems.length, "messages were not deduplicated");
+});
+
+test("an empty issue list still says something", () => {
+  // Publish cannot fail with nothing to report, but a toast reading
+  // "undefined" is the worse failure of the two.
+  const problems = publishProblems([], {});
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /\S/);
+});
+
+test("the first problem leads and the rest are counted", () => {
+  const summary = publishProblemSummary(["A missing.", "B missing.", "C missing."]);
+  assert.equal(summary.title, "A missing.");
+  assert.match(summary.description, /^2 more to fix\./);
+  assert.match(summary.description, /B missing\./);
+});
+
+test("one problem has no description at all", () => {
+  const summary = publishProblemSummary(["Only this."]);
+  assert.equal(summary.title, "Only this.");
+  assert.equal(summary.description, undefined);
+});
+
+test("a long list is trimmed rather than filling the screen", () => {
+  const many = ["1.", "2.", "3.", "4.", "5.", "6."];
+  const summary = publishProblemSummary(many);
+  assert.match(summary.description, /5 more to fix\./);
+  assert.match(summary.description, /And 2 more\./);
+  assert.ok(!summary.description.includes("6."), "listed every problem instead of trimming");
 });

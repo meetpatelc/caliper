@@ -103,3 +103,45 @@ export function publishProblem(issue: $ZodIssue | undefined, draft?: unknown): s
   const predicate = predicateFor(issue, valueAt(draft, issue.path ?? []));
   return predicate ? `${label} ${predicate}` : `${label} — ${issue.message}`;
 }
+
+/**
+ * Every distinct problem, not just the first one.
+ *
+ * Publishing reported `issues[0]` and stopped, so a draft missing three things
+ * took three attempts to find out — fix one, press Publish, discover the next.
+ * The validator has known all of them the whole time.
+ *
+ * Deduplicated by message: several fields with no unit produce the same
+ * sentence, and repeating it once per field turns a short list into a wall
+ * that says nothing extra.
+ */
+export function publishProblems(issues: readonly $ZodIssue[], draft?: unknown): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const issue of issues) {
+    const message = publishProblem(issue, draft);
+    if (seen.has(message)) continue;
+    seen.add(message);
+    out.push(message);
+  }
+  return out.length ? out : [publishProblem(undefined)];
+}
+
+/**
+ * The two halves of the message: what to fix first, and what else is waiting.
+ *
+ * The first problem is the one the editor jumps to, so it goes in the title
+ * where it is read. The rest go in the description as a count and a list, so
+ * the size of the job is visible without a toast that fills the screen.
+ */
+export function publishProblemSummary(problems: readonly string[]): { title: string; description?: string } {
+  const [first, ...rest] = problems;
+  if (!rest.length) return { title: first };
+  const shown = rest.slice(0, 3);
+  const remainder = rest.length - shown.length;
+  const tail = remainder > 0 ? ` And ${remainder} more.` : "";
+  return {
+    title: first,
+    description: `${rest.length} more to fix. ${shown.join(" ")}${tail}`,
+  };
+}

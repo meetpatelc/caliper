@@ -14,6 +14,7 @@ const source = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "sketc
  * so the direction is the tip's offset from the barbs — not the other way
  * round, which is the mistake the drawings themselves made.
  */
+/** @param {string} functionName */
 function arrowsIn(functionName) {
   const start = source.indexOf(`export function ${functionName}(`);
   assert.notEqual(start, -1, `no sketch named ${functionName}`);
