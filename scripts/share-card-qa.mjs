@@ -22,6 +22,7 @@
  * broken.
  */
 import { get as httpGet } from "node:http";
+import { get as httpsGet } from "node:https";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -40,15 +41,30 @@ if (!PRODUCTION_HOST) {
   process.exit(2);
 }
 
-/** Fetch with a Host header — `fetch` treats that name as forbidden. */
+/**
+ * Fetch with a Host header — `fetch` treats that name as forbidden.
+ *
+ * The scheme picks the module. The first version of this always used
+ * `node:http`, so pointing it at the deployed https URL returned nothing and
+ * every route reported every tag missing, including the ones that had been
+ * working for months. It read as a catastrophic regression and was a typo.
+ *
+ * A body that is not HTML is therefore an error here, not a page with no tags:
+ * "the check could not look" and "the page is empty" have to be different
+ * outcomes, or this becomes one more thing that passes by seeing nothing.
+ */
 function fetchWithHost(url, host) {
   const target = new URL(url);
+  const get = target.protocol === "https:" ? httpsGet : httpGet;
   return new Promise((resolve, reject) => {
-    const request = httpGet(
+    const request = get(
       {
         hostname: target.hostname,
-        port: target.port,
+        port: target.port || (target.protocol === "https:" ? 443 : 80),
         path: target.pathname + target.search,
+        // `servername` so TLS SNI matches the Host we are claiming to be,
+        // which is the whole point of spoofing it against a real deployment.
+        servername: target.protocol === "https:" ? host : undefined,
         headers: { Host: host },
       },
       (response) => {
@@ -57,6 +73,10 @@ function fetchWithHost(url, host) {
         response.on("data", (chunk) => (body += chunk));
         response.on("end", () => {
           response.destroy();
+          if (!/<html|<head|<meta/i.test(body)) {
+            reject(new Error(`${response.statusCode} and no HTML (${body.length} bytes)`));
+            return;
+          }
           resolve(body);
         });
       },
@@ -117,13 +137,27 @@ for (const route of ROUTES) {
 }
 
 /*
- * A preview deployment must not advertise the production card. Its own URL is
- * a throwaway, and the rule that keeps it out is the same one that used to
- * keep production out.
+ * A preview deployment must not advertise the production card: its URL is a
+ * throwaway, and the rule keeping it out is the same one that used to keep
+ * production out. Worth pinning, because relaxing that rule is exactly how the
+ * og:image fix could go too far.
+ *
+ * Only against a local server, though. A real deployment sits behind an edge
+ * that routes on Host, so a made-up one is refused there before the app ever
+ * runs — the assertion is not answerable, and pretending otherwise would make
+ * this fail for a reason that has nothing to do with the code.
  */
-const previewHtml = await fetchWithHost(BASE + "/", "instrument-some-preview-hash.vercel.app").catch(() => "");
-const previewTags = shareTags(previewHtml).found;
-record("a preview host emits no share image", !previewTags.get("og:image"), previewTags.get("og:image") ?? "none");
+const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(:|\/|$)/.test(BASE);
+if (isLocal) {
+  const previewHtml = await fetchWithHost(BASE + "/", "instrument-some-preview-hash.vercel.app").catch((error) => {
+    record("the preview probe reached the server", false, error instanceof Error ? error.message : String(error));
+    return "";
+  });
+  const previewTags = shareTags(previewHtml).found;
+  record("a preview host emits no share image", !previewTags.get("og:image"), previewTags.get("og:image") ?? "none");
+} else {
+  console.log("SKIP  a preview host emits no share image — the edge routes on Host, so this is only answerable locally");
+}
 
 const failed = findings.filter((item) => !item.ok);
 console.log(`\n${findings.length - failed.length}/${findings.length} passed against ${BASE} as ${PRODUCTION_HOST}`);
