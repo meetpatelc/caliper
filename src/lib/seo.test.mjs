@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { canonicalUrl, seoLinks, seoMeta, SITE_ORIGIN } from "./seo.ts";
+import { canonicalUrl, jsonLdScript, pageJsonLd, seoLinks, seoMeta, siteJsonLd, SITE_ORIGIN, toolJsonLd } from "./seo.ts";
 
 test("the canonical drops the query, which is the whole point", () => {
   // Every model writes its inputs into the query string as they change, so one
@@ -57,4 +57,50 @@ test("the canonical is absolute", () => {
   // A relative canonical resolves against whatever host served the page, which
   // on a preview deployment is the preview's throwaway URL.
   assert.match(seoLinks("/reference")[0].href, /^https:\/\//);
+});
+
+test("structured data claims only what is true", () => {
+  // The pull with JSON-LD is toward the types that earn rich results.
+  // AggregateRating and Offer would both be invented here: nobody has rated
+  // these models and nothing is for sale. If either appears, someone reached.
+  const serialised = JSON.stringify([
+    siteJsonLd("D"),
+    toolJsonLd({ name: "Axial response", description: "D", path: "/tool/axial" }),
+    pageJsonLd("AboutPage", { title: "About & limits · Instrument", description: "D", path: "/about" }),
+  ]);
+  for (const invented of ["aggregateRating", "review", "offers", "price", "ratingValue"]) {
+    assert.doesNotMatch(serialised, new RegExp(invented, "i"), `${invented} cannot be known from this codebase`);
+  }
+});
+
+test("structured data agrees with the canonical", () => {
+  const path = "/tool/beam";
+  assert.equal(toolJsonLd({ name: "Beam", description: "D", path }).url, seoLinks(path)[0].href);
+  assert.equal(pageJsonLd("AboutPage", { title: "T", description: "D", path }).url, canonicalUrl(path));
+});
+
+test("a page's structured name drops the site suffix", () => {
+  // The title carries " · Instrument" so a tab says which site it is. Repeating
+  // that in `name` makes the application's name something nothing is called.
+  assert.equal(pageJsonLd("AboutPage", { title: "About & limits · Instrument", description: "D", path: "/about" }).name, "About & limits");
+  assert.doesNotMatch(toolJsonLd({ name: "Axial response", description: "D", path: "/x" }).name, /·/);
+});
+
+test("the script entry is valid JSON a crawler can read", () => {
+  // A trailing comma or an unescaped quote makes the whole block invisible to a
+  // crawler while the page looks perfect. Nothing in a browser complains.
+  const [entry] = jsonLdScript(toolJsonLd({ name: 'Quote " and \\ backslash and </script>', description: "D", path: "/x" }));
+  assert.equal(entry.type, "application/ld+json");
+  assert.doesNotThrow(() => JSON.parse(entry.children));
+  assert.equal(JSON.parse(entry.children).name, 'Quote " and \\ backslash and </script>');
+});
+
+test("a value that could close the script tag cannot", () => {
+  // JSON.stringify has no reason to escape a slash, so "</script>" inside a
+  // value would end the tag early and spill the rest into the document as
+  // markup. The escape is JSON-level, so a crawler still reads the same string.
+  const [entry] = jsonLdScript({ name: "danger </script><img src=x>" });
+  assert.doesNotMatch(entry.children, /<\/script/i);
+  assert.doesNotMatch(entry.children, /</);
+  assert.equal(JSON.parse(entry.children).name, "danger </script><img src=x>");
 });

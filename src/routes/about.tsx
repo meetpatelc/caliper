@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { seoLinks, seoMeta } from "@/lib/seo";
+import { jsonLdScript, pageJsonLd, seoLinks, seoMeta } from "@/lib/seo";
 import { ICON } from "@instrument/ui";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 import { PARENT_NAME } from "@/lib/instrument";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/about")({   head: () => ({
     meta: seoMeta({ title: "About & limits · Instrument", description: "What Instrument is designed to support, and what it is not.", path: "/about" }),
     links: seoLinks("/about"),
+    scripts: jsonLdScript(pageJsonLd("AboutPage", { title: "About & limits · Instrument", description: "What Instrument is designed to support, and what it is not.", path: "/about" })),
   }),
   component: AboutPage });
 

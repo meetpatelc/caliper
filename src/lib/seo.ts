@@ -65,3 +65,84 @@ export function canonicalUrl(path: string): string {
   const trimmed = withSlash.length > 1 ? withSlash.replace(/\/+$/, "") : "/";
   return `${SITE_ORIGIN}${trimmed}`;
 }
+
+/**
+ * Structured data, kept to things that are true.
+ *
+ * The temptation with JSON-LD is to reach for the types that earn rich
+ * results — `AggregateRating`, `Review`, `Offer` — and every one of them here
+ * would be invented. Nobody has rated these models and nothing is for sale.
+ * What is true is that this is a free engineering web application, that each
+ * model page is one calculator within it, and what that calculator is called.
+ * So that is all this says.
+ *
+ * Emitted as a `<script type="application/ld+json">`, which CSP's `script-src`
+ * does not block: it is a data block, never executed. `qa:csp` re-checks that
+ * against the built function rather than taking it on faith.
+ */
+const SITE_NAME = "Instrument";
+
+export function siteJsonLd(description: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    url: `${SITE_ORIGIN}/`,
+    description,
+    inLanguage: "en",
+  };
+}
+
+/**
+ * `name` is the model's own name, not the page title.
+ *
+ * The title carries " · Instrument" so a browser tab and a search result say
+ * which site they belong to. Structured data has a field for that already —
+ * `isPartOf` — and repeating it in `name` produces "Axial response ·
+ * Instrument" as the application's name, which is not what anything is called.
+ */
+export function toolJsonLd({ name, description, path }: { name: string; description: string; path: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name,
+    description,
+    url: canonicalUrl(path),
+    applicationCategory: "EngineeringApplication",
+    // True, and the one claim here a reader might actually want up front.
+    isAccessibleForFree: true,
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: `${SITE_ORIGIN}/` },
+  };
+}
+
+/**
+ * A head `scripts` entry. Stringified here so callers cannot forget to.
+ *
+ * `<` becomes `<`, which JSON decodes back to `<`, so a crawler reads the
+ * same string either way. The reason is HTML rather than JSON: `JSON.stringify`
+ * has no reason to escape a slash, so a value containing `</script>` would end
+ * the tag early and spill the rest of the block into the document as markup.
+ * Nothing in the catalogue contains that today; this is one line, and the day
+ * a title or description does contain it is not the day to find out.
+ */
+export function jsonLdScript(data: object) {
+  return [{ type: "application/ld+json", children: JSON.stringify(data).replaceAll("<", "\\u003c") }];
+}
+
+/**
+ * A content page that is not a calculator.
+ *
+ * `AboutPage` and `CollectionPage` are schema.org's own names for exactly what
+ * /about and /reference are, so this claims nothing beyond what the pages
+ * already say about themselves.
+ */
+export function pageJsonLd(type: "AboutPage" | "CollectionPage", { title, description, path }: SeoInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": type,
+    name: title.replace(` · ${SITE_NAME}`, ""),
+    description,
+    url: canonicalUrl(path),
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: `${SITE_ORIGIN}/` },
+  };
+}

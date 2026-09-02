@@ -134,6 +134,44 @@ for (const route of ROUTES) {
 
   const image = found.get("og:image") ?? "";
   record(`${route} names an absolute share image`, image.startsWith(`https://${PRODUCTION_HOST}/`), image || "—");
+
+  /*
+   * Structured data, parsed rather than pattern-matched.
+   *
+   * JSON-LD fails silently in the worst way: a trailing comma or an unescaped
+   * quote makes the whole block invisible to a crawler while the page looks
+   * perfect to everyone else. Nothing in a browser complains — it is a data
+   * block, never executed — so the only way to know is to parse it, and the
+   * only place worth parsing it is the built output, since the description it
+   * carries is interpolated at render time.
+   */
+  const block = html.match(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/)?.[1];
+  if (!block) {
+    record(`${route} carries structured data`, false, "no ld+json block");
+  } else {
+    let parsed = null;
+    try {
+      parsed = JSON.parse(block);
+    } catch (error) {
+      record(`${route} structured data parses`, false, error instanceof Error ? error.message : String(error));
+    }
+    if (parsed) {
+      record(`${route} structured data parses`, true, `@type ${parsed["@type"]}`);
+      record(
+        `${route} structured data points at this page`,
+        parsed.url === found.get("og:url"),
+        `${parsed.url} vs og:url ${found.get("og:url")}`,
+      );
+      // The page title carries " · Instrument" so a tab says which site it is.
+      // Structured data has isPartOf for that, and repeating it in `name`
+      // makes the application's name something nothing is actually called.
+      record(
+        `${route} structured data names the thing, not the tab`,
+        typeof parsed.name === "string" && !parsed.name.includes("·"),
+        String(parsed.name),
+      );
+    }
+  }
 }
 
 /*

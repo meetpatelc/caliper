@@ -4,7 +4,7 @@ import { PARENT_NAME } from "@/lib/instrument";
 import { CalculatorWorkspace } from "@/components/calculator-workspace";
 import { Iso286Instrument } from "@/studio/components/iso-286";
 import { toolSearchFromUnknown } from "@/lib/search-params";
-import { seoLinks, seoMeta } from "@/lib/seo";
+import { jsonLdScript, seoLinks, seoMeta, toolJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/tool/$toolId")({
   validateSearch: (search: Record<string, unknown>) => toolSearchFromUnknown(search),
@@ -39,6 +39,7 @@ export const Route = createFileRoute("/tool/$toolId")({
     return {
       meta: seoMeta({ title, description: tool.description, path }),
       links: seoLinks(path),
+      scripts: jsonLdScript(toolJsonLd({ name: tool.title, description: tool.description, path })),
     };
   },
   component: ToolRoute,

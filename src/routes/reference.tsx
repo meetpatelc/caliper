@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { seoLinks, seoMeta } from "@/lib/seo";
+import { jsonLdScript, pageJsonLd, seoLinks, seoMeta } from "@/lib/seo";
 import { ICON } from "@instrument/ui";
 import { ArrowUpRight } from "lucide-react";
 import { tools } from "@/lib/catalog";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/reference")({   head: () => ({
     meta: seoMeta({ title: "Method library · Instrument", description: "Version, range and source for every released method.", path: "/reference" }),
     links: seoLinks("/reference"),
+    scripts: jsonLdScript(pageJsonLd("CollectionPage", { title: "Method library · Instrument", description: "Version, range and source for every released method.", path: "/reference" })),
   }),
   component: ReferencePage });
 
