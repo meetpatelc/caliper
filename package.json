@@ -30,7 +30,8 @@
     "goldens": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/regenerate-goldens.mjs",
     "home-demo": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/generate-home-demo.mjs",
     "qa:contrast": "node scripts/contrast-audit.mjs",
-    "qa:share": "node scripts/share-card-qa.mjs"
+    "qa:share": "node scripts/share-card-qa.mjs",
+    "build:sitemap": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/build-sitemap.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.121.0",

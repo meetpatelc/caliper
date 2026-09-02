@@ -28,6 +28,8 @@ export const SECONDARY_NAV = [
   { href: "/about", label: "About & limits" },
   { href: "/feedback", label: "Feedback" },
   { href: "/reference", label: "Method library" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
 ] as const;
 
 export const ACCOUNT_NAV = [

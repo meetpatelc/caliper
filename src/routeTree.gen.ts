@@ -16,12 +16,14 @@ import { Route as BuildRouteImport } from './routes/build'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ReferenceRouteImport } from './routes/reference'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StudioRouteImport } from './routes/studio'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WorkshopRouteImport } from './routes/workshop'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as RecordToolIdRouteImport } from './routes/record/$toolId'
@@ -66,6 +68,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -94,6 +101,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WorkshopRoute = WorkshopRouteImport.update({
@@ -145,12 +157,14 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRouteWithChildren
+  '/terms': typeof TermsRoute
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
   '/record/$toolId': typeof RecordToolIdRoute
@@ -168,11 +182,13 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
   '/record/$toolId': typeof RecordToolIdRoute
@@ -191,12 +207,14 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/reference': typeof ReferenceRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/studio': typeof StudioRouteWithChildren
+  '/terms': typeof TermsRoute
   '/workshop': typeof WorkshopRoute
   '/c/$slug': typeof CSlugRoute
   '/record/$toolId': typeof RecordToolIdRoute
@@ -216,12 +234,14 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/library'
     | '/login'
+    | '/privacy'
     | '/profile'
     | '/projects'
     | '/reference'
     | '/review'
     | '/settings'
     | '/studio'
+    | '/terms'
     | '/workshop'
     | '/c/$slug'
     | '/record/$toolId'
@@ -239,11 +259,13 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/library'
     | '/login'
+    | '/privacy'
     | '/profile'
     | '/projects'
     | '/reference'
     | '/review'
     | '/settings'
+    | '/terms'
     | '/workshop'
     | '/c/$slug'
     | '/record/$toolId'
@@ -261,12 +283,14 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/library'
     | '/login'
+    | '/privacy'
     | '/profile'
     | '/projects'
     | '/reference'
     | '/review'
     | '/settings'
     | '/studio'
+    | '/terms'
     | '/workshop'
     | '/c/$slug'
     | '/record/$toolId'
@@ -285,12 +309,14 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ProjectsRoute: typeof ProjectsRoute
   ReferenceRoute: typeof ReferenceRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   StudioRoute: typeof StudioRouteWithChildren
+  TermsRoute: typeof TermsRoute
   WorkshopRoute: typeof WorkshopRoute
   CSlugRoute: typeof CSlugRoute
   RecordToolIdRoute: typeof RecordToolIdRoute
@@ -350,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -390,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/workshop': {
@@ -472,12 +512,14 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ProjectsRoute: ProjectsRoute,
   ReferenceRoute: ReferenceRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   StudioRoute: StudioRouteWithChildren,
+  TermsRoute: TermsRoute,
   WorkshopRoute: WorkshopRoute,
   CSlugRoute: CSlugRoute,
   RecordToolIdRoute: RecordToolIdRoute,

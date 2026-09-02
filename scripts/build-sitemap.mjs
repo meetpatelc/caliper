@@ -8,7 +8,12 @@
  * Without a sitemap a crawler has to discover them by following links from
  * the Library grid, which it may or may not do.
  *
- * Run after adding models: node scripts/build-sitemap.mjs
+ * Run after adding models or a static page: npm run build:sitemap
+ *
+ * Not plain `node scripts/build-sitemap.mjs` -- it imports the catalog, which
+ * is TypeScript using the @/ alias, so it needs the strip-types flag and the
+ * alias loader. The instruction here said otherwise and the command it gave
+ * fails with ERR_MODULE_NOT_FOUND.
  */
 import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -19,7 +24,9 @@ import { fileURLToPath } from "node:url";
 // than either alone -- the crawler is told two different things about the same
 // page. scripts/seo-origin.test.mjs asserts they still agree.
 const ORIGIN = process.env.SITE_ORIGIN || "https://instrument-eta.vercel.app";
-const STATIC = ["/", "/studio", "/review", "/workshop", "/about", "/reference", "/feedback"];
+// Privacy and Terms are listed at a lower priority than the models: worth
+// being findable, not worth competing with the thing people came for.
+const STATIC = ["/", "/studio", "/review", "/workshop", "/about", "/reference", "/feedback", "/privacy", "/terms"];
 
 /** @param {string[]} toolIds */
 export function renderSitemap(toolIds, origin = ORIGIN) {
