@@ -9,6 +9,7 @@
     "nf3": "0.3.17"
   },
   "scripts": {
+    "prepare": "node scripts/install-hooks.mjs",
     "dev": "node scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080",
     "build": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/generate-home-demo.mjs --check && node scripts/with-app-env.mjs vite build && node scripts/patch-ssr-exports.mjs && node scripts/pglite-assets.mjs && node scripts/zod-locale.mjs && node scripts/csp.mjs && npm run db:migrate",
     "db:migrate": "node scripts/migrate.mjs",

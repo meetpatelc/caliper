@@ -66,6 +66,20 @@ Calculators and local saves work without signing in. Copy `.env.example` to `.en
 | `npm run format` | Prettier |
 | `npm test` | Node test runner |
 
+## Pushing
+
+`npm install` points git at `.githooks/`, and `pre-push` runs the same five
+commands as CI's required `Check` job — typecheck, lint, test, build,
+brand-check — taking about a minute. A push that CI would reject stops here
+instead, before Vercel starts building a deploy from it. Skip it with
+`git push --no-verify` when you have a reason.
+
+This is deliberately not a required status check on GitHub. Requiring one
+forces every change through a pull request, since a commit that has just been
+pushed has no status yet, and on a repo with one committer that is a review
+with no reviewer. `main` instead blocks the two things a local hook cannot
+catch — force pushes and deletion — and those apply to administrators too.
+
 ## Layout
 
 ```

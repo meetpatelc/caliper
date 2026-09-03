@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+# Run CI's required `Check` job before the push, not after it.
+#
+# Why this rather than a required status check on GitHub: requiring `Check` to
+# pass forces every change through a pull request, because a commit that has
+# just been pushed has no status yet. On a repo with one committer that is a
+# review ceremony with no reviewer. What is actually worth protecting is "do
+# not ship what CI would reject", and a pre-push hook enforces exactly that,
+# strictly earlier -- before GitHub sees the commit and before Vercel starts
+# building a deploy from it.
+#
+# The two failures a hook cannot catch are force-push and branch deletion,
+# because they destroy history rather than add to it. Those are blocked
+# server-side on main, where they have to be.
+#
+# Installed by the `prepare` script (see scripts/install-hooks.mjs), so a fresh
+# clone picks it up from `npm install` rather than from someone remembering.
+#
+# The escape hatch is deliberate: `git push --no-verify`. A gate that cannot be
+# skipped for a genuine reason is a gate that gets deleted instead.
+
+# A push that only deletes refs has no commits to check.
+zero=0000000000000000000000000000000000000000
+has_commits=no
+while read -r _local_ref local_sha _remote_ref _remote_sha; do
+  if [ "$local_sha" != "$zero" ]; then
+    has_commits=yes
+  fi
+done
+if [ "$has_commits" = no ]; then
+  exit 0
+fi
+
+# Git hooks do not always inherit an interactive shell's PATH -- on Windows in
+# particular, node lives somewhere the hook shell has never heard of.
+if ! command -v npm >/dev/null 2>&1; then
+  for dir in "/c/Program Files/nodejs" "/usr/local/bin" "/opt/homebrew/bin"; do
+    if [ -x "$dir/npm" ]; then
+      PATH="$PATH:$dir"
+      export PATH
+    fi
+  done
+fi
+# Warn rather than block. A PATH quirk that stops every push teaches people to
+# pass --no-verify by reflex, which costs more than the one push it saved.
+if ! command -v npm >/dev/null 2>&1; then
+  echo "pre-push: WARNING -- npm is not on PATH, so the CI gate did not run."
+  echo "pre-push: pushing anyway; CI will be the first thing to see this."
+  exit 0
+fi
+
+echo "pre-push: running the CI gate (typecheck, lint, test, build, brand-check)"
+for step in typecheck lint test build brand-check; do
+  echo "pre-push:   npm run $step"
+  if ! output=$(npm run "$step" 2>&1); then
+    echo "$output"
+    echo ""
+    echo "pre-push: '$step' failed, and CI would reject this push for the same reason."
+    echo "pre-push: fix it, or use 'git push --no-verify' if you know why it is fine."
+    exit 1
+  fi
+done
+echo "pre-push: gate passed."
