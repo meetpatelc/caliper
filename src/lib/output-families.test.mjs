@@ -55,29 +55,53 @@ test("a declared family actually owns the unit the output displays in", () => {
  *
  * Raise this number when more are done. It only goes up.
  *
- * ── One more thing, found the hard way ──────────────────────────────────
+ * ── Correction, 2026-09-02 ──────────────────────────────────────────────
  *
- * This count is taken over `libraryDocuments`, and for 43 tools that is not
- * what anybody sees. `calculateTool` dispatches those to hand-written
- * evaluators in `engineering.ts` — `if (toolId === "clampForce") return
- * calculateClampForce(input)` and 42 more — which never read the document's
- * outputs at all. Declaring a family on one of those changes this number and
- * changes nothing on the page.
+ * A previous version of this note said 43 tools were inert: that
+ * `calculateTool` dispatched them to hand-written evaluators which never read
+ * the document, so declaring a family on one would move this count and change
+ * nothing on the page. It named `clampForce`, `motionProfile`, `pneumatic` and
+ * `beam` as examples, and told the next person to scope future batches around
+ * them.
  *
- * `clampForce` is the clearest case. Its document declares no family, yet its
- * golden shows raw 1948.56 displayed as "1.9486 kN" — a conversion the
- * no-family branch of `document.ts` cannot perform, because the hand-written
- * evaluator produced it instead.
+ * That is wrong, and following it would have skipped live models. `computeTool`
+ * tests `DOCUMENT_TOOL_IDS` before anything else, so for all 33 tools that have
+ * both, the document branch wins and the hand-written evaluator underneath is
+ * dead code. Checked by running each document alone and comparing:
  *
- * So any future batch has to be scoped to document-driven tools first. A
- * scope taken from `libraryDocuments` alone looked like 44 clean candidates
- * and included at least `clampForce`, `motionProfile`, `pneumatic`,
- * `cuttingParameters` and `beam`, all of them inert.
+ *     clampForce      app 1.9486 kN   document alone 1.9486 kN   same
+ *     motionProfile   app 2.6667 m/s² document alone 2.6667 m/s² same
+ *     pneumatic       app 1.0014 kN   document alone 1.0014 kN   same
+ *     beam            app 1 kN        document alone 1 kN        same
+ *
+ * So every document here is live, and the scope is not the problem.
+ *
+ * ── What the remainder actually is, measured ────────────────────────────
+ *
+ * Of the outputs with no family, taking only those with a real unit that some
+ * family owns and no `rawScale` already correcting them:
+ *
+ *     0    could be declared with no observable change
+ *     91   would move `raw` — kN→N, kW→W, mm→m, mm/s→m/s
+ *     138  excluded: no family owns the unit, or it is a display convention
+ *
+ * Zero is the number that matters. There is no free subset to chip away at:
+ * every remaining candidate computes in a display unit, so declaring its family
+ * multiplies `raw` by the conversion factor. `raw` is what goes into
+ * `result_json` when somebody saves a check, so this is a stored-data
+ * migration, and it should ride with a `formulaVersion` bump so the record
+ * drift notice tells a reader their number moved.
+ *
+ * The conclusion above was right. Its reasoning was not, and the reasoning is
+ * what the next person would have acted on.
  */
 test("output family coverage does not go backwards", () => {
+  // 404 as of 2026-09-02. The floor said 275, which was 129 behind what the
+  // library already declared — so it would have sat green through a regression
+  // of a third of the coverage. A floor nobody raises stops being a floor.
   const declared = outputs.filter((output) => output.family).length;
   assert.ok(
-    declared >= 275,
-    `only ${declared} of ${outputs.length} outputs declare a family; this must not regress below 275`,
+    declared >= 404,
+    `only ${declared} of ${outputs.length} outputs declare a family; this must not regress below 404`,
   );
 });
