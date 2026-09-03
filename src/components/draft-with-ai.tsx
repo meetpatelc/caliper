@@ -121,6 +121,9 @@ export function DraftWithAI({ onAccept }: { onAccept: (draft: AssistedDraft) => 
         cancelLabel="Cancel"
         tone="accent"
         busy={pending}
+        // Drafting runs a minute or more; see the note in ConfirmDialog. The
+        // `attempt` ticket above is what makes leaving mid-flight safe.
+        cancelWhileBusy
         restoreFocusTo={triggerRef}
         onConfirm={() => {
           if (!result) {

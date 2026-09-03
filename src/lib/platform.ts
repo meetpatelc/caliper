@@ -146,11 +146,15 @@ export const sourceRegistry: SourceRecord[] = [
   { id: "sff-additive-estimate", label: "Solid Freeform Fabrication additive estimation study", url: "https://utw10945.utweb.utexas.edu/sites/default/files/2025/68%20A%20Predictive%20Approach%20to%20Estimating%20Build%20time%20.pdf", scope: "Early-stage additive material, build-time, and cost-estimation context" },
   { id: "openstax-torque", label: "OpenStax torque reference", url: "https://openstax.org/books/university-physics-volume-1/pages/10-6-torque", scope: "Static planar torque from force and perpendicular lever arm" },
   { id: "engineeringtechnology-over-center", label: "EngineeringTechnology over-center linkage overview", url: "https://engineeringtechnology.org/equipment-and-machine-elements/linkages/over-center-linkages/", scope: "Over-center linkage function and required geometry/actuation context" },
-  // Was a vendor glossary page, which now 404s. The relation it was cited for is
+  // Was `camcut-bolt-circle`, pointing at a vendor glossary page that now 404s.
+  // Renamed with the label: this repository has form for names outliving their
+  // product -- __Host-grok-auth, caliper-desk-v1, gauge-workshop -- and each of
+  // those was renamed on the grounds that a dead name left in an identifier is
+  // how the wrong name becomes permanent. The relation it was cited for is
   // x = R cos(theta), y = R sin(theta) at equal angular spacing -- a standard
   // result that never needed a machine-shop glossary to vouch for it. Named and
   // not linked, like Roark and Shigley above: a precise title cannot rot.
-  { id: "camcut-bolt-circle", label: "Elementary geometry — circular hole pattern", url: "", scope: "Pitch-circle diameter, equal-spacing hole count, and nominal circular-pattern context" },
+  { id: "geometry-bolt-circle", label: "Elementary geometry — circular hole pattern", url: "", scope: "Pitch-circle diameter, equal-spacing hole count, and nominal circular-pattern context" },
   { id: "geometry-polygon", label: "Elementary geometry — standard results", url: "", scope: "Regular-polygon perimeter, apothem, circumradius, interior-angle, and area relationships" },
   { id: "affdl-tr-69-42-bearing", label: "AFFDL-TR-69-42, Stress Analysis Manual (US Air Force)", url: "", scope: "Projected-area bearing stress in pin/rivet-to-plate connections" },
   { id: "wmberg-lewis-gear", label: "WM Berg Lewis gear-tooth overview", url: "https://www.wmberg.com/resources/blogs/measure-gear-tooth-strength", scope: "Basic static Lewis-type spur-gear tooth-bending relationship and its limitations" },

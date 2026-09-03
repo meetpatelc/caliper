@@ -1562,7 +1562,7 @@ export const tools: ToolDefinition[] = [
     status: "ready",
     sourceLabel: "Elementary geometry — circular hole pattern",
     sourceUrl: "",
-    contract: { formulaVersion: "2.0.0", domain: "mathematics", safetyTier: "A", validation: "source-reviewed", prerequisites: ["pitch circle diameter", "equal hole count", "start angle"], sourceIds: ["camcut-bolt-circle", "nist-si-units"] },
+    contract: { formulaVersion: "2.0.0", domain: "mathematics", safetyTier: "A", validation: "source-reviewed", prerequisites: ["pitch circle diameter", "equal hole count", "start angle"], sourceIds: ["geometry-bolt-circle", "nist-si-units"] },
   },
   {
     id: "regularPolygon",

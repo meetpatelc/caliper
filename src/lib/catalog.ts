@@ -23,6 +23,12 @@ export const searchableToolText = (tool: ToolDefinition) => [tool.id, tool.title
  * what "matching" means — two implementations of a ranking rule is how a search
  * box ends up showing one order and filtering by another.
  *
+ * Still true, and load-bearing: `rankToolMatch` below adds a tie-break for
+ * ORDER only, and the best-match list decides MEMBERSHIP with this function so
+ * both halves of the palette admit exactly the same tools. Filtering on the
+ * ranked value instead would let the title bonus lift a 0.4 over the 0.5
+ * threshold, and the pinned group would show a tool the list beneath it hides.
+ *
  * Word order is ignored deliberately: "bolt torque" and "torque bolt" are the
  * same question. A single-term query still scores 1 or 0.
  */
@@ -54,6 +60,11 @@ export function rankToolMatch(tool: ToolDefinition, query: string): number {
   const base = scoreSearchMatch(searchableToolText(tool), query);
   if (base === 0) return 0;
   const needle = query.trim().toLowerCase();
+  // An empty query scores 1 for everything and has no title to be precise
+  // about. Without this it would take the prefix tier instead, because
+  // `"anything".startsWith("")` is true — every tool uniformly inflated, and no
+  // tie-break at all where one was the whole point.
+  if (!needle) return base;
   const title = tool.title.toLowerCase();
   // Hyphens are a typographic choice, not a search one: nobody typing
   // "solid shaft torsion" means something different from "solid-shaft torsion".

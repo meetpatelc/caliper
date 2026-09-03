@@ -26,9 +26,47 @@ export const FEEDBACK_MAX_CHARS = 20000;
  */
 export const FEEDBACK_CONTACT_MAX_CHARS = 200;
 
+/**
+ * Does this look like an address someone could be written back to?
+ *
+ * Shared with the form so the two cannot disagree. The server is the gate —
+ * that endpoint is unauthenticated, so the browser's check is only a courtesy
+ * that saves a round trip — but a form that accepts what the server rejects
+ * costs somebody their typed message, and one regex in one place is how that
+ * is avoided.
+ *
+ * Deliberately shallow. Full RFC 5322 accepts things no mail server will, and
+ * the only real test of an address is sending to it; this rejects the typo
+ * class -- missing @, missing dot, stray whitespace -- and lets the rest
+ * through rather than lecturing someone about their own address.
+ */
+export function looksLikeEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
 const inputSchema = z.object({
   kind: z.enum(["bug", "message"]),
-  contact: z.string().trim().min(1).max(FEEDBACK_CONTACT_MAX_CHARS).pipe(z.email()),
+  /*
+   * `looksLikeEmail`, not `z.email()`.
+   *
+   * This said `.pipe(z.email())` while the form checked `looksLikeEmail`, so
+   * there were two validators and they disagreed on six of ten realistic
+   * addresses — every disagreement in the direction that loses work. `z.email()`
+   * refuses `très@example.com`, an ordinary international address the form
+   * accepts: submit, the server throws, the catch shows "Could not submit. Try
+   * again.", and retrying fails identically forever with the typed message
+   * still on screen and no way to send it.
+   *
+   * The shallow check is the better one to keep. Only delivery proves an
+   * address, and refusing a valid one is a worse failure than storing a typo:
+   * a typo wastes a reply, a refusal loses the report.
+   */
+  contact: z
+    .string()
+    .trim()
+    .min(1)
+    .max(FEEDBACK_CONTACT_MAX_CHARS)
+    .refine(looksLikeEmail, "That does not look like an email address."),
   message: z.string().trim().min(1).max(FEEDBACK_MAX_CHARS),
   pagePath: z.string().max(300),
   // Base64 so the bytes survive the JSON boundary. The ceiling is generous
@@ -41,6 +79,18 @@ const inputSchema = z.object({
     })
     .optional(),
 });
+
+/**
+ * The server's own verdict on a submission, exported for tests.
+ *
+ * Without this the only way to check what the endpoint accepts is to call the
+ * endpoint, which needs a database — so the suite tested the browser helper
+ * instead and stayed green while the two disagreed. Exposing the parse makes
+ * "do the form and the server agree?" answerable in a unit test.
+ */
+export function parseFeedbackInput(value: unknown) {
+  return inputSchema.safeParse(value);
+}
 
 export type FeedbackRow = {
   id: number;
@@ -170,21 +220,3 @@ export const listFeedback = createServerFn({ method: "GET" })
       createdAt: asIso(row.created_at),
     }));
   });
-
-/**
- * Does this look like an address someone could be written back to?
- *
- * Shared with the form so the two cannot disagree. The server is the gate —
- * that endpoint is unauthenticated, so the browser's check is only a courtesy
- * that saves a round trip — but a form that accepts what the server rejects
- * costs somebody their typed message, and one regex in one place is how that
- * is avoided.
- *
- * Deliberately shallow. Full RFC 5322 accepts things no mail server will, and
- * the only real test of an address is sending to it; this rejects the typo
- * class -- missing @, missing dot, stray whitespace -- and lets the rest
- * through rather than lecturing someone about their own address.
- */
-export function looksLikeEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-}

@@ -110,22 +110,38 @@ export function inlineAdoptSource(key: StorageKey): string {
 export const DESK_SPLIT_NOTICE_KEY: StorageKey = { name: "desk-split-noticed", legacy: [] };
 
 /**
- * Has this been noticed already? Marks it noticed if not. Never throws.
+ * Has this notice been shown already? Never throws.
  *
- * Pure over a Storage so it can be tested with a fake, and so the caller
- * decides the scope: pass `sessionStorage` for once-per-session, `localStorage`
- * for once-ever. A storage that cannot be used — private mode, quota — reads
- * as "not noticed", which errs toward showing a notice rather than losing it.
+ * A read, and only a read. This began as one function that answered *and*
+ * marked, called inside an `&&` in an `if` — a predicate that consumed the
+ * thing it reported on. It worked, and it was a trap: the name promises a
+ * question, so any later edit that reorders the operands, adds a second call,
+ * or logs the value silently spends the notice, and the failure is a message
+ * that never appears rather than anything that errors.
+ *
+ * `adopt` first, like `readKey`, so a key that gains a legacy name still
+ * migrates. Skipping it would opt this key out of the guarantee the whole
+ * module is built on, which is fine today only because `legacy` is empty.
+ *
+ * A storage that cannot be used — private mode, quota — reads as "not shown",
+ * which errs toward showing a notice rather than losing it.
  */
-// Only the two methods it uses, so a test can hand it a two-method fake and a
-// storage that throws on both, without pretending either is a whole Storage.
-export function noticedOnce(storage: Pick<Storage, "getItem" | "setItem"> | undefined, key: StorageKey): boolean {
+export function noticeShown(storage: Storage | undefined, key: StorageKey): boolean {
   if (!storage) return false;
+  adopt(storage, key);
   try {
-    if (storage.getItem(key.name)) return true;
+    return Boolean(storage.getItem(key.name));
+  } catch {
+    return false;
+  }
+}
+
+/** Record that it has been shown. Separate from the question, deliberately. */
+export function markNoticeShown(storage: Storage | undefined, key: StorageKey): void {
+  if (!storage) return;
+  try {
     storage.setItem(key.name, "1");
   } catch {
-    /* unusable storage: treat as not noticed */
+    /* unusable storage: the notice simply shows again next time */
   }
-  return false;
 }

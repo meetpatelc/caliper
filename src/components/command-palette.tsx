@@ -63,12 +63,27 @@ export function CommandPalette({
     const terms = query.trim().split(/\s+/).filter(Boolean);
     if (terms.length < 2) return [];
     return tools
-      // rankToolMatch, not the bare share: a share saturates at 1 for every
-      // tool containing the words anywhere, and the best-match list is exactly
-      // where that tie matters most.
-      .map((tool) => ({ tool, score: rankToolMatch(tool, query) }))
-      .filter((entry) => entry.score >= 0.5)
-      .sort((a, b) => b.score - a.score)
+      /*
+       * Membership from the share, order from the rank.
+       *
+       * These are two different questions and only the second one changed.
+       * `scoreSearchMatch` decides whether a tool matches at all, and it is the
+       * same rule the cmdk filter below applies — that is the invariant its doc
+       * comment asserts, and briefly this broke it: filtering on
+       * `rankToolMatch` let the title bonus push a 0.4 up to 0.55, so a tool the
+       * list below excluded could appear pinned above it.
+       *
+       * The bonus only breaks ties, which is what it was added for: a share
+       * saturates at 1 for every tool containing the words anywhere, and six
+       * models could not be found by typing their own name.
+       */
+      .map((tool) => ({
+        tool,
+        matches: scoreSearchMatch(searchableToolText(tool), query),
+        rank: rankToolMatch(tool, query),
+      }))
+      .filter((entry) => entry.matches >= 0.5)
+      .sort((a, b) => b.rank - a.rank)
       .slice(0, 3)
       .map((entry) => entry.tool);
   }, [query]);

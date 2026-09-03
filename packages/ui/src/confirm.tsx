@@ -11,6 +11,7 @@ export function ConfirmDialog({
   tone = "danger",
   restoreFocusTo,
   busy = false,
+  cancelWhileBusy = false,
   onConfirm,
   children,
 }: {
@@ -22,6 +23,8 @@ export function ConfirmDialog({
   tone?: "danger" | "accent";
   restoreFocusTo?: RefObject<HTMLElement | null>;
   busy?: boolean;
+  /** Let Cancel close the dialog while `busy`. The caller must then ignore any late result. */
+  cancelWhileBusy?: boolean;
   onConfirm: () => void;
   children?: ReactNode;
 }) {
@@ -31,16 +34,21 @@ export function ConfirmDialog({
         {children ? <div className="mt-3 text-sm leading-6 text-muted">{children}</div> : null}
         <div className="mt-5 flex justify-end gap-2">
           {/*
-            Cancel stays live while busy. It was disabled, which is backwards:
-            the longer the work runs the more someone wants out, and AI drafting
-            runs 60 to 90 seconds behind a button reading "Working…" with every
-            control dead. That is not a confirmation dialog, it is a trap.
+            Cancel is disabled while busy unless the caller opts out.
 
-            It closes the dialog; it does not claim to abort the work. Anything
-            already in flight finishes on its own, and a caller that must ignore
-            a late result tracks that itself — which `draft-with-ai` does.
+            For a delete that takes a moment, disabling it is right: the work is
+            nearly done and closing the dialog mid-flight leaves the list showing
+            a row that is already gone. For AI drafting it is a trap — 60 to 90
+            seconds behind a button reading "Working…" with every control dead,
+            and the longer it runs the more somebody wants out.
+
+            So the caller says which it is, rather than one of them silently
+            changing for the other. Opting in means accepting that Cancel closes
+            the dialog without aborting the work, so a late result must be
+            ignored deliberately — `draft-with-ai` tickets each attempt for
+            exactly that.
           */}
-          <Button type="button" onClick={onClose}>
+          <Button type="button" onClick={onClose} disabled={busy && !cancelWhileBusy}>
             {cancelLabel}
           </Button>
           <Button type="button" variant={tone === "danger" ? "destructive" : "accent"} disabled={busy} onClick={onConfirm}>

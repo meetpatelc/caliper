@@ -18,8 +18,16 @@
  * "kept separate from the account" notice -- sits over the form fields on a
  * phone, and its dismiss target was the smallest control on the page.
  * 32px clears the WCAG 2.5.8 minimum with room, without swallowing the toast.
+ *
+ * The selector is long on purpose. Sonner ships
+ * `[data-sonner-toast][data-styled="true"] [data-close-button]` at 20px, which
+ * is specificity (0,3,0); the first attempt here was (0,2,0) and lost silently.
+ * Grepping the built stylesheet showed the rule present and shipped, which is
+ * not the same as applied -- the button stayed 20px and only measuring it in a
+ * browser said so. Matching through the toaster wrapper takes this to (0,4,0),
+ * which wins on specificity rather than on load order.
  */
-[data-sonner-toast] [data-close-button] {
+[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-close-button] {
   width: 2rem;
   height: 2rem;
 }

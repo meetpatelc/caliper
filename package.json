@@ -32,7 +32,8 @@
     "qa:contrast": "node scripts/contrast-audit.mjs",
     "qa:share": "node scripts/share-card-qa.mjs",
     "build:sitemap": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/build-sitemap.mjs",
-    "qa:payload": "node scripts/payload-qa.mjs"
+    "qa:payload": "node scripts/payload-qa.mjs",
+    "build:categories": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/build-tool-categories.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.121.0",

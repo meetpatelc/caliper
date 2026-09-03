@@ -37,6 +37,11 @@ import { judgeDraftBudget, type BudgetVerdict } from "@/lib/ai/draft-budget";
  */
 async function spendDraftCall(userId: string): Promise<BudgetVerdict> {
   const { getSql } = await import("@/lib/db");
+  // node:crypto rather than the global. Dynamically imported like the db, so it
+  // never enters a client bundle, and guaranteed present on the server — the
+  // one place in this repo that reaches for the global `crypto` guards it with
+  // a fallback, which suggests a runtime here has lacked it.
+  const { randomUUID } = await import("node:crypto");
   const sql = await getSql();
   const [counts] = await sql<{ account: number; global: number }>`
     select
@@ -52,8 +57,26 @@ async function spendDraftCall(userId: string): Promise<BudgetVerdict> {
   if (!verdict.allowed) return verdict;
   await sql`
     insert into ai_draft_calls (id, user_id)
-    values (${crypto.randomUUID()}, ${userId})
+    values (${randomUUID()}, ${userId})
   `;
+  /*
+   * Drop what can no longer affect a decision.
+   *
+   * Nothing read these rows beyond the last hour, and nothing deleted them, so
+   * the table was pure growth carrying a per-account timestamp long after it
+   * stopped counting for anything. A day of history is far more than the
+   * one-hour window needs and leaves room to look at recent usage by hand.
+   *
+   * On the insert path rather than a scheduled job: it runs exactly when rows
+   * are created, needs no scheduler, and is bounded by the same cap that
+   * bounds the inserts. Failing to prune must not fail the draft the caller
+   * paid for, so it is deliberately swallowed — the next call tries again.
+   */
+  try {
+    await sql`delete from ai_draft_calls where created_at < now() - interval '1 day'`;
+  } catch {
+    /* housekeeping, not the request */
+  }
   return verdict;
 }
 

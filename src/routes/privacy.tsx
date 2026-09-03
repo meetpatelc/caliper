@@ -11,8 +11,14 @@ const DESCRIPTION = "What this site stores, where it stores it, and how to get r
 /*
  * Written from the schema, not from a template.
  *
- * Every row below was read out of migrations/0001_auth.sql through
- * 0005_feedback_attachment.sql and src/lib/storage-keys.ts. That is deliberate:
+ * Every row below was read out of the files in migrations/ and out of
+ * src/lib/storage-keys.ts. The range is deliberately not written down here: it
+ * said "0001 through 0005" while 0006 and 0007 existed, so an audit that
+ * followed the instruction checked five files, found them consistent, and
+ * would have concluded the page was current while a whole table went
+ * undisclosed. Check every migration, not a range somebody wrote once.
+ *
+ * That is deliberate:
  * a privacy policy assembled from a generator says things that are not true of
  * the app it is attached to, and the failure is silent, because nobody reads it
  * until it matters.
@@ -59,6 +65,10 @@ const onAnAccount = [
   ["Session records", "Each sign-in stores an expiry, and the IP address and browser user-agent that created it, so a session can be recognised and expired."],
   ["Favourites, projects, saved checks and reviews", "The same records as above, moved off the device so they follow the account."],
   ["Build drafts", "The document you authored, so a draft opens on another machine."],
+  [
+    "When you asked for an AI draft",
+    "One row per request, holding your account and the time. It is what enforces the hourly limit on a paid service, and it records that you asked — never what you asked for.",
+  ],
 ];
 
 const feedback = [

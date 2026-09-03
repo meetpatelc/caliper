@@ -8,7 +8,8 @@ import {
   THEME_STORAGE_KEY,
   unitsKey,
   WORKSHOP_STORAGE_KEY,
-  noticedOnce,
+  markNoticeShown,
+  noticeShown,
 } from "@/lib/storage-keys.ts";
 
 /**
@@ -119,25 +120,46 @@ test("the inline theme snippet migrates the same way", () => {
   assert.match(source, /try\{/, "and it must not throw before paint");
 });
 
-test("a notice is noticed once per storage, and marks itself", () => {
+test("a notice reads as unshown until it is marked", () => {
+  // Two functions, deliberately. One asked and answered, which made reading the
+  // condition twice enough to consume the notice.
   const storage = fakeStorage({});
   const key = { name: "notice-x", legacy: [] };
-  assert.equal(noticedOnce(storage, key), false, "first time: not yet noticed");
-  assert.equal(noticedOnce(storage, key), true, "second time: already noticed");
-  assert.equal(noticedOnce(storage, key), true);
+  assert.equal(noticeShown(storage, key), false);
+  assert.equal(noticeShown(storage, key), false, "asking is not answering");
+  markNoticeShown(storage, key);
+  assert.equal(noticeShown(storage, key), true);
+});
+
+test("a notice adopts a legacy name, like every other key here", () => {
+  // readKey calls adopt; this used to read key.name directly and quietly opt
+  // out of the migration the whole module is built on.
+  const storage = fakeStorage({ "old-notice": "1" });
+  assert.equal(noticeShown(storage, { name: "new-notice", legacy: ["old-notice"] }), true);
+  assert.equal(storage.getItem("old-notice"), null, "the legacy name is cleared once moved");
 });
 
 test("no storage means show the notice rather than lose it", () => {
   // SSR, or a browser that blocks site data. Erring toward showing is right:
   // the notice explains why saved work appears to have vanished.
-  assert.equal(noticedOnce(undefined, { name: "notice-y", legacy: [] }), false);
+  assert.equal(noticeShown(undefined, { name: "notice-y", legacy: [] }), false);
+  assert.doesNotThrow(() => markNoticeShown(undefined, { name: "notice-y", legacy: [] }));
 });
 
-test("a storage that throws is treated as not noticed, and does not throw", () => {
-  const broken = {
+test("a storage that throws is treated as unshown, and does not throw", () => {
+  // A whole Storage whose every accessor throws — what a browser with site
+  // data blocked actually hands you, rather than a two-method stand-in.
+  // Cast, because a `length` getter that only throws infers as void. The point
+  // is the throwing, not the shape.
+  const broken = /** @type {Storage} */ (/** @type {unknown} */ ({
     getItem() { throw new Error("quota"); },
     setItem() { throw new Error("quota"); },
-  };
-  assert.doesNotThrow(() => noticedOnce(broken, { name: "notice-z", legacy: [] }));
-  assert.equal(noticedOnce(broken, { name: "notice-z", legacy: [] }), false);
+    removeItem() { throw new Error("quota"); },
+    clear() { throw new Error("quota"); },
+    key() { throw new Error("quota"); },
+    get length() { throw new Error("quota"); },
+  }));
+  assert.doesNotThrow(() => noticeShown(broken, { name: "notice-z", legacy: [] }));
+  assert.equal(noticeShown(broken, { name: "notice-z", legacy: [] }), false);
+  assert.doesNotThrow(() => markNoticeShown(broken, { name: "notice-z", legacy: [] }));
 });
