@@ -9,6 +9,22 @@ const TITLE = `Terms · ${PARENT_NAME}`;
 const DESCRIPTION = "The terms of use, and the limit of what a number from this site means.";
 
 /*
+ * Four things are deliberately not stated here, and this is the record of that.
+ *
+ * The operating entity, the governing law and venue, a limitation of liability,
+ * and a data-retention period. Each is a decision for whoever owns this, not a
+ * fact that can be read out of the code, and none is invented here — a made-up
+ * liability clause reads exactly like a real one and protects nobody.
+ *
+ * They were briefly on the page as "[still to be decided]". That is worse than
+ * silence: it draws a reader's eye to the gap and still says nothing. Not
+ * naming a jurisdiction is ordinary; announcing that you have not picked one is
+ * not. So the open items live here, where the next person to work on this file
+ * will see them, rather than in front of everybody who reads the page.
+ *
+ * Contact is settled and is not among them: notices go through /feedback, which
+ * works signed out.
+ *
  * The disclaimer here has to agree with the one the app already makes.
  *
  * Every result carries "A first-pass number, not a code check, certification,
@@ -111,14 +127,14 @@ function TermsPage() {
       </section>
 
       <section className="mt-12">
-        <SectionHeader kicker={<>Open items</>} title={<>Decisions, not facts.</>} />
+        <SectionHeader kicker={<>Contact</>} title={<>Reaching whoever runs this.</>} />
         <div className={cn(panelClass, "mt-4 p-5")}>
           <p className="text-sm leading-6 text-muted">
-            The operating entity, the governing law and venue, the limitation of liability, and the contact
-            address for notices are{" "}
-            <strong className="text-fg">[still to be decided by the site owner]</strong>. They are marked
-            rather than filled with a plausible default, because a plausible default in a terms page is a
-            statement nobody checked.
+            Notices and questions go through{" "}
+            <Link to="/feedback" className="link-accent">
+              Feedback
+            </Link>
+            , which works signed out. Include an email address in the message if you want a reply.
           </p>
           <p className="mt-3 text-sm leading-6 text-muted">
             The source for this site is published under the licence in its repository. That licence governs

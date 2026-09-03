@@ -27,7 +27,14 @@ const DESCRIPTION = "What this site stores, where it stores it, and how to get r
  *   - Analytics. There are none. No gtag, Plausible, PostHog, Sentry or
  *     equivalent appears anywhere in the source. Adding one changes this page.
  *
- * The bracketed items are decisions rather than facts, and belong to the owner.
+ * Retention is deliberately not stated: how long records are kept after an
+ * account is deleted is a decision for whoever owns this, not a fact about the
+ * code, and inventing a number here would be a promise nobody had made. It sat
+ * on the page as "[still to be decided]" for an afternoon, which is worse than
+ * silence — it points at the gap and still answers nothing.
+ *
+ * Contact is settled: requests go through /feedback, which works signed out.
+ * The form asks for no email, so the page tells people to include one.
  */
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -171,10 +178,10 @@ function PrivacyPage() {
           <li>
             <strong className="text-fg">Account data:</strong> delete individual favourites, projects, checks,
             reviews and drafts from Project and Build. To remove the account itself and everything attached to
-            it, ask at the address below.
+            it, ask through Feedback.
           </li>
           <li>
-            <strong className="text-fg">Feedback:</strong> ask at the address below, quoting roughly when you
+            <strong className="text-fg">Feedback:</strong> ask through Feedback, quoting roughly when you
             sent it and what it said.
           </li>
         </ul>
@@ -184,15 +191,16 @@ function PrivacyPage() {
         <SectionHeader kicker={<>Contact</>} title={<>Asking about your data.</>} />
         <div className={cn(panelClass, "mt-4 p-5")}>
           <p className="text-sm leading-6 text-muted">
-            Requests about access, correction or deletion go to{" "}
-            <strong className="text-fg">[contact address — to be filled in by the site owner]</strong>.
+            Requests about access, correction or deletion go through{" "}
+            <Link to="/feedback" className="link-accent">
+              Feedback
+            </Link>
+            . It works signed out as well as signed in.
           </p>
           <p className="mt-3 text-sm leading-6 text-muted">
-            The operator of this site, the governing jurisdiction, and how long records are kept after an
-            account is deleted are{" "}
-            <strong className="text-fg">[still to be decided by the site owner]</strong>. Those are the three
-            items on this page that are a decision rather than a fact about the code, and they are marked so
-            nobody mistakes a placeholder for an answer.
+            Send it signed in where you can — that identifies the account without you having to prove
+            anything. Signed out, put an email address in the message, because the form does not ask for one
+            and there is otherwise no way to reply to you.
           </p>
         </div>
       </section>
