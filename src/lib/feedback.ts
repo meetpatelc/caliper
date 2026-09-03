@@ -12,8 +12,23 @@ import { ATTACHMENT_MAX_BYTES, decodeBase64, inspectAttachment } from "@/lib/att
  */
 export const FEEDBACK_MAX_CHARS = 20000;
 
+/**
+ * A reply address, required.
+ *
+ * The endpoint is unauthenticated, so a signed-out message used to arrive with
+ * no identity whatsoever -- nobody to answer about a wrong number in a model,
+ * and nobody to answer about a request to delete data. The form asks for this
+ * now; the check is here because the form is a suggestion and this is the gate.
+ *
+ * Validated as an email rather than free text. "How to reach you" invites a
+ * phone number or a handle on a service nobody here uses, and an address that
+ * cannot be written to is the same as no address with extra steps.
+ */
+export const FEEDBACK_CONTACT_MAX_CHARS = 200;
+
 const inputSchema = z.object({
   kind: z.enum(["bug", "message"]),
+  contact: z.string().trim().min(1).max(FEEDBACK_CONTACT_MAX_CHARS).pipe(z.email()),
   message: z.string().trim().min(1).max(FEEDBACK_MAX_CHARS),
   pagePath: z.string().max(300),
   // Base64 so the bytes survive the JSON boundary. The ceiling is generous
@@ -30,6 +45,7 @@ const inputSchema = z.object({
 export type FeedbackRow = {
   id: number;
   kind: "bug" | "message";
+  contact: string | null;
   message: string;
   pagePath: string | null;
   createdAt: string;
@@ -113,9 +129,9 @@ export const submitFeedback = createServerFn({ method: "POST" })
     }
 
     await sql`
-      insert into feedback (kind, message, page_path, attachment_bytes, attachment_type, attachment_name)
+      insert into feedback (kind, contact, message, page_path, attachment_bytes, attachment_type, attachment_name)
       values (
-        ${data.kind}, ${data.message}, ${data.pagePath},
+        ${data.kind}, ${data.contact}, ${data.message}, ${data.pagePath},
         ${bytes ? Buffer.from(bytes) : null}, ${type}, ${data.attachment?.name ?? null}
       )
     `;
@@ -135,11 +151,12 @@ export const listFeedback = createServerFn({ method: "GET" })
     const rows = await sql<{
       id: number;
       kind: string;
+      contact: string | null;
       message: string;
       page_path: string | null;
       created_at: unknown;
     }>`
-      select id, kind, message, page_path, created_at
+      select id, kind, contact, message, page_path, created_at
       from feedback
       order by created_at desc
       limit 50
@@ -147,8 +164,27 @@ export const listFeedback = createServerFn({ method: "GET" })
     return rows.map((row) => ({
       id: row.id,
       kind: row.kind === "message" ? "message" : "bug",
+      contact: row.contact,
       message: row.message,
       pagePath: row.page_path,
       createdAt: asIso(row.created_at),
     }));
   });
+
+/**
+ * Does this look like an address someone could be written back to?
+ *
+ * Shared with the form so the two cannot disagree. The server is the gate —
+ * that endpoint is unauthenticated, so the browser's check is only a courtesy
+ * that saves a round trip — but a form that accepts what the server rejects
+ * costs somebody their typed message, and one regex in one place is how that
+ * is avoided.
+ *
+ * Deliberately shallow. Full RFC 5322 accepts things no mail server will, and
+ * the only real test of an address is sending to it; this rejects the typo
+ * class -- missing @, missing dot, stray whitespace -- and lets the rest
+ * through rather than lecturing someone about their own address.
+ */
+export function looksLikeEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}

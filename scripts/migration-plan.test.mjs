@@ -63,7 +63,19 @@ test("the auth schema is available under migrations/auth", () => {
   assert.ok(readdirSync(join(migrationsDir, "auth")).includes("0001_auth.sql"));
   assert.deepEqual(
     pendingMigrations(readdirSync(migrationsDir), []).map((entry) => entry.name),
-    ["0001_auth.sql", "0002_feedback.sql", "0003_desk.sql", "0004_calculation_provenance.sql", "0005_feedback_attachment.sql"],
+    [
+      "0001_auth.sql",
+      "0002_feedback.sql",
+      "0003_desk.sql",
+      "0004_calculation_provenance.sql",
+      "0005_feedback_attachment.sql",
+      // A durable per-account and global cap on AI drafting. The in-memory Map
+      // it replaced was not a limit on a serverless platform.
+      "0006_ai_draft_calls.sql",
+      // A reply address on feedback. Signed-out messages arrived with no way to
+      // answer them at all.
+      "0007_feedback_contact.sql",
+    ],
   );
 });
 

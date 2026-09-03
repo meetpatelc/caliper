@@ -33,8 +33,7 @@ const DESCRIPTION = "The terms of use, and the limit of what a number from this 
  * consequences. A terms page that hedged differently — or worse, more weakly —
  * would be the app contradicting itself in the one place that is meant to
  * settle the question.
- *
- * The bracketed items are decisions rather than facts, and belong to the owner.
+
  */
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -134,7 +133,7 @@ function TermsPage() {
             <Link to="/feedback" className="link-accent">
               Feedback
             </Link>
-            , which works signed out. Include an email address in the message if you want a reply.
+            , which works signed out and asks for an email address so a reply is possible.
           </p>
           <p className="mt-3 text-sm leading-6 text-muted">
             The source for this site is published under the licence in its repository. That licence governs

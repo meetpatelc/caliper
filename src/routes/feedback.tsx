@@ -4,11 +4,12 @@ import { ICON } from "@instrument/ui";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Bug, MessageSquareText, Send } from "lucide-react";
 import { toast } from "sonner";
-import { FEEDBACK_MAX_CHARS, listFeedback, submitFeedback, type FeedbackRow } from "@/lib/feedback";
+import { FEEDBACK_CONTACT_MAX_CHARS, FEEDBACK_MAX_CHARS, listFeedback, looksLikeEmail, submitFeedback, type FeedbackRow } from "@/lib/feedback";
 import { ATTACHMENT_MAX_BYTES, inspectAttachment } from "@/lib/attachment";
 import { SignedIn } from "@/lib/auth/gates";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { Button } from "@/components/ui/button";
-import { Field, Textarea } from "@/components/ui/field";
+import { Field, Input, Textarea } from "@/components/ui/field";
 import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
 import { SelectableCard } from "@/components/ui/selection";
@@ -25,6 +26,23 @@ function FeedbackPage() {
   const [kind, setKind] = useState<"bug" | "message">("bug");
   const [message, setMessage] = useState("");
   const [messageError, setMessageError] = useState<string | null>(null);
+  const [contact, setContact] = useState("");
+  const [contactError, setContactError] = useState<string | null>(null);
+  const contactRef = useRef<HTMLInputElement>(null);
+  const { user } = useCurrentUserState();
+
+  /*
+   * Signed in, the account already knows the address, so fill it and let them
+   * change it. Required either way: the stored row is what gets answered, and
+   * looking a sender up by account id later is a step nobody takes.
+   */
+  useEffect(() => {
+    const known = user?.primaryEmail;
+    // `current ||` so it never overwrites something already typed — the session
+    // resolves after first paint, and clobbering a half-typed address then
+    // would be the worst possible moment.
+    if (known) setContact((current) => current || known);
+  }, [user?.primaryEmail]);
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const [pending, setPending] = useState(false);
   const [attachment, setAttachment] = useState<{ name: string; data: string } | null>(null);
@@ -33,6 +51,15 @@ function FeedbackPage() {
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    const address = contact.trim();
+    // Before the message check: it is the first field, so a submit with both
+    // empty should point at the first thing to fix, not the second.
+    if (!looksLikeEmail(address)) {
+      setContactError(address ? "That does not look like an email address." : "Add an email address so a reply is possible.");
+      contactRef.current?.focus();
+      return;
+    }
+    setContactError(null);
     if (!message.trim()) {
       // A toast alone left the field unmarked and the focus on the button, so
       // nothing told a keyboard or screen-reader user WHERE the problem was.
@@ -45,10 +72,12 @@ function FeedbackPage() {
     setPending(true);
     try {
       await submitFeedback({
-        data: { kind, message, pagePath: window.location.pathname, ...(attachment ? { attachment } : {}) },
+        data: { kind, contact: address, message, pagePath: window.location.pathname, ...(attachment ? { attachment } : {}) },
       });
       setMessage("");
       setAttachment(null);
+      // The address stays: sending twice from one visit is common, and a signed
+      // -in person would only watch it refill itself anyway.
       setInboxTick((value) => value + 1);
       toast.success("Feedback sent. Thank you.");
     } catch {
@@ -66,7 +95,21 @@ function FeedbackPage() {
         ledeClassName="max-w-none"
         lede="Paste the full context. No account required. It reaches the product desk, not only this browser."
       />
-      <form className="mt-8 grid gap-6" onSubmit={onSubmit}>
+      {/*
+        `noValidate` because this form presents its own errors.
+
+        `type="email"` is worth keeping — it is the right keyboard on a phone
+        and the right autofill everywhere — but it also switches on the
+        browser's constraint validation, which fires first and cancels the
+        submit event entirely. The visible result was a native bubble in the
+        browser's own styling, the field focused, and the app's error never set:
+        `Field` renders nothing, `aria-errormessage` points at nothing, and a
+        screen reader is told only "invalid". Turning native validation off
+        makes the handler authoritative, which is what the rest of the form
+        already assumes — that is why `Field` sets `aria-required` rather than
+        the `required` attribute.
+      */}
+      <form className="mt-8 grid gap-6" onSubmit={onSubmit} noValidate>
         <fieldset>
           <legend className="text-sm">Message type</legend>
           <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
@@ -92,6 +135,28 @@ function FeedbackPage() {
             </SelectableCard>
           </div>
         </fieldset>
+        <Field
+          htmlFor="feedback-contact"
+          label="Your email"
+          required
+          error={contactError ?? undefined}
+          hint="So a reply is possible. Used to answer this message and nothing else — no list, no marketing."
+        >
+          <Input
+            id="feedback-contact"
+            ref={contactRef}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            maxLength={FEEDBACK_CONTACT_MAX_CHARS}
+            value={contact}
+            onChange={(event) => {
+              setContact(event.target.value);
+              if (contactError) setContactError(null);
+            }}
+            placeholder="you@example.com"
+          />
+        </Field>
         <Field htmlFor="feedback-message" label="Full message" required error={messageError ?? undefined}>
           <Textarea id="feedback-message" ref={messageRef} value={message} onChange={(event) => { setMessage(event.target.value); if (messageError) setMessageError(null); }} rows={12} maxLength={FEEDBACK_MAX_CHARS} placeholder="Paste steps, values, and URLs." />
           {message.length > FEEDBACK_MAX_CHARS * 0.8 ? (
@@ -196,6 +261,22 @@ function FeedbackInbox({ tick }: { tick: number }) {
             <li key={row.id} className={cn(panelClass, "p-4")}>
               <p className="eyebrow">
                 {row.kind === "bug" ? "Bug" : "Message"} · {row.createdAt.slice(0, 16).replace("T", " ")} UTC
+              </p>
+              {/*
+                A mailto, because the whole point of collecting this is that
+                answering should be one click rather than a copy and a paste
+                into another application. Rows written before the field existed
+                have none, and say so rather than rendering an empty line —
+                "we never asked" reads very differently from "they declined".
+              */}
+              <p className="meta mt-1">
+                {row.contact ? (
+                  <a href={`mailto:${row.contact}`} className="link-accent">
+                    {row.contact}
+                  </a>
+                ) : (
+                  <span className="text-muted">No reply address — sent before the field existed.</span>
+                )}
               </p>
               <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{row.message}</p>
               {row.pagePath ? <p className="meta mt-2">{row.pagePath}</p> : null}

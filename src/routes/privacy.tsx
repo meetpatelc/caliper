@@ -62,6 +62,7 @@ const onAnAccount = [
 ];
 
 const feedback = [
+  ["Your email address", "Required, so the message can be answered. Used for that and nothing else: no list, no marketing."],
   ["What you wrote", "The message, and whether you sent it as a bug or a note."],
   ["The page you sent it from", "So a report about a model can be read against that model."],
   ["An image, if you attached one", "Stored alongside the message, in the same database and the same backup."],
@@ -207,9 +208,9 @@ function PrivacyPage() {
             . It works signed out as well as signed in.
           </p>
           <p className="mt-3 text-sm leading-6 text-muted">
-            Send it signed in where you can — that identifies the account without you having to prove
-            anything. Signed out, put an email address in the message, because the form does not ask for one
-            and there is otherwise no way to reply to you.
+            The form asks for an email address, so a reply is always possible. Send it signed in where you
+            can and the address fills itself in — that also identifies the account without you having to
+            prove anything.
           </p>
         </div>
       </section>

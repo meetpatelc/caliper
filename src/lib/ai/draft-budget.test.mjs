@@ -6,8 +6,23 @@ import {
   judgeDraftBudget,
 } from "./draft-budget.ts";
 
+/**
+ * @param {number} accountCallsThisHour
+ * @param {number} globalCallsThisHour
+ */
 const judge = (accountCallsThisHour, globalCallsThisHour) =>
   judgeDraftBudget({ accountCallsThisHour, globalCallsThisHour });
+
+/**
+ * The refusal, or a failure saying it was allowed when it should not have been.
+ * Narrows the union once so each test can read `.scope` and `.reason` directly.
+ * @param {ReturnType<typeof judgeDraftBudget>} verdict
+ */
+const refusal = (verdict) => {
+  assert.equal(verdict.allowed, false, "expected this to be refused");
+  if (verdict.allowed) throw new Error("unreachable");
+  return verdict;
+};
 
 test("an idle hour allows the call", () => {
   assert.equal(judge(0, 0).allowed, true);
@@ -27,8 +42,7 @@ test("the limit is the limit, not one past it", () => {
 });
 
 test("a busy account is told it is them", () => {
-  const verdict = judge(DRAFTS_PER_ACCOUNT_PER_HOUR, 0);
-  assert.equal(verdict.allowed, false);
+  const verdict = refusal(judge(DRAFTS_PER_ACCOUNT_PER_HOUR, 0));
   assert.equal(verdict.scope, "account");
   assert.match(verdict.reason, /one account/);
 });
@@ -36,8 +50,7 @@ test("a busy account is told it is them", () => {
 test("a busy site is told it is not them", () => {
   // Blaming the person for a shared ceiling sends them looking for a mistake
   // they did not make.
-  const verdict = judge(0, DRAFTS_GLOBAL_PER_HOUR);
-  assert.equal(verdict.allowed, false);
+  const verdict = refusal(judge(0, DRAFTS_GLOBAL_PER_HOUR));
   assert.equal(verdict.scope, "global");
   assert.match(verdict.reason, /across the site/);
   assert.doesNotMatch(verdict.reason, /your|you have/i);
@@ -46,7 +59,7 @@ test("a busy site is told it is not them", () => {
 test("the global ceiling wins when both are exhausted", () => {
   // Both are true; only one is useful. "The site is busy" tells them waiting
   // will fix it, which is the actionable half.
-  assert.equal(judge(DRAFTS_PER_ACCOUNT_PER_HOUR, DRAFTS_GLOBAL_PER_HOUR).scope, "global");
+  assert.equal(refusal(judge(DRAFTS_PER_ACCOUNT_PER_HOUR, DRAFTS_GLOBAL_PER_HOUR)).scope, "global");
 });
 
 test("the global ceiling is not a headcount", () => {
@@ -65,9 +78,7 @@ test("the global ceiling is not a headcount", () => {
 
 test("no refusal names the global ceiling", () => {
   // Publishing it only tells someone what to exhaust.
-  const verdict = judge(0, DRAFTS_GLOBAL_PER_HOUR);
-  assert.equal(verdict.allowed, false);
-  if (verdict.allowed) return;
+  const verdict = refusal(judge(0, DRAFTS_GLOBAL_PER_HOUR));
   assert.doesNotMatch(verdict.reason, new RegExp(String(DRAFTS_GLOBAL_PER_HOUR)));
 });
 

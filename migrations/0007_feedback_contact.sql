@@ -1,0 +1,14 @@
+-- A reply address, because there was no way to answer anyone.
+--
+-- Feedback can be sent signed out, and then the row carried no identity at
+-- all: no account, no address, nothing. Someone reporting a wrong number in a
+-- model, or asking for their data to be deleted, could not be replied to or
+-- even identified. The Privacy page had to tell people to type an address into
+-- the message body, which is a workaround standing in for a field.
+--
+-- Required going forward, so the column is nullable: every row written before
+-- today genuinely has none, and backfilling a placeholder would turn "we never
+-- asked" into "they declined to say". Nullable here, required in the schema
+-- the endpoint validates against -- the database records what happened, the
+-- application decides what it will accept next.
+alter table feedback add column if not exists contact text;
