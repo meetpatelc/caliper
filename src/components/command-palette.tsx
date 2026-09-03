@@ -5,7 +5,7 @@ import { ClipboardList, PenLine, Star } from "lucide-react";
 import { useMemo, useState, type RefObject } from "react";
 import { OverlayDialog } from "@/components/overlay-dialog";
 import { EmptyState } from "@/components/ui/status";
-import { getTool, tools, scoreSearchMatch, searchableToolText } from "@/lib/catalog";
+import { getTool, tools, rankToolMatch, scoreSearchMatch, searchableToolText } from "@/lib/catalog";
 import { releasedDomains, savedHeadline } from "@/lib/desk";
 import { PAGE_NAV } from "@/lib/nav";
 import { officialCalculators } from "@/studio/lib/catalog";
@@ -63,7 +63,10 @@ export function CommandPalette({
     const terms = query.trim().split(/\s+/).filter(Boolean);
     if (terms.length < 2) return [];
     return tools
-      .map((tool) => ({ tool, score: scoreSearchMatch(searchableToolText(tool), query) }))
+      // rankToolMatch, not the bare share: a share saturates at 1 for every
+      // tool containing the words anywhere, and the best-match list is exactly
+      // where that tie matters most.
+      .map((tool) => ({ tool, score: rankToolMatch(tool, query) }))
       .filter((entry) => entry.score >= 0.5)
       .sort((a, b) => b.score - a.score)
       .slice(0, 3)
