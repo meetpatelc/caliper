@@ -108,7 +108,12 @@ function ReferencePage() {
               <section key={domain.id}>
                 <div className="mb-2 flex items-center justify-between">
                   <p className="eyebrow">{domain.label}</p>
-                  <span className="font-mono text-xs text-muted">{domainTools.length}</span>
+                  {/* Same lone digit as the Library's section headers, and the
+                      same fix: visually terse, audibly a number with a noun. */}
+                  <span className="font-mono text-xs text-muted">
+                    {domainTools.length}
+                    <span className="sr-only"> models in {domain.label}</span>
+                  </span>
                 </div>
                 <div className={cn(panelClass)}>
                   {domainTools.map((tool) => (

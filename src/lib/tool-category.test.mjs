@@ -12,7 +12,8 @@ function declaredCategories() {
 test("every declared category is actually used by a model", () => {
   // A member nobody uses is a keyword that matches nothing — worse than absent,
   // because it looks like the search covers a topic it does not.
-  const used = new Set(tools.map((tool) => tool.category));
+  /** @type {Set<string>} — compared against the source text, which is untyped. */
+  const used = new Set(tools.map((tool) => String(tool.category)));
   const orphans = [...declaredCategories()].filter((category) => !used.has(category));
   assert.deepEqual(orphans, [], `declared but unused: ${orphans.join(", ")}`);
 });

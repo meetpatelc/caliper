@@ -287,7 +287,16 @@ function Home() {
                 className="mb-3"
                 kicker={groupDomain.label}
                 title={groupDomain.note}
-                aside={<span className="font-mono text-xs text-muted">{groupTools.length}</span>}
+                aside={
+                  // The bare number is the design, and it reads fine beside a
+                  // heading. It does not read at all on its own: a screen
+                  // reader announces "sixty-two" with no noun attached, in a
+                  // list of eleven sections that each announce a different one.
+                  <span className="font-mono text-xs text-muted">
+                    {groupTools.length}
+                    <span className="sr-only"> models in {groupDomain.label}</span>
+                  </span>
+                }
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 {shown.map((tool) => {
