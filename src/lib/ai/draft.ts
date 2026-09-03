@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { acceptDraft } from "@/lib/ai/accept-draft";
 import { draftRequestSchema, type DraftOutcome } from "@/lib/ai/draft-contract";
+import { judgeDraftBudget, type BudgetVerdict } from "@/lib/ai/draft-budget";
 
 /**
  * Draft a calculator from a written brief.
@@ -15,34 +16,61 @@ import { draftRequestSchema, type DraftOutcome } from "@/lib/ai/draft-contract";
  * lands in the Studio editor as an unsaved draft so the person who asked for it
  * has to look at it before it can become anything.
  */
-const WINDOW_MS = 60 * 60 * 1000;
-const PER_HOUR = 10;
-const recent = new Map<string, number[]>();
-
-function withinRate(userId: string) {
-  const now = Date.now();
-  const hits = (recent.get(userId) ?? []).filter((at) => now - at < WINDOW_MS);
-  if (hits.length >= PER_HOUR) {
-    recent.set(userId, hits);
-    return false;
-  }
-  hits.push(now);
-  recent.set(userId, hits);
-  return true;
+/**
+ * Count the last hour, decide, and record the call.
+ *
+ * This was a `Map<string, number[]>` in module scope, and on a serverless
+ * platform that is not a rate limit. Each instance carries its own Map, a cold
+ * start begins at zero, and the number of instances is chosen by traffic — so
+ * the real ceiling was accounts times concurrent instances. Sign-up is open, so
+ * accounts are free to mint. The counter has to live where the money does.
+ *
+ * The insert happens before the provider call, not after. A draft that fails
+ * upstream still cost a request and still has to count, or a failing key
+ * becomes an unmetered retry loop. Charging for the attempt is the safe
+ * direction to be wrong in.
+ *
+ * Not transactional, and does not need to be. Two calls racing can both read
+ * ninety-nine and both proceed; the overrun is bounded by concurrency and the
+ * next call sees a hundred and one. A lock here would serialise every draft to
+ * protect against being one over an hourly cap that is itself a judgement.
+ */
+async function spendDraftCall(userId: string): Promise<BudgetVerdict> {
+  const { getSql } = await import("@/lib/db");
+  const sql = await getSql();
+  const [counts] = await sql<{ account: number; global: number }>`
+    select
+      count(*) filter (where user_id = ${userId})::int as account,
+      count(*)::int as global
+    from ai_draft_calls
+    where created_at > now() - interval '1 hour'
+  `;
+  const verdict = judgeDraftBudget({
+    accountCallsThisHour: counts?.account ?? 0,
+    globalCallsThisHour: counts?.global ?? 0,
+  });
+  if (!verdict.allowed) return verdict;
+  await sql`
+    insert into ai_draft_calls (id, user_id)
+    values (${crypto.randomUUID()}, ${userId})
+  `;
+  return verdict;
 }
 
 export const draftCalculatorFromBrief = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((data: unknown) => draftRequestSchema.parse(data))
   .handler(async ({ context, data }): Promise<DraftOutcome> => {
-    if (!withinRate(context.userId)) {
-      return { ok: false, reason: "That is a lot of drafts in one hour. Try again later." };
-    }
     // Imported here so the SDK and the key never enter a client bundle.
     const { draftCalculator, draftingEnabled } = await import("@/lib/ai/provider.server");
+    // Configuration before budget: a deployment with no key spends nothing, and
+    // charging a call against an account for a service that cannot run would be
+    // a limit on a thing that never happened.
     if (!draftingEnabled()) {
       return { ok: false, reason: "Drafting is not configured on this deployment." };
     }
+    const budget = await spendDraftCall(context.userId);
+    if (!budget.allowed) return { ok: false, reason: budget.reason };
     const result = await draftCalculator(data.brief);
     if (!result.ok) return { ok: false, reason: result.failure.detail };
     return acceptDraft(result.value);
