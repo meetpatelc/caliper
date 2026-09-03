@@ -34,6 +34,7 @@ import {
   CircuitBoard,
   type LucideIcon,
 } from "lucide-react";
+import type { ToolCategory } from "@/lib/tool-category";
 import type { WorkspaceContract } from "@/lib/platform";
 
 type BaseToolId = "axial" | "beam" | "stability" | "section" | "converter" | "triangle" | "coordinate" | "cylinder" | "density" | "newton" | "kinetic" | "hydrostatic" | "continuity" | "sensibleHeat" | "ohm" | "fits" | "toleranceStack" | "position" | "mmc" | "motionProfile" | "reflectedInertia" | "pneumatic" | "clampForce" | "torsion" | "bearingLife" | "boltPreload" | "millingMrr" | "lmtd" | "darcy" | "thermalExpansion" | "thermalStress" | "planeConduction" | "bernoulli" | "combinedStress" | "thinVessel" | "leadScrew" | "airConsumption" | "gearRatio" | "boltLoad" | "safetyMargin" | "circularArc" | "compressionSpring" | "drillingTime" | "turningMrr" | "processCapability" | "extensionSpring" | "torsionSpring" | "keyway" | "cuttingParameters" | "sheetMetalBend" | "productionMetrics" | "gageRr" | "measurementUncertainty" | "thermalRadiation" | "shaftDesign" | "bearingLoad" | "formControl" | "driveRatio" | "motionDuty" | "filletWeld" | "threadDesign" | "orificeFlow" | "dimensionCheck" | "arithmeticScratchpad" | "shaftCombined" | "mohrCircle" | "pressFit" | "jointSeparation" | "hydraulicCylinder" | "hydraulicPump" | "hydraulicMotor" | "hydraulicLine" | "orientationControl" | "profileRunout" | "processPerformance" | "ballScrewSizing" | "rackPinion" | "beltAxis" | "cuttingPower" | "drillPointDepth" | "toolDeflection" | "fatigueConcentration" | "goodmanFatigue" | "minerDamage" | "planetaryGear" | "wormDrive" | "sCurveProfile" | "torqueSpeedDuty" | "fixtureClamping" | "pickPlaceCycle" | "payloadInertia" | "pneumaticCycleTime" | "valveCv" | "vacuumHolding" | "additiveBuild" | "gravityMoment" | "pitchCircle" | "regularPolygon" | "eccentricBoltGroup" | "pinStress" | "gearToothStress" | "vacuumEvacuation" | "toggleForce" | "wristInertia" | "cycleBuilder" | "pneumaticLineLoss" | "tappingTorque" | "threadMachiningTime" | "reynoldsNumber" | "minorLosses" | "pipeSizing" | "buoyancyForce" | "submergedPlane" | "convectionHeat" | "thermalResistance" | "idealGas" | "isentropicMachine" | "gaugeBiasStudy" | "controlChart" | "toleranceSampling" | "taylorToolLife" | "cuttingForce" | "weldGroup" | "beamDiagram" | "triangleTruss" | "hertzContact" | "fractureIntensity" | "deflectionCheck" | "bearingAdjustedLife" | "flywheelEnergy" | "frictionClutch" | "splineLoad" | "gearMeshForce" | "beltTension" | "vesselGeometry" | "threadTensileArea" | "couplingTorsion" | "cantileverFrame" | "plateBuckling" | "screwCriticalSpeed" | "linearGuideLife" | "brakingDuty" | "ballScrewLife" | "driveTrain" | "rmsDutyTorque" | "motorOperatingPoint" | "gripperHold" | "conveyorLine" | "robotReach" | "robotPayloadMoment" | "rotaryIndexing" | "pneumaticDemandBudget" | "hydraulicLossBudget" | "vacuumLeakageBudget" | "hydraulicAccumulatorState" | "hydraulicReservoirDwell" | "darcyFrictionFactor" | "pumpSystemHeadPoint" | "npshAvailableBudget" | "thermalRcStep" | "manningUniformFlow" | "compressibleMassFlow" | "machiningTimeBudget" | "threePhasePower";
@@ -45,7 +46,7 @@ export type ToolDefinition = {
   title: string;
   kicker: string;
   description: string;
-  category: string;
+  category: ToolCategory;
   icon: LucideIcon;
   accent: "cyan" | "amber" | "mineral";
   assumptions: string[];
@@ -1028,7 +1029,7 @@ export const tools: ToolDefinition[] = [
     title: "Incompressible orifice flow",
     kicker: "Pressure drop · coefficient · discharge",
     description: "Calculate incompressible volumetric and mass flow through a sharp-edged orifice-meter geometry using a discharge coefficient.",
-    category: "Fluids & thermal",
+    category: "Thermal & fluids",
     icon: Gauge,
     accent: "amber",
     assumptions: ["Incompressible fluid", "User-entered discharge coefficient", "Steady pressure difference", "Circular pipe/orifice geometry"],
