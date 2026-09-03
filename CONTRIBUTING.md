@@ -20,6 +20,11 @@ npm run lint
 npm test
 ```
 
+`npm install` also points git at `.githooks/`, so `pre-push` runs those checks
+plus `build` and `brand-check` — the same five CI runs — before a push leaves
+your machine. That is why the first push takes about a minute. `--no-verify`
+skips it when you have a reason.
+
 1. Branch from `main`.
 2. Keep the change scoped (one model family, one UX fix, or one docs pass).
 3. Open a pull request with:

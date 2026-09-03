@@ -34,6 +34,7 @@
     "qa:share": "node scripts/share-card-qa.mjs",
     "build:sitemap": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/build-sitemap.mjs",
     "qa:payload": "node scripts/payload-qa.mjs",
+    "qa:sources": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/source-audit.mjs",
     "build:categories": "node --experimental-strip-types --import ./scripts/alias-register.mjs scripts/build-tool-categories.mjs"
   },
   "dependencies": {
