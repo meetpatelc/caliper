@@ -3,6 +3,8 @@ import { getTool, type ToolId } from "@/lib/catalog";
 import { calculateTool, initialInputs, toolFields } from "@/lib/engineering";
 import { buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { splitRecordSearch, toolSearchFromUnknown } from "@/lib/search-params";
+import { getDocument, loadDomain, register } from "@/lib/document-registry";
+import type { InstrumentDocument } from "@/lib/document";
 import { PARENT_NAME } from "@/lib/instrument";
 import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { panelClass } from "@/components/ui/panel";
@@ -25,24 +27,53 @@ import { cn } from "@/lib/utils";
  */
 export const Route = createFileRoute("/record/$toolId")({
   validateSearch: (search: Record<string, unknown>) => toolSearchFromUnknown(search),
+  // This route recomputes the record to put the result in its title, so its
+  // documents have to be here before `head` runs, not just before the body.
+  loader: async ({ params }) => {
+    const domain = getTool(params.toolId)?.contract.domain;
+    if (domain) await loadDomain(domain);
+    return { document: getDocument(params.toolId) ?? null };
+  },
   head: ({ params, match }) => {
     const tool = getTool(params.toolId);
     if (!tool) return {};
     const search = (match.search ?? {}) as Record<string, string>;
     const { input: stated } = splitRecordSearch(search);
     const input = { ...(initialInputs[params.toolId as ToolId] ?? {}), ...stated };
-    const result = calculateTool(params.toolId as ToolId, input);
-    const headline = result.values[0];
+    /*
+     * Register from the match's own loader data before calculating.
+     *
+     * `head` runs again on the client during hydration, and it runs before the
+     * component — so waiting for the component to register left the client
+     * recomputing against an empty registry, catching, and replacing a correct
+     * server-rendered title ("…: 1.9899 L/s") with the bare model name. The
+     * loader's result is already serialised into the match, so the document is
+     * right here; it just has to be put back before it is needed.
+     *
+     * The try/catch below stays regardless. A title is a nicety and this route
+     * is not: an exception thrown in `head` takes down the whole page, and no
+     * tab caption is worth that.
+     */
+    const carried = (match as { loaderData?: { document?: InstrumentDocument | null } }).loaderData?.document;
+    if (carried) register({ [params.toolId]: carried });
+    let result: ReturnType<typeof calculateTool> | undefined;
+    try {
+      result = calculateTool(params.toolId as ToolId, input);
+    } catch {
+      result = undefined;
+    }
+    const headline = result?.values[0];
     // The result belongs in the title: a shared link should say what it found,
     // not just which calculator was opened.
     const summary = headline ? `${headline.display} ${headline.unit}` : tool.title;
     const title = `${tool.title}: ${summary} · ${PARENT_NAME}`;
+    const description = result ? `${tool.description} Method: ${result.method}` : tool.description;
     return {
       meta: [
         { title },
-        { name: "description", content: `${tool.description} Method: ${result.method}` },
+        { name: "description", content: description },
         { property: "og:title", content: title },
-        { property: "og:description", content: `${tool.description} Method: ${result.method}` },
+        { property: "og:description", content: description },
       ],
     };
   },
@@ -52,6 +83,9 @@ export const Route = createFileRoute("/record/$toolId")({
 function RecordPage() {
   const { toolId } = Route.useParams();
   const search = Route.useSearch();
+  const { document } = Route.useLoaderData();
+  // Before the body calculates. See the note on the tool route.
+  if (document) register({ [toolId]: document });
   const tool = getTool(toolId);
 
   if (!tool) {

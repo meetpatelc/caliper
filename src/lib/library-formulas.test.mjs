@@ -18,7 +18,7 @@ import {
   formulaEntries,
   renderFormulaIndex,
 } from "../../scripts/build-formula-index.mjs";
-import { libraryDocuments } from "./document.ts";
+import { libraryDocuments } from "./document-library.ts";
 import { libraryFormulas } from "./library-formulas.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");

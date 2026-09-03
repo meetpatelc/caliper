@@ -8,8 +8,10 @@ import { unitsForFamily } from "../../lib/units.ts";
 import { calculatorSchema } from "../lib/calculator-types.ts";
 import { formatLimitMm } from "../lib/format-limit.ts";
 import { computeFit } from "../lib/iso286.ts";
-import { axialDocument, libraryDocuments } from "../../lib/document.ts";
+import { axialDocument } from "../../lib/document.ts";
+import { libraryDocuments } from "../../lib/document-library.ts";
 import { calculateTool, initialInputs } from "../../lib/engineering.ts";
+import "@/lib/test-support/all-documents.mjs";
 
 test("G-01 axial: 50 kN → N keeps 41.67 MPa", () => {
   const start = defaultFieldState(axialDocument);

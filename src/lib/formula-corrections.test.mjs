@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { calculateTool, initialInputs } from "./engineering.ts";
 import { convertShop, hydrateDisplayInputs, unitSwitchFor, unitSwitchForResult } from "./fieldUnits.ts";
+import "@/lib/test-support/all-documents.mjs";
 
 const run = (id, patch = {}) => calculateTool(id, { ...initialInputs[id], ...patch });
 

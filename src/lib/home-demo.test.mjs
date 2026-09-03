@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { buildDemo, renderDemoModule } from "../../scripts/generate-home-demo.mjs";
 import { homeDemo } from "@/lib/home-demo.generated";
+import "@/lib/test-support/all-documents.mjs";
 
 /**
  * The front page shows a worked example and argues that the work can be

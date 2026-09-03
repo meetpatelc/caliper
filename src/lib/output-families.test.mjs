@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { libraryDocuments } from "@/lib/document";
+import { libraryDocuments } from "@/lib/document-library";
 import { unitFamilies, unitId } from "@/lib/units";
+import "@/lib/test-support/all-documents.mjs";
 
 const outputs = Object.values(libraryDocuments).flatMap((doc) =>
   doc.outputs.map((output) => ({ slug: doc.slug, ...output })),

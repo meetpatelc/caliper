@@ -6,7 +6,8 @@
 
 import type { ToolId } from "@/lib/catalog";
 import { convertQuantity, isUnitFamilyId, unitSymbol, unitsForFamily, type UnitFamilyId } from "@/lib/units";
-import { libraryDocuments, runLibraryDocument } from "@/lib/document";
+import { runLibraryDocument } from "@/lib/document";
+import { DOCUMENT_TOOL_IDS } from "@/lib/document-tool-ids";
 
 export type { FieldKind, FieldDefinition } from "@/lib/engineering-types";
 export { toolFields } from "@/lib/engineering-fields";
@@ -827,7 +828,7 @@ const guardFinite = (state: CalculationState): CalculationState => {
 };
 
 const computeTool = (toolId: ToolId, input: Record<string, string>): CalculationState => {
-    if (toolId in libraryDocuments) return runLibraryDocument(toolId, input);
+    if (DOCUMENT_TOOL_IDS.has(toolId)) return runLibraryDocument(toolId, input);
     if (toolId === "beam") return calculateBeam(input);
     if (toolId === "beamDiagram") return calculateBeamDiagram(input);
     if (toolId === "linearGuideLife") return calculateLinearGuideLife(input);

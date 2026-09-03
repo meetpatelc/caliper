@@ -25,8 +25,9 @@
  */
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { libraryDocuments } from "./document.ts";
+import { libraryDocuments } from "./document-library.ts";
 import { tools } from "./catalog.ts";
+import "@/lib/test-support/all-documents.mjs";
 
 /**
  * Documents whose prose is deliberately richer than the catalog's. These are

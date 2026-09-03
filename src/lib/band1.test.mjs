@@ -4,8 +4,9 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { libraryDocuments } from "./document.ts";
+import { libraryDocuments } from "./document-library.ts";
 import { calculateTool, initialInputs } from "./engineering.ts";
+import "@/lib/test-support/all-documents.mjs";
 
 const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "band1.golden.json"), "utf8"));
 

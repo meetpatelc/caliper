@@ -25,7 +25,8 @@ import { unitId, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { readKey, unitsKey } from "@/lib/storage-keys";
 import { assumptionsBeside, buildCalculationPrintScope } from "@/lib/calculationSnapshot";
 import { isFieldHidden, relatedTools } from "@/lib/desk";
-import { libraryDocuments, isStudioDocument } from "@/lib/document";
+import { isStudioDocument } from "@/lib/document";
+import { getDocument } from "@/lib/document-registry";
 import { adoptionLoss } from "@/studio/lib/adopt-document";
 import { resolveSketchId } from "@/lib/diagrams";
 import { quantitySymbol } from "@/lib/quantity-symbols";
@@ -73,7 +74,7 @@ export function CalculatorWorkspace({ toolId, search }: { toolId: string; search
   const saveCalculation = useDeskStore((state) => state.saveCalculation);
   const createFrom = useWorkshop((state) => state.createFrom);
   const { accountMode } = useDeskStatus();
-  const libraryDocument = tool ? libraryDocuments[tool.id] : undefined;
+  const libraryDocument = tool ? getDocument(tool.id) : undefined;
 
   useEffect(() => {
     if (!tool) return;

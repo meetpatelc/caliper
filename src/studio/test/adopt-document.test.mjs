@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { libraryDocuments, isStudioDocument } from "@/lib/document";
+import { libraryDocuments } from "@/lib/document-library";
+import { isStudioDocument } from "@/lib/document";
 import { asCalculatorDefinition, calculatorSchema, MAX_FIELDS, MAX_OUTPUTS } from "@/studio/lib/calculator-types";
 import { adoptDocument, adoptionLoss } from "@/studio/lib/adopt-document";
 import { uniqueSlug } from "@/studio/lib/workshop-store";

@@ -25,7 +25,7 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { calculateTool, initialInputs, toolFields } from "../src/lib/engineering.ts";
-import { libraryDocuments } from "../src/lib/document.ts";
+import { libraryDocuments } from "../src/lib/document-library.ts";
 import { tools } from "../src/lib/catalog.ts";
 
 const TOOL_ID = "axial";

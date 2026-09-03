@@ -21,6 +21,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { calculateTool, initialInputs } from "./engineering.ts";
+import "@/lib/test-support/all-documents.mjs";
 
 /** Standard gravity, the value the app's unit inventory uses. */
 const G = 9.80665;

@@ -83,6 +83,9 @@ jobs:
           # by the middleware, so what a route renders and what a reader gets are
           # two different sets, and only the built function does the strip.
           npm run qa:share -- http://127.0.0.1:8081
+          # Same server again: a model page shipping the whole document library
+          # renders identically and breaks no test, so it has to be weighed.
+          npm run qa:payload -- http://127.0.0.1:8081
 
       # The auth invariant compares what the dev server resolves for
       # VITE_AUTH_ENABLED against what the next build resolves. It can only be

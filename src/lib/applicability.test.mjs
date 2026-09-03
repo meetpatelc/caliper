@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateTool } from "@/lib/engineering";
+import "@/lib/test-support/all-documents.mjs";
 
 // D/t = 50: a genuinely thin wall, nothing to say.
 test("thinVessel stays quiet inside its range", () => {

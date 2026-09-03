@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { tools } from "@/lib/catalog";
+import "@/lib/test-support/all-documents.mjs";
 
 /**
  * Which models are pinned only against themselves.

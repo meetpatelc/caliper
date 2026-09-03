@@ -5,7 +5,7 @@ import { Copy, FilePlus, PenLine } from "lucide-react";
 import { DraftWithAI } from "@/components/draft-with-ai";
 import { useWorkshop } from "@/studio/lib/workshop-store";
 import { useDeskStatus } from "@/lib/desk-mode";
-import { studioDocuments } from "@/lib/document";
+import { studioDocuments } from "@/lib/document-library";
 import { Button } from "@/components/ui/button";
 import { PageHeader, SectionHeader } from "@/components/ui/page";
 import { LoadingState } from "@/components/ui/status";

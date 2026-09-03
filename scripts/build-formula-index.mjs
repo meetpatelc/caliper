@@ -65,7 +65,7 @@ export function formulaEntries(documents) {
 }
 
 async function main() {
-  const { libraryDocuments } = await import("../src/lib/document.ts");
+  const { libraryDocuments } = await import("../src/lib/document-library.ts");
   const entries = formulaEntries(libraryDocuments);
   const root = dirname(dirname(fileURLToPath(import.meta.url)));
   writeFileSync(join(root, OUTPUT_REL_PATH), renderFormulaIndex(entries), "utf8");

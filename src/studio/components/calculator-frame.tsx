@@ -11,7 +11,7 @@ import { revisionOf } from "@/studio/lib/model-revision";
 import { RECORD_VERSION_KEY } from "@/lib/search-params";
 import { unitId, unitsForFamily, type UnitFamilyId } from "@/lib/units";
 import { resolveSketchId } from "@/lib/diagrams";
-import { libraryDocuments } from "@/lib/document";
+import { libraryDocuments } from "@/lib/document-library";
 import { tools, type ToolId } from "@/lib/catalog";
 import { domains } from "@/lib/platform";
 import MechanicalDiagram from "@/components/MechanicalDiagram";

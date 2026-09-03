@@ -5,21 +5,9 @@
  */
 import { evaluateExpression, FormulaError } from "@instrument/formula";
 import { axialDocument } from "@/lib/document-axial";
+import { getDocument } from "@/lib/document-registry";
 import { convertQuantity, unitFamilies, unitSymbol, type UnitFamilyId } from "@/lib/units";
 import { quantitySymbol } from "@/lib/quantity-symbols";
-import { appliedDocuments } from "@/lib/library-applied";
-import { automationDocuments } from "@/lib/library-automation";
-import { dynamicsDocuments } from "@/lib/library-dynamics";
-import { electricalDocuments } from "@/lib/library-electrical";
-import { fluidsDocuments } from "@/lib/library-fluids";
-import { foundationDocuments } from "@/lib/library-foundation";
-import { manufacturingDocuments } from "@/lib/library-manufacturing";
-import { materialsDocuments } from "@/lib/library-materials";
-import { mathematicsDocuments } from "@/lib/library-mathematics";
-import { mechanicsDocuments } from "@/lib/library-mechanics";
-import { qualityDocuments } from "@/lib/library-quality";
-import { thermalDocuments } from "@/lib/library-thermal";
-import { studioSeedDocuments } from "@/lib/library-studio-seeds";
 import type { EngineeringDomain } from "@/lib/platform";
 import {
   applyDocumentBounds,
@@ -97,7 +85,6 @@ const round = (value: number, significant = 5) => {
   return Number(value.toFixed(Math.min(decimals, 10))).toLocaleString("en-US", { maximumFractionDigits: Math.min(decimals, 10) });
 };
 
-const STUDIO_SEED_SLUGS = new Set(["gravitationalPe", "pipeVelocity", "dynamicPressure", "hydrostatic"]);
 
 /**
  * The one Axial — Library card and Studio seed.
@@ -108,30 +95,19 @@ const STUDIO_SEED_SLUGS = new Set(["gravitationalPe", "pipeVelocity", "dynamicPr
  */
 export { axialDocument };
 
-export const libraryDocuments: Record<string, InstrumentDocument> = {
-  axial: axialDocument,
-  ...appliedDocuments,
-  ...automationDocuments,
-  ...dynamicsDocuments,
-  ...electricalDocuments,
-  ...fluidsDocuments,
-  ...foundationDocuments,
-  ...manufacturingDocuments,
-  ...materialsDocuments,
-  ...mathematicsDocuments,
-  ...mechanicsDocuments,
-  ...qualityDocuments,
-  ...thermalDocuments,
-  ...studioSeedDocuments,
-};
+/*
+ * The full map moved to document-library.ts.
+ *
+ * It used to live here, and because engineering.ts imports this file to run a
+ * calculation, every route that can calculate anything pulled all thirteen
+ * domain modules with it. This file is on the calculation path; the whole
+ * library is not. See document-registry.ts for what replaced it.
+ */
 
 export function isStudioDocument(document: InstrumentDocument) {
   return Boolean(document.slug && document.fields.length && document.outputs.length);
 }
 
-export function studioDocuments() {
-  return Object.values(libraryDocuments).filter((document) => STUDIO_SEED_SLUGS.has(document.slug));
-}
 
 const interpolate = (template: string, strings: Record<string, string>) =>
   template.replace(/\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (match, id) => (id in strings ? strings[id] : match));
@@ -171,8 +147,12 @@ const parseField = (toolId: string, field: InstrumentField, rawInput: string) =>
 };
 
 export function runLibraryDocument(toolId: string, input: Record<string, string>): CalculationState {
-  const document = libraryDocuments[toolId];
-  if (!document) throw new Error(`No library document for ${toolId}.`);
+  const document = getDocument(toolId);
+  if (!document) {
+    // Names the document and the fix. In the browser a route loader should have
+    // called loadDomain first; in Node, loadAllDomains.
+    throw new Error(`No library document for ${toolId}. Its domain has not been loaded.`);
+  }
   const scope: Record<string, number> = {};
   const strings: Record<string, string> = {};
   for (const field of document.fields) {

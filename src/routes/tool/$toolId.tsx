@@ -4,6 +4,7 @@ import { PARENT_NAME } from "@/lib/instrument";
 import { CalculatorWorkspace } from "@/components/calculator-workspace";
 import { Iso286Instrument } from "@/studio/components/iso-286";
 import { toolSearchFromUnknown } from "@/lib/search-params";
+import { getDocument, loadDomain, register } from "@/lib/document-registry";
 import { jsonLdScript, seoLinks, seoMeta, toolJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/tool/$toolId")({
@@ -15,6 +16,28 @@ export const Route = createFileRoute("/tool/$toolId")({
   // with the status the response actually means.
   beforeLoad: ({ params }) => {
     if (params.toolId !== "fits" && !getTool(params.toolId)) throw notFound();
+  },
+  /*
+   * Fetch this model's domain, and carry the document itself into the page.
+   *
+   * Returning the document rather than only awaiting the domain is what makes
+   * this work on a first load. A loader runs on the server during SSR and is
+   * skipped on hydration — the client replays its serialised result instead —
+   * so awaiting a dynamic import here left the browser with an empty registry.
+   * The server rendered correct numbers, hydration threw them away, and the
+   * page settled on "No library document for orificeFlow". Correct HTML
+   * replaced by an error a second later is worse than either.
+   *
+   * A document is plain JSON — 3.5 kB, no functions, which is already proven by
+   * drafts being stored as `document_json` — so it travels in the payload for
+   * less than the domain chunk would cost to fetch. Client-side navigation to
+   * another model still runs this loader for real, and `loadDomain` then pulls
+   * that domain's chunk once.
+   */
+  loader: async ({ params }) => {
+    const domain = getTool(params.toolId)?.contract.domain;
+    if (domain) await loadDomain(domain);
+    return { document: getDocument(params.toolId) ?? null };
   },
   // Every page previously shared one <title>, so 169 calculators were
   // indistinguishable in tabs, history, bookmarks and search results.
@@ -48,6 +71,16 @@ export const Route = createFileRoute("/tool/$toolId")({
 function ToolRoute() {
   const { toolId } = Route.useParams();
   const search = Route.useSearch();
+  const { document } = Route.useLoaderData();
+  /*
+   * Put the loader's document into the registry before anything calculates.
+   *
+   * During render rather than in an effect, because the workspace calculates on
+   * its first render and an effect runs after. It is a Map.set with the value
+   * the loader already resolved — idempotent, synchronous, and not a fetch — so
+   * the usual objection to work in a render body does not apply here.
+   */
+  if (document) register({ [toolId]: document });
   if (toolId === "fits") return <Iso286Instrument />;
   // Keyed by tool so React remounts on a tool change.
   //
