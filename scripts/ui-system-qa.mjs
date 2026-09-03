@@ -1042,6 +1042,23 @@ try {
     return { tag: el?.tagName ?? "", onScreen: el instanceof HTMLElement && el.getBoundingClientRect().width > 0 };
   });
   record("closing search returns focus to a trigger you can see", restored.tag === "BUTTON" && restored.onScreen, `${restored.tag} onScreen=${restored.onScreen}`);
+
+  // The palette reopened on whatever was typed last, with last time's results
+  // showing, and typing appended: "torsion", close, "beam" read "torsionbeam"
+  // and matched nothing. `query` lives in the component that stays mounted, so
+  // the dialog unmounting on close did not clear it.
+  await keyboard.keyboard.press("Control+k");
+  await keyboard.waitForTimeout(300);
+  await keyboard.keyboard.type("torsion");
+  await keyboard.waitForTimeout(400);
+  const firstOpen = await keyboard.evaluate(() => document.querySelector('[role="dialog"] input')?.value ?? null);
+  await keyboard.keyboard.press("Escape");
+  await keyboard.waitForTimeout(300);
+  await keyboard.keyboard.press("Control+k");
+  await keyboard.waitForTimeout(400);
+  const reopened = await keyboard.evaluate(() => document.querySelector('[role="dialog"] input')?.value ?? null);
+  record("search reopens empty, not on the last query", firstOpen === "torsion" && reopened === "", `typed "${firstOpen}", reopened as "${reopened}"`);
+  await keyboard.keyboard.press("Escape");
   await keyboard.close();
 
   // `aria-current="page"` means this link points at the page you are on, not

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect } from "react";
 import { toast } from "sonner";
+import { DESK_SPLIT_NOTICE_KEY, noticedOnce } from "@/lib/storage-keys";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { claimDesk, getDesk, type DeskSnapshot } from "@/lib/desk-account";
 import { WORKSHOP_KEY } from "@/studio/lib/brand";
@@ -131,7 +132,13 @@ async function joinAccountDesk() {
     if (claimed) {
       consumeClaimedUnsignedDesk();
       consumeClaimedWorkshop();
-    } else if (hasWork(local)) {
+    } else if (
+      hasWork(local) &&
+      // Once per session. This fired on every page load for as long as the device
+      // and the account both held work, which for anyone who had ever saved
+      // something signed out was every page load, forever.
+      !noticedOnce(typeof sessionStorage === "undefined" ? undefined : sessionStorage, DESK_SPLIT_NOTICE_KEY)
+    ) {
       // Work on this device is only claimed into an empty account, so that
       // signing in can never duplicate or overwrite what the account already
       // holds. That is the right rule, but silently it looks like data loss:

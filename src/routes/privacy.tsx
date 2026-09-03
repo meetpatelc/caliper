@@ -19,11 +19,13 @@ const DESCRIPTION = "What this site stores, where it stores it, and how to get r
  *
  * Two things to keep in step with the code if either changes:
  *
- *   - AI drafting. `src/lib/ai/draft.ts` can send a brief to Anthropic or
- *     OpenAI, but no component imports it and the Build page does not offer it,
- *     so nothing here reaches a model provider today. The moment that is wired
- *     up, this page needs a paragraph saying so, and it is exactly the kind of
- *     change that ships without anyone thinking about this file.
+ *   - AI drafting. `src/components/draft-with-ai.tsx` sends the brief typed
+ *     into "Draft from a description" to Anthropic or OpenAI, for signed-in
+ *     users, when a key is configured. The page says so under "Other companies"
+ *     and the dialog says so before sending. An earlier version of this note
+ *     claimed the feature was not wired up — a grep for the wrong identifier —
+ *     and the page told readers nothing left the browser. It was live in
+ *     production the whole time. Verified by clicking it, not by grepping.
  *   - Analytics. There are none. No gtag, Plausible, PostHog, Sentry or
  *     equivalent appears anywhere in the source. Adding one changes this page.
  *
@@ -160,6 +162,13 @@ function PrivacyPage() {
           <p className="mt-3 text-sm leading-6 text-muted">
             No analytics service, error reporter, advertising network or session recorder is present. Nothing
             you type into a model is sent anywhere: every calculation runs in your browser.
+          </p>
+          <p className="mt-3 text-sm leading-6 text-muted">
+            <strong className="text-fg">One exception.</strong> Build offers signed-in users a "Draft from a
+            description" option. The description you type there is sent to a model provider — Anthropic or
+            OpenAI, whichever this site is configured with — to produce a first draft, under that provider's
+            own terms. It is the only text on this site that leaves your browser, the dialog says so before
+            you send it, and nothing else you author goes anywhere.
           </p>
         </div>
       </section>

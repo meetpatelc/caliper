@@ -8,6 +8,7 @@ import {
   THEME_STORAGE_KEY,
   unitsKey,
   WORKSHOP_STORAGE_KEY,
+  noticedOnce,
 } from "@/lib/storage-keys.ts";
 
 /**
@@ -116,4 +117,27 @@ test("the inline theme snippet migrates the same way", () => {
   assert.match(source, /"theme"/);
   assert.match(source, /instrument-theme/, "the old name has to be in the snippet to be moved");
   assert.match(source, /try\{/, "and it must not throw before paint");
+});
+
+test("a notice is noticed once per storage, and marks itself", () => {
+  const storage = fakeStorage({});
+  const key = { name: "notice-x", legacy: [] };
+  assert.equal(noticedOnce(storage, key), false, "first time: not yet noticed");
+  assert.equal(noticedOnce(storage, key), true, "second time: already noticed");
+  assert.equal(noticedOnce(storage, key), true);
+});
+
+test("no storage means show the notice rather than lose it", () => {
+  // SSR, or a browser that blocks site data. Erring toward showing is right:
+  // the notice explains why saved work appears to have vanished.
+  assert.equal(noticedOnce(undefined, { name: "notice-y", legacy: [] }), false);
+});
+
+test("a storage that throws is treated as not noticed, and does not throw", () => {
+  const broken = {
+    getItem() { throw new Error("quota"); },
+    setItem() { throw new Error("quota"); },
+  };
+  assert.doesNotThrow(() => noticedOnce(broken, { name: "notice-z", legacy: [] }));
+  assert.equal(noticedOnce(broken, { name: "notice-z", legacy: [] }), false);
 });

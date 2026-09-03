@@ -141,7 +141,12 @@ export function DraftWithAI({ onAccept }: { onAccept: (draft: AssistedDraft) => 
           <Field
             htmlFor="ai-brief"
             label="What should it work out?"
-            hint="Name the quantity, the inputs you have, and the conditions it has to hold under."
+            // The second sentence is the disclosure, and it lives in the hint so
+            // it is part of the field's accessible description rather than a
+            // footnote a screen reader skips. This is the only place on the
+            // site where text a person types leaves the browser, and until now
+            // nothing on the page said so; the Privacy page said the opposite.
+            hint="Name the quantity, the inputs you have, and the conditions it has to hold under. What you write here is sent to a model provider (Anthropic or OpenAI) to produce the draft — it is the only text on this site that leaves your browser."
           >
             <Textarea
               id="ai-brief"

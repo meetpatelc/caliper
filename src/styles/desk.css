@@ -11,3 +11,15 @@
     display: block !important;
   }
 }
+
+/*
+ * Sonner's close button is 20px square. That is fine under a mouse and a miss
+ * under a thumb: the one toast people most want rid of -- the two-sentence
+ * "kept separate from the account" notice -- sits over the form fields on a
+ * phone, and its dismiss target was the smallest control on the page.
+ * 32px clears the WCAG 2.5.8 minimum with room, without swallowing the toast.
+ */
+[data-sonner-toast] [data-close-button] {
+  width: 2rem;
+  height: 2rem;
+}

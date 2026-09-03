@@ -96,3 +96,36 @@ export function inlineAdoptSource(key: StorageKey): string {
   const name = JSON.stringify(key.name);
   return `(function(){try{var n=${name},L=${legacy},c=localStorage.getItem(n);for(var i=0;i<L.length;i++){var v=localStorage.getItem(L[i]);if(v===null)continue;if(c===null)localStorage.setItem(n,v);localStorage.removeItem(L[i]);if(c===null)break}}catch(e){}})();`;
 }
+
+/**
+ * Whether this session has already been told its device work is kept apart.
+ *
+ * Session-scoped, deliberately. The notice explains a state that persists —
+ * the device has work, the account has work, they are not merged — and the
+ * first version of it fired on every page load for as long as that was true,
+ * which for anyone who had ever saved something signed out was every page
+ * load forever. Once per browser session says it, and says it again next
+ * time you come back, which is the cadence a reminder should have.
+ */
+export const DESK_SPLIT_NOTICE_KEY: StorageKey = { name: "desk-split-noticed", legacy: [] };
+
+/**
+ * Has this been noticed already? Marks it noticed if not. Never throws.
+ *
+ * Pure over a Storage so it can be tested with a fake, and so the caller
+ * decides the scope: pass `sessionStorage` for once-per-session, `localStorage`
+ * for once-ever. A storage that cannot be used — private mode, quota — reads
+ * as "not noticed", which errs toward showing a notice rather than losing it.
+ */
+// Only the two methods it uses, so a test can hand it a two-method fake and a
+// storage that throws on both, without pretending either is a whole Storage.
+export function noticedOnce(storage: Pick<Storage, "getItem" | "setItem"> | undefined, key: StorageKey): boolean {
+  if (!storage) return false;
+  try {
+    if (storage.getItem(key.name)) return true;
+    storage.setItem(key.name, "1");
+  } catch {
+    /* unusable storage: treat as not noticed */
+  }
+  return false;
+}

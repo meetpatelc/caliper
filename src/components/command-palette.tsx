@@ -33,8 +33,22 @@ export function CommandPalette({
   const projects = useDeskStore((state) => state.projects);
   const workshop = useWorkshop((state) => state.items);
 
-  const go = (href: string) => {
+  /*
+   * Clear the query on the way out.
+   *
+   * This component stays mounted — the dialog inside it unmounts when closed,
+   * but `query` lives here — so the next Ctrl+K reopened on whatever was typed
+   * last, with last time's results already showing. Typing then appended to it:
+   * search "torsion", close, search "beam", and the box reads "torsionbeam" and
+   * matches nothing. Every palette people have muscle memory for opens empty.
+   */
+  const close = () => {
+    setQuery("");
     onOpenChange(false);
+  };
+
+  const go = (href: string) => {
+    close();
     router.history.push(href);
   };
 
@@ -57,7 +71,7 @@ export function CommandPalette({
   }, [query]);
 
   return (
-    <OverlayDialog open={open} onClose={() => onOpenChange(false)} title="Search Instrument" restoreFocusTo={restoreFocusTo}>
+    <OverlayDialog open={open} onClose={close} title="Search Instrument" restoreFocusTo={restoreFocusTo}>
       <Command
         label="Search Instrument"
         className="bg-surface text-fg"
