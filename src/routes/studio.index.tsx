@@ -68,7 +68,9 @@ function StudioHome() {
             // so the editor can say it was drafted rather than written — the
             // slug and attribution are cleared because those are claims only
             // a person gets to make.
-            open(createFrom({ ...draft, slug: "", related: [], sourceLabel: "", sourceUrl: "", warnings: [] }));
+            // The drafted title as written. A draft from a description is not a copy
+            // of anything, so "(copy)" would name an original that never existed.
+            open(createFrom({ ...draft, slug: "", related: [], sourceLabel: "", sourceUrl: "", warnings: [] }, draft.title));
           }}
         />
       </div>

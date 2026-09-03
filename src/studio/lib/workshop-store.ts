@@ -22,7 +22,15 @@ type WorkshopState = {
   upsert: (item: WorkshopCalculator) => void;
   createBlank: () => WorkshopCalculator;
   createStarter: () => WorkshopCalculator;
-  createFrom: (seed: InstrumentDocument | CalculatorDefinition) => WorkshopCalculator;
+  /**
+   * Fork a seed into a new draft.
+   *
+   * `title` overrides the default "<seed title> (copy)". Forking a model in the
+   * library IS a copy and should say so; a draft written from a description is
+   * not a copy of anything, and calling it "Hoop stress (copy)" invents an
+   * original that never existed.
+   */
+  createFrom: (seed: InstrumentDocument | CalculatorDefinition, title?: string) => WorkshopCalculator;
   remove: (id: string) => void;
   get: (id: string) => WorkshopCalculator | undefined;
   bySlug: (slug: string) => WorkshopCalculator | undefined;
@@ -107,8 +115,8 @@ export const useWorkshop = create<WorkshopState>()(
         syncDraft(item);
         return item;
       },
-      createFrom: (seed) => {
-        const item = toItem(asCalculatorDefinition(seed), `${seed.title} (copy)`, get().items);
+      createFrom: (seed, title) => {
+        const item = toItem(asCalculatorDefinition(seed), title ?? `${seed.title} (copy)`, get().items);
         set((state) => ({ items: [item, ...state.items] }));
         syncDraft(item);
         return item;

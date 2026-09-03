@@ -30,7 +30,17 @@ export function ConfirmDialog({
       <div className="px-5 pb-5">
         {children ? <div className="mt-3 text-sm leading-6 text-muted">{children}</div> : null}
         <div className="mt-5 flex justify-end gap-2">
-          <Button type="button" onClick={onClose} disabled={busy}>
+          {/*
+            Cancel stays live while busy. It was disabled, which is backwards:
+            the longer the work runs the more someone wants out, and AI drafting
+            runs 60 to 90 seconds behind a button reading "Working…" with every
+            control dead. That is not a confirmation dialog, it is a trap.
+
+            It closes the dialog; it does not claim to abort the work. Anything
+            already in flight finishes on its own, and a caller that must ignore
+            a late result tracks that itself — which `draft-with-ai` does.
+          */}
+          <Button type="button" onClick={onClose}>
             {cancelLabel}
           </Button>
           <Button type="button" variant={tone === "danger" ? "destructive" : "accent"} disabled={busy} onClick={onConfirm}>

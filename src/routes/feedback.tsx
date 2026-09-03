@@ -115,7 +115,7 @@ function FeedbackPage() {
           <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
             <SelectableCard asChild selected={kind === "bug"} className="flex cursor-pointer gap-3 p-4">
               <label>
-              <input type="radio" name="kind" className="sr-only" checked={kind === "bug"} onChange={() => setKind("bug")} />
+              <input type="radio" name="kind" value="bug" className="sr-only" checked={kind === "bug"} onChange={() => setKind("bug")} />
               <Bug size={ICON.lead} className="text-accent" />
               <span>
                 <strong className="block">Report a bug</strong>
@@ -125,7 +125,7 @@ function FeedbackPage() {
             </SelectableCard>
             <SelectableCard asChild selected={kind === "message"} className="flex cursor-pointer gap-3 p-4">
               <label>
-              <input type="radio" name="kind" className="sr-only" checked={kind === "message"} onChange={() => setKind("message")} />
+              <input type="radio" name="kind" value="message" className="sr-only" checked={kind === "message"} onChange={() => setKind("message")} />
               <MessageSquareText size={ICON.lead} className="text-accent" />
               <span>
                 <strong className="block">Send a message</strong>

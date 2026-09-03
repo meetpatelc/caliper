@@ -47,6 +47,22 @@ export function DraftWithAI({ onAccept }: { onAccept: (draft: AssistedDraft) => 
     };
   }, []);
 
+  /*
+   * Which attempt is current.
+   *
+   * Cancel now works while a draft is running, so a request can outlive the
+   * dialog that asked for it. Without this, closing mid-draft and reopening
+   * would show the abandoned answer arriving as though it were the new one —
+   * and a failure toast would appear over a dialog nobody has open. Bumped on
+   * every start and on every close; a response whose ticket is stale is dropped
+   * on the floor, which is what cancelling means here.
+   *
+   * Declared above the `available` early return: a hook after a conditional
+   * return runs on some renders and not others, which is the one thing the
+   * rules of hooks exist to stop.
+   */
+  const attempt = useRef(0);
+
   if (!available) return null;
 
   const submit = async () => {
@@ -54,19 +70,22 @@ export function DraftWithAI({ onAccept }: { onAccept: (draft: AssistedDraft) => 
       toast.error("Describe the calculation in a sentence or two first.");
       return;
     }
+    const ticket = ++attempt.current;
     setPending(true);
     setResult(null);
     try {
       const outcome = await draftCalculatorFromBrief({ data: { brief: brief.trim() } });
+      if (ticket !== attempt.current) return;
       if (!outcome.ok) {
         toast.error(outcome.reason);
         return;
       }
       setResult({ draft: outcome.draft, preview: outcome.preview });
     } catch {
+      if (ticket !== attempt.current) return;
       toast.error("Could not reach the drafting service.");
     } finally {
-      setPending(false);
+      if (ticket === attempt.current) setPending(false);
     }
   };
 
@@ -91,6 +110,9 @@ export function DraftWithAI({ onAccept }: { onAccept: (draft: AssistedDraft) => 
       <ConfirmDialog
         open={open}
         onClose={() => {
+          // Abandons any draft still in flight: see the note on `attempt`.
+          attempt.current += 1;
+          setPending(false);
           setOpen(false);
           setResult(null);
         }}

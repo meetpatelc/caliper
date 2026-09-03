@@ -1560,8 +1560,8 @@ export const tools: ToolDefinition[] = [
     assumptions: ["Equal angular spacing", "Nominal PCD geometry", "Cartesian XY coordinates", "No tolerance interpretation"],
     outputLabel: "Pitch radius · angular pitch · chord · nominal coordinates",
     status: "ready",
-    sourceLabel: "Camcut bolt-circle reference",
-    sourceUrl: "https://www.camcut-group.com/en-us/support/machine-workshop-glossary/bolt-circle/",
+    sourceLabel: "Elementary geometry — circular hole pattern",
+    sourceUrl: "",
     contract: { formulaVersion: "2.0.0", domain: "mathematics", safetyTier: "A", validation: "source-reviewed", prerequisites: ["pitch circle diameter", "equal hole count", "start angle"], sourceIds: ["camcut-bolt-circle", "nist-si-units"] },
   },
   {
