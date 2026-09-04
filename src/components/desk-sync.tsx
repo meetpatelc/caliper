@@ -152,8 +152,12 @@ async function joinAccountDesk() {
       // the drafts on screen a moment ago are simply gone. They are still on
       // the device — `consumeClaimedUnsignedDesk` runs only on the claim path —
       // so say so rather than leaving the person to guess.
-      toast("This device had its own work, kept separate from the account.", {
-        description: "The account already had work, so the two were not merged. Sign out to see the device copy again.",
+      // "This device had its own work, kept separate from the account" is
+      // accurate and reads like a system log. The person is looking at a screen
+      // where their drafts just disappeared; the first line should say what
+      // they are looking for, and the last should say how to get it back.
+      toast("This browser also has its own saved work.", {
+        description: "It was kept separate rather than merged, because the account already had work of its own. Sign out to see it again.",
         duration: 8000,
       });
     }

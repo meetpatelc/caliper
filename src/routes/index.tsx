@@ -93,7 +93,7 @@ function Home() {
             className="lg:pt-1"
             kicker={PARENT_NAME}
             title="Engineering models you can check."
-            lede="See exactly how a result is calculated. The method, the assumptions it rests on, the source, and the boundary where it stops being valid all stay next to the number."
+            lede="See exactly how a result is calculated. The formula, its assumptions, its source, and where it stops being valid all sit next to the number."
           />
 
         {/*
@@ -111,12 +111,18 @@ function Home() {
           <div className="grid gap-2">
             <p className="text-sm leading-6">
               <span className="font-medium">Library</span>
-              <span className="text-muted"> — finished models, below.</span>
+              <span className="text-muted"> — open a finished model, below.</span>
               </p>
             {[
-              { to: "/studio", label: "Build", note: "write a unit-aware check, method attached." },
-              { to: "/review", label: "Review", note: "evidence checklists and trade studies." },
-              { to: "/workshop", label: "Project", note: "drafts and saved checks." },
+              /*
+                Plain verbs, not house nouns. "Write a unit-aware check, method
+                attached" needed two pieces of this product's dialect before it
+                said anything, and it is the first line a stranger reads. What a
+                person wants to know here is which of the four to click.
+              */
+              { to: "/studio", label: "Build", note: "write your own formula, with the method attached." },
+              { to: "/review", label: "Review", note: "checklists, a trade study, and an FMEA." },
+              { to: "/workshop", label: "Project", note: "your drafts and saved results." },
             ].map((room) => (
               <p key={room.label} className="text-sm leading-6">
                 <Link to={room.to} className="link-accent font-medium">

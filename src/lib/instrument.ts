@@ -14,5 +14,12 @@ export const THEME_KEY = THEME_STORAGE_KEY.name;
 // eslint-disable-next-line no-restricted-syntax -- see above; pinned by theme-color.test.mjs
 export const THEME_COLOR = { light: "#e8eaed", dark: "#14161a" } as const;
 export const SEARCH_EVENT = "instrument:open-search";
+/*
+ * "The model is in the frame" asked the reader to decode a metaphor before the
+ * sentence paid out, and this string is the meta description — the one line
+ * that has to work for someone who has never seen the site. "You can check" is
+ * also the more honest claim: the site does not ask for trust, it shows the
+ * working and invites you to disagree with it.
+ */
 export const APP_DESCRIPTION =
-  "Instrument is a calculator you can trust because the model is in the frame. Open a finished one, or write your own. Sign in and Project follows the account.";
+  "Instrument is a calculator you can check: the formula sits next to the number. Open a finished model, or write your own. Sign in and Project follows the account.";

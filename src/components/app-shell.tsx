@@ -239,7 +239,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <SideRail />
       <footer className="no-print border-t border-border py-6 text-sm text-muted">
         <div className="page-frame flex flex-wrap items-center justify-between gap-3">
-          <p>{PARENT_NAME} · not a design stamp</p>
+          {/* A sentence, not a tagline. The middle dot made the most important
+              disclaimer on the site read as a strapline, and "stamp" only lands
+              as a joke for someone who already knows what a design stamp is. */}
+          <p>{PARENT_NAME} is not a design stamp.</p>
           <div className="flex flex-wrap gap-4">
             {PAGE_NAV.map((item) => (
               <Link key={item.href} to={item.href} className="link-quiet">

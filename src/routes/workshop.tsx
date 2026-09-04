@@ -195,7 +195,10 @@ function ProjectPage() {
 
       <section className="mt-12" id="checks">
         <h2 className="section-title">Saved checks</h2>
-        <p className="mt-2 text-sm text-muted">Optional folders. The red one is the folder in use, not a trial of the product.</p>
+        {/* The second half used to read "not a trial of the product", which
+            answered a question nobody had asked and put the idea of a trial in
+            their head. All the line has to do is explain the red. */}
+        <p className="mt-2 text-sm text-muted">Optional. Red marks the folder you are in.</p>
         <form
           className="mt-4 flex flex-wrap items-end gap-2"
           onSubmit={(event) => {

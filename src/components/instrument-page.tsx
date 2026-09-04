@@ -71,8 +71,14 @@ export function InstrumentMethod({
   return (
     <section className="no-print mt-12 border-t border-border pt-6" aria-labelledby="method-title">
       <p className="eyebrow">Method</p>
+      {/*
+        The heading names the three blocks below it, in their order. It read
+        "Equation, when, and don't", which is the same three words with the
+        joins removed — a rhythm a reader has to solve before it tells them
+        anything, sitting above the section that carries the model's limits.
+      */}
       <h2 id="method-title" className="section-title-sm mt-1">
-        Equation, when, and don’t
+        Formula, when it applies, and when it does not
       </h2>
       {description ? <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p> : null}
       <GoverningRelation formula={formula} className="mt-4 text-sm" />

@@ -70,7 +70,11 @@ export const axialDocument: InstrumentDocument = {
   formula: "σ = F / A · ε = σ / E · ΔL = FL / AE",
   purpose: "First-pass average axial stress, elastic strain, and ideal length change in a prismatic member.",
   assumptions: ["Uniform cross-section", "Axial loading", "Linear-elastic response"],
-  boundary: "Not a local peak, not a connection, not a code check.",
+  // "Local peak" is this repo's phrase for the thing every engineer already
+  // calls a stress concentration, and it sat in the line that tells a reader
+  // where the model stops being true — the one place a house word costs the
+  // most. Same for "connection", which is a joint.
+  boundary: "Not a stress concentration, not a joint, not a code check.",
   interpretation: "Compare with an allowable only after applying the project factor of safety and section class.",
   sourceLabel: "Boston University mechanics notes",
   sourceUrl: "https://www.bu.edu/moss/mechanics-of-materials-axial-load/",

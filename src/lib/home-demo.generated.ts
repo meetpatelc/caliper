@@ -71,7 +71,7 @@ export const homeDemo: HomeDemo = {
     "Axial loading",
     "Linear-elastic response"
   ],
-  "boundary": "Not a local peak, not a connection, not a code check.",
+  "boundary": "Not a stress concentration, not a joint, not a code check.",
   "sourceLabel": "Boston University mechanics notes",
   "sourceUrl": "https://www.bu.edu/moss/mechanics-of-materials-axial-load/"
 };

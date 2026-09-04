@@ -34,12 +34,12 @@ function AboutPage() {
     <div className="page-wrap max-w-3xl">
       <PageHeader
         kicker={`About ${PARENT_NAME}`}
-        title="One product. Four rooms."
+        title="One product. Four parts."
         ledeClassName="max-w-none"
         lede={
           <>
             <p>
-              {PARENT_NAME} is a calculator you can trust because the model is in the frame.{" "}
+              {PARENT_NAME} is a calculator you can check: the formula sits next to the number.{" "}
               <Link to="/" className="link-accent">
                 Library
               </Link>{" "}
