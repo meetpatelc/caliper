@@ -22,11 +22,23 @@ import type { EngineeringDomain } from "@/lib/platform";
 
 type LibrarySearch = { domain?: string };
 
+/*
+ * The homepage claim, written once.
+ *
+ * It was a literal in the meta description and the same literal again in the
+ * JSON-LD, with the visible lede below saying the same thing in a third set of
+ * words -- so the sentence a search result shows, the sentence a shared link
+ * shows, and the sentence on the page had already drifted apart. This is the
+ * one a stranger reads first, in a context where nothing else explains it.
+ */
+const HOME_CLAIM =
+  "See exactly how a result is calculated — the formula, its assumptions, its source, and where it stops being valid all sit next to the number.";
+
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: seoMeta({ title: "Instrument · Engineering models you can check", description: "See exactly how a result is calculated — the method, assumptions, sources and limits stay visible next to the number.", path: "/" }),
+    meta: seoMeta({ title: "Instrument · Engineering models you can check", description: HOME_CLAIM, path: "/" }),
     links: seoLinks("/"),
-    scripts: jsonLdScript(siteJsonLd("See exactly how a result is calculated — the method, assumptions, sources and limits stay visible next to the number.")),
+    scripts: jsonLdScript(siteJsonLd(HOME_CLAIM)),
   }),
   validateSearch: (search: Record<string, unknown>): LibrarySearch => ({
     domain: typeof search.domain === "string" ? search.domain : undefined,
@@ -93,7 +105,7 @@ function Home() {
             className="lg:pt-1"
             kicker={PARENT_NAME}
             title="Engineering models you can check."
-            lede="See exactly how a result is calculated. The formula, its assumptions, its source, and where it stops being valid all sit next to the number."
+            lede={HOME_CLAIM}
           />
 
         {/*
