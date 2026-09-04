@@ -51,18 +51,33 @@ function pgliteBootstrapPlugin(): Plugin {
   };
 }
 
-// `0.0.0.0:8080` is the live-preview contract — don't change host/port.
-// The dev server starts once `src/router.tsx` and `src/routes/` exist — see
-// AGENTS.md § "First scaffold".
+/*
+ * 8080 for dev and 8081 for preview, unless `PORT` says otherwise.
+ *
+ * Those two numbers are a convention rather than a requirement: `qa:ui`,
+ * `qa:live` and `check:auth` each take a base URL as an argument and only fall
+ * back to 8080, so nothing breaks when the server lands elsewhere. Nothing here
+ * needs a fixed port for an OAuth callback, a webhook, or a CORS allowlist.
+ *
+ * `PORT` exists because these were pinned with `strictPort`, so a second
+ * project already holding 8080 could not be worked around — the launcher
+ * assigns a free port and Vite reads neither `--port` overrides nor `PORT` on
+ * its own. Defaults unchanged, so every existing habit still works.
+ *
+ * `strictPort` stays: with a port chosen deliberately, a silent drift to some
+ * other number is worse than a refusal to start.
+ */
+const port = (fallback: number) => Number(process.env.PORT) || fallback;
+
 export default defineConfig(({ command, isPreview }) => ({
   server: {
     host: "0.0.0.0",
-    port: 8080,
+    port: port(8080),
     strictPort: true,
   },
   preview: {
     host: "127.0.0.1",
-    port: 8081,
+    port: port(8081),
     strictPort: true,
   },
   resolve: { tsconfigPaths: true },

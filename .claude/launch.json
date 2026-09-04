@@ -4,9 +4,9 @@
     {
       "name": "instrument",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "preview", "--", "--port", "8080", "--strictPort"],
-      "port": 8080,
-      "autoPort": false
+      "runtimeArgs": ["run", "dev"],
+      "port": 8090,
+      "autoPort": true
     }
   ]
 }
